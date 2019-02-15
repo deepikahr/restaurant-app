@@ -206,53 +206,63 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
             Divider(),
             userInfo['loyaltyInfo']['minLoyalityPoints'] <
                     userInfo['totalLoyaltyPoints']
-                ? Row(
-                    children: <Widget>[
-                      Checkbox(
-                        value: isLoyaltyApplied,
-                        onChanged: (bool value) {
-                          double points = 0.0;
-                          widget.cart['grandTotal'] =
-                              widget.cart['payableAmount'];
-                          if (value) {
-                            if (userInfo['totalLoyaltyPoints'] >=
-                                widget.cart['grandTotal']) {
-                              points = userInfo['totalLoyaltyPoints'] -
-                                  widget.cart['grandTotal'];
-                              widget.cart['grandTotal'] = 0.0;
-                            } else {
+                ? userInfo['loyaltyInfo']['minOrdLoyality'] <
+                        widget.cart['grandTotal']
+                    ? Row(
+                        children: <Widget>[
+                          Checkbox(
+                            value: isLoyaltyApplied,
+                            onChanged: (bool value) {
+                              double points = 0.0;
                               widget.cart['grandTotal'] =
-                                  widget.cart['grandTotal'] -
-                                      userInfo['totalLoyaltyPoints'];
-                              points = 0.0;
-                            }
-                          } else {
-                            points = double.parse(
-                                userInfo['totalLoyaltyPoints'].toString());
-                          }
-                          setState(() {
-                            remainingLoyaltyPoint = points;
-                            isLoyaltyApplied = value;
-                          });
-                        },
-                        activeColor: PRIMARY,
-                      ),
-                      Text(
-                        'Use Loyalty Points',
-                        style: hintStyleSmallDarkLightOSR(),
-                      ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 15.0),
-                          child: new Text(
-                            remainingLoyaltyPoint.toStringAsFixed(2),
-                            textAlign: TextAlign.end,
-                            style: hintStyleTitleBlueOSR(),
+                                  widget.cart['payableAmount'];
+                              if (value) {
+                                if (userInfo['totalLoyaltyPoints'] >=
+                                    widget.cart['grandTotal']) {
+                                  points = userInfo['totalLoyaltyPoints'] -
+                                      widget.cart['grandTotal'];
+                                  widget.cart['grandTotal'] = 0.0;
+                                } else {
+                                  widget.cart['grandTotal'] =
+                                      widget.cart['grandTotal'] -
+                                          userInfo['totalLoyaltyPoints'];
+                                  points = 0.0;
+                                }
+                              } else {
+                                points = double.parse(
+                                    userInfo['totalLoyaltyPoints'].toString());
+                              }
+                              setState(() {
+                                remainingLoyaltyPoint = points;
+                                isLoyaltyApplied = value;
+                              });
+                            },
+                            activeColor: PRIMARY,
                           ),
-                        ),
-                      ),
-                    ],
-                  )
+                          Text(
+                            'Use Loyalty Points',
+                            style: hintStyleSmallDarkLightOSR(),
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 15.0),
+                              child: new Text(
+                                remainingLoyaltyPoint.toStringAsFixed(2),
+                                textAlign: TextAlign.end,
+                                style: hintStyleTitleBlueOSR(),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Container(
+                        child: Text('Your order amount should be more than \$' +
+                            userInfo['loyaltyInfo']['minOrdLoyality']
+                                .toString() +
+                            ' You have ' +
+                            userInfo['totalLoyaltyPoints'].toStringAsFixed(2) +
+                            ' points on your account! Place orders to get more.'),
+                      )
                 : Container(
                     child: Text('You dont have enough loyalty points. Minimum ' +
                         userInfo['loyaltyInfo']['minLoyalityPoints']
