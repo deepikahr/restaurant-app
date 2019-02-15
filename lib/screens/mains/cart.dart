@@ -22,7 +22,7 @@ class _CartPageState extends State<CartPage> {
   Map<String, dynamic> cartItems = {};
   int productsLength = 0;
   Map<String, dynamic> selectedCoupon;
-  double couponDeduction;
+  double couponDeduction = 0.0;
 
   @override
   void initState() {
@@ -179,7 +179,12 @@ class _CartPageState extends State<CartPage> {
                       selectedCoupon != null ? Divider() : Container(),
                       selectedCoupon != null
                           ? _buildPriceTagLine(
-                              'Coupon Deduction', couponDeduction)
+                              'Coupon (' +
+                                  selectedCoupon['couponName'] +
+                                  ' - ' +
+                                  selectedCoupon['offPrecentage'].toString() +
+                                  '% off)',
+                              couponDeduction)
                           : Container(),
                       Divider(),
                       _buildPriceTagLine('Sub Total', subTotal),
@@ -297,6 +302,7 @@ class _CartPageState extends State<CartPage> {
         children: <Widget>[
           new Text(
             title,
+            overflow: TextOverflow.ellipsis,
             style: titleBlackLightOSB(),
           ),
           new Text(
