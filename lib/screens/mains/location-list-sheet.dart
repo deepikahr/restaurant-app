@@ -185,14 +185,16 @@ class LocationListSheet extends StatelessWidget {
   }
 
   static Widget buildOutletInfo(int locationCount) {
-    return Padding(
-      padding: EdgeInsets.all(4.0),
-      child: Text(
-        locationCount.toString() + ' outlets delivering to you',
-        style: subBoldTitle(),
-        textAlign: TextAlign.left,
-      ),
-    );
+    return locationCount != null
+        ? Padding(
+            padding: EdgeInsets.all(4.0),
+            child: Text(
+              locationCount.toString() + ' outlets delivering to you',
+              style: subBoldTitle(),
+              textAlign: TextAlign.left,
+            ),
+          )
+        : Container();
   }
 
   static Widget buildViewMoreButton(BuildContext context,

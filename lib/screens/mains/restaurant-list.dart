@@ -49,7 +49,7 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
         backgroundColor: PRIMARY,
         elevation: 0.0,
         title: Text(
-          widget.title,
+          widget.title + ' Restaurants',
           style: titleBoldWhiteOSS(),
         ),
         centerTitle: true,

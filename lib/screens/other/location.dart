@@ -79,7 +79,7 @@ class _LocationPageState extends State<LocationPage> {
           children: <Widget>[
             // searchBar,
             isMapAvailable ? _buildMapView() : Container(),
-            // _buildRecentView(),
+            _buildRecentView(),
           ],
         ),
       ),

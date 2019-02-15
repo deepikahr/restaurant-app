@@ -14,8 +14,8 @@ import '../mains/product-list.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:location/location.dart';
 import '../../services/common.dart';
-import 'package:flutter/services.dart';
 import 'dart:async';
+import '../../services/profile-service.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -40,6 +40,7 @@ class HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    checkAndValidateToken();
     _showBottomSheetCallback = _showBottomSheet;
     super.initState();
   }
@@ -48,11 +49,25 @@ class HomePageState extends State<HomePage> {
   String address;
   Location _location = Location();
   Map<String, dynamic> position;
+  String itemCount = '4';
+  bool isFirstStart = true;
 
   @override
   void dispose() {
     super.dispose();
     if (_locationStream != null) _locationStream.cancel();
+  }
+
+  void checkAndValidateToken() {
+    Common.getToken().then((onValue) {
+      if (onValue != null) {
+        ProfileService.validateToken().then((value) {
+          if (!value) {
+            Common.removeToken();
+          }
+        });
+      }
+    });
   }
 
   getNearByRestaurants() async {
@@ -79,19 +94,23 @@ class HomePageState extends State<HomePage> {
         await Common.savePositionInfo(position).then((onValue) {});
       }
     });
-    await Future.delayed(Duration(milliseconds: 3000), () {});
+    if (isFirstStart) {
+      await Future.delayed(Duration(milliseconds: 4000), () {});
+      isFirstStart = false;
+    }
     if (position != null) {
       return await MainService.getNearByRestaurants(
-          position['lat'], position['long']);
+          position['lat'], position['long'],
+          count: itemCount);
     }
   }
 
   getTopRatedRestaurants() async {
-    return await MainService.getTopRatedRestaurants();
+    return await MainService.getTopRatedRestaurants(count: itemCount);
   }
 
   getNewlyArrivedRestaurants() async {
-    return await MainService.getNewlyArrivedRestaurants();
+    return await MainService.getNewlyArrivedRestaurants(count: itemCount);
   }
 
   getAdvertisementList() async {
@@ -130,9 +149,9 @@ class HomePageState extends State<HomePage> {
               physics: ScrollPhysics(),
               shrinkWrap: true,
               children: <Widget>[
-                _buildGridHeader('Locations Near You'),
+                _buildGridHeader('Restaurants Near You'),
                 _buildGetNearByLocationLoader(),
-                _buildViewAllButton('Near By Locations'),
+                _buildViewAllButton('Near By'),
               ],
             ),
           ),
@@ -199,7 +218,9 @@ class HomePageState extends State<HomePage> {
               shrinkWrap: true,
               gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2),
-              itemCount: 4,
+              itemCount: data.length < int.parse(itemCount)
+                  ? data.length
+                  : int.parse(itemCount),
               padding: const EdgeInsets.all(0.0),
               itemBuilder: (BuildContext context, int index) {
                 return InkWell(
@@ -228,7 +249,9 @@ class HomePageState extends State<HomePage> {
               shrinkWrap: true,
               gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2),
-              itemCount: 4,
+              itemCount: data.length < int.parse(itemCount)
+                  ? data.length
+                  : int.parse(itemCount),
               padding: const EdgeInsets.all(0.0),
               itemBuilder: (BuildContext context, int index) {
                 return InkWell(
@@ -257,7 +280,9 @@ class HomePageState extends State<HomePage> {
               shrinkWrap: true,
               gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2),
-              itemCount: 4,
+              itemCount: data.length < int.parse(itemCount)
+                  ? data.length
+                  : int.parse(itemCount),
               padding: const EdgeInsets.all(0.0),
               itemBuilder: (BuildContext context, int index) {
                 return InkWell(
@@ -418,51 +443,52 @@ class HomePageState extends State<HomePage> {
                 height: 200.0,
               ),
               new Positioned(
-                  bottom: 0.0,
-                  left: 0.0,
-                  right: 0.0,
+                bottom: 0.0,
+                left: 0.0,
+                right: 0.0,
+                child: new Container(
+                  decoration: new BoxDecoration(
+                    gradient: new LinearGradient(
+                      colors: [
+                        Color.fromARGB(200, 0, 0, 0),
+                        Color.fromARGB(0, 0, 0, 0)
+                      ],
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                    ),
+                  ),
+                  padding:
+                      EdgeInsets.symmetric(vertical: 0.0, horizontal: 00.0),
                   child: new Container(
-                    decoration: new BoxDecoration(
-                      gradient: new LinearGradient(
-                        colors: [
-                          Color.fromARGB(200, 0, 0, 0),
-                          Color.fromARGB(0, 0, 0, 0)
-                        ],
-                        begin: Alignment.bottomCenter,
-                        end: Alignment.topCenter,
-                      ),
+                    color: Colors.black26,
+                    height: 200.0,
+                    padding: new EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0),
+                    alignment: FractionalOffset.centerLeft,
+                    child: new Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        new Text(
+                          list[index]['restaurantName'],
+                          style: hintStyleGreyLightOSL(),
+                        ),
+                        new Padding(
+                          padding:
+                              new EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 15.0),
+                          child: new Text(
+                            list[index]['locationName'],
+                            style: hintStyleSmallYellowLightOSR(),
+                          ),
+                        ),
+                        new Text(
+                          list[index]['message'],
+                          style: category(),
+                        ),
+                      ],
                     ),
-                    padding:
-                        EdgeInsets.symmetric(vertical: 0.0, horizontal: 00.0),
-                    child: new Container(
-                      color: Colors.black26,
-                      height: 200.0,
-                      padding: new EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0),
-                      alignment: FractionalOffset.centerLeft,
-                      child: new Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          new Text(
-                            list[index]['restaurantName'],
-                            style: hintStyleGreyLightOSL(),
-                          ),
-                          new Padding(
-                            padding:
-                                new EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 15.0),
-                            child: new Text(
-                              list[index]['locationName'],
-                              style: hintStyleSmallYellowLightOSR(),
-                            ),
-                          ),
-                          new Text(
-                            list[index]['message'],
-                            style: category(),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )),
+                  ),
+                ),
+              ),
             ],
           ),
         );
@@ -528,7 +554,7 @@ class HomePageState extends State<HomePage> {
       padding: EdgeInsets.all(6.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Column(
             children: <Widget>[
@@ -536,10 +562,12 @@ class HomePageState extends State<HomePage> {
                 restaurantName,
                 style: titleStyle(),
               ),
-              Text(
-                locationCounter.toString() + ' Branches',
-                style: subBoldTitle(),
-              ),
+              locationCounter != null
+                  ? Text(
+                      locationCounter.toString() + ' Branches',
+                      style: subBoldTitle(),
+                    )
+                  : Container(),
             ],
           ),
           rating > 0
