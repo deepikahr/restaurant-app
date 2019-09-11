@@ -16,9 +16,30 @@ class _LocationPageState extends State<LocationPage> {
   StreamSubscription<Map<String, double>> _locationStream;
   String address;
   Location _location = Location();
+  final Set<Marker> markers = {};
+  StreamSubscription<LocationData> _locationSubscription;
   String error;
   Map<String, dynamic> position;
   bool isMapAvailable = false;
+
+  GoogleMapController myController;
+  LocationData _startLocation;
+  LocationData _currentLocation;
+
+  Location _locationService = new Location();
+  bool _permission = false;
+
+  bool currentWidget = true;
+
+  Completer<GoogleMapController> _controller = Completer();
+  static final CameraPosition _initialCamera = CameraPosition(
+    target: LatLng(0, 0),
+    zoom: 4,
+  );
+
+  CameraPosition _currentCameraPosition;
+
+  GoogleMap googleMap;
 
   @override
   void initState() {
@@ -32,11 +53,12 @@ class _LocationPageState extends State<LocationPage> {
   }
 
   initPlatformState() async {
-    _locationStream = _location
+    _locationSubscription = _locationService
         .onLocationChanged()
-        .listen((Map<String, double> result) async {
-      Coordinates coordinates =
-          Coordinates(result['latitude'], result['longitude']);
+        .listen((LocationData result) async {
+      _currentCameraPosition = CameraPosition(
+          target: LatLng(result.latitude, result.longitude), zoom: 16);
+      Coordinates coordinates = Coordinates(result.latitude, result.longitude);
       List<Address> addresses;
       try {
         addresses =
@@ -47,8 +69,8 @@ class _LocationPageState extends State<LocationPage> {
       if (addresses != null && mounted) {
         setState(() {
           position = {
-            'lat': result['latitude'],
-            'long': result['longitude'],
+            'lat': result.latitude,
+            'long': result.longitude,
             'name': addresses.first.addressLine
           };
           isMapAvailable = true;
@@ -91,23 +113,55 @@ class _LocationPageState extends State<LocationPage> {
       height: screenHeight(context) * 0.3,
       width: screenWidth(context),
       child: GoogleMap(
-        mapType: MapType.none,
-        scrollGesturesEnabled: false,
-        onMapCreated: (GoogleMapController controller) {
-          controller.addMarker(
-            MarkerOptions(
-              icon: BitmapDescriptor.fromAsset(
-                "lib/assets/icon/marker.png",
-              ),
-              position: LatLng(12.916674, 77.5900977),
-            ),
-          );
+        onMapCreated: (controller) {
+          setState(() {
+            myController = controller;
+          });
+          // print(widget.deliveryBoyLatLong);
+          // markers.add(Marker(
+          //     // icon: BitmapDescriptor.fromAsset(
+          //     //   'assets/shop.png',
+          //     // ),
+          //     markerId: MarkerId(LatLng(
+          //             widget.deliveryBoyLatLong['latitude'],
+          //             widget.deliveryBoyLatLong['longitude'])
+          //         .toString()),
+          //     position: LatLng(widget.deliveryBoyLatLong['latitude'],
+          //         widget.deliveryBoyLatLong['longitude'])));
+          // print(widget.deliveryBoyLatLong);
+          markers.add(Marker(
+              // icon: BitmapDescriptor.fromAsset(
+              //   'assets/shop.png',
+              // ),
+              markerId: MarkerId(LatLng(12.916674, 77.5900977).toString()),
+              position: LatLng(12.916674, 77.5900977)));
         },
         initialCameraPosition: CameraPosition(
           target: LatLng(12.916674, 77.5900977),
-          zoom: 6,
+          zoom: 11.0,
         ),
+        mapType: MapType.none,
+        markers: markers,
       ),
+
+      // child: GoogleMap(
+      //   mapType: MapType.none,
+      //   scrollGesturesEnabled: false,
+      //   onMapCreated: (GoogleMapController controller) {
+      //     controller.addMarker(
+      //       MarkerOptions(
+      //         icon: BitmapDescriptor.fromAsset(
+      //           "lib/assets/icon/marker.png",
+      //         ),
+      //         position: LatLng(12.916674, 77.5900977),
+      //       ),
+      //     );
+      //   },
+      //   initialCameraPosition: CameraPosition(
+      //     target: LatLng(12.916674, 77.5900977),
+      //     zoom: 6,
+      //   ),
+      // ),
     );
   }
 

@@ -15,20 +15,23 @@ dependencies:
   shared_preferences: ^0.4.3
   async_loader: ^0.1.2
   flutter_swiper: ^1.1.4
-  google_maps_flutter:
+  google_maps_flutter: ^0.5.21
   # flutter_google_places: 
-  location: ^1.4.1
-  geocoder: ^0.1.2
-  image_picker: 0.4.12+1
+  location: 2.3.5 
+  geocoder: 0.2.1
+  image_picker: ^0.6.0+8
   # stripe_payment: ^0.0.7
-  onesignal: ^1.0.5
-  razorpay_plugin: ^0.2.1
-  intl: ^0.15.7
+  onesignal: ^1.1.0
+  razorpay_plugin: ^0.2.9
+  intl: ^0.16.0
+
+
+ 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_stetho: ^0.2.2
+  # flutter_stetho: ^0.2.2
 
 flutter:
    uses-material-design: true

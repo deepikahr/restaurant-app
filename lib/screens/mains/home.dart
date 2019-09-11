@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'drawer.dart';
 import 'package:async_loader/async_loader.dart';
 import '../../styles/styles.dart';
@@ -37,7 +38,7 @@ class HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   VoidCallback _showBottomSheetCallback;
   Map<String, dynamic> restaurantInfo;
-
+  int nearByLength;
   @override
   void initState() {
     checkAndValidateToken();
@@ -45,12 +46,14 @@ class HomePageState extends State<HomePage> {
     super.initState();
   }
 
-  StreamSubscription<Map<String, double>> _locationStream;
+  StreamSubscription<LocationData> _locationStream;
   String address;
   Location _location = Location();
   Map<String, dynamic> position;
   String itemCount = '4';
   bool isFirstStart = true;
+  Map<String, dynamic> tableInfo;
+  String barcodeError;
 
   @override
   void dispose() {
@@ -71,11 +74,9 @@ class HomePageState extends State<HomePage> {
   }
 
   getNearByRestaurants() async {
-    _locationStream = _location
-        .onLocationChanged()
-        .listen((Map<String, double> result) async {
-      Coordinates coordinates =
-          Coordinates(result['latitude'], result['longitude']);
+    _locationStream =
+        _location.onLocationChanged().listen((LocationData result) async {
+      Coordinates coordinates = Coordinates(result.latitude, result.longitude);
       List<Address> addresses;
       try {
         addresses =
@@ -86,8 +87,8 @@ class HomePageState extends State<HomePage> {
       if (addresses != null && mounted) {
         setState(() {
           position = {
-            'lat': result['latitude'],
-            'long': result['longitude'],
+            'lat': result.latitude,
+            'long': result.longitude,
             'name': addresses.first.addressLine
           };
         });
@@ -95,7 +96,7 @@ class HomePageState extends State<HomePage> {
       }
     });
     if (isFirstStart) {
-      await Future.delayed(Duration(milliseconds: 4000), () {});
+      await Future.delayed(Duration(milliseconds: 5000), () {});
       isFirstStart = false;
     }
     if (position != null) {
@@ -104,6 +105,44 @@ class HomePageState extends State<HomePage> {
           count: itemCount);
     }
   }
+
+  // Future <Null>getNearByRestaurants() async {
+  //   _locationSubscription = _locationService
+  //       .onLocationChanged()
+  //       .listen((Map<String, dynamic> result) async {
+  //     print(result['latitude']);
+  //     _currentCameraPosition = CameraPosition(
+  //         target: LatLng(result['latitude'], result['longitude']), zoom: 16);
+  //     Coordinates coordinates =
+  //         Coordinates(result['latitude'], result['longitude']);
+  //     List<Address> addresses;
+  //     try {
+  //       addresses =
+  //           await Geocoder.local.findAddressesFromCoordinates(coordinates);
+  //     } catch (e) {
+  //       print(e);
+  //     }
+  //     if (addresses != null && mounted) {
+  //       setState(() {
+  //         position = {
+  //           'lat': result['latitude'],
+  //           'long': result['longitude'],
+  //           'name': addresses.first.addressLine
+  //         };
+  //       });
+  //       await Common.savePositionInfo(position).then((onValue) {});
+  //     }
+  //   });
+  //   if (isFirstStart) {
+  //     await Future.delayed(Duration(milliseconds: 4000), () {});
+  //     isFirstStart = false;
+  //   }
+  //   if (position != null) {
+  //     return await MainService.getNearByRestaurants(
+  //         position['lat'], position['long'],
+  //         count: itemCount);
+  //   }
+  // }
 
   getTopRatedRestaurants() async {
     return await MainService.getTopRatedRestaurants(count: itemCount);

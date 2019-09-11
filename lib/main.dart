@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import './styles/styles.dart';
 import './services/constant.dart';
 import 'screens/mains/home.dart';
-import 'package:flutter_stetho/flutter_stetho.dart';
+// import 'package:flutter_stetho/flutter_stetho.dart';
 import 'package:onesignal/onesignal.dart';
 
 void main() {
-  Stetho.initialize();
+  // Stetho.initialize();
   runApp(EntryPage());
 }
 
