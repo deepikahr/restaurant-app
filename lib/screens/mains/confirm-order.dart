@@ -587,7 +587,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
         ));
   }
 
-  Future<void> _showAvailablePincodeAlert(
+  _showAvailablePincodeAlert(
       String restaurant, String zip, List<dynamic> pins) async {
     return showDialog<void>(
       context: context,

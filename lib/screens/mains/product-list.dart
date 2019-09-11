@@ -397,7 +397,7 @@ class _ProductListPageState extends State<ProductListPage> {
   }
 
   Widget _buildProductTile(
-      String imgUrl, String productName, double mrp, double off, double price String info, double topPadding) {
+      String imgUrl, String productName, double mrp, double off, double price, String info, double topPadding) {
     return Column(
       children: <Widget>[
         ListTile(
