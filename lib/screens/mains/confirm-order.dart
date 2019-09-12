@@ -7,6 +7,8 @@ import '../../widgets/no-data.dart';
 import '../../services/profile-service.dart';
 import 'dart:core';
 import '../../services/main-service.dart';
+import 'package:intl/intl.dart';
+// import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 
 class ConfrimOrderPage extends StatefulWidget {
   final Map<String, dynamic> cart, deliveryInfo;
@@ -22,23 +24,34 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
   double remainingLoyaltyPoint = 0.0;
   double usedLoyaltyPoint = 0.0;
   bool isLoyaltyApplied = false;
+  bool isDeliveryAvailable = true;
+  double grandTotal = 0.0;
   double tempGrandTotal = 0.0;
+  bool isFirstTime = true;
+  double deliveryCharge = 0.0;
+  Map<String, dynamic> userInfo;
   final GlobalKey<AsyncLoaderState> _asyncLoaderState =
       GlobalKey<AsyncLoaderState>();
   final GlobalKey<AsyncLoaderState> _asyncLoaderStateAddress =
       GlobalKey<AsyncLoaderState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  // final formats = {
+  //   InputType.both: DateFormat("hh:mma dd/MM/yyyy"),
+  //   InputType.date: DateFormat('yyyy-MM-dd'),
+  //   InputType.time: DateFormat("HH:mma"),
+  // };
+  // InputType inputType = InputType.both;
+
   Future<Map<String, dynamic>> _getUserInfo() async {
-    Map<String, dynamic> userInfo;
     await ProfileService.getUserInfo().then((onValue) {
       userInfo = onValue;
     });
-    tempGrandTotal = widget.cart['grandTotal'];
     await MainService.getLoyaltyInfoByRestaurantId(widget.cart['restaurantID'])
         .then((onValue) {
       userInfo['loyaltyInfo'] = onValue;
-      remainingLoyaltyPoint = userInfo['totalLoyaltyPoints'];
+      remainingLoyaltyPoint =
+          double.parse(userInfo['totalLoyaltyPoints'].toString());
     });
     return userInfo;
   }
@@ -47,8 +60,77 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
     return await ProfileService.getAddressList();
   }
 
+  void _calculateFinalAmount() {
+    if ((widget.deliveryInfo != null) &&
+        (widget.deliveryInfo['isDeliveryAvailable'] != null) &&
+        (widget.deliveryInfo['isDeliveryAvailable'] == false)) {
+      setState(() {
+        isDeliveryAvailable = false;
+        widget.cart['orderType'] = 'Pickup';
+      });
+    } else {
+      setState(() {
+        isDeliveryAvailable = true;
+      });
+    }
+
+    if (isFirstTime) {
+      setState(() {
+        tempGrandTotal = widget.cart['grandTotal'];
+        grandTotal = tempGrandTotal;
+        deliveryCharge = double.parse(widget.cart['deliveryCharge'].toString());
+        isFirstTime = false;
+      });
+    }
+    if (widget.cart['orderType'] == 'Delivery') {
+      setState(() {
+        widget.cart['deliveryCharge'] = deliveryCharge;
+        widget.cart['grandTotal'] = grandTotal;
+        widget.cart['payableAmount'] = grandTotal;
+      });
+    } else if (widget.cart['orderType'] == 'Pickup' ||
+        widget.cart['orderType'] == 'Dine In') {
+      setState(() {
+        if (grandTotal > 0) {
+          widget.cart['grandTotal'] = grandTotal - deliveryCharge;
+        }
+        widget.cart['deliveryCharge'] = 0;
+        widget.cart['payableAmount'] = widget.cart['grandTotal'];
+      });
+    }
+  }
+
+  void _calculateLoyaltyInfo() {
+    grandTotal = tempGrandTotal;
+    double points = 0.0;
+    if (isLoyaltyApplied) {
+      if (userInfo['totalLoyaltyPoints'] >= grandTotal) {
+        points = userInfo['totalLoyaltyPoints'] - grandTotal;
+        grandTotal = 0.0;
+      } else {
+        grandTotal = grandTotal - userInfo['totalLoyaltyPoints'];
+        points = 0.0;
+      }
+      setState(() {
+        usedLoyaltyPoint =
+            double.parse(userInfo['totalLoyaltyPoints'].toString()) - points;
+        remainingLoyaltyPoint = points;
+        grandTotal = grandTotal;
+      });
+    } else {
+      setState(() {
+        usedLoyaltyPoint = 0.0;
+        remainingLoyaltyPoint =
+            double.parse(userInfo['totalLoyaltyPoints'].toString());
+        grandTotal = grandTotal;
+      });
+    }
+    _calculateFinalAmount();
+  }
+
   @override
   Widget build(BuildContext context) {
+    _calculateFinalAmount();
     AsyncLoader _asyncLoader = AsyncLoader(
         key: _asyncLoaderState,
         initState: () async => await _getUserInfo(),
@@ -107,7 +189,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
 
   Widget _buildHeader() {
     return Container(
-      color: Colors.black12,
+      color: Colors.black38,
       padding: EdgeInsets.all(10.0),
       child: new Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -175,6 +257,192 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
     );
   }
 
+  Widget _buildDineInTypeBlock() {
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 10.0,
+        right: 10.0,
+      ),
+      child: Container(
+        color: Colors.white,
+        padding: EdgeInsets.all(10.0),
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.only(left: 10.0, right: 10.0, bottom: 0.0),
+              child: Container(
+                padding:
+                    EdgeInsets.only(top: 10, left: 10, bottom: 0, right: 10),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(9.0), color: PRIMARY),
+                child: Column(
+                  children: <Widget>[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Container(
+                          width: screenWidth(context) * 0.7,
+                          height: 34,
+                          color: PRIMARY,
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    'Dine In',
+                                    textAlign: TextAlign.center,
+                                    // style: hintStyleOSBType(),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 10),
+                                  ),
+                                  Icon(
+                                    Icons.check,
+                                    color: Colors.white,
+                                    size: 15.0,
+                                  ),
+                                ],
+                              ),
+                              Divider(color: Colors.white),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOrderTypeBlock() {
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 10.0,
+        right: 10.0,
+      ),
+      child: Container(
+        color: Colors.white,
+        padding: EdgeInsets.all(10.0),
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.only(left: 10.0, right: 10.0, bottom: 0.0),
+              child: Container(
+                padding:
+                    EdgeInsets.only(top: 10, left: 10, bottom: 0, right: 10),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(9.0), color: PRIMARY),
+                child: Column(
+                  children: <Widget>[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              widget.cart['orderType'] = 'Pickup';
+                            });
+                          },
+                          child: Container(
+                            width: screenWidth(context) * 0.3,
+                            height: 34,
+                            color: PRIMARY,
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      'PICKUP',
+                                      textAlign: TextAlign.center,
+                                      // style: hintStyleOSBType(),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(left: 10),
+                                    ),
+                                    widget.cart['orderType'] == 'Pickup'
+                                        ? Icon(
+                                            Icons.check,
+                                            color: Colors.white,
+                                            size: 15.0,
+                                          )
+                                        : Container(),
+                                  ],
+                                ),
+                                widget.cart['orderType'] == 'Pickup'
+                                    ? Divider(color: Colors.white)
+                                    : Divider(color: Colors.black),
+                              ],
+                            ),
+                          ),
+                        ),
+                        isDeliveryAvailable
+                            ? Container(
+                                color: Colors.white,
+                                height: 25,
+                                width: 3,
+                              )
+                            : Container(),
+                        isDeliveryAvailable
+                            ? InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    widget.cart['orderType'] = 'Delivery';
+                                    widget.cart['pickupDate'] = null;
+                                    widget.cart['pickupTime'] = null;
+                                  });
+                                },
+                                child: Container(
+                                  width: screenWidth(context) * 0.3,
+                                  height: 34,
+                                  color: PRIMARY,
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text(
+                                            'DELIVERY',
+                                            textAlign: TextAlign.center,
+                                            // style: hintStyleOSBType(),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.only(left: 10),
+                                          ),
+                                          widget.cart['orderType'] == 'Delivery'
+                                              ? Icon(
+                                                  Icons.check,
+                                                  color: Colors.white,
+                                                  size: 15.0,
+                                                )
+                                              : Container(),
+                                        ],
+                                      ),
+                                      widget.cart['orderType'] == 'Delivery'
+                                          ? Divider(color: Colors.white)
+                                          : Divider(color: Colors.black),
+                                    ],
+                                  ),
+                                ),
+                              )
+                            : Container(),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildContactBlock(
       String title, String value, Map<String, dynamic> userInfo) {
     return Padding(
@@ -205,82 +473,6 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
               value,
               style: hintLightOSR(),
             ),
-            Divider(),
-            (userInfo['loyaltyInfo']['message'] == null &&
-                    userInfo['loyaltyInfo']['loyalityProgram'])
-                ? userInfo['loyaltyInfo']['minLoyalityPoints'] <
-                        userInfo['totalLoyaltyPoints']
-                    ? userInfo['loyaltyInfo']['minOrdLoyality'] < tempGrandTotal
-                        ? Row(
-                            children: <Widget>[
-                              Checkbox(
-                                value: isLoyaltyApplied,
-                                onChanged: (bool value) {
-                                  double points = 0.0;
-                                  widget.cart['grandTotal'] =
-                                      widget.cart['payableAmount'];
-                                  if (value) {
-                                    if (userInfo['totalLoyaltyPoints'] >=
-                                        widget.cart['grandTotal']) {
-                                      points = userInfo['totalLoyaltyPoints'] -
-                                          widget.cart['grandTotal'];
-                                      widget.cart['grandTotal'] = 0.0;
-                                    } else {
-                                      widget.cart['grandTotal'] =
-                                          widget.cart['grandTotal'] -
-                                              userInfo['totalLoyaltyPoints'];
-                                      points = 0.0;
-                                    }
-                                  } else {
-                                    points = double.parse(
-                                        userInfo['totalLoyaltyPoints']
-                                            .toString());
-                                  }
-                                  setState(() {
-                                    remainingLoyaltyPoint = points;
-                                    isLoyaltyApplied = value;
-                                  });
-                                },
-                                activeColor: PRIMARY,
-                              ),
-                              Text(
-                                'Use Loyalty Points',
-                                style: hintStyleSmallDarkLightOSR(),
-                              ),
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(right: 15.0),
-                                  child: new Text(
-                                    remainingLoyaltyPoint.toStringAsFixed(2),
-                                    textAlign: TextAlign.end,
-                                    style: hintStyleTitleBlueOSR(),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          )
-                        : Container(
-                            child: Text('Your order amount should be more than \$' +
-                                userInfo['loyaltyInfo']['minOrdLoyality']
-                                    .toString() +
-                                ' to use loyalty point. You have ' +
-                                userInfo['totalLoyaltyPoints']
-                                    .toStringAsFixed(2) +
-                                ' points on your account! Place orders to get more.'),
-                          )
-                    : Container(
-                        child: Text(
-                            'You dont have enough loyalty points. Minimum ' +
-                                userInfo['loyaltyInfo']['minLoyalityPoints']
-                                    .toString() +
-                                ' points required to use it, You have only ' +
-                                userInfo['totalLoyaltyPoints']
-                                    .toStringAsFixed(2) +
-                                ' points on your account! Place orders to get more.'),
-                      )
-                : Container(
-                    child: Text('Loyalty is not applicable!'),
-                  ),
           ],
         ),
       ),
@@ -399,7 +591,6 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
 
   Widget _buildProductListBlock(Map<String, dynamic> userInfo) {
     List<dynamic> products = widget.cart['productDetails'];
-    usedLoyaltyPoint = (userInfo['totalLoyaltyPoints'] - remainingLoyaltyPoint);
     return Padding(
       padding: EdgeInsets.only(top: 0.0, left: 10.0, right: 10.0, bottom: 10.0),
       child: Container(
@@ -414,16 +605,19 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
               itemCount: products.length,
               itemBuilder: (BuildContext context, int index) {
                 return Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Flexible(
                           flex: 6,
                           fit: FlexFit.tight,
                           child: new Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: <Widget>[
                               new Text(
                                 products[index]['title'],
@@ -453,6 +647,9 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                         ),
                       ],
                     ),
+                    products[index]['note'] != null
+                        ? Text('Note: ' + products[index]['note'])
+                        : Container(),
                     Divider(),
                   ],
                 );
@@ -476,19 +673,22 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
             ),
             Divider(),
             _buildTotalPriceLine('Sub Total', widget.cart['subTotal']),
-            widget.cart['taxInfo'] != null
-                ? _buildTotalPriceLine(
-                    'Tax ' + widget.cart['taxInfo']['taxName'],
-                    double.parse(widget.cart['taxInfo']['taxRate'].toString()))
-                : Container(height: 0, width: 0),
+            // widget.cart['taxInfo'] != null
+            //     ? _buildTotalPriceLine(
+            //         'Tax ' + widget.cart['taxInfo']['taxName'],
+            //         (double.parse(
+            //                 widget.cart['taxInfo']['taxRate'].toString()) *
+            //             widget.cart['subTotal'] /
+            //             100))
+            //     : Container(height: 0, width: 0),
             _buildTotalPriceLine(
                 'Delivery Charge',
                 widget.cart['deliveryCharge'] == 'Free'
                     ? '0.0'
-                    : widget.cart['deliveryCharge']),
-            _buildTotalPriceLine('Grand Total',
+                    : double.parse(widget.cart['deliveryCharge'].toString())),
+            _buildTotalPriceLine('Total including GST',
                 double.parse(widget.cart['grandTotal'].toString())),
-            _buildTotalPriceLine('Used Loyalty Point', usedLoyaltyPoint),
+            // _buildTotalPriceLine('Used Loyalty Point', usedLoyaltyPoint),
           ],
         ),
       ),
@@ -520,34 +720,47 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
   Widget _buildBottomBar() {
     return RawMaterialButton(
       onPressed: () {
-        if (widget.cart['shippingAddress'] != null &&
-            widget.deliveryInfo != null) {
-          if (widget.deliveryInfo['areaAthority']) {
+        if (widget.cart['orderType'] == 'Pickup') {
+          if (widget.cart['pickupDate'] != null) {
             _buildBottomBarButton();
           } else {
-            if (widget.deliveryInfo['areaCode'] == null ||
-                widget.deliveryInfo['areaCode'][0] == null) {
+            showSnackbar('Please Select Date and Time first for pickup');
+          }
+        } else if (widget.cart['orderType'] == 'Delivery') {
+          if (widget.cart['shippingAddress'] == null) {
+            showSnackbar('Please Select/Add shipping address first');
+          } else {
+            if (widget.deliveryInfo == null ||
+                widget.deliveryInfo['areaAthority']) {
               _buildBottomBarButton();
             } else {
-              bool isPinFound = false;
-              for (int i = 0; i < widget.deliveryInfo['areaCode'].length; i++) {
-                if (widget.deliveryInfo['areaCode'][i]['pinCode'].toString() ==
-                    widget.cart['shippingAddress']['zip'].toString()) {
-                  isPinFound = true;
-                }
-              }
-              if (isPinFound) {
+              if (widget.deliveryInfo['areaCode'] == null ||
+                  widget.deliveryInfo['areaCode'][0] == null) {
                 _buildBottomBarButton();
               } else {
-                _showAvailablePincodeAlert(
-                    widget.cart['restaurant'],
-                    widget.cart['shippingAddress']['zip'].toString(),
-                    widget.deliveryInfo['areaCode']);
+                bool isPinFound = false;
+                for (int i = 0;
+                    i < widget.deliveryInfo['areaCode'].length;
+                    i++) {
+                  if (widget.deliveryInfo['areaCode'][i]['pinCode']
+                          .toString() ==
+                      widget.cart['shippingAddress']['zip'].toString()) {
+                    isPinFound = true;
+                  }
+                }
+                if (isPinFound) {
+                  _buildBottomBarButton();
+                } else {
+                  _showAvailablePincodeAlert(
+                      widget.cart['restaurant'],
+                      widget.cart['shippingAddress']['zip'].toString(),
+                      widget.deliveryInfo['areaCode']);
+                }
               }
             }
           }
         } else {
-          showSnackbar('Please Add address first');
+          showSnackbar('Something went wrong please restart the app.');
         }
       },
       child: new Row(
@@ -587,21 +800,21 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
         ));
   }
 
-  _showAvailablePincodeAlert(
+  Future<void> _showAvailablePincodeAlert(
       String restaurant, String zip, List<dynamic> pins) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Delivery Not availble here!'),
+          title: Text('Delivery Not availble in Your Area!'),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
                 Text(restaurant +
-                    ' does not deliver to ' +
+                    ' does not deliver to your postcode ' +
                     zip +
-                    ' available pincodes are listed here!'),
+                    '. Currently we deliver to the following postcodes :'),
                 Divider(),
                 SingleChildScrollView(
                   child: ListView.builder(

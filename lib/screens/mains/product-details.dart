@@ -4,10 +4,11 @@ import 'cart.dart';
 import '../../services/common.dart';
 import '../../services/profile-service.dart';
 import '../mains/home.dart';
+import 'dart:convert';
 
 class ProductDetailsPage extends StatefulWidget {
-  final Map<String, dynamic> product, locationInfo, taxInfo;
-  final String restaurantName, restaurantId;
+  final Map<String, dynamic> product, locationInfo, taxInfo, tableInfo;
+  final String restaurantName, restaurantId, restaurantAddress;
 
   ProductDetailsPage(
       {Key key,
@@ -15,7 +16,9 @@ class ProductDetailsPage extends StatefulWidget {
       this.locationInfo,
       this.restaurantName,
       this.restaurantId,
-      this.taxInfo})
+      this.taxInfo,
+      this.tableInfo,
+      this.restaurantAddress})
       : super(key: key);
 
   @override
@@ -57,15 +60,19 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       price = price * quantity;
     });
     List<dynamic> extraIngredientsList = List<dynamic>();
-    widget.product['extraIngredients'].forEach((item) {
-      if (item['isSelected'] != null && item['isSelected']) {
-        price = price + item['price'];
-        extraIngredientsList.add(item);
-      }
-    });
+    if (widget.product['extraIngredients'].length > 0 &&
+        widget.product['extraIngredients'][0] != null) {
+      widget.product['extraIngredients'].forEach((item) {
+        if (item != null && item['isSelected'] != null && item['isSelected']) {
+          price = price + item['price'];
+          extraIngredientsList.add(item);
+        }
+      });
+    }
     cartProduct = {
       'Discount': variant['Discount'],
       'MRP': variant['MRP'],
+      'note': null,
       'Quantity': quantity,
       'price': variant['price'],
       'extraIngredients': extraIngredientsList,
@@ -76,6 +83,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       'restaurant': widget.restaurantName,
       'restaurantID': widget.restaurantId,
       'totalPrice': price,
+      'restaurantAddress': widget.restaurantAddress
     };
   }
 
@@ -153,45 +161,81 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           HomePageState.buildCartIcon(context),
         ],
       ),
-      body: Stack(
+      // body: Stack(
+      //   alignment: AlignmentDirectional.topCenter,
+      //   children: <Widget>[
+
+      //     _buildProductAddCounter(),
+      //     _buildAddToCartButton(),
+      //   ],
+      // ),
+
+      body: Container(
         alignment: AlignmentDirectional.topCenter,
-        children: <Widget>[
-          Container(
-            alignment: AlignmentDirectional.topCenter,
-            color: Colors.white,
-            child: SingleChildScrollView(
-              child: ListView(
-                physics: ScrollPhysics(),
-                shrinkWrap: true,
-                children: <Widget>[
-                  _buildProductTopImg(
-                    widget.product['imageUrl'],
-                    widget.product['description'],
-                  ),
-                  _buildHeadingBlock(
-                    'Sizes & Price',
-                    'Select which size would you like to add',
-                  ),
-                  _buildSingleSelectionBlock(widget.product['variants']),
-                  widget.product['extraIngredients'].length > 0
-                      ? _buildHeadingBlock(
-                          'Extra',
-                          'Which extra ingredients would you like to add',
-                        )
-                      : Container(
-                          height: 0.0,
-                          width: 0.0,
-                        ),
-                  _buildMultiSelectionBlock(widget.product['extraIngredients']),
-                  Padding(padding: EdgeInsets.only(bottom: 100.0)),
-                ],
+        color: Colors.white,
+        child: SingleChildScrollView(
+          child: ListView(
+            physics: ScrollPhysics(),
+            shrinkWrap: true,
+            children: <Widget>[
+              _buildProductTopImg(
+                widget.product['imageUrl'],
+                widget.product['description'],
               ),
-            ),
+              _buildHeadingBlock(
+                'Sizes & Price',
+                'Select which size would you like to add',
+              ),
+              _buildSingleSelectionBlock(widget.product['variants']),
+              Padding(
+                padding: EdgeInsets.only(bottom: 5.0),
+                child: widget.product['extraIngredients'].length > 0
+                    ? _buildHeadingBlock(
+                        'Extra',
+                        'Which extra ingredients would you like to add',
+                      )
+                    : Container(
+                        height: 0.0,
+                        width: 0.0,
+                      ),
+              ),
+              _buildMultiSelectionBlock(widget.product['extraIngredients']),
+            ],
           ),
-          _buildProductAddCounter(),
-          _buildAddToCartButton(),
-        ],
+        ),
       ),
+
+      bottomNavigationBar: Container(
+        height: 110.0,
+        child: Column(
+          children: <Widget>[
+            _buildProductAddCounter(),
+            _buildAddToCartButton(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildABoutUsBox(String description) {
+    return Container(
+      width: screenWidth(context),
+      child: Column(children: [
+        ExpansionTile(
+          title: Text(
+            'Description',
+            // style: titleWhiteBoldOSBB(),
+          ),
+          children: <Widget>[
+            Padding(
+                padding: EdgeInsets.only(left: 15.0, right: 15.0, bottom: 10.0),
+                child: Text(
+                  description,
+                  //  style: hintStyleSmallWhiteLightOSRInfo()
+                ))
+          ],
+        ),
+      ]),
     );
   }
 
@@ -227,16 +271,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       ),
               )
             : Container(height: 0, width: 0),
-        Container(
-          color: Color.fromRGBO(0, 0, 0, 0.4),
-          height: 20.0,
-          width: 10.0,
-          child: Text(
-            description,
-            style: hintStyleGreyLightOSRDescription(),
-            textAlign: TextAlign.center,
-          ),
-        ),
       ],
     );
   }
@@ -273,7 +307,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         shrinkWrap: true,
         itemCount: extras.length,
         itemBuilder: (BuildContext context, int index) {
-          if (extras[index]['isSelected'] == null)
+          if (extras[index] != null && extras[index]['isSelected'] == null)
             extras[index]['isSelected'] = false;
           return Container(
             color: Colors.white,
@@ -299,13 +333,12 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   ),
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.only(right: 15.0),
-                      child: new Text(
-                        '\$' + extras[index]['price'].toStringAsFixed(2),
-                        textAlign: TextAlign.end,
-                        style: hintStyleTitleBlueOSR(),
-                      ),
-                    ),
+                        padding: const EdgeInsets.only(right: 15.0),
+                        child: new Text(
+                          '\$' + (extras[index]['price']).toStringAsFixed(2),
+                          textAlign: TextAlign.end,
+                          style: hintStyleTitleBlueOSR(),
+                        )),
                   ),
                 ],
               ),
@@ -359,97 +392,89 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   }
 
   Widget _buildProductAddCounter() {
-    return Positioned(
-      width: screenWidth(context),
-      top: screenHeight(context) * 0.71,
-      child: Padding(
-        padding: const EdgeInsetsDirectional.only(
-          start: 20.0,
-          end: 20.0,
-          bottom: 15.0,
+    return Padding(
+      padding: const EdgeInsetsDirectional.only(
+        start: 20.0,
+        end: 20.0,
+        bottom: 10.0,
+      ),
+      child: RawMaterialButton(
+        onPressed: null,
+        padding: EdgeInsetsDirectional.only(start: 15.0, end: 15.0),
+        fillColor: primaryLight,
+        constraints: const BoxConstraints(minHeight: 44.0),
+        shape: RoundedRectangleBorder(
+          borderRadius: new BorderRadius.circular(50.0),
         ),
-        child: RawMaterialButton(
-          onPressed: null,
-          padding: EdgeInsetsDirectional.only(start: 15.0, end: 15.0),
-          fillColor: primaryLight,
-          constraints: const BoxConstraints(minHeight: 44.0),
-          shape: RoundedRectangleBorder(
-            borderRadius: new BorderRadius.circular(50.0),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              InkWell(
-                onTap: () {
-                  _changeProductQuantity(false);
-                },
-                child: Container(
-                  child: Image(
-                    image: AssetImage('lib/assets/icon/minus.png'),
-                    width: 26.0,
-                  ),
-                ),
-              ),
-              new Container(
-                alignment: AlignmentDirectional.center,
-                width: 26.0,
-                height: 26.0,
-                decoration: new BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: PRIMARY,
-                ),
-                child: new Text(quantity.toString(),
-                    textAlign: TextAlign.center, style: hintStyleLightOSB()),
-              ),
-              InkWell(
-                onTap: () {
-                  _changeProductQuantity(true);
-                },
-                child: Container(
-                    child: Image(
-                  image: AssetImage('lib/assets/icon/addbtn.png'),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            InkWell(
+              onTap: () {
+                _changeProductQuantity(false);
+              },
+              child: Container(
+                child: Image(
+                  image: AssetImage('lib/assets/icon/minus.png'),
                   width: 26.0,
-                )),
-              )
-            ],
-          ),
+                ),
+              ),
+            ),
+            new Container(
+              alignment: AlignmentDirectional.center,
+              width: 26.0,
+              height: 26.0,
+              decoration: new BoxDecoration(
+                shape: BoxShape.circle,
+                color: PRIMARY,
+              ),
+              child: new Text(quantity.toString(),
+                  textAlign: TextAlign.center, style: hintStyleLightOSB()),
+            ),
+            InkWell(
+              onTap: () {
+                _changeProductQuantity(true);
+              },
+              child: Container(
+                  child: Image(
+                image: AssetImage('lib/assets/icon/addbtn.png'),
+                width: 26.0,
+              )),
+            )
+          ],
         ),
       ),
     );
   }
 
   Widget _buildAddToCartButton() {
-    return Positioned(
-      width: screenWidth(context),
-      top: screenHeight(context) * 0.79,
-      child: Padding(
-        padding: const EdgeInsetsDirectional.only(
-            start: 20.0, end: 20.0, bottom: 15.0),
-        child: RawMaterialButton(
-          padding: EdgeInsetsDirectional.only(start: 15.0, end: 15.0),
-          fillColor: PRIMARY,
-          constraints: const BoxConstraints(minHeight: 44.0),
-          shape: RoundedRectangleBorder(
-            borderRadius: new BorderRadius.circular(50.0),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              new Text(
-                "ADD TO CART",
-                style: hintStyleWhiteLightOSB(),
-              ),
-              new Text(
-                '\$' + price.toStringAsFixed(2),
-                style: titleLightWhiteOSR(),
-              ),
-            ],
-          ),
-          onPressed: _checkIfCartIsAvailable,
-          splashColor: secondary,
+    return Padding(
+      padding:
+          const EdgeInsetsDirectional.only(start: 20.0, end: 20.0, bottom: 1.0),
+      child: RawMaterialButton(
+        padding: EdgeInsetsDirectional.only(start: 15.0, end: 15.0),
+        fillColor: PRIMARY,
+        constraints: const BoxConstraints(minHeight: 44.0),
+        shape: RoundedRectangleBorder(
+          borderRadius: new BorderRadius.circular(50.0),
         ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            new Text(
+              "ADD TO CART",
+              style: hintStyleWhiteLightOSB(),
+            ),
+            new Text(
+              '\$' + price.toStringAsFixed(2),
+              style: titleLightWhiteOSR(),
+            ),
+          ],
+        ),
+        onPressed: _checkIfCartIsAvailable,
+        splashColor: secondary,
       ),
     );
   }
@@ -473,10 +498,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       context,
       MaterialPageRoute(
         builder: (BuildContext context) => CartPage(
-              product: cartProduct,
-              taxInfo: widget.taxInfo,
-              locationInfo: widget.locationInfo,
-            ),
+          product: cartProduct,
+          taxInfo: widget.taxInfo,
+          locationInfo: widget.locationInfo,
+        ),
       ),
     );
   }

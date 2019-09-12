@@ -95,7 +95,7 @@ class _ProductListPageState extends State<ProductListPage> {
   //       } else {
   //         isShopOpen = true;
   //       }
-  //     } else 
+  //     } else
   //       isShopOpen = true;
   //     }
   //     print(isShopOpen.toString());
@@ -106,32 +106,40 @@ class _ProductListPageState extends State<ProductListPage> {
     AsyncLoader asyncLoader = AsyncLoader(
       key: _asyncLoaderState,
       initState: () async => await getProductList(),
-      renderLoad: () => Center(child: Padding(padding:EdgeInsets.all(20.0),child: CircularProgressIndicator(),),),
-      renderError: ([error]) =>
-          NoData(message: 'Please check your internet connection!', icon: Icons.block),
-      renderSuccess: ({data}){ 
-        if(data['message']!=null){
+      renderLoad: () => Center(
+        child: Padding(
+          padding: EdgeInsets.all(20.0),
+          child: CircularProgressIndicator(),
+        ),
+      ),
+      renderError: ([error]) => NoData(
+          message: 'Please check your internet connection!', icon: Icons.block),
+      renderSuccess: ({data}) {
+        if (data['message'] != null) {
           return NoData(message: 'No products available yet!');
-        }else{
+        } else {
           return Container(
             padding: EdgeInsetsDirectional.only(bottom: 16.0),
             child: ListView.builder(
-                physics: ScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: data['categorydata']!=null? data['categorydata'].length:0,
-                itemBuilder: (BuildContext context, int index) {
-                  return Column(
-                    children: <Widget>[
-                      _buildCategoryTitle(
-                          data['categorydata'][index]['categoryTitle'],
-                          null,
-                          data['categorydata'][index]['product']),
-                    ],
-                  );
-                },),
+              physics: ScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: data['categorydata'] != null
+                  ? data['categorydata'].length
+                  : 0,
+              itemBuilder: (BuildContext context, int index) {
+                return Column(
+                  children: <Widget>[
+                    _buildCategoryTitle(
+                        data['categorydata'][index]['categoryTitle'],
+                        null,
+                        data['categorydata'][index]['product']),
+                  ],
+                );
+              },
+            ),
           );
         }
-        },
+      },
     );
     return Scaffold(
       appBar: AppBar(
@@ -170,8 +178,7 @@ class _ProductListPageState extends State<ProductListPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (BuildContext context) =>
-                  CartPage(),
+              builder: (BuildContext context) => CartPage(),
             ),
           );
         },
@@ -339,11 +346,16 @@ class _ProductListPageState extends State<ProductListPage> {
           height: 18.0,
         ),
         title: Text(
-          (widget.deliveryInfo!=null && widget.deliveryInfo['freeDelivery'] && widget.deliveryInfo['amountEligibility']!=null)
-          ? 'Free delivery above \$' +
-              widget.deliveryInfo['amountEligibility']
-                  .toString()
-          :(widget.deliveryInfo!=null && !widget.deliveryInfo['freeDelivery'])? 'Delivery charge: Only \$'+widget.deliveryInfo['deliveryCharges'].toString(): 'Free delivery available',
+          (widget.deliveryInfo != null &&
+                  widget.deliveryInfo['freeDelivery'] &&
+                  widget.deliveryInfo['amountEligibility'] != null)
+              ? 'Free delivery above \$' +
+                  widget.deliveryInfo['amountEligibility'].toString()
+              : (widget.deliveryInfo != null &&
+                      !widget.deliveryInfo['freeDelivery'])
+                  ? 'Delivery charge: Only \$' +
+                      widget.deliveryInfo['deliveryCharges'].toString()
+                  : 'Free delivery available',
           style: hintStyleSmallWhiteLightOSL(),
         ),
         // trailing: Icon(
@@ -375,52 +387,68 @@ class _ProductListPageState extends State<ProductListPage> {
           ),
         ),
         ListView.builder(
-          physics: ScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: products.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return InkWell(
-                    onTap: (){
-                      Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (BuildContext context) =>
-                                  ProductDetailsPage(product: products[index], restaurantName: widget.restaurantName, restaurantId: widget.restaurantId, locationInfo: widget.locationInfo, taxInfo: widget.taxInfo),
-                            ),
-                          );
-                    },
-                    child: _buildProductTile(products[index]['imgUrl'], products[index]['title'], double.parse(products[index]['variants'][0]['MRP'].toString()), double.parse(products[index]['variants'][0]['Discount'].toString()), double.parse(products[index]['variants'][0]['price'].toString()), products[index]['description'], index==0?42.0:0),
+            physics: ScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: products.length,
+            itemBuilder: (BuildContext context, int index) {
+              return InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (BuildContext context) => ProductDetailsPage(
+                          product: products[index],
+                          restaurantName: widget.restaurantName,
+                          restaurantId: widget.restaurantId,
+                          locationInfo: widget.locationInfo,
+                          taxInfo: widget.taxInfo),
+                    ),
                   );
-                }),
+                },
+                child: _buildProductTile(
+                    products[index]['imgUrl'],
+                    products[index]['title'],
+                    double.parse(
+                        products[index]['variants'][0]['MRP'].toString()),
+                    double.parse(
+                        products[index]['variants'][0]['Discount'].toString()),
+                    double.parse(
+                        products[index]['variants'][0]['price'].toString()),
+                    products[index]['description'],
+                    index == 0 ? 42.0 : 0),
+              );
+            }),
       ],
     );
   }
 
-  Widget _buildProductTile(
-      String imgUrl, String productName, double mrp, double off, double price, String info, double topPadding) {
+  Widget _buildProductTile(String imgUrl, String productName, double mrp,
+      double off, double price, String info, double topPadding) {
     return Column(
       children: <Widget>[
         ListTile(
-            contentPadding: EdgeInsets.only(top: topPadding, left: 10.0, right: 10.0, bottom: 0.0),
-            title: _buildProductTileTitle(imgUrl, productName, mrp, off, price, info),
-            subtitle: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                    height: 20.0,
-                    child: Row(
-                      children: <Widget>[
-                        Text(
-                          info,
-                          style: hintStyleGreyLightOSR(),
-                        ),
-                      ],
-                    )
-                    ),
-                off>0?Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
-                  child: Container(
+          contentPadding: EdgeInsets.only(
+              top: topPadding, left: 10.0, right: 10.0, bottom: 0.0),
+          title: _buildProductTileTitle(
+              imgUrl, productName, mrp, off, price, info),
+          subtitle: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Container(
+                  height: 20.0,
+                  child: Row(
+                    children: <Widget>[
+                      Text(
+                        info,
+                        style: hintStyleGreyLightOSR(),
+                      ),
+                    ],
+                  )),
+              off > 0
+                  ? Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Container(
                         decoration: BoxDecoration(
                             border: Border.all(color: Color(0xFFFF0000)),
                             borderRadius: BorderRadius.circular(5.0)),
@@ -428,57 +456,63 @@ class _ProductListPageState extends State<ProductListPage> {
                           padding: EdgeInsets.only(
                               left: 15.0, top: 2.0, bottom: 2.0, right: 15.0),
                           child: Text(
-                            off.toStringAsFixed(1)+'% off',
+                            off.toStringAsFixed(1) + '% off',
                             style: hintStyleRedOSS(),
                           ),
                         ),
-                  ),
-                ): Text(''),
-              ],
-            ),
-            trailing: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  '\$'+price.toStringAsFixed(2),
-                  style: subTitleDarkBoldOSS(),
+                      ),
+                    )
+                  : Text(''),
+            ],
+          ),
+          trailing: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                '\$' + price.toStringAsFixed(2),
+                style: subTitleDarkBoldOSS(),
+              ),
+              Container(
+                padding: EdgeInsetsDirectional.only(top: 18.0),
+                child: Image.asset(
+                  'lib/assets/icon/addbtn.png',
+                  width: 18.0,
                 ),
-                Container(
-                  padding: EdgeInsetsDirectional.only(top: 18.0),
-                  child: Image.asset(
-                    'lib/assets/icon/addbtn.png',
-                    width: 26.0,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
+          ),
         ),
         Divider(),
       ],
     );
   }
 
-  Widget _buildProductTileTitle(String imgUrl, String productName, double mrp, double off, double price, String info) {
+  Widget _buildProductTileTitle(String imgUrl, String productName, double mrp,
+      double off, double price, String info) {
     return Row(
       children: <Widget>[
         Text(
-         productName.length>21? productName.substring(0,21)+'...': productName,
+          productName.length > 21
+              ? productName.substring(0, 21) + '...'
+              : productName,
           style: subTitleDarkBoldOSS(),
         ),
         Padding(padding: EdgeInsets.all(5.0)),
-        off>0?Container(
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(5.0), color: PRIMARY),
-          child: Padding(
-            padding: EdgeInsets.only(left: 5.0, right: 5.0),
-            child: Text(
-              '\$ ' + mrp.toStringAsFixed(2),
-              style: hintStyleSmallWhiteLightOSSStrike(),
-            ),
-          ),
-        ):Text(''),
-        ],
+        off > 0
+            ? Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5.0), color: PRIMARY),
+                child: Padding(
+                  padding: EdgeInsets.only(left: 5.0, right: 5.0),
+                  child: Text(
+                    '\$ ' + mrp.toStringAsFixed(2),
+                    style: hintStyleSmallWhiteLightOSSStrike(),
+                  ),
+                ),
+              )
+            : Text(''),
+      ],
     );
   }
 }
