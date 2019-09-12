@@ -1,5 +1,5 @@
+import 'package:RestaurantSass/services/constant.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'drawer.dart';
 import 'package:async_loader/async_loader.dart';
 import '../../styles/styles.dart';
@@ -10,13 +10,16 @@ import 'cart.dart';
 import '../other/location.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'restaurant-list.dart';
-import '../../services/constant.dart';
 import '../mains/product-list.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:location/location.dart';
 import '../../services/common.dart';
 import 'dart:async';
 import '../../services/profile-service.dart';
+// import 'package:barcode_scan/barcode_scan.dart';
+import 'package:flutter/services.dart';
+import 'dart:convert';
+// import '../other/search.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -27,6 +30,8 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   final GlobalKey<AsyncLoaderState> _asyncLoaderStateForAdvertisement =
+      GlobalKey<AsyncLoaderState>();
+  final GlobalKey<AsyncLoaderState> _asyncLoaderStateForTableInfo =
       GlobalKey<AsyncLoaderState>();
   final GlobalKey<AsyncLoaderState> _asyncLoaderStateForNearByLocations =
       GlobalKey<AsyncLoaderState>();
@@ -39,9 +44,10 @@ class HomePageState extends State<HomePage> {
   VoidCallback _showBottomSheetCallback;
   Map<String, dynamic> restaurantInfo;
   int nearByLength;
+
   @override
   void initState() {
-    checkAndValidateToken();
+    // checkAndValidateToken();
     _showBottomSheetCallback = _showBottomSheet;
     super.initState();
   }
@@ -60,6 +66,76 @@ class HomePageState extends State<HomePage> {
     super.dispose();
     if (_locationStream != null) _locationStream.cancel();
   }
+
+  // getLocationInfoByTableId() async {
+  //   showDialog<void>(
+  //     context: context,
+  //     barrierDismissible: false,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         title:
+  //             Text('Book Table Number: ' + tableInfo['tableNumber'].toString()),
+  //         content: SingleChildScrollView(
+  //           child: ListBody(
+  //             children: <Widget>[Center(child: CircularProgressIndicator())],
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+
+  //   return await MainService.getLocationInfoByTableId(tableInfo['tableId'])
+  //       .then((res) {
+  //     var data = res;
+  //     Navigator.of(context).pop();
+  //     Navigator.push(
+  //       context,
+  //       MaterialPageRoute(
+  //         builder: (BuildContext context) => ProductListPage(
+  //           restaurantName: data['restaurantId']['restaurantName'],
+  //           locationName: data['locationId']['locationName'],
+  //           aboutUs: data['locationId']['aboutUs'],
+  //           imgUrl: data['restaurantId']['logo'],
+  //           address: data['locationId']['address'],
+  //           locationId: data['locationId']['_id'],
+  //           restaurantId: data['restaurantId']['_id'],
+  //           cuisine: data['locationId']['cuisine'],
+  //           deliveryInfo: data['locationId']['deliveryInfo'] != null
+  //               ? data['locationId']['deliveryInfo']['deliveryInfo']
+  //               : null,
+  //           workingHours: data['locationId']['workingHours'] ?? null,
+  //           locationInfo: data['locationId'],
+  //           taxInfo: data['restaurantId']['taxInfo'],
+  //           tableInfo: tableInfo,
+  //         ),
+  //       ),
+  //     );
+  //   });
+  // }
+
+  // Future barcodeScanning() async {
+  //   try {
+  //     String code = await BarcodeScanner.scan();
+  //     // setState(() {
+  //     Map<String, dynamic> barcode = json.decode(code);
+  //     tableInfo = barcode;
+  //     // });
+  //     getLocationInfoByTableId();
+  //     // _showBottomSheetForBarcodeView();
+  //   } on PlatformException catch (e) {
+  //     if (e.code == BarcodeScanner.CameraAccessDenied) {
+  //       setState(() {
+  //         barcodeError = 'No camera permission!';
+  //       });
+  //     } else {
+  //       setState(() => barcodeError = 'Unknown error: $e');
+  //     }
+  //   } on FormatException {
+  //     setState(() => barcodeError = 'Nothing captured.');
+  //   } catch (e) {
+  //     setState(() => barcodeError = 'Unknown error: $e');
+  //   }
+  // }
 
   void checkAndValidateToken() {
     Common.getToken().then((onValue) {
@@ -105,44 +181,6 @@ class HomePageState extends State<HomePage> {
           count: itemCount);
     }
   }
-
-  // Future <Null>getNearByRestaurants() async {
-  //   _locationSubscription = _locationService
-  //       .onLocationChanged()
-  //       .listen((Map<String, dynamic> result) async {
-  //     print(result['latitude']);
-  //     _currentCameraPosition = CameraPosition(
-  //         target: LatLng(result['latitude'], result['longitude']), zoom: 16);
-  //     Coordinates coordinates =
-  //         Coordinates(result['latitude'], result['longitude']);
-  //     List<Address> addresses;
-  //     try {
-  //       addresses =
-  //           await Geocoder.local.findAddressesFromCoordinates(coordinates);
-  //     } catch (e) {
-  //       print(e);
-  //     }
-  //     if (addresses != null && mounted) {
-  //       setState(() {
-  //         position = {
-  //           'lat': result['latitude'],
-  //           'long': result['longitude'],
-  //           'name': addresses.first.addressLine
-  //         };
-  //       });
-  //       await Common.savePositionInfo(position).then((onValue) {});
-  //     }
-  //   });
-  //   if (isFirstStart) {
-  //     await Future.delayed(Duration(milliseconds: 4000), () {});
-  //     isFirstStart = false;
-  //   }
-  //   if (position != null) {
-  //     return await MainService.getNearByRestaurants(
-  //         position['lat'], position['long'],
-  //         count: itemCount);
-  //   }
-  // }
 
   getTopRatedRestaurants() async {
     return await MainService.getTopRatedRestaurants(count: itemCount);
@@ -252,25 +290,43 @@ class HomePageState extends State<HomePage> {
             message: 'Please check your internet connection!',
             icon: Icons.block),
         renderSuccess: ({data}) {
-          return GridView.builder(
-              physics: ScrollPhysics(),
-              shrinkWrap: true,
-              gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2),
-              itemCount: data.length < int.parse(itemCount)
-                  ? data.length
-                  : int.parse(itemCount),
-              padding: const EdgeInsets.all(0.0),
-              itemBuilder: (BuildContext context, int index) {
-                return InkWell(
-                    child: buildRestaurantCard(data[index]),
-                    onTap: () {
-                      setState(() {
-                        restaurantInfo = data[index];
-                      });
-                      _showBottomSheet();
-                    });
-              });
+          if (data != null) {
+            nearByLength = data.length;
+            return nearByLength > 0
+                ? Container(
+                    color: Colors.white70,
+                    margin: EdgeInsets.only(bottom: 5.0),
+                    child: ListView(
+                        physics: ScrollPhysics(),
+                        shrinkWrap: true,
+                        children: <Widget>[
+                          _buildGridHeader('Restaurants Near You'),
+                          GridView.builder(
+                              physics: ScrollPhysics(),
+                              shrinkWrap: true,
+                              gridDelegate:
+                                  new SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2),
+                              itemCount: data.length < int.parse(itemCount)
+                                  ? data.length
+                                  : int.parse(itemCount),
+                              padding: const EdgeInsets.all(0.0),
+                              itemBuilder: (BuildContext context, int index) {
+                                return InkWell(
+                                    child: buildRestaurantCard(data[index]),
+                                    onTap: () {
+                                      setState(() {
+                                        restaurantInfo = data[index];
+                                      });
+                                      _showBottomSheet();
+                                    });
+                              }),
+                          _buildViewAllButton('Near By'),
+                        ]))
+                : Container();
+          } else {
+            return Container();
+          }
         });
   }
 
@@ -347,12 +403,13 @@ class HomePageState extends State<HomePage> {
         );
       },
       child: Container(
-        padding: EdgeInsets.only(right: 10.0),
-        child: Image.asset(
-          "lib/assets/icon/cart.png",
-          width: 18.0,
-        ),
-      ),
+          padding: EdgeInsets.only(right: 10.0),
+          child: Icon(Icons.shopping_cart)
+          // Image.asset(
+          //   "lib/assets/icon/cart.png",
+          //   width: 18.0,
+          // ),
+          ),
     );
   }
 
@@ -410,27 +467,6 @@ class HomePageState extends State<HomePage> {
               size: 16.0,
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget buildLocationIcon() {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (BuildContext context) => LocationPage(),
-          ),
-        );
-      },
-      child: Container(
-        padding: EdgeInsets.only(right: 10.0),
-        child: Image.asset(
-          "lib/assets/icon/location.png",
-          color: Colors.white,
-          width: 15.0,
         ),
       ),
     );
