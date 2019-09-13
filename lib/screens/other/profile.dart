@@ -7,6 +7,9 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'dart:async';
+import 'package:http/http.dart' as http;
+
+import 'package:async/async.dart';
 
 class Profile extends StatefulWidget {
   @override
@@ -34,6 +37,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
         isLoading = true;
       });
       _formKey.currentState.save();
+      print(profileData);
       ProfileService.setUserInfo(profileData['_id'], profileData)
           .then((onValue) {
         setState(() {
@@ -44,15 +48,13 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
     }
   }
 
+  static File _imageFile;
+
   void _choose() async {
-    file = await ImagePicker.pickImage(source: ImageSource.gallery);
-    base64Image = base64Encode(file.readAsBytesSync());
+    var file = await ImagePicker.pickImage(source: ImageSource.gallery);
+    // base64Image = base64Encode(file.readAsBytesSync());
     setState(() {
-      selectedImage = Image.memory(
-        base64.decode(base64Image),
-        width: 80.0,
-        height: 80.0,
-      );
+      _imageFile = file;
     });
   }
 
@@ -60,22 +62,27 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
     setState(() {
       isPicUploading = true;
     });
-    if (file != null) {
-      Map<String, dynamic> body = {
-        'baseKey': 'data:image/png;base64,' + base64Image
-      };
+    if (_imageFile != null) {
+      var stream =
+          new http.ByteStream(DelegatingStream.typed(_imageFile.openRead()));
+      Map<String, dynamic> body = {"baseKey": base64Image};
       Map<String, dynamic> imageData;
-      await ProfileService.uploadProfileImage(body).then((onValue) {
-        imageData = onValue;
+      await ProfileService.uploadProfileImage(
+        _imageFile,
+        stream,
+        profileData['_id'],
+      );
+      setState(() {
+        isPicUploading = false;
       });
-      await ProfileService.setUserInfo(profileData['_id'], {
-        'publicId': imageData['public_id'],
-        'logo': imageData['url']
-      }).then((onValue) {
-        setState(() {
-          isPicUploading = false;
-        });
-      });
+      // await ProfileService.setUserInfo(profileData['_id'], {
+      //   'publicId': imageData['public_id'],
+      //   'logo': imageData['url']
+      // }).then((onValue) {
+      //   setState(() {
+      //     isPicUploading = false;
+      //   });
+      // });
     }
   }
 
@@ -108,19 +115,27 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                       bottom: BorderSide(color: Colors.grey, width: 1.5),
                     )),
                 child: ListTile(
-                  leading: selectedImage != null
-                      ? selectedImage
-                      : profileData['logo'] == null
-                          ? Image.asset(
-                              "lib/assets/imgs/na.jpg",
-                              width: 80.0,
-                              height: 80.0,
-                            )
-                          : Image.network(
-                              profileData['logo'],
-                              width: 80.0,
-                              height: 80.0,
-                            ),
+                  leading: Container(
+                    height: 50.0,
+                    width: 50.0,
+                    decoration: new BoxDecoration(
+                      border: new Border.all(color: Colors.black, width: 2.0),
+                      borderRadius: BorderRadius.circular(80.0),
+                    ),
+                    child: _imageFile == null
+                        ? profileData['logo'] != null
+                            ? new CircleAvatar(
+                                backgroundImage:
+                                    new NetworkImage("${profileData['logo']}"),
+                              )
+                            : new CircleAvatar(
+                                backgroundImage:
+                                    new AssetImage('lib/assets/imgs/na.jpg'))
+                        : new CircleAvatar(
+                            backgroundImage: new FileImage(_imageFile),
+                            radius: 80.0,
+                          ),
+                  ),
                   title: Row(
                     children: [
                       RaisedButton(
@@ -211,7 +226,26 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           },
                           initialValue: data['locationName'],
                           decoration: new InputDecoration(
-                            labelText: 'Area',
+                            labelText: 'Suburb',
+                            hintStyle: textOS(),
+                            contentPadding: EdgeInsets.all(10.0),
+                            border: InputBorder.none,
+                          ),
+                          keyboardType: TextInputType.text,
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(top: 10.0),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey, width: 1.0),
+                        ),
+                        child: TextFormField(
+                          onSaved: (value) {
+                            data['state'] = value;
+                          },
+                          initialValue: data['state'],
+                          decoration: new InputDecoration(
+                            labelText: 'State',
                             hintStyle: textOS(),
                             contentPadding: EdgeInsets.all(10.0),
                             border: InputBorder.none,
@@ -247,9 +281,10 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           onSaved: (value) {
                             data['zip'] = value;
                           },
-                          initialValue: data['zip'].toString(),
+                          initialValue:
+                              data['zip'] != null ? data['zip'].toString() : '',
                           decoration: new InputDecoration(
-                            labelText: 'Pin Code',
+                            labelText: 'Post Code',
                             hintStyle: textOS(),
                             contentPadding: EdgeInsets.all(10.0),
                             border: InputBorder.none,

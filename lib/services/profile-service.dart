@@ -3,6 +3,12 @@ import 'constant.dart';
 import 'dart:convert';
 import 'common.dart';
 
+import 'dart:async';
+import 'package:http/http.dart' as http;
+
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path/path.dart';
+
 class ProfileService {
   static final Client client = Client();
 
@@ -35,21 +41,48 @@ class ProfileService {
     final response = await client.put(API_ENDPOINT + 'users/$id',
         headers: {'Content-Type': 'application/json', 'Authorization': token},
         body: json.encode(body));
+    print(json.decode(response.body));
     return json.decode(response.body);
   }
 
   static Future<Map<String, dynamic>> uploadProfileImage(
-      Map<String, dynamic> body) async {
-    String token;
+      image, stream, id) async {
+    Map<String, dynamic> imageData;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String authToken;
     await Common.getToken().then((onValue) {
-      token = 'bearer ' + onValue;
+      authToken = 'bearer ' + onValue;
     });
-    final response = await client.post(
-      API_ENDPOINT + 'users/upload/to/cloud',
-      body: json.encode(body),
-      headers: {'Content-Type': 'application/json', 'Authorization': token},
-    );
-    return json.decode(response.body);
+    print("token $authToken");
+    print("image $image");
+    print("stream $stream");
+
+    var length = await image.length();
+    String uri = API_ENDPOINT + 'users/upload/to/cloud';
+    print("$uri");
+    var request = new http.MultipartRequest("POST", Uri.parse(uri));
+    var multipartFile = new http.MultipartFile('file', stream, length,
+        filename: basename(image.path));
+    //print(' $multipartFile');
+    request.files.add(multipartFile);
+    var response = await request.send();
+    print('$response');
+    response.stream.transform(utf8.decoder).listen((value) {
+      print('value $value');
+      var profileImageRes = value + "}";
+
+      if (value.length > 3) {
+        var profileValue = json.decode(profileImageRes);
+        print('PROFILERES   $profileValue');
+
+        ProfileService.setUserInfo(id, {
+          'publicId': profileValue['public_id'],
+          'logo': profileValue['url']
+        }).then((onValue) {
+          print(onValue);
+        });
+      }
+    });
   }
 
   static Future<List<dynamic>> getAddressList() async {

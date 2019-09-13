@@ -300,7 +300,7 @@ class HomePageState extends State<HomePage> {
                         physics: ScrollPhysics(),
                         shrinkWrap: true,
                         children: <Widget>[
-                          _buildGridHeader('Restaurants Near You'),
+                          // _buildGridHeader('Restaurants Near You'),
                           GridView.builder(
                               physics: ScrollPhysics(),
                               shrinkWrap: true,
@@ -321,7 +321,7 @@ class HomePageState extends State<HomePage> {
                                       _showBottomSheet();
                                     });
                               }),
-                          _buildViewAllButton('Near By'),
+                          // _buildViewAllButton('Near By'),
                         ]))
                 : Container();
           } else {
