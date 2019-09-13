@@ -80,11 +80,19 @@ class _MenuState extends State<Menu> {
                   _buildMenuBg(),
                   Column(
                     children: <Widget>[
-                      _buildMenuProfileLogo(profilePic),
-                      fullname != null
-                          ? Text(fullname.toUpperCase(),
-                              style: hintStyleWhitePNR())
-                          : Container(height: 0, width: 0),
+                      Row(
+                        children: <Widget>[
+                          _buildMenuProfileLogo(profilePic),
+                          Padding(
+                            padding: EdgeInsets.only(left: 20.0),
+                          ),
+                          fullname != null
+                              ? Text(fullname.toUpperCase(),
+                                  style: hintStyleWhitePNR())
+                              : Container(height: 0, width: 0),
+                        ],
+                      ),
+
                       Divider(color: Colors.white12),
                       _buildMenuTileList(
                           'lib/assets/icon/spoon.png', 'Home', 0),
@@ -173,17 +181,22 @@ class _MenuState extends State<Menu> {
 
   Widget _buildMenuProfileLogo(String imgUrl) {
     return Padding(
-      padding: EdgeInsets.only(top: 30.0, bottom: 30.0),
-      child: imgUrl == null
-          ? Image.asset(
-              'lib/assets/logos/logo.png',
-              width: 100.0,
-            )
-          : Image.network(
-              imgUrl,
-              width: 100.0,
-              height: 100.0,
-            ),
+      padding: EdgeInsets.only(top: 30.0, bottom: 10.0),
+      child: Container(
+        height: 80.0,
+        width: 80.0,
+        decoration: new BoxDecoration(
+          border: new Border.all(color: Colors.black, width: 2.0),
+          borderRadius: BorderRadius.circular(80.0),
+        ),
+        child: imgUrl == null
+            ? new CircleAvatar(
+                backgroundImage: new AssetImage('lib/assets/logos/logo.png'))
+            : new CircleAvatar(
+                backgroundImage: new NetworkImage(imgUrl),
+                radius: 80.0,
+              ),
+      ),
     );
   }
 

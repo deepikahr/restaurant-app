@@ -186,7 +186,12 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 'Sizes & Price',
                 'Select which size would you like to add',
               ),
-              _buildSingleSelectionBlock(widget.product['variants']),
+              widget.product['variants'].length > 0
+                  ? _buildSingleSelectionBlock(widget.product['variants'])
+                  : Container(
+                      height: 0.0,
+                      width: 0.0,
+                    ),
               Padding(
                 padding: EdgeInsets.only(bottom: 5.0),
                 child: widget.product['extraIngredients'].length > 0
@@ -356,7 +361,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         physics: ScrollPhysics(),
         shrinkWrap: true,
         padding: EdgeInsets.only(right: 0.0),
-        itemCount: sizes.length,
+        itemCount: sizes.length == null ? 0 : sizes.length,
         itemBuilder: (BuildContext context, int index) {
           if (sizes[index]['isSelected'] == null)
             sizes[index]['isSelected'] = false;
@@ -375,15 +380,19 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 _calculatePrice();
               },
               activeColor: PRIMARY,
-              title: new Text(
-                sizes[index]['size'],
-                style: hintStyleSmallDarkLightOSR(),
-              ),
-              secondary: new Text(
-                '\$' + sizes[index]['price'].toStringAsFixed(2),
-                textAlign: TextAlign.end,
-                style: hintStyleTitleBlueOSR(),
-              ),
+              title: sizes[index]['size'] != null
+                  ? new Text(
+                      sizes[index]['size'],
+                      style: hintStyleSmallDarkLightOSR(),
+                    )
+                  : Text(''),
+              secondary: sizes[index]['price'] != null
+                  ? new Text(
+                      '\$' + sizes[index]['price'].toStringAsFixed(2),
+                      textAlign: TextAlign.end,
+                      style: hintStyleTitleBlueOSR(),
+                    )
+                  : Text(''),
             ),
           );
         },

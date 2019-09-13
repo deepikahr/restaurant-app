@@ -24,6 +24,7 @@ dependencies:
   onesignal: ^1.1.0
   razorpay_plugin: ^0.2.9
   intl: ^0.16.0
+  # flutter_stetho: ^0.5.0
 
 
  
