@@ -37,7 +37,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
         isLoading = true;
       });
       _formKey.currentState.save();
-      print(profileData);
+      print("save button $profileData");
+
       ProfileService.setUserInfo(profileData['_id'], profileData)
           .then((onValue) {
         setState(() {

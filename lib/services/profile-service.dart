@@ -37,11 +37,28 @@ class ProfileService {
     String token;
     await Common.getToken().then((onValue) {
       token = 'bearer ' + onValue;
+      print("id profile $id");
     });
+    // print("auto set $body");
+
     final response = await client.put(API_ENDPOINT + 'users/$id',
         headers: {'Content-Type': 'application/json', 'Authorization': token},
         body: json.encode(body));
-    print(json.decode(response.body));
+    print("set user info ${json.decode(response.body)}");
+    return json.decode(response.body);
+  }
+
+  static Future<Map<String, dynamic>> setUserProfileInfo(
+      String id, Map<String, dynamic> body) async {
+    String token;
+    await Common.getToken().then((onValue) {
+      token = 'bearer ' + onValue;
+    });
+    print("id userprofile $id");
+    final response = await client.put(API_ENDPOINT + 'users/userProfile/$id',
+        headers: {'Content-Type': 'application/json', 'Authorization': token},
+        body: json.encode(body));
+    print("set user info ${json.decode(response.body)}");
     return json.decode(response.body);
   }
 
@@ -68,18 +85,19 @@ class ProfileService {
     var response = await request.send();
     print('$response');
     response.stream.transform(utf8.decoder).listen((value) {
-      print('value $value');
+      // print('value $value');
       var profileImageRes = value + "}";
 
       if (value.length > 3) {
         var profileValue = json.decode(profileImageRes);
         print('PROFILERES   $profileValue');
-
-        ProfileService.setUserInfo(id, {
+        // prefs.setString("logo", profileValue['url']);
+        print("auto set ${profileValue['public_id']}");
+        ProfileService.setUserProfileInfo(id, {
           'publicId': profileValue['public_id'],
           'logo': profileValue['url']
         }).then((onValue) {
-          print(onValue);
+          print("jgcvjb  $onValue");
         });
       }
     });
