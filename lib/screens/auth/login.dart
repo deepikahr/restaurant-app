@@ -1,3 +1,4 @@
+import 'package:RestaurantSass/screens/mains/home.dart';
 import 'package:flutter/material.dart';
 import '../../styles/styles.dart';
 import '../../blocs/validators.dart';
@@ -7,7 +8,8 @@ import 'registration.dart';
 import 'forgot-password.dart';
 
 class LoginPage extends StatefulWidget {
-  LoginPage({Key key}) : super(key: key);
+  final isDrawe;
+  LoginPage({Key key, this.isDrawe}) : super(key: key);
 
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -35,7 +37,16 @@ class _LoginPageState extends State<LoginPage> {
             if (saved) {
               showSnackbar('Login Successful!');
               Future.delayed(Duration(milliseconds: 1500), () {
-                Navigator.of(context).pop('Success');
+                if (widget.isDrawe == true) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (BuildContext context) => HomePage(),
+                    ),
+                  );
+                } else {
+                  Navigator.of(context).pop('Success');
+                }
               });
             }
           });
