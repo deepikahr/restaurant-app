@@ -6,7 +6,6 @@ import '../../services/main-service.dart';
 import 'location-list-sheet.dart';
 import '../../widgets/no-data.dart';
 import 'cart.dart';
-import '../other/location.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'restaurant-list.dart';
 import '../../services/constant.dart';
@@ -376,26 +375,26 @@ class HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildLocationIcon() {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (BuildContext context) => LocationPage(),
-          ),
-        );
-      },
-      child: Container(
-        padding: EdgeInsets.only(right: 10.0),
-        child: Image.asset(
-          "lib/assets/icon/location.png",
-          color: Colors.white,
-          width: 15.0,
-        ),
-      ),
-    );
-  }
+  // Widget buildLocationIcon() {
+  //   return GestureDetector(
+  //     onTap: () {
+  //       Navigator.push(
+  //         context,
+  //         MaterialPageRoute(
+  //           builder: (BuildContext context) => LocationPage(),
+  //         ),
+  //       );
+  //     },
+  //     child: Container(
+  //       padding: EdgeInsets.only(right: 10.0),
+  //       child: Image.asset(
+  //         "lib/assets/icon/location.png",
+  //         color: Colors.white,
+  //         width: 15.0,
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _buildOfferSlider(List<dynamic> list) {
     return Swiper(

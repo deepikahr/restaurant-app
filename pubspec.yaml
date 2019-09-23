@@ -7,7 +7,7 @@ environment:
   sdk: ">=2.0.0-dev.68.0 <3.0.0"
 
 dependencies:
-  flutter:  
+  flutter:
     sdk: flutter
   cupertino_icons: ^0.1.2
   rxdart: ^0.20.0
@@ -16,9 +16,9 @@ dependencies:
   async_loader: ^0.1.2
   flutter_swiper: ^1.1.4
   google_maps_flutter:
-  # flutter_google_places: 
+  # flutter_google_places:
   location: ^1.4.1
-  geocoder: ^0.1.2
+  geocoder: ^0.2.1
   image_picker: 0.4.12+1
   # stripe_payment: ^0.0.7
   onesignal: ^1.0.5
@@ -28,67 +28,67 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_stetho: ^0.2.2
+  # flutter_stetho: ^0.2.2
 
 flutter:
-   uses-material-design: true
-   assets:
-      - lib/assets/logos/logo.png
-      - lib/assets/bgImgs/background.png
-      - lib/assets/bgImgs/confirmedbg.png
-      - lib/assets/bgImgs/cover.png
-      - lib/assets/imgs/na.jpg
-      - lib/assets/bgImgs/coverbg.png
-      - lib/assets/bgImgs/drawer.png
-      - lib/assets/bgImgs/locationbg.png
-      - lib/assets/bgImgs/loginbg.png
-      - lib/assets/bgImgs/map.png
-      - lib/assets/bgImgs/splashscreen.png
-      - lib/assets/bgImgs/BG.png
-      - lib/assets/headers/deliverybg.png
-      - lib/assets/headers/facebook.png
-      - lib/assets/headers/menu.png
-      - lib/assets/headers/menubg.png
-      - lib/assets/headers/search.png
-      - lib/assets/headers/twitter.png
-      - lib/assets/icon/about.png
-      - lib/assets/icon/fishBone.png
-      - lib/assets/icon/addbtn.png
-      - lib/assets/icon/additem.png
-      - lib/assets/icon/cart.png
-      - lib/assets/icon/cartbtn.png
-      - lib/assets/icon/carte.png
-      - lib/assets/icon/cash.png
-      - lib/assets/icon/cashSelected.png
-      - lib/assets/icon/chat.png
-      - lib/assets/icon/check.png
-      - lib/assets/icon/delivery.png
-      - lib/assets/icon/dinein.png
-      - lib/assets/icon/favorite.png
-      - lib/assets/icon/filter.png
-      - lib/assets/icon/findus.png
-      - lib/assets/icon/go.png
-      - lib/assets/icon/h.png
-      - lib/assets/icon/homedelivery.png
-      - lib/assets/icon/location.png
-      - lib/assets/icon/locationpin.png
-      - lib/assets/icon/marker.png
-      - lib/assets/icon/loginIcon.png
-      - lib/assets/icon/mail.png
-      - lib/assets/icon/minus.png
-      - lib/assets/icon/offer.png
-      - lib/assets/icon/orderHistory.png
-      - lib/assets/icon/orderlater.png
-      - lib/assets/icon/ordernow.png
-      - lib/assets/icon/pin.png
-      - lib/assets/icon/qmark.png
-      - lib/assets/icon/settings.png
-      - lib/assets/icon/spinner.gif
-      - lib/assets/icon/spoon.png
-      - lib/assets/icon/table.png
-      - lib/assets/icon/clearCartIcon.png
-      - lib/assets/icon/home.png
-      - lib/assets/imgs/fishBone.png
-      - lib/assets/imgs/image1.jpg
-      - lib/assets/imgs/orderimg.png
-      - lib/assets/imgs/chicken.png
+  uses-material-design: true
+  assets:
+    - lib/assets/logos/logo.png
+    - lib/assets/bgImgs/background.png
+    - lib/assets/bgImgs/confirmedbg.png
+    - lib/assets/bgImgs/cover.png
+    - lib/assets/imgs/na.jpg
+    - lib/assets/bgImgs/coverbg.png
+    - lib/assets/bgImgs/drawer.png
+    - lib/assets/bgImgs/locationbg.png
+    - lib/assets/bgImgs/loginbg.png
+    - lib/assets/bgImgs/map.png
+    - lib/assets/bgImgs/splashscreen.png
+    - lib/assets/bgImgs/BG.png
+    - lib/assets/headers/deliverybg.png
+    - lib/assets/headers/facebook.png
+    - lib/assets/headers/menu.png
+    - lib/assets/headers/menubg.png
+    - lib/assets/headers/search.png
+    - lib/assets/headers/twitter.png
+    - lib/assets/icon/about.png
+    - lib/assets/icon/fishBone.png
+    - lib/assets/icon/addbtn.png
+    - lib/assets/icon/additem.png
+    - lib/assets/icon/cart.png
+    - lib/assets/icon/cartbtn.png
+    - lib/assets/icon/carte.png
+    - lib/assets/icon/cash.png
+    - lib/assets/icon/cashSelected.png
+    - lib/assets/icon/chat.png
+    - lib/assets/icon/check.png
+    - lib/assets/icon/delivery.png
+    - lib/assets/icon/dinein.png
+    - lib/assets/icon/favorite.png
+    - lib/assets/icon/filter.png
+    - lib/assets/icon/findus.png
+    - lib/assets/icon/go.png
+    - lib/assets/icon/h.png
+    - lib/assets/icon/homedelivery.png
+    - lib/assets/icon/location.png
+    - lib/assets/icon/locationpin.png
+    - lib/assets/icon/marker.png
+    - lib/assets/icon/loginIcon.png
+    - lib/assets/icon/mail.png
+    - lib/assets/icon/minus.png
+    - lib/assets/icon/offer.png
+    - lib/assets/icon/orderHistory.png
+    - lib/assets/icon/orderlater.png
+    - lib/assets/icon/ordernow.png
+    - lib/assets/icon/pin.png
+    - lib/assets/icon/qmark.png
+    - lib/assets/icon/settings.png
+    - lib/assets/icon/spinner.gif
+    - lib/assets/icon/spoon.png
+    - lib/assets/icon/table.png
+    - lib/assets/icon/clearCartIcon.png
+    - lib/assets/icon/home.png
+    - lib/assets/imgs/fishBone.png
+    - lib/assets/imgs/image1.jpg
+    - lib/assets/imgs/orderimg.png
+    - lib/assets/imgs/chicken.png
