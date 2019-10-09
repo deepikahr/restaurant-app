@@ -54,7 +54,7 @@ class ProfileService {
     await Common.getToken().then((onValue) {
       token = 'bearer ' + onValue;
     });
-    print("id userprofile $id");
+    print("id userprofile $id $body $token");
     final response = await client.put(API_ENDPOINT + 'users/userProfile/$id',
         headers: {'Content-Type': 'application/json', 'Authorization': token},
         body: json.encode(body));
@@ -92,12 +92,10 @@ class ProfileService {
         var profileValue = json.decode(profileImageRes);
         print('PROFILERES   $profileValue');
         // prefs.setString("logo", profileValue['url']);
-        print("auto set ${profileValue['public_id']}");
+        print("auto set ${profileValue['public_id']} ${profileValue['url']}");
         ProfileService.setUserProfileInfo(id, {
           'publicId': profileValue['public_id'],
           'logo': profileValue['url']
-        }).then((onValue) {
-          print("jgcvjb  $onValue");
         });
       }
     });

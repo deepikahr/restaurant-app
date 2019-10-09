@@ -1,4 +1,7 @@
+import 'package:RestaurantSass/screens/mains/cart.dart';
+import 'package:RestaurantSass/screens/other/CounterModel.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../styles/styles.dart';
 import 'home.dart';
 import '../../services/main-service.dart';
@@ -21,6 +24,7 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
       GlobalKey<AsyncLoaderState>();
   Map<String, dynamic> restaurantInfo;
   VoidCallback _showBottomSheetCallback;
+  int cartCount;
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   getRestaurantsList() async {
@@ -42,7 +46,20 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
   }
 
   @override
+  void initState() {
+    // TODO: implement initState
+
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    CounterModel().getCounter().then((res) {
+      setState(() {
+        cartCount = res;
+      });
+      print("responcencdc   $cartCount");
+    });
     return Scaffold(
       key: scaffoldKey,
       appBar: AppBar(
@@ -53,7 +70,40 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
           style: titleBoldWhiteOSS(),
         ),
         centerTitle: true,
-        actions: <Widget>[HomePageState.buildCartIcon(context)],
+        actions: <Widget>[
+          // HomePageState.buildCartIcon(context)
+          GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => CartPage(),
+                  ),
+                );
+              },
+              child: Column(
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2.0),
+                    child: (cartCount == null || cartCount == 0)
+                        ? Text(
+                            '',
+                            style: TextStyle(fontSize: 14.0),
+                          )
+                        : Text(
+                            '${cartCount.toString()}',
+                            style: TextStyle(fontSize: 14.0),
+                          ),
+                  ),
+                  Container(
+                      padding: EdgeInsets.only(right: 10.0),
+                      child: Icon(Icons.shopping_cart)),
+                ],
+              )),
+          Padding(padding: EdgeInsets.only(left: 7.0)),
+          // buildLocationIcon(),
+          // Padding(padding: EdgeInsets.only(left: 7.0)),
+        ],
       ),
       body: _buildGetRestaurantLoader(),
     );

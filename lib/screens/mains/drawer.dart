@@ -110,7 +110,7 @@ class _MenuState extends State<Menu> {
                                     )
                                   : new CircleAvatar(
                                       backgroundImage: new AssetImage(
-                                          'assets/User_tzzeri.png')),
+                                          'lib/assets/imgs/na.jpg')),
                             )),
                         Flexible(
                             flex: 6,
@@ -149,29 +149,27 @@ class _MenuState extends State<Menu> {
                     );
                   },
                 ),
-                isLoggedIn
-                    ? new ListTile(
-                        title: new Text(
-                            "Cart   ${cartCounter > 0 ? cartCounter.toString() : ""}",
-                            style: TextStyle(
-                                color: Colors.white, fontFamily: "bold")),
-                        leading: Image.asset("lib/assets/icon/carte.png",
-                            width: 25.0),
-                        trailing: new Icon(
-                          Icons.keyboard_arrow_right,
-                          color: Colors.white70,
-                        ),
-                        onTap: () {
-                          Navigator.of(context).pop();
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (BuildContext context) => CartPage(),
-                            ),
-                          );
-                        },
-                      )
-                    : Container(),
+                new ListTile(
+                  title: new Text(
+                      "Cart   ${cartCounter > 0 ? cartCounter.toString() : ""}",
+                      style:
+                          TextStyle(color: Colors.white, fontFamily: "bold")),
+                  leading:
+                      Image.asset("lib/assets/icon/carte.png", width: 25.0),
+                  trailing: new Icon(
+                    Icons.keyboard_arrow_right,
+                    color: Colors.white70,
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (BuildContext context) => CartPage(),
+                      ),
+                    );
+                  },
+                ),
                 isLoggedIn
                     ? new ListTile(
                         title: new Text("My Order",

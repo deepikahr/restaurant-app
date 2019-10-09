@@ -49,42 +49,109 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
     }
   }
 
-  static File _imageFile;
+  File _imageFile;
 
-  void _choose() async {
+  void _choosegallery() async {
     var file = await ImagePicker.pickImage(source: ImageSource.gallery);
     // base64Image = base64Encode(file.readAsBytesSync());
-    setState(() {
+    setState(() async {
       _imageFile = file;
+      setState(() {
+        isPicUploading = true;
+      });
+      if (_imageFile != null) {
+        var stream =
+            new http.ByteStream(DelegatingStream.typed(_imageFile.openRead()));
+        Map<String, dynamic> body = {"baseKey": base64Image};
+        Map<String, dynamic> imageData;
+        await ProfileService.uploadProfileImage(
+          _imageFile,
+          stream,
+          profileData['_id'],
+        );
+        setState(() {
+          isPicUploading = false;
+        });
+      }
     });
   }
 
-  void _upload() async {
-    setState(() {
-      isPicUploading = true;
-    });
-    if (_imageFile != null) {
-      var stream =
-          new http.ByteStream(DelegatingStream.typed(_imageFile.openRead()));
-      Map<String, dynamic> body = {"baseKey": base64Image};
-      Map<String, dynamic> imageData;
-      await ProfileService.uploadProfileImage(
-        _imageFile,
-        stream,
-        profileData['_id'],
-      );
+  void _choosecemera() async {
+    var file = await ImagePicker.pickImage(source: ImageSource.camera);
+    // base64Image = base64Encode(file.readAsBytesSync());
+    setState(() async {
+      _imageFile = file;
       setState(() {
-        isPicUploading = false;
+        isPicUploading = true;
       });
-      // await ProfileService.setUserInfo(profileData['_id'], {
-      //   'publicId': imageData['public_id'],
-      //   'logo': imageData['url']
-      // }).then((onValue) {
-      //   setState(() {
-      //     isPicUploading = false;
-      //   });
-      // });
-    }
+      if (_imageFile != null) {
+        var stream =
+            new http.ByteStream(DelegatingStream.typed(_imageFile.openRead()));
+        Map<String, dynamic> body = {"baseKey": base64Image};
+        Map<String, dynamic> imageData;
+        await ProfileService.uploadProfileImage(
+          _imageFile,
+          stream,
+          profileData['_id'],
+        );
+        setState(() {
+          isPicUploading = false;
+        });
+      }
+    });
+  }
+
+  Future<bool> _onWillPop() {
+    return showDialog(
+          context: context,
+          builder: (context) => new AlertDialog(
+            title: InkWell(
+              onTap: () {
+                _choosegallery();
+                Navigator.of(context).pop(false);
+              },
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Icon(Icons.image, size: 18.0, color: Colors.black),
+                  Padding(
+                    padding: EdgeInsets.only(left: 10.0),
+                  ),
+                  Text(
+                    "Select Gallery",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            content: InkWell(
+              onTap: () {
+                _choosecemera();
+                Navigator.of(context).pop(false);
+              },
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Icon(Icons.delete, size: 18.0, color: Colors.black),
+                  Padding(
+                    padding: EdgeInsets.only(left: 10.0),
+                  ),
+                  Text("Select Cemera",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black,
+                        fontSize: 18.0,
+                      )),
+                ],
+              ),
+            ),
+          ),
+        ) ??
+        false;
   }
 
   @override
@@ -102,82 +169,58 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
             shrinkWrap: true,
             physics: ScrollPhysics(),
             children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      new BoxShadow(
-                        blurRadius: 3.0,
-                      ),
-                    ],
-                    border: Border(
-                      top: BorderSide(color: Colors.grey, width: 1.5),
-                      bottom: BorderSide(color: Colors.grey, width: 1.5),
-                    )),
-                child: ListTile(
-                  leading: Container(
-                    height: 50.0,
-                    width: 50.0,
-                    decoration: new BoxDecoration(
-                      border: new Border.all(color: Colors.black, width: 2.0),
-                      borderRadius: BorderRadius.circular(80.0),
-                    ),
-                    child: _imageFile == null
-                        ? profileData['logo'] != null
-                            ? new CircleAvatar(
-                                backgroundImage:
-                                    new NetworkImage("${profileData['logo']}"),
-                              )
-                            : new CircleAvatar(
-                                backgroundImage:
-                                    new AssetImage('lib/assets/imgs/na.jpg'))
-                        : new CircleAvatar(
-                            backgroundImage: new FileImage(_imageFile),
-                            radius: 80.0,
-                          ),
-                  ),
-                  title: Row(
-                    children: [
-                      RaisedButton(
-                        color: primaryLight,
-                        onPressed: _choose,
-                        child: Text(
-                          "Change",
-                          style: textOS(),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(left: 5.0),
-                      ),
-                      isPicUploading
-                          ? RaisedButton(
-                              onPressed: () {},
-                              color: primaryLight,
-                              child: Image.asset(
-                                'lib/assets/icon/spinner.gif',
-                                width: 19.0,
-                                height: 19.0,
-                              ),
-                            )
-                          : RaisedButton(
-                              onPressed: _upload,
-                              color: primaryLight,
-                              child: Text(
-                                "Upload",
-                                style: textOS(),
-                              ),
-                            ),
-                    ],
-                  ),
-                ),
-              ),
               new Padding(
                 padding: EdgeInsets.only(left: 20.0, right: 20.0),
                 child: Form(
                   key: _formKey,
                   child: Column(
                     children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: InkWell(
+                          onTap: _onWillPop,
+                          child: Container(
+                            height: 120.0,
+                            width: 120.0,
+                            decoration: new BoxDecoration(
+                              border: new Border.all(
+                                  color: Colors.black, width: 2.0),
+                              borderRadius: BorderRadius.circular(80.0),
+                            ),
+                            child: _imageFile == null
+                                ? profileData['logo'] != null
+                                    ? new CircleAvatar(
+                                        backgroundImage: new NetworkImage(
+                                            "${profileData['logo']}"),
+                                      )
+                                    : new CircleAvatar(
+                                        backgroundImage: new AssetImage(
+                                            'lib/assets/imgs/na.jpg'))
+                                : isPicUploading
+                                    ? CircularProgressIndicator()
+                                    : new CircleAvatar(
+                                        backgroundImage:
+                                            new FileImage(_imageFile),
+                                        radius: 80.0,
+                                      ),
+                          ),
+                        ),
+                      ),
+                      // Positioned(
+                      //   right: 2.0,
+                      //   bottom: 40.0,
+                      //   child: Container(
+                      //     height: 40.0,
+                      //     width: 40.0,
+                      //     child: new FloatingActionButton(
+                      //       foregroundColor: Colors.black,
+                      //       backgroundColor: Colors.white,
+                      //       onPressed: () => _onWillPop(),
+                      //       tooltip: 'Photo',
+                      //       child: new Icon(Icons.edit),
+                      //     ),
+                      //   ),
+                      // ),
                       Container(
                         margin: EdgeInsets.only(top: 20.0),
                         decoration: BoxDecoration(
@@ -203,6 +246,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           border: Border.all(color: Colors.grey, width: 1.0),
                         ),
                         child: TextFormField(
+                          maxLength: 10,
                           onSaved: (value) {
                             data['contactNumber'] = value;
                           },
@@ -210,10 +254,11 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           decoration: new InputDecoration(
                             labelText: 'Mobile No.',
                             hintStyle: textOS(),
+                            counterText: "",
                             contentPadding: EdgeInsets.all(10.0),
                             border: InputBorder.none,
                           ),
-                          keyboardType: TextInputType.text,
+                          keyboardType: TextInputType.number,
                         ),
                       ),
                       Container(
@@ -279,6 +324,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           border: Border.all(color: Colors.grey, width: 1.0),
                         ),
                         child: TextFormField(
+                          maxLength: 6,
                           onSaved: (value) {
                             data['zip'] = value;
                           },
@@ -287,10 +333,11 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           decoration: new InputDecoration(
                             labelText: 'Post Code',
                             hintStyle: textOS(),
+                            counterText: "",
                             contentPadding: EdgeInsets.all(10.0),
                             border: InputBorder.none,
                           ),
-                          keyboardType: TextInputType.text,
+                          keyboardType: TextInputType.number,
                         ),
                       ),
                       Container(

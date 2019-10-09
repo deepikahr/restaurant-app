@@ -1,3 +1,4 @@
+import 'package:RestaurantSass/screens/other/CounterModel.dart';
 import 'package:flutter/material.dart';
 import '../../styles/styles.dart';
 import 'cart.dart';
@@ -5,6 +6,7 @@ import '../../services/common.dart';
 import '../../services/profile-service.dart';
 import '../mains/home.dart';
 import 'dart:convert';
+import 'package:toast/toast.dart';
 
 class ProductDetailsPage extends StatefulWidget {
   final Map<String, dynamic> product, locationInfo, taxInfo, tableInfo;
@@ -27,14 +29,14 @@ class ProductDetailsPage extends StatefulWidget {
 
 class _ProductDetailsPageState extends State<ProductDetailsPage> {
   int selectedSizeIndex = 0;
-  int quantity = 1;
+  int quantity = 1, cartCount;
   double price = 0;
   Map<String, dynamic> cartProduct;
   bool isLoading = true;
   bool isFavourite = false;
   String favouriteId;
   bool isLoggedIn = false;
-
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   void _changeProductQuantity(bool increase) {
     if (increase) {
       setState(() {
@@ -97,6 +99,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         });
       }
     });
+
     _calculatePrice();
     super.initState();
   }
@@ -119,12 +122,22 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     });
   }
 
+  void showSnackbar(message) {
+    final snackBar = SnackBar(
+      content: Text(message),
+      duration: Duration(milliseconds: 3000),
+    );
+    _scaffoldKey.currentState.showSnackBar(snackBar);
+  }
+
   void _addToFavourite() async {
     setState(() {
       isLoading = true;
     });
     if (isFavourite) {
       ProfileService.removeFavouritById(favouriteId).then((onValue) {
+        Toast.show("Product remove to Favourite list", context,
+            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         if (onValue != null) {
           setState(() {
             favouriteId = null;
@@ -137,6 +150,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       ProfileService.addToFavourite(widget.product['_id'], widget.restaurantId,
               widget.locationInfo['_id'])
           .then((onValue) {
+        Toast.show("Product add to Favourite list", context,
+            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         setState(() {
           favouriteId = onValue['_id'];
           isLoading = false;
@@ -148,6 +163,12 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    CounterModel().getCounter().then((res) {
+      setState(() {
+        cartCount = res;
+      });
+      print("responcencdc   $cartCount");
+    });
     return Scaffold(
       appBar: AppBar(
         backgroundColor: PRIMARY,
@@ -158,7 +179,37 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         ),
         centerTitle: true,
         actions: <Widget>[
-          HomePageState.buildCartIcon(context),
+          // HomePageState.buildCartIcon(context),
+          GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => CartPage(),
+                  ),
+                );
+              },
+              child: Column(
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2.0),
+                    child: (cartCount == null || cartCount == 0)
+                        ? Text(
+                            '',
+                            style: TextStyle(fontSize: 14.0),
+                          )
+                        : Text(
+                            '${cartCount.toString()}',
+                            style: TextStyle(fontSize: 14.0),
+                          ),
+                  ),
+                  Container(
+                      padding: EdgeInsets.only(right: 10.0),
+                      child: Icon(Icons.shopping_cart)),
+                ],
+              )),
+          Padding(padding: EdgeInsets.only(left: 7.0)),
+          // buildLocationIcon(),
         ],
       ),
       // body: Stack(
@@ -204,7 +255,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         width: 0.0,
                       ),
               ),
-              _buildMultiSelectionBlock(widget.product['extraIngredients']),
+              widget.product['extraIngredients'] != null
+                  ? _buildMultiSelectionBlock(
+                      widget.product['extraIngredients'])
+                  : Container(),
             ],
           ),
         ),
@@ -215,7 +269,33 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         child: Column(
           children: <Widget>[
             _buildProductAddCounter(),
-            _buildAddToCartButton(),
+            widget.locationInfo['deliveryInfo'] != null
+                ? _buildAddToCartButton()
+                : Padding(
+                    padding: const EdgeInsetsDirectional.only(
+                        start: 20.0, end: 20.0, bottom: 1.0),
+                    child: RawMaterialButton(
+                      padding:
+                          EdgeInsetsDirectional.only(start: 15.0, end: 15.0),
+                      fillColor: PRIMARY,
+                      constraints: const BoxConstraints(minHeight: 44.0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(50.0),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          new Text(
+                            "Delivery is Not Available",
+                            style: hintStyleWhiteLightOSB(),
+                          ),
+                        ],
+                      ),
+                      onPressed: null,
+                      splashColor: secondary,
+                    ),
+                  ),
           ],
         ),
       ),
@@ -270,7 +350,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         onTap: _addToFavourite,
                         child: Icon(
                           Icons.favorite,
-                          color: isFavourite ? PRIMARY : primaryLight,
+                          color: isFavourite ? PRIMARY : Colors.white,
                           size: 40.0,
                         ),
                       ),
@@ -314,41 +394,52 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         itemBuilder: (BuildContext context, int index) {
           if (extras[index] != null && extras[index]['isSelected'] == null)
             extras[index]['isSelected'] = false;
-          return Container(
-            color: Colors.white,
-            width: screenWidth(context),
-            child: Padding(
-              padding: EdgeInsets.only(left: 10.0),
-              child: Row(
-                children: <Widget>[
-                  Checkbox(
-                    value: extras[index]['isSelected'],
-                    onChanged: (bool value) {
-                      setState(() {
-                        extras[index]['isSelected'] =
-                            !extras[index]['isSelected'];
-                      });
-                      _calculatePrice();
-                    },
-                    activeColor: PRIMARY,
+          return extras[index] != null
+              ? Container(
+                  color: Colors.white,
+                  width: screenWidth(context),
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 10.0),
+                    child: Row(
+                      children: <Widget>[
+                        Checkbox(
+                          value: extras[index]['isSelected'],
+                          onChanged: (bool value) {
+                            setState(() {
+                              extras[index]['isSelected'] =
+                                  !extras[index]['isSelected'];
+                            });
+                            _calculatePrice();
+                          },
+                          activeColor: PRIMARY,
+                        ),
+                        Text(
+                          extras[index]['name'] != null
+                              ? extras[index]['name']
+                              : '',
+                          style: hintStyleSmallDarkLightOSR(),
+                        ),
+                        Expanded(
+                          child: Padding(
+                              padding: const EdgeInsets.only(right: 15.0),
+                              child: new Text(
+                                '\$' +
+                                    (extras[index]['price']).toStringAsFixed(2),
+                                textAlign: TextAlign.end,
+                                style: hintStyleTitleBlueOSR(),
+                              )),
+                        ),
+                      ],
+                    ),
                   ),
-                  Text(
-                    extras[index]['name'] != null ? extras[index]['name'] : '',
-                    style: hintStyleSmallDarkLightOSR(),
+                )
+              : Container(
+                  color: Colors.white,
+                  width: screenWidth(context),
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 10.0),
                   ),
-                  Expanded(
-                    child: Padding(
-                        padding: const EdgeInsets.only(right: 15.0),
-                        child: new Text(
-                          '\$' + (extras[index]['price']).toStringAsFixed(2),
-                          textAlign: TextAlign.end,
-                          style: hintStyleTitleBlueOSR(),
-                        )),
-                  ),
-                ],
-              ),
-            ),
-          );
+                );
         },
       ),
     );
