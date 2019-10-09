@@ -1,3 +1,4 @@
+import 'package:RestaurantSass/screens/other/CounterModel.dart';
 import 'package:flutter/material.dart';
 import 'package:async_loader/async_loader.dart';
 import '../../styles/styles.dart';
@@ -43,7 +44,7 @@ class _ProductListPageState extends State<ProductListPage> {
   final GlobalKey<AsyncLoaderState> _asyncLoaderState =
       GlobalKey<AsyncLoaderState>();
   bool isShopOpen = true;
-
+  int cartCount;
   getProductList() async {
     // _checkLocationOpenClose();
     return await MainService.getProductsBylocationId(widget.locationId);
@@ -100,9 +101,22 @@ class _ProductListPageState extends State<ProductListPage> {
   //     }
   //     print(isShopOpen.toString());
   // }
+  @override
+  void initState() {
+    print(widget.cuisine.length);
+    print(widget.cuisine);
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
+    CounterModel().getCounter().then((res) {
+      setState(() {
+        cartCount = res;
+      });
+      print("responcencdc   $cartCount");
+    });
     AsyncLoader asyncLoader = AsyncLoader(
       key: _asyncLoaderState,
       initState: () async => await getProductList(),
@@ -151,7 +165,37 @@ class _ProductListPageState extends State<ProductListPage> {
         ),
         centerTitle: true,
         actions: <Widget>[
-          HomePageState.buildCartIcon(context),
+          // HomePageState.buildCartIcon(context),
+          GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => CartPage(),
+                  ),
+                );
+              },
+              child: Column(
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2.0),
+                    child: (cartCount == null || cartCount == 0)
+                        ? Text(
+                            '',
+                            style: TextStyle(fontSize: 14.0),
+                          )
+                        : Text(
+                            '${cartCount.toString()}',
+                            style: TextStyle(fontSize: 14.0),
+                          ),
+                  ),
+                  Container(
+                      padding: EdgeInsets.only(right: 10.0),
+                      child: Icon(Icons.shopping_cart)),
+                ],
+              )),
+          Padding(padding: EdgeInsets.only(left: 7.0)),
+          // buildLocationIcon(),
         ],
       ),
       body: SingleChildScrollView(
@@ -204,7 +248,7 @@ class _ProductListPageState extends State<ProductListPage> {
       image: widget.imgUrl != null
           ? NetworkImage(widget.imgUrl)
           : AssetImage("lib/assets/bgImgs/coverbg.png"),
-      height: 200.0,
+      height: 220.0,
       width: screenWidth(context),
       color: Colors.black45,
       colorBlendMode: BlendMode.hardLight,
@@ -310,13 +354,6 @@ class _ProductListPageState extends State<ProductListPage> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: <Widget>[
                       Text(
-                        LocationCard.getCuisines(widget.cuisine)
-                            .substring(0, 10),
-                        overflow: TextOverflow.ellipsis,
-                        style: hintStyleSmallWhiteLightOSS(),
-                      ),
-                      Padding(padding: EdgeInsets.only(left: 5.0)),
-                      Text(
                         'Open',
                         style: hintStyleSmallGreenLightOSS(),
                       ),
@@ -324,13 +361,21 @@ class _ProductListPageState extends State<ProductListPage> {
                       Image.asset(
                         'lib/assets/icon/about.png',
                         width: 18.0,
-                      )
+                      ),
+                      Padding(padding: EdgeInsets.only(left: 5.0)),
                     ],
                   ),
                 ),
               ),
             ],
           ),
+          Row(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
+            Text(
+              LocationCard.getCuisines(widget.cuisine),
+              overflow: TextOverflow.ellipsis,
+              style: hintStyleSmallWhiteLightOSS(),
+            ),
+          ])
         ],
       ),
     );
@@ -338,7 +383,7 @@ class _ProductListPageState extends State<ProductListPage> {
 
   Widget _buildInfoBar() {
     return Container(
-      margin: EdgeInsetsDirectional.only(top: 200.0),
+      margin: EdgeInsetsDirectional.only(top: 220.0),
       color: PRIMARY,
       child: ListTile(
         leading: Image(
@@ -477,7 +522,7 @@ class _ProductListPageState extends State<ProductListPage> {
                 padding: EdgeInsetsDirectional.only(top: 18.0),
                 child: Image.asset(
                   'lib/assets/icon/addbtn.png',
-                  width: 26.0,
+                  width: 16.0,
                 ),
               ),
             ],

@@ -1,3 +1,4 @@
+import 'package:RestaurantSass/screens/other/CounterModel.dart';
 import 'package:flutter/material.dart';
 import 'package:async_loader/async_loader.dart';
 import '../../styles/styles.dart';
@@ -15,7 +16,7 @@ class LocationListSheet extends StatelessWidget {
 
   final GlobalKey<AsyncLoaderState> _asyncLoaderState =
       GlobalKey<AsyncLoaderState>();
-
+  int cartCount;
   getLocationListByRestaurantId() async {
     return await MainService.getLocationsByRestaurantId(
         restaurantInfo['list']['_id']);
@@ -23,6 +24,10 @@ class LocationListSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // CounterModel().getCounter().then((res) {
+    //   cartCount = res;
+    //   print("responce   $cartCount");
+    // });
     AsyncLoader asyncLoader = new AsyncLoader(
         key: _asyncLoaderState,
         initState: () async => getLocationListByRestaurantId(),

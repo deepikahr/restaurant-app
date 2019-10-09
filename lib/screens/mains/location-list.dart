@@ -1,3 +1,5 @@
+import 'package:RestaurantSass/screens/mains/cart.dart';
+import 'package:RestaurantSass/screens/other/CounterModel.dart';
 import 'package:flutter/material.dart';
 import '../../styles/styles.dart';
 import 'location-list-sheet.dart';
@@ -15,8 +17,15 @@ class LocationListPage extends StatefulWidget {
 }
 
 class _LocationListPageState extends State<LocationListPage> {
+  int cartCount;
   @override
   Widget build(BuildContext context) {
+    CounterModel().getCounter().then((res) {
+      setState(() {
+        cartCount = res;
+      });
+      print("responce   $cartCount");
+    });
     return Scaffold(
       appBar: AppBar(
         backgroundColor: PRIMARY,
@@ -26,7 +35,40 @@ class _LocationListPageState extends State<LocationListPage> {
           style: titleBoldWhiteOSS(),
         ),
         centerTitle: true,
-        actions: <Widget>[HomePageState.buildCartIcon(context)],
+        actions: <Widget>[
+          // HomePageState.buildCartIcon(context)
+          GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => CartPage(),
+                  ),
+                );
+              },
+              child: Column(
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2.0),
+                    child: (cartCount == null || cartCount == 0)
+                        ? Text(
+                            '',
+                            style: TextStyle(fontSize: 14.0),
+                          )
+                        : Text(
+                            '${cartCount.toString()}',
+                            style: TextStyle(fontSize: 14.0),
+                          ),
+                  ),
+                  Container(
+                      padding: EdgeInsets.only(right: 10.0),
+                      child: Icon(Icons.shopping_cart)),
+                ],
+              )),
+          Padding(padding: EdgeInsets.only(left: 7.0)),
+          // buildLocationIcon(),
+          // Padding(padding: EdgeInsets.only(left: 7.0)),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(

@@ -123,9 +123,11 @@ class _AddAddressPageState extends State<AddAddressPage> {
                             ),
                           ),
                           child: TextFormField(
+                            maxLength: 10,
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
                                 hintText: 'Enter Contact no',
+                                counterText: "",
                                 hintStyle: hintStyleSmallLightOSR(),
                                 border: InputBorder.none),
                             style: textOSR(),
@@ -155,7 +157,10 @@ class _AddAddressPageState extends State<AddAddressPage> {
                                   border: BorderDirectional(
                                       bottom: BorderSide(color: Colors.grey))),
                               child: new TextFormField(
+                                keyboardType: TextInputType.number,
+                                maxLength: 6,
                                 decoration: InputDecoration(
+                                    counterText: "",
                                     hintText: 'Enter your pincode',
                                     hintStyle: hintStyleSmallLightOSR(),
                                     border: InputBorder.none),

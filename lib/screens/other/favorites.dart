@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:toast/toast.dart';
 import '../../styles/styles.dart';
 import '../../services/profile-service.dart';
 import '../../widgets/no-data.dart';
@@ -150,6 +151,11 @@ class _FavoritesState extends State<Favorites> {
                                       ProfileService.removeFavouritById(
                                               favs[index]['_id'])
                                           .then((onValue) {
+                                        Toast.show(
+                                            "Product remove to Favourite list",
+                                            context,
+                                            duration: Toast.LENGTH_LONG,
+                                            gravity: Toast.BOTTOM);
                                         if (onValue) {
                                           setState(() {
                                             isProcessing = false;

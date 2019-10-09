@@ -1,4 +1,6 @@
+import 'package:RestaurantSass/screens/other/CounterModel.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../styles/styles.dart';
 import 'confirm-order.dart';
 import '../../services/common.dart';
@@ -23,7 +25,7 @@ class _CartPageState extends State<CartPage> {
   // double tax = 0.0;
   List<dynamic> products;
   Map<String, dynamic> cartItems = {};
-  int productsLength = 0;
+  int productsLength = 0, cartCoun;
   Map<String, dynamic> selectedCoupon;
   double couponDeduction = 0.0;
 
@@ -163,6 +165,11 @@ class _CartPageState extends State<CartPage> {
 
   @override
   Widget build(BuildContext context) {
+    // final counterModel = Provider.of<CounterModel>(context);
+    CounterModel().getCounter().then((res) {
+      cartCoun = res;
+      print("responce   $cartCoun");
+    });
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -289,6 +296,7 @@ class _CartPageState extends State<CartPage> {
                           ),
                           onPressed: () async {
                             products.removeAt(index);
+                            CounterModel().calculateCounter();
                             widget.product = null;
                             if (products.length == 0) {
                               cartItems = null;
