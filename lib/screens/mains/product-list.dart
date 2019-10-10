@@ -427,7 +427,7 @@ class _ProductListPageState extends State<ProductListPage> {
           padding: EdgeInsetsDirectional.only(top: 8.0, start: 14.0),
           alignment: AlignmentDirectional.centerStart,
           child: Text(
-            categoryName,
+            "${categoryName[0].toUpperCase()}${categoryName.substring(1)}",
             style: titleWhiteBoldOSB(),
           ),
         ),
@@ -539,8 +539,8 @@ class _ProductListPageState extends State<ProductListPage> {
       children: <Widget>[
         Text(
           productName.length > 21
-              ? productName.substring(0, 21) + '...'
-              : productName,
+              ? "${productName[0].toUpperCase()}${productName.substring(1, 21) + '...'}"
+              : "${productName[0].toUpperCase()}${productName.substring(1)}",
           style: subTitleDarkBoldOSS(),
         ),
         Padding(padding: EdgeInsets.all(5.0)),

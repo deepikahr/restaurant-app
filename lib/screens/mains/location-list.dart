@@ -31,7 +31,7 @@ class _LocationListPageState extends State<LocationListPage> {
         backgroundColor: PRIMARY,
         elevation: 0.0,
         title: Text(
-          widget.restaurantInfo['list']['restaurantName'],
+          "${widget.restaurantInfo['list']['restaurantName'][0].toUpperCase()}${widget.restaurantInfo['list']['restaurantName'].substring(1)}",
           style: titleBoldWhiteOSS(),
         ),
         centerTitle: true,

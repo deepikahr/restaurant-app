@@ -174,7 +174,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         backgroundColor: PRIMARY,
         elevation: 0.0,
         title: Text(
-          widget.product['title'],
+          "${widget.product['title'][0].toUpperCase()}${widget.product['title'].substring(1)}",
           style: titleBoldWhiteOSS(),
         ),
         centerTitle: true,
