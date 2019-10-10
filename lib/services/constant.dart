@@ -1,5 +1,5 @@
 //App name
-const APP_NAME = 'Restaurant Sass';
+const APP_NAME = 'Restaurant Saas';
 
 //one signal
 const ONE_SIGNAL_APP_ID = '05ac6c51-8416-41ab-8779-b48503bbe125';

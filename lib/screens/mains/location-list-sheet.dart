@@ -169,7 +169,7 @@ class LocationListSheet extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  name,
+                  "${name[0].toUpperCase()}${name.substring(1)}",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 15.0,

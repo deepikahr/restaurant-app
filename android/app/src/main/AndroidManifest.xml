@@ -18,7 +18,7 @@
          FlutterApplication and put your custom class here. -->
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="restaurant_sass"
+        android:label="Restaurant Saas"
         android:icon="@mipmap/ic_launcher">
         <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyD6Q4UgAYOL203nuwNeBr4j_-yAd1U1gko"/>
         <activity
