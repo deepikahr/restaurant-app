@@ -1,4 +1,5 @@
-import 'package:RestaurantSass/screens/other/CounterModel.dart';
+import 'package:RestaurantSaas/screens/other/CounterModel.dart';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../styles/styles.dart';

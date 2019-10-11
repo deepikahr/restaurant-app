@@ -85,8 +85,13 @@ class ProfileService {
     var response = await request.send();
     print('$response');
     response.stream.transform(utf8.decoder).listen((value) {
-      // print('value $value');
-      var profileImageRes = value + "}";
+      var profileImageRes;
+      print('value ${value.substring(value.length - 1, value.length)}');
+      if (value.substring(value.length - 1, value.length) == "}") {
+        profileImageRes = value;
+      } else {
+        profileImageRes = value + "}";
+      }
 
       if (value.length > 3) {
         var profileValue = json.decode(profileImageRes);

@@ -1,4 +1,4 @@
-import 'package:RestaurantSass/screens/other/CounterModel.dart';
+import 'package:RestaurantSaas/screens/other/CounterModel.dart';
 import 'package:flutter/material.dart';
 import 'package:async_loader/async_loader.dart';
 import '../../styles/styles.dart';
