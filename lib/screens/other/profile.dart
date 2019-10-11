@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:toast/toast.dart';
 import '../../styles/styles.dart';
 import '../../services/profile-service.dart';
 import 'package:async_loader/async_loader.dart';
@@ -41,6 +42,9 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 
       ProfileService.setUserInfo(profileData['_id'], profileData)
           .then((onValue) {
+        print(onValue);
+        Toast.show("Your profile Successfully UPDATED", context,
+            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         setState(() {
           isLoading = false;
         });
@@ -94,6 +98,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
           stream,
           profileData['_id'],
         );
+
         setState(() {
           isPicUploading = false;
         });
@@ -140,7 +145,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                   Padding(
                     padding: EdgeInsets.only(left: 10.0),
                   ),
-                  Text("Select Cemera",
+                  Text("Select Camera",
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
                         color: Colors.black,
