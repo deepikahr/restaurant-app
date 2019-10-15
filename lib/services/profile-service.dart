@@ -1,4 +1,5 @@
 import 'package:http/http.dart' show Client;
+import 'package:toast/toast.dart';
 import 'constant.dart';
 import 'dart:convert';
 import 'common.dart';
@@ -29,6 +30,18 @@ class ProfileService {
     });
     final response = await client.get(API_ENDPOINT + 'users/me',
         headers: {'Content-Type': 'application/json', 'Authorization': token});
+    return json.decode(response.body);
+  }
+
+  static Future<Map<String, dynamic>> deleteUserProfilePic() async {
+    String token;
+    await Common.getToken().then((onValue) {
+      token = 'bearer ' + onValue;
+    });
+    print("$token ");
+    final response = await client.delete(API_ENDPOINT + 'users/profile/delete',
+        headers: {'Content-Type': 'application/json', 'Authorization': token});
+    print(json.decode(response.body));
     return json.decode(response.body);
   }
 
@@ -101,6 +114,8 @@ class ProfileService {
         ProfileService.setUserProfileInfo(id, {
           'publicId': profileValue['public_id'],
           'logo': profileValue['url']
+        }).then((dmdkc) {
+          print(dmdkc);
         });
       }
     });

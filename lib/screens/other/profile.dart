@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:toast/toast.dart';
 import '../../styles/styles.dart';
 import '../../services/profile-service.dart';
 import 'package:async_loader/async_loader.dart';
@@ -25,7 +27,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   bool isLoading = false;
   Image selectedImage;
   String base64Image;
-  bool isPicUploading = false;
+  bool isPicUploading = false, isImageUploading = false;
 
   Future<Map<String, dynamic>> getProfileInfo() async {
     return await ProfileService.getUserInfo();
@@ -38,9 +40,19 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
       });
       _formKey.currentState.save();
       print("save button $profileData");
-
-      ProfileService.setUserInfo(profileData['_id'], profileData)
-          .then((onValue) {
+      var body = {
+        "name": profileData['name'],
+        "contactNumber": profileData['contactNumber'],
+        "country": profileData['country'],
+        "locationName": profileData['locationName'],
+        "zip": profileData['zip'],
+        "state": profileData['state'],
+        "address": profileData['address'],
+      };
+      ProfileService.setUserInfo(profileData['_id'], body).then((onValue) {
+        print(onValue);
+        Toast.show("Your profile Successfully UPDATED", context,
+            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         setState(() {
           isLoading = false;
         });
@@ -51,7 +63,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 
   File _imageFile;
 
-  void _choosegallery() async {
+  void selectGallary() async {
     var file = await ImagePicker.pickImage(source: ImageSource.gallery);
     // base64Image = base64Encode(file.readAsBytesSync());
     setState(() async {
@@ -72,11 +84,13 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
         setState(() {
           isPicUploading = false;
         });
+        Toast.show("Your profile Picture Successfully UPDATED", context,
+            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
       }
     });
   }
 
-  void _choosecemera() async {
+  void selectCamera() async {
     var file = await ImagePicker.pickImage(source: ImageSource.camera);
     // base64Image = base64Encode(file.readAsBytesSync());
     setState(() async {
@@ -94,64 +108,33 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
           stream,
           profileData['_id'],
         );
+
         setState(() {
           isPicUploading = false;
         });
+        Toast.show("Your profile Picture Successfully UPDATED", context,
+            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
       }
     });
   }
 
-  Future<bool> _onWillPop() {
-    return showDialog(
-          context: context,
-          builder: (context) => new AlertDialog(
-            title: InkWell(
-              onTap: () {
-                _choosegallery();
-                Navigator.of(context).pop(false);
-              },
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Icon(Icons.image, size: 18.0, color: Colors.black),
-                  Padding(
-                    padding: EdgeInsets.only(left: 10.0),
-                  ),
-                  Text(
-                    "Select Gallery",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            content: InkWell(
-              onTap: () {
-                _choosecemera();
-                Navigator.of(context).pop(false);
-              },
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Icon(Icons.delete, size: 18.0, color: Colors.black),
-                  Padding(
-                    padding: EdgeInsets.only(left: 10.0),
-                  ),
-                  Text("Select Cemera",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black,
-                        fontSize: 18.0,
-                      )),
-                ],
-              ),
-            ),
-          ),
-        ) ??
-        false;
+  void removeProfilePic() async {
+    setState(() {
+      isImageUploading = true;
+    });
+    await ProfileService.deleteUserProfilePic().then((onValue) {
+      // print(onValue['statusCode']);
+      // print(onValue['message']);
+      // if (onValue['statusCode'] == 200) {
+      Toast.show(onValue['message'], context,
+          duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+      profileData['logo'] = null;
+      _imageFile = null;
+      setState(() {
+        isImageUploading = false;
+      });
+      // }
+    });
   }
 
   @override
@@ -178,7 +161,48 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                       Padding(
                         padding: const EdgeInsets.only(top: 8.0),
                         child: InkWell(
-                          onTap: _onWillPop,
+                          // onTap: _onWillPop,
+                          onTap: () {
+                            containerForSheet<String>(
+                              context: context,
+                              child: CupertinoActionSheet(
+                                title: const Text('Change profile picture'),
+                                actions: <Widget>[
+                                  CupertinoActionSheetAction(
+                                    child: const Text('Choose from photos'),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                      selectGallary();
+                                    },
+                                  ),
+                                  CupertinoActionSheetAction(
+                                    child: const Text('Take photo'),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                      selectCamera();
+                                    },
+                                  ),
+                                  profileData['logo'] != null
+                                      ? CupertinoActionSheetAction(
+                                          child: const Text('Remove photo'),
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                            removeProfilePic();
+                                          },
+                                        )
+                                      : Container(),
+                                ],
+                                cancelButton: CupertinoActionSheetAction(
+                                  child: const Text('Cancel'),
+                                  isDefaultAction: true,
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              ),
+                            );
+                          },
+
                           child: Container(
                             height: 120.0,
                             width: 120.0,
@@ -424,6 +448,13 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
           )
         ],
       ),
+    );
+  }
+
+  void containerForSheet<T>({BuildContext context, Widget child}) {
+    showCupertinoModalPopup<T>(
+      context: context,
+      builder: (BuildContext context) => child,
     );
   }
 }
