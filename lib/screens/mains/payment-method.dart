@@ -78,7 +78,10 @@ class _PaymentMethodState extends State<PaymentMethod> {
   }
 
   void _orderInfo() {
+    print(widget.cart);
+
     ProfileService.placeOrder(widget.cart).then((onValue) {
+      print(onValue);
       if (onValue != null && onValue['message'] != null) {
         setState(() {
           isLoading = false;
