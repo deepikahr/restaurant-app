@@ -9,6 +9,9 @@ import 'package:async_loader/async_loader.dart';
 import '../../widgets/no-data.dart';
 import 'location-list-sheet.dart';
 import '../../services/common.dart';
+import '../../services/sentry-services.dart';
+
+SentryError sentryError = new SentryError();
 
 class RestaurantListPage extends StatefulWidget {
   final String title;
@@ -35,11 +38,18 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
     } else {
       List<dynamic> restaurants;
       await Common.getPositionInfo().then((position) async {
-        await MainService.getNearByRestaurants(
-                position['lat'], position['long'])
-            .then((onValue) {
-          restaurants = onValue;
-        });
+        try{
+          await MainService.getNearByRestaurants(
+              position['lat'], position['long'])
+              .then((onValue) {
+            restaurants = onValue;
+          });
+        }
+        catch (error, stackTrace) {
+        sentryError.reportError(error, stackTrace);
+        }
+      }).catchError((onError) {
+        sentryError.reportError(onError, null);
       });
       return restaurants;
     }
@@ -55,10 +65,17 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
   @override
   Widget build(BuildContext context) {
     CounterModel().getCounter().then((res) {
-      setState(() {
-        cartCount = res;
-      });
-      print("responcencdc   $cartCount");
+      try{
+        setState(() {
+          cartCount = res;
+        });
+        print("responcencdc   $cartCount");
+      }
+      catch (error, stackTrace) {
+      sentryError.reportError(error, stackTrace);
+      }
+    }).catchError((onError) {
+      sentryError.reportError(onError, null);
     });
     return Scaffold(
       key: scaffoldKey,
@@ -114,9 +131,12 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
         key: _asyncLoaderState,
         initState: () async => await getRestaurantsList(),
         renderLoad: () => Center(child: CircularProgressIndicator()),
-        renderError: ([error]) => NoData(
-            message: 'Please check your internet connection!',
-            icon: Icons.block),
+        renderError: ([error]) {
+          sentryError.reportError(error, null);
+          return NoData(
+              message: 'Please check your internet connection!',
+              icon: Icons.block);
+        },
         renderSuccess: ({data}) {
           return GridView.builder(
               physics: ScrollPhysics(),

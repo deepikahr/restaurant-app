@@ -6,6 +6,9 @@ import '../../services/common.dart';
 // import '../../services/constant.dart';
 // import 'package:stripe_payment/stripe_payment.dart';
 // import 'package:razorpay_plugin/razorpay_plugin.dart';
+import '../../services/sentry-services.dart';
+
+SentryError sentryError = new SentryError();
 
 class PaymentMethod extends StatefulWidget {
   final Map<String, dynamic> cart;
@@ -48,7 +51,14 @@ class _PaymentMethodState extends State<PaymentMethod> {
 
   void _placeOrder() async {
     await Common.getPositionInfo().then((onValue) {
-      widget.cart['position'] = onValue;
+      try{
+        widget.cart['position'] = onValue;
+      }
+      catch (error, stackTrace) {
+      sentryError.reportError(error, stackTrace);
+      }
+    }).catchError((onError) {
+      sentryError.reportError(onError, null);
     });
     if (widget.cart['paymentOption'] == 'RazorPay') {
       // // Map<String, String> notesr= {'orderInfo': json.encode(widget.cart)};
@@ -81,16 +91,23 @@ class _PaymentMethodState extends State<PaymentMethod> {
     print(widget.cart);
 
     ProfileService.placeOrder(widget.cart).then((onValue) {
-      print(onValue);
-      if (onValue != null && onValue['message'] != null) {
-        setState(() {
-          isLoading = false;
-        });
-        Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (BuildContext context) => ThankYou()),
-            (Route<dynamic> route) => route.isFirst);
+      try{
+        print(onValue);
+        if (onValue != null && onValue['message'] != null) {
+          setState(() {
+            isLoading = false;
+          });
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (BuildContext context) => ThankYou()),
+                  (Route<dynamic> route) => route.isFirst);
+        }
       }
+      catch (error, stackTrace) {
+      sentryError.reportError(error, stackTrace);
+      }
+    }).catchError((onError) {
+      sentryError.reportError(onError, null);
     });
   }
 

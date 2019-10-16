@@ -9,6 +9,9 @@ import 'dart:core';
 import '../../services/main-service.dart';
 import 'package:intl/intl.dart';
 // import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import '../../services/sentry-services.dart';
+
+SentryError sentryError = new SentryError();
 
 class ConfrimOrderPage extends StatefulWidget {
   final Map<String, dynamic> cart, deliveryInfo;
@@ -45,13 +48,27 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
 
   Future<Map<String, dynamic>> _getUserInfo() async {
     await ProfileService.getUserInfo().then((onValue) {
-      userInfo = onValue;
+      try{
+        userInfo = onValue;
+      }
+      catch (error, stackTrace) {
+      sentryError.reportError(error, stackTrace);
+      }
+    }).catchError((onError) {
+      sentryError.reportError(onError, null);
     });
     await MainService.getLoyaltyInfoByRestaurantId(widget.cart['restaurantID'])
         .then((onValue) {
-      userInfo['loyaltyInfo'] = onValue;
-      remainingLoyaltyPoint =
-          double.parse(userInfo['totalLoyaltyPoints'].toString());
+     try{
+       userInfo['loyaltyInfo'] = onValue;
+       remainingLoyaltyPoint =
+           double.parse(userInfo['totalLoyaltyPoints'].toString());
+     }
+      catch (error, stackTrace) {
+      sentryError.reportError(error, stackTrace);
+      }
+    }).catchError((onError) {
+      sentryError.reportError(onError, null);
     });
     return userInfo;
   }
@@ -135,9 +152,12 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
         key: _asyncLoaderState,
         initState: () async => await _getUserInfo(),
         renderLoad: () => Center(child: CircularProgressIndicator()),
-        renderError: ([error]) => NoData(
-            message: 'Please check your internet connection!',
-            icon: Icons.block),
+        renderError: ([error]) {
+          sentryError.reportError(error, null);
+          return NoData(
+              message: 'Please check your internet connection!',
+              icon: Icons.block);
+        },
         renderSuccess: ({data}) {
           return _buildConfirmOrderView(data);
         });
@@ -484,9 +504,12 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
         key: _asyncLoaderStateAddress,
         initState: () async => await _getAddressList(),
         renderLoad: () => Center(child: CircularProgressIndicator()),
-        renderError: ([error]) => NoData(
-            message: 'Please check your internet connection!',
-            icon: Icons.block),
+        renderError: ([error]) {
+          sentryError.reportError(error, null);
+          return NoData(
+              message: 'Please check your internet connection!',
+              icon: Icons.block);
+        },
         renderSuccess: ({data}) {
           if (widget.cart['shippingAddress'] == null) {
             widget.cart['shippingAddress'] = data.length > 0 ? data[0] : null;

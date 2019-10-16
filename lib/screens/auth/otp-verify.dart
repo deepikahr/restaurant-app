@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import '../../styles/styles.dart';
 import '../../services/auth-service.dart';
 import 'new-password.dart';
+import '../../services/sentry-services.dart';
+
+SentryError sentryError = new SentryError();
 
 class OtpVerify extends StatefulWidget {
   final String otpToken;
@@ -23,24 +26,30 @@ class _OtpVerifyState extends State<OtpVerify> {
         isLoading = true;
       });
       AuthService.verifyOTP({'otp': otp}, widget.otpToken).then((onValue) {
-        if (onValue['message'] != null) {
-          showSnackbar(onValue['message']);
-          if (onValue['token'] != null) {
-            Future.delayed(Duration(milliseconds: 1500), () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (BuildContext context) =>
-                      NewPassword(otpToken: onValue['token']),
-                ),
-              );
-            });
-          }
-        }
-        setState(() {
-          isLoading = false;
-        });
+       try{
+         if (onValue['message'] != null) {
+           showSnackbar(onValue['message']);
+           if (onValue['token'] != null) {
+             Future.delayed(Duration(milliseconds: 1500), () {
+               Navigator.push(
+                 context,
+                 MaterialPageRoute(
+                   builder: (BuildContext context) =>
+                       NewPassword(otpToken: onValue['token']),
+                 ),
+               );
+             });
+           }
+         }
+         setState(() {
+           isLoading = false;
+         });
+       }
+       catch (error, stackTrace) {
+         sentryError.reportError(error, stackTrace);
+       }
       }).catchError((onError) {
+        sentryError.reportError(onError, null);
         setState(() {
           isLoading = false;
         });

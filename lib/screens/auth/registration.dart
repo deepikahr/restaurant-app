@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import '../../styles/styles.dart';
 import '../../blocs/validators.dart';
 import '../../services/auth-service.dart';
+import '../../services/sentry-services.dart';
+
+SentryError sentryError = new SentryError();
 
 class RegisterForm extends StatefulWidget {
   @override
@@ -29,18 +32,23 @@ class _RegisterFormState extends State<RegisterForm> {
         });
         _formKey.currentState.save();
         await AuthService.register(register).then((onValue) {
-          if (onValue['message'] != null) {
-            showSnackbar(onValue['message']);
-            Future.delayed(const Duration(milliseconds: 3000), () {
-              if (onValue['_id'] != null) {
-                Navigator.pop(context);
-              }
-              setState(() {
-                isLoading = false;
+          try{
+            if (onValue['message'] != null) {
+              showSnackbar(onValue['message']);
+              Future.delayed(const Duration(milliseconds: 3000), () {
+                if (onValue['_id'] != null) {
+                  Navigator.pop(context);
+                }
+                setState(() {
+                  isLoading = false;
+                });
               });
-            });
+            }
+          }catch (error, stackTrace) {
+            sentryError.reportError(error, stackTrace);
           }
         }).catchError((onError) {
+          sentryError.reportError(onError, null);
           showSnackbar(onError);
           setState(() {
             isLoading = false;

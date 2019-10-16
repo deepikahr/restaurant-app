@@ -7,6 +7,9 @@ import '../../services/profile-service.dart';
 import '../mains/home.dart';
 import 'dart:convert';
 import 'package:toast/toast.dart';
+import '../../services/sentry-services.dart';
+
+SentryError sentryError = new SentryError();
 
 class ProductDetailsPage extends StatefulWidget {
   final Map<String, dynamic> product, locationInfo, taxInfo, tableInfo;
@@ -92,12 +95,19 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   @override
   void initState() {
     Common.getToken().then((onValue) {
-      if (onValue != null) {
-        setState(() {
-          isLoggedIn = true;
-          _checkFavourite();
-        });
+      try{
+        if (onValue != null) {
+          setState(() {
+            isLoggedIn = true;
+            _checkFavourite();
+          });
+        }
       }
+      catch (error, stackTrace) {
+      sentryError.reportError(error, stackTrace);
+      }
+    }).catchError((onError) {
+      sentryError.reportError(onError, null);
     });
 
     _calculatePrice();
@@ -106,19 +116,26 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
   void _checkFavourite() async {
     ProfileService.checkFavourite(widget.product['_id']).then((onValue) {
-      if (mounted) {
-        setState(() {
-          isLoading = false;
-          if (onValue['_id'] != null) {
-            favouriteId = onValue['_id'];
-          }
-          if (onValue['resflag'] != null) {
-            isFavourite = onValue['resflag'];
-          } else {
-            isFavourite = false;
-          }
-        });
+      try{
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+            if (onValue['_id'] != null) {
+              favouriteId = onValue['_id'];
+            }
+            if (onValue['resflag'] != null) {
+              isFavourite = onValue['resflag'];
+            } else {
+              isFavourite = false;
+            }
+          });
+        }
       }
+      catch (error, stackTrace) {
+      sentryError.reportError(error, stackTrace);
+      }
+    }).catchError((onError) {
+      sentryError.reportError(onError, null);
     });
   }
 
@@ -136,27 +153,41 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     });
     if (isFavourite) {
       ProfileService.removeFavouritById(favouriteId).then((onValue) {
-        Toast.show("Product remove to Favourite list", context,
-            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-        if (onValue != null) {
-          setState(() {
-            favouriteId = null;
-            isLoading = false;
-            isFavourite = false;
-          });
+        try{
+          Toast.show("Product remove to Favourite list", context,
+              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+          if (onValue != null) {
+            setState(() {
+              favouriteId = null;
+              isLoading = false;
+              isFavourite = false;
+            });
+          }
         }
+        catch (error, stackTrace) {
+        sentryError.reportError(error, stackTrace);
+        }
+      }).catchError((onError) {
+        sentryError.reportError(onError, null);
       });
     } else {
       ProfileService.addToFavourite(widget.product['_id'], widget.restaurantId,
               widget.locationInfo['_id'])
           .then((onValue) {
-        Toast.show("Product add to Favourite list", context,
-            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-        setState(() {
-          favouriteId = onValue['_id'];
-          isLoading = false;
-          isFavourite = true;
-        });
+        try{
+          Toast.show("Product add to Favourite list", context,
+              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+          setState(() {
+            favouriteId = onValue['_id'];
+            isLoading = false;
+            isFavourite = true;
+          });
+        }
+        catch (error, stackTrace) {
+        sentryError.reportError(error, stackTrace);
+        }
+      }).catchError((onError) {
+        sentryError.reportError(onError, null);
       });
     }
   }
@@ -164,10 +195,17 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   @override
   Widget build(BuildContext context) {
     CounterModel().getCounter().then((res) {
-      setState(() {
-        cartCount = res;
-      });
-      print("responcencdc   $cartCount");
+      try{
+        setState(() {
+          cartCount = res;
+        });
+        print("responcencdc   $cartCount");
+      }
+      catch (error, stackTrace) {
+      sentryError.reportError(error, stackTrace);
+      }
+    }).catchError((onError) {
+      sentryError.reportError(onError, null);
     });
     return Scaffold(
       appBar: AppBar(
@@ -581,15 +619,22 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
   void _checkIfCartIsAvailable() {
     Common.getCart().then((onValue) {
-      if (onValue == null) {
-        _goToCart();
-      } else {
-        if (onValue['location'] == widget.locationInfo['_id']) {
+      try{
+        if (onValue == null) {
           _goToCart();
         } else {
-          _showClearCartAlert();
+          if (onValue['location'] == widget.locationInfo['_id']) {
+            _goToCart();
+          } else {
+            _showClearCartAlert();
+          }
         }
       }
+      catch (error, stackTrace) {
+      sentryError.reportError(error, stackTrace);
+      }
+    }).catchError((onError) {
+      sentryError.reportError(onError, null);
     });
   }
 

@@ -151,7 +151,7 @@ class _MenuState extends State<Menu> {
                 ),
                 new ListTile(
                   title: new Text(
-                      "Cart   ${cartCounter > 0 ? cartCounter.toString() : ""}",
+                      "Cart   ${cartCounter ==  0 || cartCounter == null  ?  "" : cartCounter.toString()}",
                       style:
                           TextStyle(color: Colors.white, fontFamily: "bold")),
                   leading:

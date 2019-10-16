@@ -3,6 +3,10 @@ import 'package:async_loader/async_loader.dart';
 import '../../widgets/no-data.dart';
 import '../../screens/other/order-upcoming.dart';
 import '../../services/profile-service.dart';
+import '../../services/sentry-services.dart';
+
+SentryError sentryError = new SentryError();
+
 
 class OrderHistory extends StatefulWidget {
   final bool isRatingAllowed;
@@ -27,9 +31,12 @@ class _OrderHistoryState extends State<OrderHistory>
         key: _asyncLoaderState,
         initState: () async => await getDelieveredOrders(),
         renderLoad: () => Center(child: CircularProgressIndicator()),
-        renderError: ([error]) => NoData(
-            message: 'Please check your internet connection!',
-            icon: Icons.block),
+        renderError: ([error]) {
+          sentryError.reportError(error, null);
+          return NoData(
+              message: 'Please check your internet connection!',
+              icon: Icons.block);
+        },
         renderSuccess: ({data}) {
           if (data.length > 0) {
             return OrderUpcomingState.buildOrderList(
