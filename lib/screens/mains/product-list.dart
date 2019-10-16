@@ -8,6 +8,9 @@ import '../../widgets/no-data.dart';
 import 'product-details.dart';
 import 'cart.dart';
 import 'home.dart';
+import '../../services/sentry-services.dart';
+
+SentryError sentryError = new SentryError();
 
 class ProductListPage extends StatefulWidget {
   final String restaurantName,
@@ -112,10 +115,17 @@ class _ProductListPageState extends State<ProductListPage> {
   @override
   Widget build(BuildContext context) {
     CounterModel().getCounter().then((res) {
-      setState(() {
-        cartCount = res;
-      });
-      print("responcencdc   $cartCount");
+      try {
+        setState(() {
+          cartCount = res;
+        });
+        print("responcencdc   $cartCount");
+      }
+      catch (error, stackTrace) {
+      sentryError.reportError(error, stackTrace);
+      }
+    }).catchError((onError) {
+      sentryError.reportError(onError, null);
     });
     AsyncLoader asyncLoader = AsyncLoader(
       key: _asyncLoaderState,
@@ -126,8 +136,11 @@ class _ProductListPageState extends State<ProductListPage> {
           child: CircularProgressIndicator(),
         ),
       ),
-      renderError: ([error]) => NoData(
-          message: 'Please check your internet connection!', icon: Icons.block),
+      renderError: ([error]) {
+        sentryError.reportError(error, null);
+        return NoData(
+            message: 'Please check your internet connection!', icon: Icons.block);
+      },
       renderSuccess: ({data}) {
         if (data['message'] != null) {
           return NoData(message: 'No products available yet!');

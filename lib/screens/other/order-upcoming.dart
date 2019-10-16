@@ -5,6 +5,10 @@ import '../../widgets/no-data.dart';
 import '../../services/profile-service.dart';
 import 'order-details.dart';
 import 'order-track.dart';
+import '../../services/sentry-services.dart';
+
+SentryError sentryError = new SentryError();
+
 
 class OrderUpcoming extends StatefulWidget {
   final bool isRatingAllowed;
@@ -30,9 +34,12 @@ class OrderUpcomingState extends State<OrderUpcoming>
         key: _asyncLoaderState,
         initState: () async => await getNonDelieveredOrders(),
         renderLoad: () => Center(child: CircularProgressIndicator()),
-        renderError: ([error]) => NoData(
-            message: 'Please check your internet connection!',
-            icon: Icons.block),
+        renderError: ([error]) {
+          sentryError.reportError(error, null);
+          return NoData(
+              message: 'Please check your internet connection!',
+              icon: Icons.block);
+        },
         renderSuccess: ({data}) {
           if (data.length > 0) {
             return buildOrderList(data, widget.isRatingAllowed);

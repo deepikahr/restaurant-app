@@ -22,6 +22,9 @@ import 'package:flutter/services.dart';
 
 import 'dart:convert';
 // import '../other/search.dart';
+import '../../services/sentry-services.dart';
+
+SentryError sentryError = new SentryError();
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -82,16 +85,23 @@ class HomePageState extends State<HomePage> {
 
   void _getCartLength() async {
     await Common.getCart().then((onValue) {
-      if (onValue != null) {
-        setState(() {
-          cartCounter = onValue['productDetails'].length;
-        });
-        // print(cartCounter);
-      } else {
-        setState(() {
-          cartCounter = 0;
-        });
+      try{
+        if (onValue != null) {
+          setState(() {
+            cartCounter = onValue['productDetails'].length;
+          });
+          // print(cartCounter);
+        } else {
+          setState(() {
+            cartCounter = 0;
+          });
+        }
       }
+      catch (error, stackTrace) {
+      sentryError.reportError(error, stackTrace);
+      }
+    }).catchError((onError) {
+      sentryError.reportError(onError, null);
     });
   }
   // getLocationInfoByTableId() async {
@@ -166,13 +176,20 @@ class HomePageState extends State<HomePage> {
 
   void checkAndValidateToken() {
     Common.getToken().then((onValue) {
-      if (onValue != null) {
-        ProfileService.validateToken().then((value) {
-          if (!value) {
-            Common.removeToken();
-          }
-        });
+      try{
+        if (onValue != null) {
+          ProfileService.validateToken().then((value) {
+            if (!value) {
+              Common.removeToken();
+            }
+          });
+        }
       }
+      catch (error, stackTrace) {
+        sentryError.reportError(error, stackTrace);
+      }
+    }).catchError((onError) {
+      sentryError.reportError(onError, null);
     });
   }
 
@@ -232,10 +249,17 @@ class HomePageState extends State<HomePage> {
 
   Widget build(BuildContext context) {
     CounterModel().getCounter().then((res) {
-      setState(() {
-        cartCount = res;
-      });
+      try{
+        setState(() {
+          cartCount = res;
+        });
+      }
       // print("res   $cartCount");
+      catch (error, stackTrace) {
+      sentryError.reportError(error, stackTrace);
+      }
+    }).catchError((onError) {
+      sentryError.reportError(onError, null);
     });
     return Scaffold(
       backgroundColor: whitec,
@@ -366,14 +390,17 @@ class HomePageState extends State<HomePage> {
         key: _asyncLoaderStateForAdvertisement,
         initState: () async => await getAdvertisementList(),
         renderLoad: () => Center(),
-        renderError: ([error]) => Container(
-              height: 20,
-              child: Icon(
-                Icons.block,
-                size: 100.0,
-                color: Colors.grey[300],
-              ),
+        renderError: ([error]) {
+          sentryError.reportError(error, null);
+          return Container(
+            height: 20,
+            child: Icon(
+              Icons.block,
+              size: 100.0,
+              color: Colors.grey[300],
             ),
+          );
+        },
         renderSuccess: ({data}) {
           isAdvertisementList = true;
           if (data != null) {
@@ -388,9 +415,12 @@ class HomePageState extends State<HomePage> {
         key: _asyncLoaderStateForNearByLocations,
         initState: () async => await getNearByRestaurants(),
         renderLoad: () => Center(),
-        renderError: ([error]) => NoData(
-            message: 'Please check your internet connection!',
-            icon: Icons.block),
+        renderError: ([error]) {
+          sentryError.reportError(error, null);
+          return NoData(
+              message: 'Please check your internet connection!',
+              icon: Icons.block);
+        },
         renderSuccess: ({data}) {
           isNearByRestaurants = true;
           if (data != null) {
@@ -442,9 +472,12 @@ class HomePageState extends State<HomePage> {
         key: _asyncLoaderStateForTopRatedRestaurants,
         initState: () async => await getTopRatedRestaurants(),
         renderLoad: () => Center(),
-        renderError: ([error]) => NoData(
-            message: 'Please check your internet connection!',
-            icon: Icons.block),
+        renderError: ([error]) {
+          sentryError.reportError(error, null);
+          return NoData(
+              message: 'Please check your internet connection!',
+              icon: Icons.block);
+        },
         renderSuccess: ({data}) {
           isTopRatedRestaurants = true;
           if (data != null) {
@@ -477,9 +510,12 @@ class HomePageState extends State<HomePage> {
         key: _asyncLoaderStateForNewlyArrivedRestaurants,
         initState: () async => await getNewlyArrivedRestaurants(),
         renderLoad: () => Center(),
-        renderError: ([error]) => NoData(
-            message: 'Please check your internet connection!',
-            icon: Icons.block),
+        renderError: ([error]) {
+          sentryError.reportError(error, null);
+          return NoData(
+              message: 'Please check your internet connection!',
+              icon: Icons.block);
+        },
         renderSuccess: ({data}) {
           isNewlyArrivedRestaurants = true;
           if (data != null) {

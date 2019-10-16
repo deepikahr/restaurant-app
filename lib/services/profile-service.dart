@@ -9,6 +9,9 @@ import 'package:http/http.dart' as http;
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path/path.dart';
+import 'sentry-services.dart';
+
+SentryError sentryError = new SentryError();
 
 class ProfileService {
   static final Client client = Client();

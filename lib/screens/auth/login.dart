@@ -6,6 +6,9 @@ import '../../services/auth-service.dart';
 import '../../services/common.dart';
 import 'registration.dart';
 import 'forgot-password.dart';
+import '../../services/sentry-services.dart';
+
+SentryError sentryError = new SentryError();
 
 class LoginPage extends StatefulWidget {
   final isDrawe;
@@ -29,32 +32,38 @@ class _LoginPageState extends State<LoginPage> {
       _formKey.currentState.save();
       Map<String, dynamic> body = {'email': email, 'password': password};
       AuthService.login(body).then((onValue) {
-        if (onValue['message'] != null) {
-          showSnackbar(onValue['message']);
-        }
-        if (onValue['token'] != null) {
-          Common.setToken(onValue['token']).then((saved) {
-            if (saved) {
-              showSnackbar('Login Successful!');
-              Future.delayed(Duration(milliseconds: 1500), () {
-                if (widget.isDrawe == true) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (BuildContext context) => HomePage(),
-                    ),
-                  );
-                } else {
-                  Navigator.of(context).pop('Success');
-                }
-              });
-            }
+        try{
+          if (onValue['message'] != null) {
+            showSnackbar(onValue['message']);
+          }
+          if (onValue['token'] != null) {
+            Common.setToken(onValue['token']).then((saved) {
+              if (saved) {
+                showSnackbar('Login Successful!');
+                Future.delayed(Duration(milliseconds: 1500), () {
+                  if (widget.isDrawe == true) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (BuildContext context) => HomePage(),
+                      ),
+                    );
+                  } else {
+                    Navigator.of(context).pop('Success');
+                  }
+                });
+              }
+            });
+          }
+          setState(() {
+            isLoading = false;
           });
         }
-        setState(() {
-          isLoading = false;
-        });
+        catch (error, stackTrace) {
+          sentryError.reportError(error, stackTrace);
+        }
       }).catchError((onError) {
+        sentryError.reportError(onError, null);
         setState(() {
           isLoading = false;
         });

@@ -7,6 +7,9 @@ import '../../widgets/no-data.dart';
 import '../../widgets/location-card.dart';
 import 'product-list.dart';
 import 'location-list.dart';
+import '../../services/sentry-services.dart';
+
+SentryError sentryError = new SentryError();
 
 class LocationListSheet extends StatelessWidget {
   final Map<String, dynamic> restaurantInfo, locationInfo;
@@ -32,11 +35,14 @@ class LocationListSheet extends StatelessWidget {
         key: _asyncLoaderState,
         initState: () async => getLocationListByRestaurantId(),
         renderLoad: () => new Center(child: CircularProgressIndicator()),
-        renderError: ([error]) => new Center(
-              child: NoData(
-                  message: 'Please check your internet connection!',
-                  icon: Icons.block),
-            ),
+        renderError: ([error]) {
+          sentryError.reportError(error, null);
+          return new Center(
+            child: NoData(
+                message: 'Please check your internet connection!',
+                icon: Icons.block),
+          );
+        },
         renderSuccess: ({data}) {
           return buildLocationSheetView(context, data, restaurantInfo, true);
         });

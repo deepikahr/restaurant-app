@@ -5,6 +5,9 @@ import '../../services/profile-service.dart';
 import '../../widgets/no-data.dart';
 import 'package:async_loader/async_loader.dart';
 import '../../screens/mains/product-details.dart';
+import '../../services/sentry-services.dart';
+
+SentryError sentryError = new SentryError();
 
 class Favorites extends StatefulWidget {
   @override
@@ -35,9 +38,12 @@ class _FavoritesState extends State<Favorites> {
         key: _asyncLoaderState,
         initState: () async => await getFavouriteList(),
         renderLoad: () => Center(child: CircularProgressIndicator()),
-        renderError: ([error]) => NoData(
-            message: 'Please check your internet connection!',
-            icon: Icons.block),
+        renderError: ([error]) {
+          sentryError.reportError(error, null);
+          return NoData(
+              message: 'Please check your internet connection!',
+              icon: Icons.block);
+        },
         renderSuccess: ({data}) {
           if (data.length > 0) {
             return _buildFavTile(data);
@@ -151,17 +157,25 @@ class _FavoritesState extends State<Favorites> {
                                       ProfileService.removeFavouritById(
                                               favs[index]['_id'])
                                           .then((onValue) {
-                                        Toast.show(
-                                            "Product remove to Favourite list",
-                                            context,
-                                            duration: Toast.LENGTH_LONG,
-                                            gravity: Toast.BOTTOM);
-                                        if (onValue) {
-                                          setState(() {
-                                            isProcessing = false;
-                                            favs.removeAt(index);
-                                          });
+                                        try {
+                                          Toast.show(
+                                              "Product remove to Favourite list",
+                                              context,
+
+                                              duration: Toast.LENGTH_LONG,
+                                              gravity: Toast.BOTTOM);
+                                          if (onValue) {
+                                            setState(() {
+                                              isProcessing = false;
+                                              favs.removeAt(index);
+                                            });
+                                          }
                                         }
+                                        catch (error, stackTrace) {
+                                        sentryError.reportError(error, stackTrace);
+                                        }
+                                      }).catchError((onError) {
+                                        sentryError.reportError(onError, null);
                                       });
                                     }
                                   },

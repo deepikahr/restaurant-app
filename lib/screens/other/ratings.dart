@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../styles/styles.dart';
 import '../../services/profile-service.dart';
+import '../../services/sentry-services.dart';
+
+SentryError sentryError = new SentryError();
 
 class Rating extends StatefulWidget {
   final String productId, orderId, locationId, restaurantId;
@@ -37,10 +40,17 @@ class _RatingState extends State<Rating> {
         isLoading = true;
       });
       await ProfileService.postProductRating(body).then((onValue) {
-        setState(() {
-          isLoading = false;
-        });
-        Navigator.popUntil(context, (Route<dynamic> route) => route.isFirst);
+        try{
+          setState(() {
+            isLoading = false;
+          });
+          Navigator.popUntil(context, (Route<dynamic> route) => route.isFirst);
+        }
+        catch (error, stackTrace) {
+        sentryError.reportError(error, stackTrace);
+        }
+      }).catchError((onError) {
+        sentryError.reportError(onError, null);
       });
     }
   }

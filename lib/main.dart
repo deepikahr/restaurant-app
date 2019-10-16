@@ -7,10 +7,31 @@ import 'screens/mains/home.dart';
 // import 'package:flutter_stetho/flutter_stetho.dart';
 import 'package:onesignal/onesignal.dart';
 import 'package:provider/provider.dart';
+import './services/sentry-services.dart';
+import 'dart:async';
 
-void main() {
-  // Stetho.initialize();
-  runApp(EntryPage());
+bool get isInDebugMode {
+  bool inDebugMode = false;
+  assert(inDebugMode = true);
+  return inDebugMode;
+}
+
+SentryError sentryError = new SentryError();
+
+main() async {
+  FlutterError.onError = (FlutterErrorDetails details) async {
+    if (isInDebugMode) {
+      FlutterError.dumpErrorToConsole(details);
+    } else {
+      Zone.current.handleUncaughtError(details.exception, details.stack);
+    }
+  };
+
+  runZoned<Future<Null>>(() async {
+    runApp(new EntryPage());
+  }, onError: (error, stackTrace) async {
+    await sentryError.reportError(error, stackTrace);
+  });
 }
 
 void initOneSignal() {

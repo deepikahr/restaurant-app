@@ -8,6 +8,9 @@ import '../../services/common.dart';
 import '../../widgets/no-data.dart';
 import '../auth/login.dart';
 import '../other/coupons-list.dart';
+import '../../services/sentry-services.dart';
+
+SentryError sentryError = new SentryError();
 
 class CartPage extends StatefulWidget {
   Map<String, dynamic> product, taxInfo, locationInfo;
@@ -40,10 +43,17 @@ class _CartPageState extends State<CartPage> {
     // [0] other options when opening cart from menu
     if (widget.taxInfo == null) {
       await Common.getCartInfo().then((onValue) {
-        if (onValue != null) {
-          widget.taxInfo = onValue['taxInfo'];
-          widget.locationInfo = onValue['locationInfo'];
+        try {
+          if (onValue != null) {
+            widget.taxInfo = onValue['taxInfo'];
+            widget.locationInfo = onValue['locationInfo'];
+          }
         }
+        catch (error, stackTrace) {
+        sentryError.reportError(error, stackTrace);
+        }
+      }).catchError((onError) {
+        sentryError.reportError(onError, null);
       });
     } else {
       Map<String, dynamic> cartInfo = {
@@ -56,7 +66,14 @@ class _CartPageState extends State<CartPage> {
     // [1] retrive cart from storage if available
     Map<String, dynamic> cart = cartItems;
     await Common.getCart().then((onValue) {
-      cart = onValue;
+      try{
+        cart = onValue;
+      }
+      catch (error, stackTrace) {
+      sentryError.reportError(error, stackTrace);
+      }
+    }).catchError((onError) {
+      sentryError.reportError(onError, null);
     });
 
     // [2] add new product to cart products list. remove first if already available
@@ -168,8 +185,15 @@ class _CartPageState extends State<CartPage> {
   Widget build(BuildContext context) {
     // final counterModel = Provider.of<CounterModel>(context);
     CounterModel().getCounter().then((res) {
-      cartCoun = res;
-      print("responce   $cartCoun");
+      try{
+        cartCoun = res;
+        print("responce   $cartCoun");
+      }
+      catch (error, stackTrace) {
+      sentryError.reportError(error, stackTrace);
+      }
+    }).catchError((onError) {
+      sentryError.reportError(onError, null);
     });
     return Scaffold(
       backgroundColor: Colors.white,
@@ -427,29 +451,36 @@ class _CartPageState extends State<CartPage> {
 
   void _checkLoginAndNavigate() async {
     Common.getToken().then((onValue) async {
-      String msg;
-      if (onValue == null) {
-        msg = await Navigator.push(
-          context,
-          MaterialPageRoute(builder: (BuildContext context) => LoginPage()),
-        );
-      } else {
-        msg = 'Success';
+      try{
+        String msg;
+        if (onValue == null) {
+          msg = await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (BuildContext context) => LoginPage()),
+          );
+        } else {
+          msg = 'Success';
+        }
+        if (msg == 'Success' && mounted) {
+          var info = (widget.locationInfo != null &&
+              widget.locationInfo['deliveryInfo'] != null)
+              ? widget.locationInfo['deliveryInfo']['deliveryInfo']
+              : null;
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext context) => ConfrimOrderPage(
+                    cart: cartItems,
+                    deliveryInfo: widget.locationInfo['deliveryInfo']
+                    ['deliveryInfo'])),
+          );
+        }
       }
-      if (msg == 'Success' && mounted) {
-        var info = (widget.locationInfo != null &&
-                widget.locationInfo['deliveryInfo'] != null)
-            ? widget.locationInfo['deliveryInfo']['deliveryInfo']
-            : null;
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (BuildContext context) => ConfrimOrderPage(
-                  cart: cartItems,
-                  deliveryInfo: widget.locationInfo['deliveryInfo']
-                      ['deliveryInfo'])),
-        );
+      catch (error, stackTrace) {
+      sentryError.reportError(error, stackTrace);
       }
+    }).catchError((onError) {
+      sentryError.reportError(onError, null);
     });
   }
 

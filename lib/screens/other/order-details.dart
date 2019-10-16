@@ -4,6 +4,9 @@ import '../other/ratings.dart';
 import '../../services/profile-service.dart';
 import 'package:async_loader/async_loader.dart';
 import '../../widgets/no-data.dart';
+import '../../services/sentry-services.dart';
+
+SentryError sentryError = new SentryError();
 
 class OrderDetails extends StatefulWidget {
   final String orderId;
@@ -26,9 +29,13 @@ class _OrderDetailsState extends State<OrderDetails> {
         key: _asyncLoader,
         initState: () async => await getOrderDetails(widget.orderId),
         renderLoad: () => Center(child: CircularProgressIndicator()),
-        renderError: ([error]) => NoData(
-            message: 'Please check your internet connection!',
-            icon: Icons.block),
+        renderError: ([error]) {
+          sentryError.reportError(error, null);
+          return NoData(
+          message: 'Please check your internet connection!',
+          icon: Icons.block,
+          );
+        },
         renderSuccess: ({data}) {
           return _buildOrderDetailsBody(data);
         });

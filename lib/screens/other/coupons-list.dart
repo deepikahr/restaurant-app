@@ -4,6 +4,9 @@ import '../../styles/styles.dart';
 import '../../services/main-service.dart';
 import 'package:async_loader/async_loader.dart';
 import '../../widgets/no-data.dart';
+import '../../services/sentry-services.dart';
+
+SentryError sentryError = new SentryError();
 
 class CouponsList extends StatefulWidget {
   final String locationId;
@@ -35,9 +38,12 @@ class _CouponsListState extends State<CouponsList> {
         key: _asyncLoaderState,
         initState: () async => await getCouponsByLocationId(),
         renderLoad: () => Center(child: CircularProgressIndicator()),
-        renderError: ([error]) => NoData(
-            message: 'Please check your internet connection!',
-            icon: Icons.block),
+        renderError: ([error]) {
+          sentryError.reportError(error, null);
+          return NoData(
+              message: 'Please check your internet connection!',
+              icon: Icons.block);
+        },
         renderSuccess: ({data}) {
           if (data is Map<String, dynamic> && data['message'] != null) {
             return buildEmptyPage(data['message']);

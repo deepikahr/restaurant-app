@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../styles/styles.dart';
 import '../../services/profile-service.dart';
+import '../../services/sentry-services.dart';
+
+SentryError sentryError = new SentryError();
 
 class AddAddressPage extends StatefulWidget {
   @override
@@ -30,10 +33,17 @@ class _AddAddressPageState extends State<AddAddressPage> {
       });
       _formKey.currentState.save();
       ProfileService.addAddress(address).then((onValue) {
-        setState(() {
-          isLoading = false;
-          Navigator.of(context).pop(address);
-        });
+        try{
+          setState(() {
+            isLoading = false;
+            Navigator.of(context).pop(address);
+          });
+        }
+        catch (error, stackTrace) {
+        sentryError.reportError(error, stackTrace);
+        }
+      }).catchError((onError) {
+        sentryError.reportError(onError, null);
       });
     }
   }

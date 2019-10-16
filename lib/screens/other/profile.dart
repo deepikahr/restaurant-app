@@ -10,8 +10,10 @@ import 'dart:io';
 import 'dart:convert';
 import 'dart:async';
 import 'package:http/http.dart' as http;
-
 import 'package:async/async.dart';
+import '../../services/sentry-services.dart';
+
+SentryError sentryError = new SentryError();
 
 class Profile extends StatefulWidget {
   @override
@@ -50,13 +52,20 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
         "address": profileData['address'],
       };
       ProfileService.setUserInfo(profileData['_id'], body).then((onValue) {
-        print(onValue);
-        Toast.show("Your profile Successfully UPDATED", context,
-            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-        setState(() {
-          isLoading = false;
-        });
-        Navigator.of(context).pop();
+        try{
+          print(onValue);
+          Toast.show("Your profile Successfully UPDATED", context,
+              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+          setState(() {
+            isLoading = false;
+          });
+          Navigator.of(context).pop();
+        }
+        catch (error, stackTrace) {
+        sentryError.reportError(error, stackTrace);
+        }
+      }).catchError((onError) {
+        sentryError.reportError(onError, null);
       });
     }
   }
@@ -66,7 +75,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   void selectGallary() async {
     var file = await ImagePicker.pickImage(source: ImageSource.gallery);
     // base64Image = base64Encode(file.readAsBytesSync());
-    setState(() async {
+    setState(()  {
       _imageFile = file;
       setState(() {
         isPicUploading = true;
@@ -76,7 +85,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
             new http.ByteStream(DelegatingStream.typed(_imageFile.openRead()));
         Map<String, dynamic> body = {"baseKey": base64Image};
         Map<String, dynamic> imageData;
-        await ProfileService.uploadProfileImage(
+        ProfileService.uploadProfileImage(
           _imageFile,
           stream,
           profileData['_id'],
@@ -126,14 +135,21 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
       // print(onValue['statusCode']);
       // print(onValue['message']);
       // if (onValue['statusCode'] == 200) {
-      Toast.show(onValue['message'], context,
-          duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-      profileData['logo'] = null;
-      _imageFile = null;
-      setState(() {
-        isImageUploading = false;
-      });
+      try{
+        Toast.show(onValue['message'], context,
+            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+        profileData['logo'] = null;
+        _imageFile = null;
+        setState(() {
+          isImageUploading = false;
+        });
+      }
       // }
+      catch (error, stackTrace) {
+      sentryError.reportError(error, stackTrace);
+      }
+    }).catchError((onError) {
+      sentryError.reportError(onError, null);
     });
   }
 
@@ -143,9 +159,12 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
         key: _asyncLoaderState,
         initState: () async => await getProfileInfo(),
         renderLoad: () => Center(child: CircularProgressIndicator()),
-        renderError: ([error]) => NoData(
-            message: 'Please check your internet connection!',
-            icon: Icons.block),
+        renderError: ([error]) {
+          sentryError.reportError(error, null);
+          return NoData(
+              message: 'Please check your internet connection!',
+              icon: Icons.block);
+        },
         renderSuccess: ({data}) {
           profileData = data;
           return ListView(

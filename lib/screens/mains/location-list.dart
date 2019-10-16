@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import '../../styles/styles.dart';
 import 'location-list-sheet.dart';
 import 'home.dart';
+import '../../services/sentry-services.dart';
+
+SentryError sentryError = new SentryError();
 
 class LocationListPage extends StatefulWidget {
   final Map<String, dynamic> restaurantInfo;
@@ -21,10 +24,17 @@ class _LocationListPageState extends State<LocationListPage> {
   @override
   Widget build(BuildContext context) {
     CounterModel().getCounter().then((res) {
-      setState(() {
-        cartCount = res;
-      });
-      print("responce   $cartCount");
+      try{
+        setState(() {
+          cartCount = res;
+        });
+        print("responce   $cartCount");
+      }
+      catch (error, stackTrace) {
+      sentryError.reportError(error, stackTrace);
+      }
+    }).catchError((onError) {
+      sentryError.reportError(onError, null);
     });
     return Scaffold(
       appBar: AppBar(

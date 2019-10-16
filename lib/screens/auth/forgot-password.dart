@@ -3,6 +3,9 @@ import '../../styles/styles.dart';
 import '../../services/auth-service.dart';
 import '../../blocs/validators.dart';
 import 'otp-verify.dart';
+import '../../services/sentry-services.dart';
+
+SentryError sentryError = new SentryError();
 
 class ResetPassword extends StatefulWidget {
   ResetPassword({Key key}) : super(key: key);
@@ -24,24 +27,30 @@ class _ResetPasswordState extends State<ResetPassword> {
         isLoading = true;
       });
       AuthService.sendOTP({'email': email}).then((onValue) {
-        if (onValue['message'] != null) {
-          showSnackbar(onValue['message']);
-          if (onValue['token'] != null) {
-            Future.delayed(Duration(milliseconds: 1500), () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (BuildContext context) =>
-                      OtpVerify(otpToken: onValue['token']),
-                ),
-              );
-            });
+        try{
+          if (onValue['message'] != null) {
+            showSnackbar(onValue['message']);
+            if (onValue['token'] != null) {
+              Future.delayed(Duration(milliseconds: 1500), () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) =>
+                        OtpVerify(otpToken: onValue['token']),
+                  ),
+                );
+              });
+            }
           }
+          setState(() {
+            isLoading = false;
+          });
         }
-        setState(() {
-          isLoading = false;
-        });
+        catch (error, stackTrace) {
+          sentryError.reportError(error, stackTrace);
+        }
       }).catchError((onError) {
+        sentryError.reportError(onError, null);
         showSnackbar(onError);
         setState(() {
           isLoading = false;

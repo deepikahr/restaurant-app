@@ -3,6 +3,9 @@ import '../../styles/styles.dart';
 import '../../services/auth-service.dart';
 import '../../services/common.dart';
 import '../mains/home.dart';
+import '../../services/sentry-services.dart';
+
+SentryError sentryError = new SentryError();
 
 class NewPassword extends StatefulWidget {
   final String otpToken;
@@ -25,25 +28,31 @@ class _NewPasswordState extends State<NewPassword> {
       });
       AuthService.createNewPassword({'newPass': newPassword}, widget.otpToken)
           .then((onValue) {
-        if (onValue['message'] != null) {
-          showSnackbar(onValue['message']);
-          if (onValue['token'] != null) {
-            Common.setToken(onValue['token']).then((onValue) {
-              if (onValue) {
-                Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                      builder: (BuildContext context) => HomePage(),
-                    ),
-                    (Route<dynamic> route) => route.isFirst);
-              }
-            });
+        try{
+          if (onValue['message'] != null) {
+            showSnackbar(onValue['message']);
+            if (onValue['token'] != null) {
+              Common.setToken(onValue['token']).then((onValue) {
+                if (onValue) {
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (BuildContext context) => HomePage(),
+                      ),
+                          (Route<dynamic> route) => route.isFirst);
+                }
+              });
+            }
           }
+          setState(() {
+            isLoading = false;
+          });
         }
-        setState(() {
-          isLoading = false;
-        });
+        catch (error, stackTrace) {
+        sentryError.reportError(error, stackTrace);
+        }
       }).catchError((onError) {
+        sentryError.reportError(onError, null);
         setState(() {
           isLoading = false;
         });
