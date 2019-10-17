@@ -21,6 +21,7 @@ class Menu extends StatefulWidget {
 
 class _MenuState extends State<Menu> {
   int cartCounter;
+  int favCounter;
   String profilePic;
   String fullname;
   bool isLoggedIn = false;
@@ -29,6 +30,7 @@ class _MenuState extends State<Menu> {
   void initState() {
     _checkLoginStatus();
     _getCartLength();
+    _getFavLength();
     super.initState();
   }
 
@@ -41,6 +43,20 @@ class _MenuState extends State<Menu> {
       } else {
         setState(() {
           cartCounter = 0;
+        });
+      }
+    });
+  }
+
+  void _getFavLength() {
+    ProfileService.getFavouritList().then((onValue) {
+      if (onValue != null) {
+        setState(() {
+          favCounter = onValue.length;
+        });
+      } else {
+        setState(() {
+          favCounter = 0;
         });
       }
     });
@@ -92,7 +108,7 @@ class _MenuState extends State<Menu> {
               children: <Widget>[
                 fullname == null && profilePic == null
                     ? Container(
-                        height: 100.0,
+                        height: 80.0,
                       )
                     : Row(children: <Widget>[
                         Flexible(
@@ -150,10 +166,30 @@ class _MenuState extends State<Menu> {
                   },
                 ),
                 new ListTile(
-                  title: new Text(
-                      "Cart   ${cartCounter ==  0 || cartCounter == null  ?  "" : cartCounter.toString()}",
-                      style:
-                          TextStyle(color: Colors.white, fontFamily: "bold")),
+                  title: Row(
+                    children: <Widget>[
+                      new Text("Cart ",
+                          style: TextStyle(
+                              color: Colors.white, fontFamily: "bold")),
+                      (cartCounter == 0 || cartCounter == null)
+                          ? Text(
+                              '',
+                              style: TextStyle(fontSize: 14.0),
+                            )
+                          : Container(
+                              height: 25,
+                              width: 25,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: PRIMARY,
+                              ),
+                              child: Text('${cartCounter.toString()}',
+                                  style: TextStyle(
+                                      color: Colors.white, fontFamily: "bold")),
+                            )
+                    ],
+                  ),
                   leading:
                       Image.asset("lib/assets/icon/carte.png", width: 25.0),
                   trailing: new Icon(
@@ -194,9 +230,31 @@ class _MenuState extends State<Menu> {
                     : Container(),
                 isLoggedIn
                     ? new ListTile(
-                        title: new Text("Favourites",
-                            style: TextStyle(
-                                color: Colors.white, fontFamily: "bold")),
+                        title: Row(
+                          children: <Widget>[
+                            new Text("Favourites  ",
+                                style: TextStyle(
+                                    color: Colors.white, fontFamily: "bold")),
+                            (favCounter == 0 || favCounter == null)
+                                ? Text(
+                                    '',
+                                    style: TextStyle(fontSize: 14.0),
+                                  )
+                                : Container(
+                                    height: 25,
+                                    width: 25,
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: PRIMARY,
+                                    ),
+                                    child: Text('${favCounter.toString()}',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontFamily: "bold")),
+                                  )
+                          ],
+                        ),
                         leading: Image.asset('lib/assets/icon/favorite.png',
                             width: 25.0),
                         trailing: new Icon(

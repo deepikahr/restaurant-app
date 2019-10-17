@@ -32,7 +32,7 @@ class _LoginPageState extends State<LoginPage> {
       _formKey.currentState.save();
       Map<String, dynamic> body = {'email': email, 'password': password};
       AuthService.login(body).then((onValue) {
-        try{
+        try {
           if (onValue['message'] != null) {
             showSnackbar(onValue['message']);
           }
@@ -58,8 +58,7 @@ class _LoginPageState extends State<LoginPage> {
           setState(() {
             isLoading = false;
           });
-        }
-        catch (error, stackTrace) {
+        } catch (error, stackTrace) {
           sentryError.reportError(error, stackTrace);
         }
       }).catchError((onError) {
@@ -85,22 +84,26 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: Colors.transparent,
-      body: Container(
-        child: Stack(
-          fit: StackFit.expand,
-          children: <Widget>[
-            buildLoginPageBg(),
-            SingleChildScrollView(
+      body: Stack(
+        fit: StackFit.expand,
+        children: <Widget>[
+          Image(
+            image: AssetImage("lib/assets/bgImgs/background.png"),
+            fit: BoxFit.cover,
+          ),
+          Center(
+            child: new SingleChildScrollView(
+              // padding: const EdgeInsets.fromLTRB(30.0, 0.0, 30.0, 30.0),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   buildLoginPageLogo(),
                   buildLoginPageForm(),
                 ],
               ),
-            )
-          ],
-        ),
+            ),
+          )
+        ],
       ),
     );
   }
@@ -119,7 +122,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget buildLoginPageLogo() {
     return Padding(
-      padding: EdgeInsets.only(top: 128.0, bottom: 45.0),
+      padding: EdgeInsets.only(top: 30.0, bottom: 45.0),
       child: Image(
         image: AssetImage("lib/assets/logos/logo.png"),
         fit: BoxFit.cover,
@@ -144,9 +147,9 @@ class _LoginPageState extends State<LoginPage> {
               buildLoginButton(),
               buildForgotPasswordButton(),
               Padding(
-                padding: EdgeInsetsDirectional.only(top: 74.0, bottom: 20.0),
+                padding: EdgeInsetsDirectional.only(top: 40.0, bottom: 20.0),
                 child: Text(
-                  "Dont have account Yet?",
+                  "Don't have account Yet?",
                   style: subTitleWhiteLightOSR(),
                 ),
               ),

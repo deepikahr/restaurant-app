@@ -42,6 +42,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
       });
       _formKey.currentState.save();
       print("save button $profileData");
+
       var body = {
         "name": profileData['name'],
         "contactNumber": profileData['contactNumber'],
@@ -52,7 +53,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
         "address": profileData['address'],
       };
       ProfileService.setUserInfo(profileData['_id'], body).then((onValue) {
-        try{
+        try {
           print(onValue);
           Toast.show("Your profile Successfully UPDATED", context,
               duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
@@ -60,13 +61,14 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
             isLoading = false;
           });
           Navigator.of(context).pop();
-        }
-        catch (error, stackTrace) {
-        sentryError.reportError(error, stackTrace);
+        } catch (error, stackTrace) {
+          sentryError.reportError(error, stackTrace);
         }
       }).catchError((onError) {
         sentryError.reportError(onError, null);
       });
+    } else {
+      return;
     }
   }
 
@@ -75,7 +77,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   void selectGallary() async {
     var file = await ImagePicker.pickImage(source: ImageSource.gallery);
     // base64Image = base64Encode(file.readAsBytesSync());
-    setState(()  {
+    setState(() {
       _imageFile = file;
       setState(() {
         isPicUploading = true;
@@ -135,7 +137,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
       // print(onValue['statusCode']);
       // print(onValue['message']);
       // if (onValue['statusCode'] == 200) {
-      try{
+      try {
         Toast.show(onValue['message'], context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         profileData['logo'] = null;
@@ -146,7 +148,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
       }
       // }
       catch (error, stackTrace) {
-      sentryError.reportError(error, stackTrace);
+        sentryError.reportError(error, stackTrace);
       }
     }).catchError((onError) {
       sentryError.reportError(onError, null);
@@ -177,51 +179,9 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                   key: _formKey,
                   child: Column(
                     children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: InkWell(
-                          // onTap: _onWillPop,
-                          onTap: () {
-                            containerForSheet<String>(
-                              context: context,
-                              child: CupertinoActionSheet(
-                                title: const Text('Change profile picture'),
-                                actions: <Widget>[
-                                  CupertinoActionSheetAction(
-                                    child: const Text('Choose from photos'),
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                      selectGallary();
-                                    },
-                                  ),
-                                  CupertinoActionSheetAction(
-                                    child: const Text('Take photo'),
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                      selectCamera();
-                                    },
-                                  ),
-                                  profileData['logo'] != null
-                                      ? CupertinoActionSheetAction(
-                                          child: const Text('Remove photo'),
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                            removeProfilePic();
-                                          },
-                                        )
-                                      : Container(),
-                                ],
-                                cancelButton: CupertinoActionSheetAction(
-                                  child: const Text('Cancel'),
-                                  isDefaultAction: true,
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                              ),
-                            );
-                          },
-
+                      Stack(children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
                           child: Container(
                             height: 120.0,
                             width: 120.0,
@@ -248,22 +208,61 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                       ),
                           ),
                         ),
-                      ),
-                      // Positioned(
-                      //   right: 2.0,
-                      //   bottom: 40.0,
-                      //   child: Container(
-                      //     height: 40.0,
-                      //     width: 40.0,
-                      //     child: new FloatingActionButton(
-                      //       foregroundColor: Colors.black,
-                      //       backgroundColor: Colors.white,
-                      //       onPressed: () => _onWillPop(),
-                      //       tooltip: 'Photo',
-                      //       child: new Icon(Icons.edit),
-                      //     ),
-                      //   ),
-                      // ),
+                        Positioned(
+                          right: 2.0,
+                          bottom: 0.0,
+                          child: Container(
+                            height: 40.0,
+                            width: 40.0,
+                            child: new FloatingActionButton(
+                              foregroundColor: Colors.black,
+                              backgroundColor: Colors.white,
+                              onPressed: () {
+                                containerForSheet<String>(
+                                  context: context,
+                                  child: CupertinoActionSheet(
+                                    title: const Text('Change profile picture'),
+                                    actions: <Widget>[
+                                      CupertinoActionSheetAction(
+                                        child: const Text('Choose from photos'),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                          selectGallary();
+                                        },
+                                      ),
+                                      CupertinoActionSheetAction(
+                                        child: const Text('Take photo'),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                          selectCamera();
+                                        },
+                                      ),
+                                      profileData['logo'] != null
+                                          ? CupertinoActionSheetAction(
+                                              child: const Text('Remove photo'),
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                                removeProfilePic();
+                                              },
+                                            )
+                                          : Container(),
+                                    ],
+                                    cancelButton: CupertinoActionSheetAction(
+                                      child: const Text('Cancel'),
+                                      isDefaultAction: true,
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                  ),
+                                );
+                              },
+                              tooltip: 'Photo',
+                              child: new Icon(Icons.edit),
+                            ),
+                          ),
+                        ),
+                      ]),
                       Container(
                         margin: EdgeInsets.only(top: 20.0),
                         decoration: BoxDecoration(
@@ -290,6 +289,11 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                         ),
                         child: TextFormField(
                           maxLength: 10,
+                          validator: (String value) {
+                            if (value.length > 9) {
+                              return 'Please Enter Valid Mobile number';
+                            }
+                          },
                           onSaved: (value) {
                             data['contactNumber'] = value;
                           },
