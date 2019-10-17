@@ -9,7 +9,6 @@ import '../../services/sentry-services.dart';
 
 SentryError sentryError = new SentryError();
 
-
 class OrderUpcoming extends StatefulWidget {
   final bool isRatingAllowed;
 
@@ -52,7 +51,7 @@ class OrderUpcomingState extends State<OrderUpcoming>
   static Widget buildEmptyPage() {
     return Padding(
       padding: EdgeInsets.only(top: 40.0),
-      child: NoData(message: 'No order has been placed yet!'),
+      child: NoData(message: 'No order has been completed yet!'),
     );
   }
 
