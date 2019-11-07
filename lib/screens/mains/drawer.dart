@@ -11,9 +11,19 @@ import '../other/about-us.dart';
 import '../other/profile.dart';
 import '../../services/profile-service.dart';
 
+
+import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'package:RestaurantSaas/initialize_i18n.dart' show initializeI18n;
+import 'package:RestaurantSaas/constant.dart' show languages;
+import 'package:RestaurantSaas/localizations.dart'
+    show MyLocalizations, MyLocalizationsDelegate;
+
 class Menu extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
-  Menu({Key key, this.scaffoldKey}) : super(key: key);
+  final Map<String, Map<String, String>> localizedValues;
+  String locale;
+  Menu({Key key, this.scaffoldKey, this.locale, this.localizedValues}) : super(key: key);
 
   @override
   _MenuState createState() => _MenuState();
@@ -230,7 +240,7 @@ class _MenuState extends State<Menu> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (BuildContext context) => Profile(),
+                              builder: (BuildContext context) => Profile(locale: widget.locale, localizedValues: widget.localizedValues),
                             ),
                           );
                         },
@@ -297,7 +307,7 @@ class _MenuState extends State<Menu> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (BuildContext context) =>
-                                        HomePage()));
+                                        HomePage(locale: widget.locale, localizedValues: widget.localizedValues)));
                             showSnackbar('Logout Successfully!');
                             // Navigator.pop(context);
                           });

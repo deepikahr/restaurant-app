@@ -1,5 +1,7 @@
 import 'package:RestaurantSaas/screens/other/CounterModel.dart';
 import 'package:RestaurantSaas/services/constant.dart';
+import 'package:RestaurantSaas/styles/styles.dart' as prefix0;
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'drawer.dart';
@@ -24,10 +26,50 @@ import 'dart:convert';
 // import '../other/search.dart';
 import '../../services/sentry-services.dart';
 
+
+
+import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'package:RestaurantSaas/initialize_i18n.dart' show initializeI18n;
+import 'package:RestaurantSaas/constant.dart' show languages;
+import 'package:RestaurantSaas/localizations.dart'
+    show MyLocalizations, MyLocalizationsDelegate;
+import 'package:shared_preferences/shared_preferences.dart';
+
 SentryError sentryError = new SentryError();
 
+
+//class App extends StatefulWidget {
+//  final Map<String, Map<String, String>> localizedValues;
+//  String locale;
+//  App({Key key, this.locale, this.localizedValues}) : super(key: key);
+//  @override
+//  _AppState createState() => _AppState();
+//}
+//
+//class _AppState extends State<App> {
+//
+//  @override
+//  Widget build(BuildContext context) {
+//    return new MaterialApp(
+//      locale: Locale(widget.locale),
+//      debugShowCheckedModeBanner: false,
+//      localizationsDelegates: [
+//        MyLocalizationsDelegate(widget.localizedValues),
+//        GlobalMaterialLocalizations.delegate,
+//        GlobalWidgetsLocalizations.delegate,
+//      ],
+//      supportedLocales: languages.map((language) => Locale(language, '')),
+//      home: HomePage(locale: widget.locale, localizedValues: widget.localizedValues),
+//    );
+//  }
+//}
+
+
 class HomePage extends StatefulWidget {
-  HomePage({Key key}) : super(key: key);
+  final Map<String, Map<String, String>> localizedValues;
+  var locale;
+  HomePage({Key key, this.locale, this.localizedValues}) : super(key: key);
 
   @override
   HomePageState createState() => HomePageState();
@@ -65,6 +107,45 @@ class HomePageState extends State<HomePage> {
     // checkAndValidateToken();
     _showBottomSheetCallback = _showBottomSheet;
     super.initState();
+    _checkLoginStatus();
+    selectedLanguages();
+  }
+
+  var selectedLanguage;
+
+  selectedLanguages() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      selectedLanguage = prefs.getString('selectedLanguage');
+    });
+    print('selectedLanguage............$selectedLanguage');
+  }
+
+  String fullname;
+  bool isLoggedIn = false;
+
+  Future _checkLoginStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Common.getToken().then((token) {
+      if (token != null) {
+        setState(() {
+          isLoggedIn = true;
+        });
+        ProfileService.getUserInfo().then((value) {
+          print(value);
+          if (value != null && mounted) {
+            setState(() {
+              fullname = value['name'];
+              isLoggedIn = true;
+            });
+          }
+        });
+      } else {
+        setState(() {
+          isLoggedIn = false;
+        });
+      }
+    });
   }
 
   StreamSubscription<LocationData> _locationStream;
@@ -261,126 +342,150 @@ class HomePageState extends State<HomePage> {
     }).catchError((onError) {
       sentryError.reportError(onError, null);
     });
-    return Scaffold(
-      backgroundColor: whitec,
-      key: scaffoldKey,
-      drawer: Menu(scaffoldKey: scaffoldKey),
-      appBar: AppBar(
-        backgroundColor: PRIMARY,
-        title: Text(APP_NAME),
-        centerTitle: true,
-        actions: <Widget>[
-          GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => CartPage(),
-                  ),
-                );
-              },
-              child: Column(
+    return MaterialApp(
+      locale: Locale(widget.locale),
+      debugShowCheckedModeBanner: false,
+      localizationsDelegates: [
+        MyLocalizationsDelegate(widget.localizedValues),
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: languages.map((language) => Locale(language, '')),
+      home: Scaffold(
+        backgroundColor: whitec,
+        key: scaffoldKey,
+        drawer: Menu(scaffoldKey: scaffoldKey, locale: widget.locale, localizedValues: widget.localizedValues),
+        appBar: AppBar(
+          backgroundColor: PRIMARY,
+          title: Text(APP_NAME),
+          centerTitle: true,
+          actions: <Widget>[
+            GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (BuildContext context) => CartPage(),
+                    ),
+                  );
+                },
+                child: Column(
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.only(top: 2.0),
+                      child: (cartCount == null || cartCount == 0)
+                          ? Text(
+                              '',
+                              style: TextStyle(fontSize: 14.0),
+                            )
+                          : Text(
+                              '${cartCount.toString()}',
+                              style: TextStyle(fontSize: 14.0),
+                            ),
+                    ),
+                    Container(
+                        padding: EdgeInsets.only(right: 10.0),
+                        child: Icon(Icons.shopping_cart)),
+                  ],
+                )),
+            Padding(padding: EdgeInsets.only(left: 7.0)),
+            // buildLocationIcon(),
+            // Padding(padding: EdgeInsets.only(left: 7.0)),
+          ],
+        ),
+        body: ListView(
+          shrinkWrap: true,
+          physics: ScrollPhysics(),
+          children: <Widget>[
+            Container(
+              alignment: AlignmentDirectional.center,
+              height: 28.0,
+              color: prefix0.PRIMARY.withOpacity(0.7),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(top: 2.0),
-                    child: (cartCount == null || cartCount == 0)
-                        ? Text(
-                            '',
-                            style: TextStyle(fontSize: 14.0),
-                          )
-                        : Text(
-                            '${cartCount.toString()}',
-                            style: TextStyle(fontSize: 14.0),
-                          ),
-                  ),
-                  Container(
-                      padding: EdgeInsets.only(right: 10.0),
-                      child: Icon(Icons.shopping_cart)),
+                  Text(MyLocalizations.of(context).hello , style: hintStyleWhiteLightOSR(),),
+                  Text(" "),
+                  Text(MyLocalizations.of(context).greetTo('$fullname'), style: hintStyleWhiteLightOSR(),),
                 ],
-              )),
-          Padding(padding: EdgeInsets.only(left: 7.0)),
-          // buildLocationIcon(),
-          // Padding(padding: EdgeInsets.only(left: 7.0)),
-        ],
-      ),
-      body: ListView(
-        shrinkWrap: true,
-        physics: ScrollPhysics(),
-        children: <Widget>[
-          Container(
-            height: 180.0,
-            width: screenWidth(context),
-            child: _buildAdvertisementLoader(),
-          ),
-          (isNearByRestaurants == true ||
-                  isTopRatedRestaurants == true ||
-                  isAdvertisementList == true ||
-                  isNewlyArrivedRestaurants == true)
-              ? Container()
-              : Container(
-                  alignment: AlignmentDirectional.center,
-                  margin: EdgeInsets.only(left: 5.0, right: 5.0),
-                  height: 56.0,
-                  decoration:
-                      BoxDecoration(border: Border.all(color: Colors.white70)),
-                  child: Image.asset(
-                    'lib/assets/icon/spinner.gif',
-                    width: 40.0,
-                    height: 40.0,
+              ),
+            ),
+            Container(
+              height: 180.0,
+              width: screenWidth(context),
+              child: _buildAdvertisementLoader(),
+            ),
+            (isNearByRestaurants == true ||
+                    isTopRatedRestaurants == true ||
+                    isAdvertisementList == true ||
+                    isNewlyArrivedRestaurants == true)
+                ? Container()
+                : Container(
+                    alignment: AlignmentDirectional.center,
+                    margin: EdgeInsets.only(left: 5.0, right: 5.0),
+                    height: 56.0,
+                    decoration:
+                        BoxDecoration(border: Border.all(color: Colors.white70)),
+                    child: Image.asset(
+                      'lib/assets/icon/spinner.gif',
+                      width: 40.0,
+                      height: 40.0,
+                    ),
                   ),
-                ),
-          Container(
-            color: Colors.white70,
-            margin: EdgeInsets.only(bottom: 5.0),
-            child: ListView(
-              physics: ScrollPhysics(),
-              shrinkWrap: true,
-              children: <Widget>[
-                isNearByRestaurants != true
-                    ? Container()
-                    : _buildGridHeader('Restaurants Near You'),
-                _buildGetNearByLocationLoader(),
-                isNearByRestaurants != true
-                    ? Container()
-                    : _buildViewAllButton('Near By'),
-              ],
+            Container(
+              color: Colors.white70,
+              margin: EdgeInsets.only(bottom: 5.0),
+              child: ListView(
+                physics: ScrollPhysics(),
+                shrinkWrap: true,
+                children: <Widget>[
+                  isNearByRestaurants != true
+                      ? Container()
+                      : _buildGridHeader('Restaurants Near You'),
+                  _buildGetNearByLocationLoader(),
+                  isNearByRestaurants != true
+                      ? Container()
+                      : _buildViewAllButton('Near By'),
+                ],
+              ),
             ),
-          ),
-          Container(
-            color: Colors.white70,
-            margin: EdgeInsets.only(bottom: 5.0),
-            child: ListView(
-              physics: ScrollPhysics(),
-              shrinkWrap: true,
-              children: <Widget>[
-                isTopRatedRestaurants != true
-                    ? Container()
-                    : _buildGridHeader('Top Rated Restaurants'),
-                _buildTopRatedRestaurantLoader(),
-                isTopRatedRestaurants != true
-                    ? Container()
-                    : _buildViewAllButton('Top Rated'),
-              ],
+            Container(
+              color: Colors.white70,
+              margin: EdgeInsets.only(bottom: 5.0),
+              child: ListView(
+                physics: ScrollPhysics(),
+                shrinkWrap: true,
+                children: <Widget>[
+                  isTopRatedRestaurants != true
+                      ? Container()
+                      : _buildGridHeader('Top Rated Restaurants'),
+                  _buildTopRatedRestaurantLoader(),
+                  isTopRatedRestaurants != true
+                      ? Container()
+                      : _buildViewAllButton('Top Rated'),
+                ],
+              ),
             ),
-          ),
-          Container(
-            color: Colors.white70,
-            margin: EdgeInsets.only(bottom: 5.0),
-            child: ListView(
-              physics: ScrollPhysics(),
-              shrinkWrap: true,
-              children: <Widget>[
-                isNewlyArrivedRestaurants != true
-                    ? Container()
-                    : _buildGridHeader('Newly Arrived Restaurants'),
-                _buildNewlyArrivedRestaurantLoader(),
-                isNewlyArrivedRestaurants != true
-                    ? Container()
-                    : _buildViewAllButton('Newly Arrived'),
-              ],
+            Container(
+              color: Colors.white70,
+              margin: EdgeInsets.only(bottom: 5.0),
+              child: ListView(
+                physics: ScrollPhysics(),
+                shrinkWrap: true,
+                children: <Widget>[
+                  isNewlyArrivedRestaurants != true
+                      ? Container()
+                      : _buildGridHeader('Newly Arrived Restaurants'),
+                  _buildNewlyArrivedRestaurantLoader(),
+                  isNewlyArrivedRestaurants != true
+                      ? Container()
+                      : _buildViewAllButton('Newly Arrived'),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
