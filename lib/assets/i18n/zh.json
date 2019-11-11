@@ -49,5 +49,18 @@
   "otpErrorMessage": "OTP至少应为6位数字！",
   "otpMessage": "输入您收到的OTP",
   "createPassword": "创建密码",
-  "createPasswordMessage": "为您的帐户创建新密码！"
+  "createPasswordMessage": "为您的帐户创建新密码！",
+  "connectionError": "请检查您的互联网连接！",
+  "favoritesListEmpty": "您的收藏列表为空 !",
+  "removedFavoriteItem": "产品已从收藏夹中删除",
+  "cartEmpty": "您的购物车是空的 !",
+  "history": "历史",
+  "upcoming": "即将来临",
+  "noCompletedOrders": "尚未完成任何订单！",
+  "status": "状态",
+  "view": "视图",
+  "track": "跟踪",
+  "total": "总计",
+  "paymentMode": "付款方式",
+  "chargesIncluding": "包括其他费用"
 }

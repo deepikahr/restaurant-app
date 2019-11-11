@@ -182,6 +182,50 @@ class MyLocalizations {
   String get createPasswordMessage {
     return localizedValues[locale.languageCode]['createPasswordMessage'];
   }
+  String get connectionError {
+    return localizedValues[locale.languageCode]['connectionError'];
+  }
+  String get favoritesListEmpty {
+    return localizedValues[locale.languageCode]['favoritesListEmpty'];
+  }
+  String get removedFavoriteItem {
+    return localizedValues[locale.languageCode]['removedFavoriteItem'];
+  }
+  String get cartEmpty {
+    return localizedValues[locale.languageCode]['cartEmpty'];
+  }
+  String get upcoming {
+    return localizedValues[locale.languageCode]['upcoming'];
+  }
+  String get history {
+    return localizedValues[locale.languageCode]['history'];
+  }
+  String get noCompletedOrders {
+    return localizedValues[locale.languageCode]['noCompletedOrders'];
+  }
+  String get orders {
+    return localizedValues[locale.languageCode]['orders'];
+  }
+  String get status {
+    return localizedValues[locale.languageCode]['status'];
+  }
+  String get view {
+    return localizedValues[locale.languageCode]['view'];
+  }
+  String get track {
+    return localizedValues[locale.languageCode]['track'];
+  }
+  String get total {
+    return localizedValues[locale.languageCode]['total'];
+  }
+  String get paymentMode {
+    return localizedValues[locale.languageCode]['paymentMode'];
+  }
+  String get chargesIncluding {
+    return localizedValues[locale.languageCode]['chargesIncluding'];
+  }
+
+
 
 
   greetTo(name) {

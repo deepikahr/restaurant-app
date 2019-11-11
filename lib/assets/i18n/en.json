@@ -49,5 +49,18 @@
   "otpErrorMessage": "OTP should be atleast 6 digit long!",
   "otpMessage": "Enter OTP you have received",
   "createPassword": "Create Password",
-  "createPasswordMessage": "Create new password for your account!"
+  "createPasswordMessage": "Create new password for your account!",
+  "connectionError": "Please check your internet connection!",
+  "favoritesListEmpty": "Your Favourite list is empty!",
+  "removedFavoriteItem": "Product Removed From Favourites",
+  "cartEmpty": "Your Cart is empty",
+  "history": "History",
+  "upcoming": "Upcoming",
+  "noCompletedOrders": "No order has been completed yet!",
+  "status": "status",
+  "view": "view",
+  "track": "track",
+  "total": "total",
+  "paymentMode": "Payment Mode",
+  "chargesIncluding": "Including other charges"
 }

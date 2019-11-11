@@ -6,10 +6,20 @@ import '../../widgets/no-data.dart';
 import 'package:async_loader/async_loader.dart';
 import '../../screens/mains/product-details.dart';
 import '../../services/sentry-services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'package:RestaurantSaas/initialize_i18n.dart' show initializeI18n;
+import 'package:RestaurantSaas/constant.dart' show languages;
+import 'package:RestaurantSaas/localizations.dart'
+    show MyLocalizations, MyLocalizationsDelegate;
+import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
 
 class Favorites extends StatefulWidget {
+  final Map<String, Map<String, String>> localizedValues;
+  var locale;
+  Favorites({Key key, this.locale, this.localizedValues}) : super(key: key);
   @override
   _FavoritesState createState() => _FavoritesState();
 }
@@ -27,38 +37,48 @@ class _FavoritesState extends State<Favorites> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: whiteTextb,
-      appBar: AppBar(
-        backgroundColor: PRIMARY,
-        title: new Text('Favorites', style: titleBoldWhiteOSS()),
-        centerTitle: true,
-      ),
-      body: AsyncLoader(
-        key: _asyncLoaderState,
-        initState: () async => await getFavouriteList(),
-        renderLoad: () => Center(child: CircularProgressIndicator()),
-        renderError: ([error]) {
-          sentryError.reportError(error, null);
-          return NoData(
-              message: 'Please check your internet connection!',
-              icon: Icons.block);
-        },
-        renderSuccess: ({data}) {
-          if (data.length > 0) {
-            return _buildFavTile(data);
-          } else {
-            return buildEmptyPage();
-          }
-        },
+    return MaterialApp(
+      locale: Locale(widget.locale),
+      debugShowCheckedModeBanner: false,
+      localizationsDelegates: [
+        MyLocalizationsDelegate(widget.localizedValues),
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: languages.map((language) => Locale(language, '')),
+      home: Scaffold(
+        backgroundColor: whiteTextb,
+        appBar: AppBar(
+          backgroundColor: PRIMARY,
+          title: new Text(MyLocalizations.of(context).favourites, style: titleBoldWhiteOSS()),
+          centerTitle: true,
+        ),
+        body: AsyncLoader(
+          key: _asyncLoaderState,
+          initState: () async => await getFavouriteList(),
+          renderLoad: () => Center(child: CircularProgressIndicator()),
+          renderError: ([error]) {
+            sentryError.reportError(error, null);
+            return NoData(
+                message: MyLocalizations.of(context).connectionError,
+                icon: Icons.block);
+          },
+          renderSuccess: ({data}) {
+            if (data.length > 0) {
+              return _buildFavTile(data);
+            } else {
+              return buildEmptyPage(context);
+            }
+          },
+        ),
       ),
     );
   }
 
-  static Widget buildEmptyPage() {
+  static Widget buildEmptyPage(context) {
     return Padding(
       padding: EdgeInsets.only(top: 40.0),
-      child: NoData(message: 'Your Favourite list is empty!'),
+      child: NoData(message: MyLocalizations.of(context).favoritesListEmpty),
     );
   }
 
@@ -159,7 +179,7 @@ class _FavoritesState extends State<Favorites> {
                                           .then((onValue) {
                                         try {
                                           Toast.show(
-                                              "Product Removed From Favourites",
+                                              MyLocalizations.of(context).removedFavoriteItem,
                                               context,
                                               duration: Toast.LENGTH_LONG,
                                               gravity: Toast.BOTTOM);

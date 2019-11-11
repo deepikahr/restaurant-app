@@ -5,14 +5,22 @@ import '../../services/profile-service.dart';
 import 'package:async_loader/async_loader.dart';
 import '../../widgets/no-data.dart';
 import '../../services/sentry-services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'package:RestaurantSaas/initialize_i18n.dart' show initializeI18n;
+import 'package:RestaurantSaas/constant.dart' show languages;
+import 'package:RestaurantSaas/localizations.dart'
+    show MyLocalizations, MyLocalizationsDelegate;
+import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
 
 
 class OrderTrack extends StatefulWidget {
   final String orderId;
-
-  OrderTrack({Key key, this.orderId}) : super(key: key);
+  final Map<String, Map<String, String>> localizedValues;
+  var locale;
+  OrderTrack({Key key, this.orderId, this.locale, this.localizedValues}) : super(key: key);
   @override
   OrderTrackState createState() => OrderTrackState();
 }

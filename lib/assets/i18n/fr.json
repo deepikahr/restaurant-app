@@ -49,5 +49,18 @@
   "otpErrorMessage": "OTP devrait comporter au moins 6 chiffres!",
   "otpMessage": "Entrez l'OTP que vous avez reçu",
   "createPassword": "Créer un mot de passe",
-  "createPasswordMessage": "Créez un nouveau mot de passe pour votre compte!"
+  "createPasswordMessage": "Créez un nouveau mot de passe pour votre compte!",
+  "connectionError": "Veuillez vérifier votre connexion internet!",
+  "favoritesListEmpty": "Votre liste de favoris est vide!",
+  "removedFavoriteItem": "Produit supprimé des favoris",
+  "cartEmpty": "Votre panier est vide!",
+  "history": "Histoire",
+  "upcoming": "à venir",
+  "noCompletedOrders": "Aucune commande n'a encore été finalisée!",
+  "status": "statut",
+  "view": "vue",
+  "track": "piste",
+  "total": "total",
+  "paymentMode": "Mode de paiement",
+  "chargesIncluding": "y compris autres charges"
 }
