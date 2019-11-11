@@ -60,7 +60,7 @@ class _RegisterFormState extends State<RegisterForm> {
         });
         _formKey.currentState.save();
         await AuthService.register(register).then((onValue) {
-          try{
+          try {
             if (onValue['message'] != null) {
               showSnackbar(onValue['message']);
               Future.delayed(const Duration(milliseconds: 3000), () {
@@ -72,7 +72,7 @@ class _RegisterFormState extends State<RegisterForm> {
                 });
               });
             }
-          }catch (error, stackTrace) {
+          } catch (error, stackTrace) {
             sentryError.reportError(error, stackTrace);
           }
         }).catchError((onError) {
@@ -332,9 +332,9 @@ class _RegisterFormState extends State<RegisterForm> {
   }
 
   Widget _buildRegisterButton() {
-    return Positioned(
-      width: screenWidth(context),
-      top: screenHeight(context) * 0.78,
+    return Container(
+      // width: screenWidth(context),
+      // top: screenHeight(context) * 0.78,
       child: RawMaterialButton(
         child: !isLoading
             ? Container(

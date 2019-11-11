@@ -31,6 +31,7 @@ class Menu extends StatefulWidget {
 
 class _MenuState extends State<Menu> {
   int cartCounter;
+  int favCounter;
   String profilePic;
   String fullname;
   bool isLoggedIn = false;
@@ -62,6 +63,20 @@ class _MenuState extends State<Menu> {
       } else {
         setState(() {
           cartCounter = 0;
+        });
+      }
+    });
+  }
+
+  void _getFavLength() {
+    ProfileService.getFavouritList().then((onValue) {
+      if (onValue != null) {
+        setState(() {
+          favCounter = onValue.length;
+        });
+      } else {
+        setState(() {
+          favCounter = 0;
         });
       }
     });

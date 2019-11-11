@@ -120,9 +120,8 @@ class _ProductListPageState extends State<ProductListPage> {
           cartCount = res;
         });
         print("responcencdc   $cartCount");
-      }
-      catch (error, stackTrace) {
-      sentryError.reportError(error, stackTrace);
+      } catch (error, stackTrace) {
+        sentryError.reportError(error, stackTrace);
       }
     }).catchError((onError) {
       sentryError.reportError(onError, null);
@@ -139,7 +138,8 @@ class _ProductListPageState extends State<ProductListPage> {
       renderError: ([error]) {
         sentryError.reportError(error, null);
         return NoData(
-            message: 'Please check your internet connection!', icon: Icons.block);
+            message: 'Please check your internet connection!',
+            icon: Icons.block);
       },
       renderSuccess: ({data}) {
         if (data['message'] != null) {
@@ -178,7 +178,6 @@ class _ProductListPageState extends State<ProductListPage> {
         ),
         centerTitle: true,
         actions: <Widget>[
-          // HomePageState.buildCartIcon(context),
           GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -188,27 +187,38 @@ class _ProductListPageState extends State<ProductListPage> {
                   ),
                 );
               },
-              child: Column(
+              child: Stack(
                 children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(top: 2.0),
-                    child: (cartCount == null || cartCount == 0)
-                        ? Text(
-                            '',
-                            style: TextStyle(fontSize: 14.0),
-                          )
-                        : Text(
-                            '${cartCount.toString()}',
-                            style: TextStyle(fontSize: 14.0),
-                          ),
-                  ),
                   Container(
-                      padding: EdgeInsets.only(right: 10.0),
+                      padding: EdgeInsets.only(top: 20.0, right: 10),
                       child: Icon(Icons.shopping_cart)),
+                  Positioned(
+                      right: 3,
+                      top: 5,
+                      child: (cartCount == null || cartCount == 0)
+                          ? Text(
+                              '',
+                              style: TextStyle(fontSize: 14.0),
+                            )
+                          : Container(
+                              height: 20,
+                              width: 20,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.black,
+                              ),
+                              child: Text('${cartCount.toString()}',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontFamily: "bold",
+                                      fontSize: 11)),
+                            )),
                 ],
               )),
           Padding(padding: EdgeInsets.only(left: 7.0)),
           // buildLocationIcon(),
+          // Padding(padding: EdgeInsets.only(left: 7.0)),
         ],
       ),
       body: SingleChildScrollView(

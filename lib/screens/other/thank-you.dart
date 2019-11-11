@@ -1,3 +1,4 @@
+import 'package:RestaurantSaas/screens/mains/home.dart';
 import 'package:flutter/material.dart';
 import '../../styles/styles.dart';
 import '../../services/common.dart';
@@ -46,7 +47,11 @@ class _ThankYouState extends State<ThankYou> {
                     padding: const EdgeInsets.symmetric(horizontal: 36.0),
                     child: RawMaterialButton(
                       onPressed: () {
-                        Navigator.pop(context);
+                        Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                                builder: (BuildContext context) => HomePage()),
+                            (Route<dynamic> route) => false);
                       },
                       fillColor: Colors.white,
                       child: Row(

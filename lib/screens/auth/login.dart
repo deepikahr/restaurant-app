@@ -61,7 +61,7 @@ class _LoginPageState extends State<LoginPage> {
       _formKey.currentState.save();
       Map<String, dynamic> body = {'email': email, 'password': password};
       AuthService.login(body).then((onValue) {
-        try{
+        try {
           if (onValue['message'] != null) {
             showSnackbar(onValue['message']);
           }
@@ -88,8 +88,7 @@ class _LoginPageState extends State<LoginPage> {
           setState(() {
             isLoading = false;
           });
-        }
-        catch (error, stackTrace) {
+        } catch (error, stackTrace) {
           sentryError.reportError(error, stackTrace);
         }
       }).catchError((onError) {
@@ -159,7 +158,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget buildLoginPageLogo() {
     return Padding(
-      padding: EdgeInsets.only(top: 128.0, bottom: 45.0),
+      padding: EdgeInsets.only(top: 30.0, bottom: 45.0),
       child: Image(
         image: AssetImage("lib/assets/logos/logo.png"),
         fit: BoxFit.cover,
@@ -184,7 +183,7 @@ class _LoginPageState extends State<LoginPage> {
               buildLoginButton(),
               buildForgotPasswordButton(),
               Padding(
-                padding: EdgeInsetsDirectional.only(top: 74.0, bottom: 20.0),
+                padding: EdgeInsetsDirectional.only(top: 40.0, bottom: 20.0),
                 child: Text(
                   MyLocalizations.of(context).dontHaveAccountYet,
                   style: subTitleWhiteLightOSR(),
