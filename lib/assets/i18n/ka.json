@@ -1,0 +1,18 @@
+{
+  "hello": "ನಮಸ್ಕಾರ!",
+  "greetTo": " ನಿಮ್ಮನ್ನು ಭೇಟಿಯಾಗಲು ಸಂತೋಷವಾಗಿದೆ, {{name}}!",
+  "restaurantsNearYou": "ನಿಮ್ಮ ಹತ್ತಿರವಿರುವ ರೆಸ್ಟೋರೆಂಟ್ಗಳು",
+  "topRatedRestaurants": "ಉನ್ನತ ದರದ ರೆಸ್ಟೋರೆಂಟ್ಗಳು",
+  "newlyArrivedRestaurants": "ಹೊಸದಾಗಿ ಆಗಮಿಸಿದ ರೆಸ್ಟೋರೆಂಟ್ಗಳು",
+  "viewAll": "ಎಲ್ಲಾ ವೀಕ್ಷಿಸಿ",
+  "reviews": "ವಿಮರ್ಶೆಗಳು",
+  "branches": "ಶಾಖೆಗಳು",
+  "home": "ಮನೆ",
+  "cart": "ಬಂಡಿ",
+  "myOrders": "ನನ್ನ ಆಜ್ಞೆಗಳು",
+  "favourites": "ಮೆಚ್ಚಿನವುಗಳು",
+  "profile": "ಪ್ರೊಫೈಲ್",
+  "aboutUs": "ನಮ್ಮ ಬಗ್ಗೆ",
+  "login": "ಲಾಗಿನ್",
+  "logout": "ಲಾಗ್ ಔಟ್"
+}

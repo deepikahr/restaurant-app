@@ -25,9 +25,6 @@ import 'package:flutter/services.dart';
 import 'dart:convert';
 // import '../other/search.dart';
 import '../../services/sentry-services.dart';
-
-
-
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'package:RestaurantSaas/initialize_i18n.dart' show initializeI18n;
@@ -118,7 +115,7 @@ class HomePageState extends State<HomePage> {
     setState(() {
       selectedLanguage = prefs.getString('selectedLanguage');
     });
-    print('selectedLanguage............$selectedLanguage');
+    print('selectedLanguage home............$selectedLanguage ${widget.localizedValues}');
   }
 
   String fullname;
@@ -326,7 +323,12 @@ class HomePageState extends State<HomePage> {
     }
   }
 
+  String review, branches;
+
   Widget build(BuildContext context) {
+
+    review = MyLocalizations.of(context).reviews;
+    branches = MyLocalizations.of(context).branches;
     CounterModel().getCounter().then((res) {
       try {
         setState(() {
@@ -340,7 +342,8 @@ class HomePageState extends State<HomePage> {
     }).catchError((onError) {
       sentryError.reportError(onError, null);
     });
-    return MaterialApp(
+    return
+      MaterialApp(
       locale: Locale(widget.locale),
       debugShowCheckedModeBanner: false,
       localizationsDelegates: [
@@ -349,7 +352,8 @@ class HomePageState extends State<HomePage> {
         GlobalWidgetsLocalizations.delegate,
       ],
       supportedLocales: languages.map((language) => Locale(language, '')),
-      home: Scaffold(
+      home:
+      Scaffold(
         backgroundColor: whitec,
         key: scaffoldKey,
         drawer: Menu(scaffoldKey: scaffoldKey, locale: widget.locale, localizedValues: widget.localizedValues),
@@ -405,6 +409,8 @@ class HomePageState extends State<HomePage> {
                 children: <Widget>[
                   Text(MyLocalizations.of(context).hello , style: hintStyleWhiteLightOSR(),),
                   Text(" "),
+                  fullname == null ?
+                  Text(MyLocalizations.of(context).greetTo('User'), style: hintStyleWhiteLightOSR(),) :
                   Text(MyLocalizations.of(context).greetTo('$fullname'), style: hintStyleWhiteLightOSR(),),
                 ],
               ),
@@ -440,7 +446,7 @@ class HomePageState extends State<HomePage> {
                 children: <Widget>[
                   isNearByRestaurants != true
                       ? Container()
-                      : _buildGridHeader('Restaurants Near You'),
+                      : _buildGridHeader(MyLocalizations.of(context).restaurantsNearYou),
                   _buildGetNearByLocationLoader(),
                   isNearByRestaurants != true
                       ? Container()
@@ -457,7 +463,7 @@ class HomePageState extends State<HomePage> {
                 children: <Widget>[
                   isTopRatedRestaurants != true
                       ? Container()
-                      : _buildGridHeader('Top Rated Restaurants'),
+                      : _buildGridHeader(MyLocalizations.of(context).topRatedRestaurants),
                   _buildTopRatedRestaurantLoader(),
                   isTopRatedRestaurants != true
                       ? Container()
@@ -474,7 +480,7 @@ class HomePageState extends State<HomePage> {
                 children: <Widget>[
                   isNewlyArrivedRestaurants != true
                       ? Container()
-                      : _buildGridHeader('Newly Arrived Restaurants'),
+                      : _buildGridHeader(MyLocalizations.of(context).newlyArrivedRestaurants),
                   _buildNewlyArrivedRestaurantLoader(),
                   isNewlyArrivedRestaurants != true
                       ? Container()
@@ -555,7 +561,7 @@ class HomePageState extends State<HomePage> {
                             itemBuilder: (BuildContext context, int index) {
                               return InkWell(
                                   child: buildRestaurantCard(
-                                      nearByRestaurentsList[index]),
+                                      nearByRestaurentsList[index], review, branches),
                                   onTap: () {
                                     setState(() {
                                       restaurantInfo =
@@ -597,7 +603,7 @@ class HomePageState extends State<HomePage> {
               padding: const EdgeInsets.all(0.0),
               itemBuilder: (BuildContext context, int index) {
                 return InkWell(
-                    child: buildRestaurantCard(topRatedRestaurantsList[index]),
+                    child: buildRestaurantCard(topRatedRestaurantsList[index], review, branches),
                     onTap: () {
                       setState(() {
                         restaurantInfo = topRatedRestaurantsList[index];
@@ -640,7 +646,7 @@ class HomePageState extends State<HomePage> {
         padding: const EdgeInsets.all(0.0),
         itemBuilder: (BuildContext context, int index) {
           return InkWell(
-              child: buildRestaurantCard(data[index]),
+              child: buildRestaurantCard(data[index], review, branches),
               onTap: () {
                 setState(() {
                   restaurantInfo = data[index];
@@ -717,7 +723,7 @@ class HomePageState extends State<HomePage> {
             Padding(
               padding: const EdgeInsets.only(right: 8.0),
               child: Text(
-                "View All",
+                MyLocalizations.of(context).viewAll,
                 style: hintStylePrimaryLightOSR(),
               ),
             ),
@@ -852,7 +858,7 @@ class HomePageState extends State<HomePage> {
     );
   }
 
-  static Widget buildRestaurantCard(info) {
+  static Widget buildRestaurantCard(info, review, branches) {
     // print(info);
     return Card(
       child: Column(
@@ -862,7 +868,10 @@ class HomePageState extends State<HomePage> {
               info['list']['restaurantName'],
               double.parse(info['list']['rating'].toString()),
               info['locationCount'],
-              info['list']['reviewCount']),
+              info['list']['reviewCount'],
+              review,
+            branches
+          ),
         ],
       ),
     );
@@ -906,7 +915,7 @@ class HomePageState extends State<HomePage> {
   }
 
   static Widget buildCardBottom(
-      String restaurantName, double rating, int locationCounter, int reviews) {
+      String restaurantName, double rating, int locationCounter, int reviews, String review, branches) {
     return Container(
       padding: EdgeInsets.all(6.0),
       child: Row(
@@ -921,29 +930,32 @@ class HomePageState extends State<HomePage> {
               ),
               locationCounter != null
                   ? Text(
-                      locationCounter.toString() + ' Branches',
+                      locationCounter.toString() + ' $branches',
                       style: subBoldTitle(),
                     )
                   : Container(),
             ],
           ),
-          rating > 0
-              ? Column(
-                  children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        Text(rating.toStringAsFixed(1),
-                            style: priceDescription()),
-                        Icon(Icons.star, color: PRIMARY, size: 16.0),
-                      ],
-                    ),
-                    Text(
-                      '(' + reviews.toString() + ' Reviews)',
-                      style: hintStyleSmallTextDarkOSR(),
-                    )
-                  ],
-                )
-              : Text(''),
+          Flexible(
+            child: rating > 0
+                ? Column(
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          Text(rating.toStringAsFixed(1),
+                              style: priceDescription()),
+                          Icon(Icons.star, color: PRIMARY, size: 16.0),
+                        ],
+                      ),
+                      Text(
+                        '(' + reviews.toString() + ')' + review,
+                        style: hintStyleSmallTextDarkOSR(),
+                        overflow: TextOverflow.ellipsis,
+                      )
+                    ],
+                  )
+                : Text(''),
+          ),
         ],
       ),
     );

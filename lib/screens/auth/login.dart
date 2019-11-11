@@ -1,3 +1,4 @@
+import 'package:RestaurantSaas/main.dart';
 import 'package:RestaurantSaas/screens/mains/home.dart';
 import 'package:flutter/material.dart';
 import '../../styles/styles.dart';
@@ -7,6 +8,15 @@ import '../../services/common.dart';
 import 'registration.dart';
 import 'forgot-password.dart';
 import '../../services/sentry-services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'package:RestaurantSaas/initialize_i18n.dart' show initializeI18n;
+import 'package:RestaurantSaas/constant.dart' show languages;
+import 'package:RestaurantSaas/localizations.dart'
+    show MyLocalizations, MyLocalizationsDelegate;
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 SentryError sentryError = new SentryError();
 
@@ -27,6 +37,22 @@ class _LoginPageState extends State<LoginPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  @override
+  void initState() {
+    super.initState();
+    selectedLanguages();
+  }
+
+  var selectedLanguage;
+
+  selectedLanguages() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      selectedLanguage = prefs.getString('selectedLanguage');
+    });
+    print('selectedLanguage login............$selectedLanguage ${widget.localizedValues}');
+  }
+
   login() {
     if (_formKey.currentState.validate()) {
       setState(() {
@@ -42,13 +68,14 @@ class _LoginPageState extends State<LoginPage> {
           if (onValue['token'] != null) {
             Common.setToken(onValue['token']).then((saved) {
               if (saved) {
-                showSnackbar('Login Successful!');
+                showSnackbar(MyLocalizations.of(context).loginSuccessful);
                 Future.delayed(Duration(milliseconds: 1500), () {
                   if (widget.isDrawe == true) {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (BuildContext context) => HomePage(locale: widget.locale, localizedValues: widget.localizedValues),
+                        builder: (BuildContext context) => HomePage
+                          (locale: widget.locale, localizedValues:widget.localizedValues),
                       ),
                     );
                   } else {
@@ -84,29 +111,35 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      backgroundColor: Colors.transparent,
-      body: Stack(
-        fit: StackFit.expand,
-        children: <Widget>[
-          Image(
-            image: AssetImage("lib/assets/bgImgs/background.png"),
-            fit: BoxFit.cover,
+    return MaterialApp(
+      locale: Locale(widget.locale),
+      debugShowCheckedModeBanner: false,
+      localizationsDelegates: [
+        MyLocalizationsDelegate(widget.localizedValues),
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: languages.map((language) => Locale(language, '')),
+      home: Scaffold(
+        key: _scaffoldKey,
+        backgroundColor: Colors.transparent,
+        body: Container(
+          child: Stack(
+            fit: StackFit.expand,
+            children: <Widget>[
+              buildLoginPageBg(),
+              SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    buildLoginPageLogo(),
+                    buildLoginPageForm(),
+                  ],
+                ),
+              )
+            ],
           ),
-          Center(
-            child: new SingleChildScrollView(
-              // padding: const EdgeInsets.fromLTRB(30.0, 0.0, 30.0, 30.0),
-              child: Column(
-                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  buildLoginPageLogo(),
-                  buildLoginPageForm(),
-                ],
-              ),
-            ),
-          )
-        ],
+        ),
       ),
     );
   }
@@ -152,7 +185,7 @@ class _LoginPageState extends State<LoginPage> {
               Padding(
                 padding: EdgeInsetsDirectional.only(top: 40.0, bottom: 20.0),
                 child: Text(
-                  "Don't have account Yet?",
+                  MyLocalizations.of(context).dontHaveAccountYet,
                   style: subTitleWhiteLightOSR(),
                 ),
               ),
@@ -172,14 +205,14 @@ class _LoginPageState extends State<LoginPage> {
         validator: (String value) {
           if (value.isEmpty ||
               !RegExp(Validators.emailPattern).hasMatch(value)) {
-            return 'Please enter a valid email';
+            return MyLocalizations.of(context).pleaseEnterValidEmail;
           }
         },
         onSaved: (String value) {
           email = value;
         },
         decoration: InputDecoration(
-          labelText: "Your Email",
+          labelText: MyLocalizations.of(context).yourEmail,
           labelStyle: hintStyleGreyLightOSR(),
           contentPadding: EdgeInsets.all(10),
           border: InputBorder.none,
@@ -197,14 +230,14 @@ class _LoginPageState extends State<LoginPage> {
         keyboardType: TextInputType.text,
         validator: (String value) {
           if (value.isEmpty || value.length < 6) {
-            return 'Password should be atleast 6 char long';
+            return MyLocalizations.of(context).pleaseEnterValidPassword;
           }
         },
         onSaved: (String value) {
           password = value;
         },
         decoration: InputDecoration(
-          labelText: "Your Password",
+          labelText: MyLocalizations.of(context).yourPassword,
           labelStyle: hintStyleGreyLightOSR(),
           contentPadding: EdgeInsets.only(
             left: 15.0,
@@ -242,7 +275,7 @@ class _LoginPageState extends State<LoginPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              "LOGIN TO YOUR ACCOUNT",
+              MyLocalizations.of(context).loginToYourAccount,
               style: subTitleWhiteLightOSR(),
             ),
             Padding(padding: EdgeInsets.only(left: 5.0, right: 5.0)),
@@ -267,12 +300,12 @@ class _LoginPageState extends State<LoginPage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (BuildContext context) => ResetPassword(),
+                builder: (BuildContext context) => ResetPassword(locale: widget.locale, localizedValues: widget.localizedValues,),
               ),
             );
           },
           child: Text(
-            'Forgot Password?',
+            MyLocalizations.of(context).forgotPassword,
             style: hintStyleLightOSB(),
           )),
     );
@@ -286,7 +319,7 @@ class _LoginPageState extends State<LoginPage> {
         width: screenWidth(context),
         decoration: BoxDecoration(border: Border.all(color: Colors.white70)),
         child: Text(
-          " Sign-Up Now",
+          MyLocalizations.of(context).signInNow,
           style: subTitleWhiteShadeLightOSR(),
         ),
       ),
@@ -294,7 +327,7 @@ class _LoginPageState extends State<LoginPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (BuildContext context) => RegisterForm(),
+            builder: (BuildContext context) => RegisterForm(locale: widget.locale, localizedValues: widget.localizedValues,),
           ),
         );
       },

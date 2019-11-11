@@ -4,11 +4,21 @@ import '../../services/auth-service.dart';
 import '../../blocs/validators.dart';
 import 'otp-verify.dart';
 import '../../services/sentry-services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'package:RestaurantSaas/initialize_i18n.dart' show initializeI18n;
+import 'package:RestaurantSaas/constant.dart' show languages;
+import 'package:RestaurantSaas/localizations.dart'
+    show MyLocalizations, MyLocalizationsDelegate;
+import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
 
 class ResetPassword extends StatefulWidget {
-  ResetPassword({Key key}) : super(key: key);
+  var locale;
+  final Map<String, Map<String, String>> localizedValues;
+
+  ResetPassword({Key key, this.locale, this.localizedValues}) : super(key: key);
   @override
   _ResetPasswordState createState() => _ResetPasswordState();
 }
@@ -36,7 +46,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                   context,
                   MaterialPageRoute(
                     builder: (BuildContext context) =>
-                        OtpVerify(otpToken: onValue['token']),
+                        OtpVerify(otpToken: onValue['token'], locale: widget.locale, localizedValues: widget.localizedValues,),
                   ),
                 );
               });
@@ -69,35 +79,45 @@ class _ResetPasswordState extends State<ResetPassword> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        key: _scaffoldKey,
-        appBar: AppBar(
-          title: Text(
-            "Reset Password",
-          ),
-          centerTitle: true,
-          backgroundColor: PRIMARY,
-          elevation: 0.0,
-        ),
-        body: new ListView(
-          children: <Widget>[
-            Stack(
-              children: <Widget>[
-                Image(
-                  image: AssetImage("lib/assets/bgImgs/background.png"),
-                  fit: BoxFit.fill,
-                  height: screenHeight(context),
-                  width: screenWidth(context),
-                ),
-                Form(
-                  key: _formKey,
-                  child: _buildEmailField(),
-                ),
-                _buildSubmitButton(),
-              ],
+    return MaterialApp(
+      locale: Locale(widget.locale),
+      debugShowCheckedModeBanner: false,
+      localizationsDelegates: [
+        MyLocalizationsDelegate(widget.localizedValues),
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: languages.map((language) => Locale(language, '')),
+      home: Scaffold(
+          key: _scaffoldKey,
+          appBar: AppBar(
+            title: Text(
+              MyLocalizations.of(context).resetPassword,
             ),
-          ],
-        ));
+            centerTitle: true,
+            backgroundColor: PRIMARY,
+            elevation: 0.0,
+          ),
+          body: new ListView(
+            children: <Widget>[
+              Stack(
+                children: <Widget>[
+                  Image(
+                    image: AssetImage("lib/assets/bgImgs/background.png"),
+                    fit: BoxFit.fill,
+                    height: screenHeight(context),
+                    width: screenWidth(context),
+                  ),
+                  Form(
+                    key: _formKey,
+                    child: _buildEmailField(),
+                  ),
+                  _buildSubmitButton(),
+                ],
+              ),
+            ],
+          )),
+    );
   }
 
   Widget _buildEmailField() {
@@ -114,7 +134,7 @@ class _ResetPasswordState extends State<ResetPassword> {
             padding: EdgeInsetsDirectional.only(top: 30.0, bottom: 30.0),
             child: Center(
                 child: Text(
-              "Reset Password via OTP!",
+              MyLocalizations.of(context).resetPasswordOtp,
               textAlign: TextAlign.center,
               style: subTitleWhiteLightOSR(),
             )),
@@ -133,14 +153,14 @@ class _ResetPasswordState extends State<ResetPassword> {
                     validator: (String value) {
                       if (value.isEmpty ||
                           !RegExp(Validators.emailPattern).hasMatch(value)) {
-                        return 'Please enter a valid email';
+                        return MyLocalizations.of(context).pleaseEnterValidEmail;
                       }
                     },
                     onSaved: (value) {
                       email = value;
                     },
                     decoration: new InputDecoration(
-                      labelText: "Email",
+                      labelText: MyLocalizations.of(context).emailId,
                       hintStyle: hintStyleGreyLightOSR(),
                       contentPadding: EdgeInsets.all(12.0),
                       border: InputBorder.none,
@@ -162,7 +182,7 @@ class _ResetPasswordState extends State<ResetPassword> {
           new Padding(
             padding: EdgeInsets.only(top: 20.0),
             child: new Text(
-              'You will receive OTP on your registered mail!',
+              MyLocalizations.of(context).resetMessage,
               textAlign: TextAlign.center,
               style: subTitleWhiteLightOSR(),
             ),
@@ -187,7 +207,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                   decoration:
                       BoxDecoration(border: Border.all(color: Colors.white70)),
                   child: Text(
-                    "Reset Password",
+                    MyLocalizations.of(context).resetPassword,
                     style: subTitleWhiteShadeLightOSR(),
                   ),
                 )
