@@ -95,16 +95,15 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   @override
   void initState() {
     Common.getToken().then((onValue) {
-      try{
+      try {
         if (onValue != null) {
           setState(() {
             isLoggedIn = true;
             _checkFavourite();
           });
         }
-      }
-      catch (error, stackTrace) {
-      sentryError.reportError(error, stackTrace);
+      } catch (error, stackTrace) {
+        sentryError.reportError(error, stackTrace);
       }
     }).catchError((onError) {
       sentryError.reportError(onError, null);
@@ -116,7 +115,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
   void _checkFavourite() async {
     ProfileService.checkFavourite(widget.product['_id']).then((onValue) {
-      try{
+      try {
         if (mounted) {
           setState(() {
             isLoading = false;
@@ -130,9 +129,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             }
           });
         }
-      }
-      catch (error, stackTrace) {
-      sentryError.reportError(error, stackTrace);
+      } catch (error, stackTrace) {
+        sentryError.reportError(error, stackTrace);
       }
     }).catchError((onError) {
       sentryError.reportError(onError, null);
@@ -153,8 +151,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     });
     if (isFavourite) {
       ProfileService.removeFavouritById(favouriteId).then((onValue) {
-        try{
-          Toast.show("Product remove to Favourite list", context,
+        try {
+          Toast.show("Product Removed From Favourite", context,
               duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
           if (onValue != null) {
             setState(() {
@@ -163,9 +161,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               isFavourite = false;
             });
           }
-        }
-        catch (error, stackTrace) {
-        sentryError.reportError(error, stackTrace);
+        } catch (error, stackTrace) {
+          sentryError.reportError(error, stackTrace);
         }
       }).catchError((onError) {
         sentryError.reportError(onError, null);
@@ -174,17 +171,16 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       ProfileService.addToFavourite(widget.product['_id'], widget.restaurantId,
               widget.locationInfo['_id'])
           .then((onValue) {
-        try{
-          Toast.show("Product add to Favourite list", context,
+        try {
+          Toast.show("Product added to Favourites", context,
               duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
           setState(() {
             favouriteId = onValue['_id'];
             isLoading = false;
             isFavourite = true;
           });
-        }
-        catch (error, stackTrace) {
-        sentryError.reportError(error, stackTrace);
+        } catch (error, stackTrace) {
+          sentryError.reportError(error, stackTrace);
         }
       }).catchError((onError) {
         sentryError.reportError(onError, null);
@@ -195,14 +191,13 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   @override
   Widget build(BuildContext context) {
     CounterModel().getCounter().then((res) {
-      try{
+      try {
         setState(() {
           cartCount = res;
         });
         print("responcencdc   $cartCount");
-      }
-      catch (error, stackTrace) {
-      sentryError.reportError(error, stackTrace);
+      } catch (error, stackTrace) {
+        sentryError.reportError(error, stackTrace);
       }
     }).catchError((onError) {
       sentryError.reportError(onError, null);
@@ -217,7 +212,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         ),
         centerTitle: true,
         actions: <Widget>[
-          // HomePageState.buildCartIcon(context),
           GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -227,38 +221,40 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   ),
                 );
               },
-              child: Column(
+              child: Stack(
                 children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(top: 2.0),
-                    child: (cartCount == null || cartCount == 0)
-                        ? Text(
-                            '',
-                            style: TextStyle(fontSize: 14.0),
-                          )
-                        : Text(
-                            '${cartCount.toString()}',
-                            style: TextStyle(fontSize: 14.0),
-                          ),
-                  ),
                   Container(
-                      padding: EdgeInsets.only(right: 10.0),
+                      padding: EdgeInsets.only(top: 20.0, right: 10),
                       child: Icon(Icons.shopping_cart)),
+                  Positioned(
+                      right: 3,
+                      top: 5,
+                      child: (cartCount == null || cartCount == 0)
+                          ? Text(
+                              '',
+                              style: TextStyle(fontSize: 14.0),
+                            )
+                          : Container(
+                              height: 20,
+                              width: 20,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.black,
+                              ),
+                              child: Text('${cartCount.toString()}',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontFamily: "bold",
+                                      fontSize: 11)),
+                            )),
                 ],
               )),
           Padding(padding: EdgeInsets.only(left: 7.0)),
           // buildLocationIcon(),
+          // Padding(padding: EdgeInsets.only(left: 7.0)),
         ],
       ),
-      // body: Stack(
-      //   alignment: AlignmentDirectional.topCenter,
-      //   children: <Widget>[
-
-      //     _buildProductAddCounter(),
-      //     _buildAddToCartButton(),
-      //   ],
-      // ),
-
       body: Container(
         alignment: AlignmentDirectional.topCenter,
         color: Colors.white,
@@ -301,7 +297,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           ),
         ),
       ),
-
       bottomNavigationBar: Container(
         height: 110.0,
         child: Column(
@@ -619,7 +614,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
   void _checkIfCartIsAvailable() {
     Common.getCart().then((onValue) {
-      try{
+      try {
         if (onValue == null) {
           _goToCart();
         } else {
@@ -629,9 +624,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             _showClearCartAlert();
           }
         }
-      }
-      catch (error, stackTrace) {
-      sentryError.reportError(error, stackTrace);
+      } catch (error, stackTrace) {
+        sentryError.reportError(error, stackTrace);
       }
     }).catchError((onError) {
       sentryError.reportError(onError, null);

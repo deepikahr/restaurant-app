@@ -159,9 +159,8 @@ class _FavoritesState extends State<Favorites> {
                                           .then((onValue) {
                                         try {
                                           Toast.show(
-                                              "Product remove to Favourite list",
+                                              "Product Removed From Favourites",
                                               context,
-
                                               duration: Toast.LENGTH_LONG,
                                               gravity: Toast.BOTTOM);
                                           if (onValue) {
@@ -170,9 +169,9 @@ class _FavoritesState extends State<Favorites> {
                                               favs.removeAt(index);
                                             });
                                           }
-                                        }
-                                        catch (error, stackTrace) {
-                                        sentryError.reportError(error, stackTrace);
+                                        } catch (error, stackTrace) {
+                                          sentryError.reportError(
+                                              error, stackTrace);
                                         }
                                       }).catchError((onError) {
                                         sentryError.reportError(onError, null);

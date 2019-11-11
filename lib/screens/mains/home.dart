@@ -166,7 +166,7 @@ class HomePageState extends State<HomePage> {
 
   void _getCartLength() async {
     await Common.getCart().then((onValue) {
-      try{
+      try {
         if (onValue != null) {
           setState(() {
             cartCounter = onValue['productDetails'].length;
@@ -177,9 +177,8 @@ class HomePageState extends State<HomePage> {
             cartCounter = 0;
           });
         }
-      }
-      catch (error, stackTrace) {
-      sentryError.reportError(error, stackTrace);
+      } catch (error, stackTrace) {
+        sentryError.reportError(error, stackTrace);
       }
     }).catchError((onError) {
       sentryError.reportError(onError, null);
@@ -257,7 +256,7 @@ class HomePageState extends State<HomePage> {
 
   void checkAndValidateToken() {
     Common.getToken().then((onValue) {
-      try{
+      try {
         if (onValue != null) {
           ProfileService.validateToken().then((value) {
             if (!value) {
@@ -265,8 +264,7 @@ class HomePageState extends State<HomePage> {
             }
           });
         }
-      }
-      catch (error, stackTrace) {
+      } catch (error, stackTrace) {
         sentryError.reportError(error, stackTrace);
       }
     }).catchError((onError) {
@@ -330,14 +328,14 @@ class HomePageState extends State<HomePage> {
 
   Widget build(BuildContext context) {
     CounterModel().getCounter().then((res) {
-      try{
+      try {
         setState(() {
           cartCount = res;
         });
       }
       // print("res   $cartCount");
       catch (error, stackTrace) {
-      sentryError.reportError(error, stackTrace);
+        sentryError.reportError(error, stackTrace);
       }
     }).catchError((onError) {
       sentryError.reportError(onError, null);
