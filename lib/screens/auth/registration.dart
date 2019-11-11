@@ -3,10 +3,21 @@ import '../../styles/styles.dart';
 import '../../blocs/validators.dart';
 import '../../services/auth-service.dart';
 import '../../services/sentry-services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'package:RestaurantSaas/initialize_i18n.dart' show initializeI18n;
+import 'package:RestaurantSaas/constant.dart' show languages;
+import 'package:RestaurantSaas/localizations.dart'
+    show MyLocalizations, MyLocalizationsDelegate;
+import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
 
 class RegisterForm extends StatefulWidget {
+  var locale;
+  final Map<String, Map<String, String>> localizedValues;
+
+  RegisterForm({Key key, this.locale, this.localizedValues}) : super(key: key);
   @override
   _RegisterFormState createState() => _RegisterFormState();
 }
@@ -14,6 +25,23 @@ class RegisterForm extends StatefulWidget {
 class _RegisterFormState extends State<RegisterForm> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    selectedLanguages();
+  }
+
+  var selectedLanguage;
+
+  selectedLanguages() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      selectedLanguage = prefs.getString('selectedLanguage');
+    });
+    print('selectedLanguage reg............$selectedLanguage ${widget.localizedValues}');
+  }
+
   Map<String, dynamic> register = {
     'email': null,
     'password': null,
@@ -70,42 +98,52 @@ class _RegisterFormState extends State<RegisterForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
-        title: Text("Register"),
-        centerTitle: true,
-        backgroundColor: PRIMARY,
-      ),
-      body: SingleChildScrollView(
-        child: Stack(
-          children: <Widget>[
-            Image(
-              image: AssetImage("lib/assets/bgImgs/background.png"),
-              fit: BoxFit.fill,
-              height: screenHeight(context),
-              width: screenWidth(context),
-            ),
-            Form(
-              key: _formKey,
-              child: Container(
-                padding: EdgeInsetsDirectional.only(start: 14.0, end: 14.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Padding(padding: EdgeInsets.only(top: 60.0)),
-                    _buildNameField(),
-                    _buildNumberField(),
-                    _buildEmailField(),
-                    _buildPasswordField(),
-                    _buildTermsAndCondiField(),
-                  ],
+    return MaterialApp(
+      locale: Locale(widget.locale),
+      debugShowCheckedModeBanner: false,
+      localizationsDelegates: [
+        MyLocalizationsDelegate(widget.localizedValues),
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: languages.map((language) => Locale(language, '')),
+      home: Scaffold(
+        key: _scaffoldKey,
+        appBar: AppBar(
+          title: Text(MyLocalizations.of(context).register),
+          centerTitle: true,
+          backgroundColor: PRIMARY,
+        ),
+        body: SingleChildScrollView(
+          child: Stack(
+            children: <Widget>[
+              Image(
+                image: AssetImage("lib/assets/bgImgs/background.png"),
+                fit: BoxFit.fill,
+                height: screenHeight(context),
+                width: screenWidth(context),
+              ),
+              Form(
+                key: _formKey,
+                child: Container(
+                  padding: EdgeInsetsDirectional.only(start: 14.0, end: 14.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Padding(padding: EdgeInsets.only(top: 60.0)),
+                      _buildNameField(),
+                      _buildNumberField(),
+                      _buildEmailField(),
+                      _buildPasswordField(),
+                      _buildTermsAndCondiField(),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            _buildRegisterButton(),
-          ],
+              _buildRegisterButton(),
+            ],
+          ),
         ),
       ),
     );
@@ -125,14 +163,14 @@ class _RegisterFormState extends State<RegisterForm> {
               keyboardType: TextInputType.text,
               validator: (String value) {
                 if (value.isEmpty) {
-                  return 'Please enter a valid name';
+                  return MyLocalizations.of(context).pleaseEnterValidName;
                 }
               },
               onSaved: (String value) {
                 register['name'] = value;
               },
               decoration: new InputDecoration(
-                labelText: "Full Name",
+                labelText: MyLocalizations.of(context).fullName,
                 hintStyle: hintStyleGreyLightOSR(),
                 contentPadding: EdgeInsets.all(12.0),
                 border: InputBorder.none,
@@ -163,14 +201,14 @@ class _RegisterFormState extends State<RegisterForm> {
               keyboardType: TextInputType.number,
               validator: (String value) {
                 if (value.isEmpty || value.length < 9) {
-                  return 'Please enter a valid contact number';
+                  return MyLocalizations.of(context).pleaseEnterValidMobileNumber;
                 }
               },
               onSaved: (String value) {
                 register['contactNumber'] = value;
               },
               decoration: new InputDecoration(
-                labelText: "Contact Number",
+                labelText:  MyLocalizations.of(context).mobileNumber,
                 hintStyle: hintStyleGreyLightOSR(),
                 contentPadding: EdgeInsets.all(12.0),
                 border: InputBorder.none,
@@ -199,7 +237,7 @@ class _RegisterFormState extends State<RegisterForm> {
             flex: 9,
             child: TextFormField(
               decoration: new InputDecoration(
-                labelText: "Email",
+                labelText:  MyLocalizations.of(context).emailId,
                 hintStyle: hintStyleGreyLightOSR(),
                 contentPadding: EdgeInsets.all(12.0),
                 border: InputBorder.none,
@@ -208,7 +246,7 @@ class _RegisterFormState extends State<RegisterForm> {
               validator: (String value) {
                 if (value.isEmpty ||
                     !RegExp(Validators.emailPattern).hasMatch(value)) {
-                  return 'Please enter a valid email';
+                  return MyLocalizations.of(context).pleaseEnterValidEmail;
                 }
               },
               onSaved: (String value) {
@@ -238,7 +276,7 @@ class _RegisterFormState extends State<RegisterForm> {
             flex: 9,
             child: TextFormField(
               decoration: new InputDecoration(
-                labelText: "Password",
+                labelText: MyLocalizations.of(context).password,
                 hintStyle: hintStyleGreyLightOSR(),
                 contentPadding: EdgeInsets.all(12.0),
                 border: InputBorder.none,
@@ -247,7 +285,7 @@ class _RegisterFormState extends State<RegisterForm> {
               obscureText: true,
               validator: (String value) {
                 if (value.isEmpty || value.length < 6) {
-                  return 'Password should be atleast 6 char long';
+                  return MyLocalizations.of(context).pleaseEnterValidPassword;
                 }
               },
               onSaved: (String value) {
@@ -279,9 +317,14 @@ class _RegisterFormState extends State<RegisterForm> {
             },
             activeColor: PRIMARY,
           ),
-          new Text(
-            "Accept T&C and Privacy Policy",
-            style: subTitleWhiteShadeLightOSR(),
+          Flexible(
+            child: Container(
+              height: 50.0,
+              child: new Text(
+                MyLocalizations.of(context).acceptTerms,
+                style: subTitleWhiteShadeLightOSR(),
+              ),
+            ),
           ),
         ],
       ),
@@ -302,7 +345,7 @@ class _RegisterFormState extends State<RegisterForm> {
                   border: Border.all(color: Colors.white70),
                 ),
                 child: Text(
-                  " Register Now",
+                  MyLocalizations.of(context).registerNow,
                   style: subTitleWhiteShadeLightOSR(),
                 ),
               )

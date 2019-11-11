@@ -18,14 +18,42 @@ import 'package:flutter/cupertino.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+import 'package:flutter_localizations/flutter_localizations.dart';
+
 import 'package:RestaurantSaas/initialize_i18n.dart' show initializeI18n;
 import 'package:RestaurantSaas/constant.dart' show languages;
 import 'package:RestaurantSaas/localizations.dart'
     show MyLocalizations, MyLocalizationsDelegate;
 
-import 'package:RestaurantSaas/main.dart';
 
 SentryError sentryError = new SentryError();
+
+class ProfileApp extends StatefulWidget {
+  final Map<String, Map<String, String>> localizedValues;
+  String locale;
+  ProfileApp({Key key, this.locale, this.localizedValues}) : super(key: key);
+  @override
+  _ProfileAppState createState() => _ProfileAppState();
+}
+
+class _ProfileAppState extends State<ProfileApp> {
+
+  @override
+  Widget build(BuildContext context) {
+    return new MaterialApp(
+      locale: Locale(widget.locale),
+      debugShowCheckedModeBanner: false,
+      localizationsDelegates: [
+        MyLocalizationsDelegate(widget.localizedValues),
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: languages.map((language) => Locale(language, '')),
+      home: Profile(locale: widget.locale, localizedValues: widget.localizedValues),
+    );
+  }
+}
+
 
 class Profile extends StatefulWidget {
 
@@ -72,8 +100,10 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
       selectedLocale = 'French';
     }else if(selectedLanguage == 'zh'){
       selectedLocale = 'Chinese';
+    }else if(selectedLanguage == 'ka'){
+      selectedLocale = 'Kannada';
     }
-    print('selectedLanguage............$selectedLanguage');
+    print('selectedLanguage profile............$selectedLanguage ${widget.localizedValues}');
   }
 
 
@@ -199,12 +229,13 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 
   String selectedLanguages, selectedLang;
 
-  List<String> languages = ['english', 'french', 'chinese'];
+  List<String> languages = ['english', 'french', 'chinese', 'kannada'];
 
 
 
   @override
   Widget build(BuildContext context) {
+
     AsyncLoader _asyncLoader = AsyncLoader(
         key: _asyncLoaderState,
         initState: () async => await getProfileInfo(),
@@ -320,7 +351,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           border: Border.all(color: Colors.grey, width: 1.0),
                         ),
                         child: ListTile(
-                            title: Text('Select languages: '),
+                            title: Text(MyLocalizations.of(context).selectLanguages),
                             trailing: DropdownButtonHideUnderline(
                               child: DropdownButton(
                                 hint: Text(selectedLocale == null  ? 'english' : selectedLocale),
@@ -344,7 +375,17 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                         builder: (BuildContext context) => EntryPage(widget.locale, widget.localizedValues),
                                       ),
                                     );
-                                  }else {
+                                  }
+                                  else if(newValue == 'kannada'){
+                                  SharedPreferences prefs = await SharedPreferences.getInstance();
+                                  prefs.setString('selectedLanguage', 'ka');
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (BuildContext context) => EntryPage(widget.locale, widget.localizedValues),
+                                    ),
+                                  );
+                                }else {
                                     SharedPreferences prefs = await SharedPreferences.getInstance();
                                     prefs.setString('selectedLanguage', 'fr');
                                     Navigator.push(
@@ -376,7 +417,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           },
                           initialValue: data['name'],
                           decoration: new InputDecoration(
-                            labelText: 'Full Name',
+                            labelText: MyLocalizations.of(context).fullName,
                             hintStyle: textOS(),
                             contentPadding: EdgeInsets.all(10.0),
                             border: InputBorder.none,
@@ -396,7 +437,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           },
                           initialValue: data['contactNumber'].toString(),
                           decoration: new InputDecoration(
-                            labelText: 'Mobile No.',
+                            labelText: MyLocalizations.of(context).mobileNumber,
                             hintStyle: textOS(),
                             counterText: "",
                             contentPadding: EdgeInsets.all(10.0),
@@ -416,7 +457,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           },
                           initialValue: data['locationName'],
                           decoration: new InputDecoration(
-                            labelText: 'Suburb',
+                            labelText: MyLocalizations.of(context).subUrban,
                             hintStyle: textOS(),
                             contentPadding: EdgeInsets.all(10.0),
                             border: InputBorder.none,
@@ -435,7 +476,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           },
                           initialValue: data['state'],
                           decoration: new InputDecoration(
-                            labelText: 'State',
+                            labelText: MyLocalizations.of(context).state,
                             hintStyle: textOS(),
                             contentPadding: EdgeInsets.all(10.0),
                             border: InputBorder.none,
@@ -454,7 +495,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           },
                           initialValue: data['country'],
                           decoration: new InputDecoration(
-                            labelText: 'Country',
+                            labelText: MyLocalizations.of(context).country,
                             hintStyle: textOS(),
                             contentPadding: EdgeInsets.all(10.0),
                             border: InputBorder.none,
@@ -475,7 +516,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           initialValue:
                               data['zip'] != null ? data['zip'].toString() : '',
                           decoration: new InputDecoration(
-                            labelText: 'Post Code',
+                            labelText: MyLocalizations.of(context).postalCode,
                             hintStyle: textOS(),
                             counterText: "",
                             contentPadding: EdgeInsets.all(10.0),
@@ -497,7 +538,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                               },
                               initialValue: data['address'],
                               decoration: new InputDecoration(
-                                  labelText: 'Address',
+                                  labelText: MyLocalizations.of(context).address,
                                   hintStyle: textOS(),
                                   fillColor: Colors.black,
                                   border: InputBorder.none),
@@ -514,12 +555,14 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
         });
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: PRIMARY,
-        title: Text("Profile"),
-      ),
-      body: _asyncLoader,
-      bottomNavigationBar: _buildBottomBar(),
+        appBar: AppBar(
+          backgroundColor: PRIMARY,
+          title: Text(MyLocalizations.of(context).profile),
+          leading: BackButton(),
+        ),
+        body: _asyncLoader,
+        bottomNavigationBar: _buildBottomBar(),
+
     );
   }
 
@@ -536,7 +579,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
               height: 40.0,
               child: FlatButton(
                 child: Text(
-                  'Cancel',
+                  MyLocalizations.of(context).cancel,
                 ),
                 onPressed: () {
                   Navigator.of(context).pop();
@@ -557,7 +600,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                     )
                   : FlatButton(
                       child: Text(
-                        'Save',
+                        MyLocalizations.of(context).save,
                         style: TextStyle(color: Colors.white),
                       ),
                       onPressed: () {

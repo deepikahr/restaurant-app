@@ -64,6 +64,9 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
 
   @override
   Widget build(BuildContext context) {
+
+//    String review = MyLocalizations.of(context).reviews;
+
     CounterModel().getCounter().then((res) {
       try{
         setState(() {
@@ -146,14 +149,14 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
               itemCount: data.length,
               padding: const EdgeInsets.all(0.0),
               itemBuilder: (BuildContext context, int index) {
-                return InkWell(
-                    child: HomePageState.buildRestaurantCard(data[index]),
-                    onTap: () {
-                      setState(() {
-                        restaurantInfo = data[index];
-                      });
-                      _showBottomSheet();
-                    });
+//                return InkWell(
+//                    child: HomePageState.buildRestaurantCard(data[index], review),
+//                    onTap: () {
+//                      setState(() {
+//                        restaurantInfo = data[index];
+//                      });
+//                      _showBottomSheet();
+//                    });
               });
         });
   }

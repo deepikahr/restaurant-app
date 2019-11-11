@@ -3,12 +3,21 @@ import '../../styles/styles.dart';
 import '../../services/auth-service.dart';
 import 'new-password.dart';
 import '../../services/sentry-services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'package:RestaurantSaas/initialize_i18n.dart' show initializeI18n;
+import 'package:RestaurantSaas/constant.dart' show languages;
+import 'package:RestaurantSaas/localizations.dart'
+    show MyLocalizations, MyLocalizationsDelegate;
+import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
 
 class OtpVerify extends StatefulWidget {
   final String otpToken;
-  OtpVerify({Key key, this.otpToken}) : super(key: key);
+  var locale;
+  final Map<String, Map<String, String>> localizedValues;
+  OtpVerify({Key key, this.otpToken, this.locale, this.localizedValues}) : super(key: key);
   @override
   _OtpVerifyState createState() => _OtpVerifyState();
 }
@@ -35,7 +44,7 @@ class _OtpVerifyState extends State<OtpVerify> {
                  context,
                  MaterialPageRoute(
                    builder: (BuildContext context) =>
-                       NewPassword(otpToken: onValue['token']),
+                       NewPassword(otpToken: onValue['token'], locale: widget.locale, localizedValues: widget.localizedValues,),
                  ),
                );
              });
@@ -68,31 +77,41 @@ class _OtpVerifyState extends State<OtpVerify> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
-        title: Text("Verify OTP"),
-        centerTitle: true,
-        backgroundColor: PRIMARY,
-      ),
-      body: ListView(
-        children: <Widget>[
-          Stack(
-            children: <Widget>[
-              Image(
-                image: AssetImage("lib/assets/bgImgs/background.png"),
-                fit: BoxFit.fill,
-                height: screenHeight(context),
-                width: screenWidth(context),
-              ),
-              Form(
-                key: _formKey,
-                child: _buildOTPField(),
-              ),
-              _buildVerifyOTPButton(),
-            ],
-          ),
-        ],
+    return MaterialApp(
+      locale: Locale(widget.locale),
+      debugShowCheckedModeBanner: false,
+      localizationsDelegates: [
+        MyLocalizationsDelegate(widget.localizedValues),
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: languages.map((language) => Locale(language, '')),
+      home: Scaffold(
+        key: _scaffoldKey,
+        appBar: AppBar(
+          title: Text(MyLocalizations.of(context).verifyOtp),
+          centerTitle: true,
+          backgroundColor: PRIMARY,
+        ),
+        body: ListView(
+          children: <Widget>[
+            Stack(
+              children: <Widget>[
+                Image(
+                  image: AssetImage("lib/assets/bgImgs/background.png"),
+                  fit: BoxFit.fill,
+                  height: screenHeight(context),
+                  width: screenWidth(context),
+                ),
+                Form(
+                  key: _formKey,
+                  child: _buildOTPField(),
+                ),
+                _buildVerifyOTPButton(),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -114,7 +133,7 @@ class _OtpVerifyState extends State<OtpVerify> {
             ),
             child: Center(
                 child: Text(
-              "Verify OTP!",
+              MyLocalizations.of(context).verifyOtp + '!',
               textAlign: TextAlign.center,
               style: subTitleWhiteLightOSR(),
             )),
@@ -138,7 +157,7 @@ class _OtpVerifyState extends State<OtpVerify> {
                     keyboardType: TextInputType.number,
                     validator: (String value) {
                       if (value.isEmpty || value.length < 6) {
-                        return 'OTP should be atleast 6 digit long!';
+                        return MyLocalizations.of(context).otpErrorMessage;
                       }
                     },
                     onSaved: (value) {
@@ -157,7 +176,7 @@ class _OtpVerifyState extends State<OtpVerify> {
           new Padding(
             padding: EdgeInsets.only(top: 20.0),
             child: new Text(
-              'Enter OTP you have received using mail!',
+              MyLocalizations.of(context).otpMessage,
               textAlign: TextAlign.center,
               style: subTitleWhiteLightOSR(),
             ),
@@ -182,7 +201,7 @@ class _OtpVerifyState extends State<OtpVerify> {
                   decoration:
                       BoxDecoration(border: Border.all(color: Colors.white70)),
                   child: Text(
-                    'Verify OTP',
+                    MyLocalizations.of(context).verifyOtp,
                     style: subTitleWhiteShadeLightOSR(),
                   ),
                 )

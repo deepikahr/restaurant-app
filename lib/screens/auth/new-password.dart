@@ -4,12 +4,21 @@ import '../../services/auth-service.dart';
 import '../../services/common.dart';
 import '../mains/home.dart';
 import '../../services/sentry-services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'package:RestaurantSaas/initialize_i18n.dart' show initializeI18n;
+import 'package:RestaurantSaas/constant.dart' show languages;
+import 'package:RestaurantSaas/localizations.dart'
+    show MyLocalizations, MyLocalizationsDelegate;
+import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
 
 class NewPassword extends StatefulWidget {
   final String otpToken;
-  NewPassword({Key key, this.otpToken}) : super(key: key);
+  var locale;
+  final Map<String, Map<String, String>> localizedValues;
+  NewPassword({Key key, this.otpToken, this.locale, this.localizedValues}) : super(key: key);
   @override
   _NewPasswordState createState() => _NewPasswordState();
 }
@@ -37,7 +46,7 @@ class _NewPasswordState extends State<NewPassword> {
                   Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(
-                        builder: (BuildContext context) => HomePage(),
+                        builder: (BuildContext context) => HomePage(locale: widget.locale, localizedValues: widget.localizedValues,),
                       ),
                           (Route<dynamic> route) => route.isFirst);
                 }
@@ -71,31 +80,41 @@ class _NewPasswordState extends State<NewPassword> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
-        title: Text("New Password"),
-        centerTitle: true,
-        backgroundColor: PRIMARY,
-      ),
-      body: ListView(
-        children: <Widget>[
-          Stack(
-            children: <Widget>[
-              Image(
-                image: AssetImage("lib/assets/bgImgs/background.png"),
-                fit: BoxFit.fill,
-                height: screenHeight(context),
-                width: screenWidth(context),
-              ),
-              Form(
-                key: _formKey,
-                child: _buildNewPasswordField(),
-              ),
-              _buildSubmitButton(),
-            ],
-          ),
-        ],
+    return MaterialApp(
+      locale: Locale(widget.locale),
+      debugShowCheckedModeBanner: false,
+      localizationsDelegates: [
+        MyLocalizationsDelegate(widget.localizedValues),
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: languages.map((language) => Locale(language, '')),
+      home: Scaffold(
+        key: _scaffoldKey,
+        appBar: AppBar(
+          title: Text(MyLocalizations.of(context).createPassword),
+          centerTitle: true,
+          backgroundColor: PRIMARY,
+        ),
+        body: ListView(
+          children: <Widget>[
+            Stack(
+              children: <Widget>[
+                Image(
+                  image: AssetImage("lib/assets/bgImgs/background.png"),
+                  fit: BoxFit.fill,
+                  height: screenHeight(context),
+                  width: screenWidth(context),
+                ),
+                Form(
+                  key: _formKey,
+                  child: _buildNewPasswordField(),
+                ),
+                _buildSubmitButton(),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -114,7 +133,7 @@ class _NewPasswordState extends State<NewPassword> {
             padding: EdgeInsetsDirectional.only(top: 30.0, bottom: 30.0),
             child: Center(
               child: Text(
-                "Create New Password!",
+                MyLocalizations.of(context).createPassword + '!',
                 textAlign: TextAlign.center,
                 style: subTitleWhiteLightOSR(),
               ),
@@ -131,7 +150,7 @@ class _NewPasswordState extends State<NewPassword> {
                   flex: 9,
                   child: TextFormField(
                     decoration: new InputDecoration(
-                      labelText: "Password",
+                      labelText: MyLocalizations.of(context).password,
                       hintStyle: hintStyleGreyLightOSR(),
                       contentPadding: EdgeInsets.all(12.0),
                       border: InputBorder.none,
@@ -139,7 +158,7 @@ class _NewPasswordState extends State<NewPassword> {
                     keyboardType: TextInputType.number,
                     validator: (String value) {
                       if (value.isEmpty || value.length < 6) {
-                        return 'Password should be atleast 6 char long!';
+                        return MyLocalizations.of(context).pleaseEnterValidPassword;
                       }
                     },
                     onSaved: (value) {
@@ -158,7 +177,7 @@ class _NewPasswordState extends State<NewPassword> {
           new Padding(
             padding: EdgeInsets.only(top: 20.0),
             child: new Text(
-              'Create new password for your account!',
+              MyLocalizations.of(context).createPasswordMessage,
               textAlign: TextAlign.center,
               style: subTitleWhiteLightOSR(),
             ),
@@ -183,7 +202,7 @@ class _NewPasswordState extends State<NewPassword> {
                   decoration:
                       BoxDecoration(border: Border.all(color: Colors.white70)),
                   child: Text(
-                    "Create Password",
+                    MyLocalizations.of(context).createPassword,
                     style: subTitleWhiteShadeLightOSR(),
                   ),
                 )
