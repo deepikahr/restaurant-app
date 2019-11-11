@@ -12,7 +12,10 @@ SentryError sentryError = new SentryError();
 
 class LoginPage extends StatefulWidget {
   final isDrawe;
-  LoginPage({Key key, this.isDrawe}) : super(key: key);
+  var locale;
+  final Map<String, Map<String, String>> localizedValues;
+
+  LoginPage({Key key, this.isDrawe, this.locale, this.localizedValues}) : super(key: key);
 
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -45,7 +48,7 @@ class _LoginPageState extends State<LoginPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (BuildContext context) => HomePage(),
+                        builder: (BuildContext context) => HomePage(locale: widget.locale, localizedValues: widget.localizedValues),
                       ),
                     );
                   } else {

@@ -23,11 +23,13 @@ dependencies:
   # stripe_payment: ^0.0.7
   onesignal: ^1.1.0
   razorpay_plugin: ^0.2.9
-  intl: ^0.16.0
+  intl: ^0.15.8
   # flutter_stetho: ^0.5.0
   toast: ^0.1.5
   provider: ^3.1.0
   sentry: ^2.2.0
+  flutter_localizations:
+    sdk: flutter
 
 dev_dependencies:
   flutter_test:
@@ -37,6 +39,9 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - lib/assets/i18n/en.json
+    - lib/assets/i18n/fr.json
+    - lib/assets/i18n/zh.json
     - lib/assets/logos/logo.png
     - lib/assets/bgImgs/background.png
     - lib/assets/bgImgs/confirmedbg.png

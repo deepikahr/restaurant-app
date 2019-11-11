@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:RestaurantSaas/styles/styles.dart' as prefix0;
 import 'package:flutter/material.dart';
 import 'package:toast/toast.dart';
 import '../../styles/styles.dart';
@@ -12,10 +12,26 @@ import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:async/async.dart';
 import '../../services/sentry-services.dart';
+import 'package:RestaurantSaas/main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/cupertino.dart';
+
+import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'package:RestaurantSaas/initialize_i18n.dart' show initializeI18n;
+import 'package:RestaurantSaas/constant.dart' show languages;
+import 'package:RestaurantSaas/localizations.dart'
+    show MyLocalizations, MyLocalizationsDelegate;
+
+import 'package:RestaurantSaas/main.dart';
 
 SentryError sentryError = new SentryError();
 
 class Profile extends StatefulWidget {
+
+  final Map<String, Map<String, String>> localizedValues;
+  String locale;
+  Profile({Key key, this.locale, this.localizedValues}) : super(key: key);
   @override
   _ProfileState createState() => _ProfileState();
 }
@@ -34,6 +50,34 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   Future<Map<String, dynamic>> getProfileInfo() async {
     return await ProfileService.getUserInfo();
   }
+
+  Map<String, Map<String, String>> localizedValues;
+
+  @override
+  void initState() {
+    super.initState();
+    getData();
+  }
+
+  var selectedLanguage, selectedLocale;
+
+  getData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      selectedLanguage = prefs.getString('selectedLanguage');
+    });
+    if(selectedLanguage == 'en'){
+      selectedLocale = 'English';
+    }else if(selectedLanguage == 'fr'){
+      selectedLocale = 'French';
+    }else if(selectedLanguage == 'zh'){
+      selectedLocale = 'Chinese';
+    }
+    print('selectedLanguage............$selectedLanguage');
+  }
+
+
+
 
   void _saveProfileInfo() {
     if (_formKey.currentState.validate()) {
@@ -155,6 +199,12 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
     });
   }
 
+  String selectedLanguages, selectedLang;
+
+  List<String> languages = ['english', 'french', 'chinese'];
+
+
+
   @override
   Widget build(BuildContext context) {
     AsyncLoader _asyncLoader = AsyncLoader(
@@ -263,6 +313,57 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           ),
                         ),
                       ]),
+                      Container(
+                        margin: EdgeInsets.only(top: 10.0),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey, width: 1.0),
+                        ),
+                        child: ListTile(
+                            title: Text('Select languages: '),
+                            trailing: DropdownButtonHideUnderline(
+                              child: DropdownButton(
+                                hint: Text(selectedLocale == null  ? 'english' : selectedLocale),
+                                value: selectedLanguages,
+                                onChanged: (newValue) async {
+                                  if(newValue == 'english'){
+                                    SharedPreferences prefs = await SharedPreferences.getInstance();
+                                    prefs.setString('selectedLanguage', 'en');
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (BuildContext context) => EntryPage(widget.locale, widget.localizedValues),
+                                      ),
+                                    );
+                                  }else if(newValue == 'chinese'){
+                                    SharedPreferences prefs = await SharedPreferences.getInstance();
+                                    prefs.setString('selectedLanguage', 'zh');
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (BuildContext context) => EntryPage(widget.locale, widget.localizedValues),
+                                      ),
+                                    );
+                                  }else {
+                                    SharedPreferences prefs = await SharedPreferences.getInstance();
+                                    prefs.setString('selectedLanguage', 'fr');
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (BuildContext context) => EntryPage(widget.locale, widget.localizedValues),
+                                      ),
+                                    );
+                                  }
+                                },
+                                items: languages.map((lang) {
+                                  return DropdownMenuItem(
+                                    child: new Text(lang),
+                                    value: lang,
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                        ),
+                      ),
                       Container(
                         margin: EdgeInsets.only(top: 20.0),
                         decoration: BoxDecoration(
