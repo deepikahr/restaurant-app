@@ -1,3 +1,4 @@
+import 'package:RestaurantSaas/localizations.dart';
 import 'package:flutter/material.dart';
 import '../../styles/styles.dart';
 import '../../services/profile-service.dart';
@@ -388,7 +389,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                           decoration: BoxDecoration(
                               color: PRIMARY,
                               borderRadius: BorderRadius.circular(50.0)),
-                          child: new Text("ADD ADDRESS",
+                          child: new Text(MyLocalizations.of(context).addAddress,
                               style: subTitleWhiteBOldOSB()),
                         ),
                 ),

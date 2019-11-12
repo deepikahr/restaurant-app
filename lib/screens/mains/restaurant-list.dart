@@ -10,6 +10,12 @@ import '../../widgets/no-data.dart';
 import 'location-list-sheet.dart';
 import '../../services/common.dart';
 import '../../services/sentry-services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'package:RestaurantSaas/initialize_i18n.dart' show initializeI18n;
+import 'package:RestaurantSaas/constant.dart' show languages;
+import 'package:RestaurantSaas/localizations.dart'
+    show MyLocalizations, MyLocalizationsDelegate;
 
 SentryError sentryError = new SentryError();
 
@@ -144,7 +150,7 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
         renderError: ([error]) {
           sentryError.reportError(error, null);
           return NoData(
-              message: 'Please check your internet connection!',
+              message: MyLocalizations.of(context).connectionError,
               icon: Icons.block);
         },
         renderSuccess: ({data}) {

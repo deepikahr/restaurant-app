@@ -1,3 +1,4 @@
+import 'package:RestaurantSaas/localizations.dart';
 import 'package:flutter/material.dart';
 import '../../styles/styles.dart';
 import '../other/thank-you.dart';
@@ -7,6 +8,7 @@ import '../../services/common.dart';
 // import 'package:stripe_payment/stripe_payment.dart';
 // import 'package:razorpay_plugin/razorpay_plugin.dart';
 import '../../services/sentry-services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 SentryError sentryError = new SentryError();
 
@@ -119,7 +121,7 @@ class _PaymentMethodState extends State<PaymentMethod> {
         backgroundColor: PRIMARY,
         elevation: 0.0,
         title: new Text(
-          'Payment Method',
+          MyLocalizations.of(context).paymentMethod,
           style: titleBoldWhiteOSS(),
         ),
         centerTitle: true,
@@ -148,13 +150,12 @@ class _PaymentMethodState extends State<PaymentMethod> {
                   children: <Widget>[
                     new Padding(padding: EdgeInsets.only(top: 10.0)),
                     new Text(
-                      "PLACE ORDER NOW",
+                      MyLocalizations.of(context).placeOrderNow,
                       style: subTitleWhiteLightOSR(),
                     ),
                     new Padding(padding: EdgeInsets.only(top: 5.0)),
                     new Text(
-                      'Total: \$' +
-                          widget.cart['grandTotal'].toStringAsFixed(2),
+                     MyLocalizations.of(context).total+ ': \$ ${widget.cart['grandTotal'].toStringAsFixed(2)}',
                       style: titleWhiteBoldOSB(),
                     ),
                   ],

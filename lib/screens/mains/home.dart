@@ -527,7 +527,7 @@ class HomePageState extends State<HomePage> {
         renderError: ([error]) {
           sentryError.reportError(error, null);
           return NoData(
-              message: 'Please check your internet connection!',
+              message: MyLocalizations.of(context).connectionError,
               icon: Icons.block);
         },
         renderSuccess: ({data}) {
@@ -584,7 +584,7 @@ class HomePageState extends State<HomePage> {
         renderError: ([error]) {
           sentryError.reportError(error, null);
           return NoData(
-              message: 'Please check your internet connection!',
+              message: MyLocalizations.of(context).connectionError,
               icon: Icons.block);
         },
         renderSuccess: ({data}) {
@@ -622,7 +622,7 @@ class HomePageState extends State<HomePage> {
         renderError: ([error]) {
           sentryError.reportError(error, null);
           return NoData(
-              message: 'Please check your internet connection!',
+              message: MyLocalizations.of(context).connectionError,
               icon: Icons.block);
         },
         renderSuccess: ({data}) {

@@ -1,3 +1,4 @@
+import 'package:RestaurantSaas/styles/styles.dart' as prefix0;
 import 'package:flutter/material.dart';
 import '../../styles/styles.dart';
 import 'package:intl/intl.dart';
@@ -41,7 +42,7 @@ class OrderTrackState extends State<OrderTrack> {
         renderError: ([error]) {
           sentryError.reportError(error, null);
           return NoData(
-              message: 'Please check your internet connection!',
+              message: MyLocalizations.of(context).connectionError,
               icon: Icons.block);
         },
         renderSuccess: ({data}) {
@@ -53,9 +54,10 @@ class OrderTrackState extends State<OrderTrack> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: prefix0.PRIMARY,
         iconTheme: IconThemeData(color: Colors.white),
         title: new Text(
-          'Track Order',
+          MyLocalizations.of(context).trackOrder,
         ),
       ),
       body: _retriveOrderTrack(),
@@ -103,7 +105,11 @@ class OrderTrackState extends State<OrderTrack> {
                         children: <Widget>[
                           new Padding(padding: EdgeInsets.only(top: 0.0)),
                           new Text(
-                            'Order Progress...',
+                            MyLocalizations.of(context).orderProgress,
+                            style: textOSl(),
+                          ),
+                          new Text(
+                            '...',
                             style: textOSl(),
                           ),
                         ],
@@ -114,7 +120,7 @@ class OrderTrackState extends State<OrderTrack> {
                       children: <Widget>[
                         new Text('Order ID: ' + order['orderID'].toString()),
                         new Text(
-                          'Status: ' + order['status'],
+                          MyLocalizations.of(context).status + ': ${order['status']}',
                           style: TextStyle(color: Colors.green),
                         ),
                       ],
@@ -181,7 +187,7 @@ class OrderTrackState extends State<OrderTrack> {
                                 // new Padding(padding: EdgeInsets.only(top: 5.0)),
                                 new Text(
                                   readTimestamp(
-                                      order['userNotification'][index]['time']),
+                                      order['userNotification'][index]['time'], context),
                                   style: textOS(),
                                 ),
                               ],
@@ -199,7 +205,7 @@ class OrderTrackState extends State<OrderTrack> {
     );
   }
 
-  static String readTimestamp(int timestamp) {
+  static String readTimestamp(int timestamp, context) {
     var now = new DateTime.now();
     var format = new DateFormat('HH:mm a dd/MM/yyyy');
     var date = new DateTime.fromMillisecondsSinceEpoch(timestamp);
@@ -212,15 +218,15 @@ class OrderTrackState extends State<OrderTrack> {
       time = format.format(date);
     } else if (diff.inDays > 0 && diff.inDays < 7) {
       if (diff.inDays == 1) {
-        time = diff.inDays.toString() + ' DAY AGO';
+        time = diff.inDays.toString() + ' ' + MyLocalizations.of(context).dayAgo;
       } else {
-        time = diff.inDays.toString() + ' DAYS AGO';
+        time = diff.inDays.toString() + ' ' + MyLocalizations.of(context).daysAgo;
       }
     } else {
       if (diff.inDays == 7) {
-        time = (diff.inDays / 7).floor().toString() + ' WEEK AGO';
+        time = (diff.inDays / 7).floor().toString() + ' ' + MyLocalizations.of(context).weekAgo;
       } else {
-        time = (diff.inDays / 7).floor().toString() + ' WEEKS AGO';
+        time = (diff.inDays / 7).floor().toString() + ' ' + MyLocalizations.of(context).weeksAgo;
       }
     }
     return time;

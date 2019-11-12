@@ -1,3 +1,4 @@
+import 'package:RestaurantSaas/localizations.dart';
 import 'package:flutter/material.dart';
 import '../../styles/styles.dart';
 import 'add-address.dart';
@@ -155,7 +156,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
         renderError: ([error]) {
           sentryError.reportError(error, null);
           return NoData(
-              message: 'Please check your internet connection!',
+              message: MyLocalizations.of(context).connectionError,
               icon: Icons.block);
         },
         renderSuccess: ({data}) {
@@ -169,7 +170,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
         backgroundColor: PRIMARY,
         elevation: 0.0,
         title: new Text(
-          'Review Your Order',
+          MyLocalizations.of(context).reviewOrder,
           style: titleBoldWhiteOSS(),
         ),
         centerTitle: true,
@@ -192,12 +193,12 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
             _buildHeader(),
             new Column(
               children: <Widget>[
-                _buildBulletTitle(1, 'Contact Information'),
+                _buildBulletTitle(1, MyLocalizations.of(context).contactInformation),
                 _buildContactBlock(userInfo['name'],
                     userInfo['contactNumber'].toString(), userInfo),
-                _buildBulletTitle(2, 'Select Address'),
+                _buildBulletTitle(2, MyLocalizations.of(context).selectAddress),
                 _buildAddressList(),
-                _buildBulletTitle(3, 'Order Details'),
+                _buildBulletTitle(3, MyLocalizations.of(context).orderDetails),
                 _buildProductListBlock(userInfo),
               ],
             ),
@@ -220,7 +221,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               new Text(
-                'Date:',
+                MyLocalizations.of(context).date,
                 style: hintStyleSmallWhiteLightOSL(),
               ),
               new Text(
@@ -234,7 +235,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               new Text(
-                'Total Order:',
+                MyLocalizations.of(context).totalOrder,
                 style: hintStyleSmallWhiteLightOSL(),
               ),
               new Text(
@@ -477,7 +478,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             new Text(
-              'Name',
+              MyLocalizations.of(context).fullName,
               style: hintStyleOSB(),
             ),
             new Text(
@@ -486,7 +487,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
             ),
             new Divider(),
             new Text(
-              'Phone',
+              MyLocalizations.of(context).mobileNumber,
               style: hintStyleOSB(),
             ),
             new Text(
@@ -507,7 +508,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
         renderError: ([error]) {
           sentryError.reportError(error, null);
           return NoData(
-              message: 'Please check your internet connection!',
+              message: MyLocalizations.of(context).connectionError,
               icon: Icons.block);
         },
         renderSuccess: ({data}) {
@@ -598,7 +599,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                         Padding(
                           padding: const EdgeInsets.only(left: 8.0),
                           child: Text(
-                            ' Add Address',
+                            MyLocalizations.of(context).addAddress,
                             style: textPrimaryOSR(),
                           ),
                         )
@@ -671,7 +672,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                       ],
                     ),
                     products[index]['note'] != null
-                        ? Text('Note: ' + products[index]['note'])
+                        ? Text(MyLocalizations.of(context).note + ': ${products[index]['note']}')
                         : Container(),
                     Divider(),
                   ],
@@ -688,14 +689,14 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                 Padding(
                   padding: const EdgeInsets.only(left: 8.0),
                   child: Text(
-                    ' Order Summary',
+                    MyLocalizations.of(context).orderSummary,
                     style: textPrimaryOSR(),
                   ),
                 )
               ],
             ),
             Divider(),
-            _buildTotalPriceLine('Sub Total', widget.cart['subTotal']),
+            _buildTotalPriceLine(MyLocalizations.of(context).subTotal, widget.cart['subTotal']),
             // widget.cart['taxInfo'] != null
             //     ? _buildTotalPriceLine(
             //         'Tax ' + widget.cart['taxInfo']['taxName'],
@@ -705,11 +706,11 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
             //             100))
             //     : Container(height: 0, width: 0),
             _buildTotalPriceLine(
-                'Delivery Charge',
+                MyLocalizations.of(context).deliveryCharges,
                 widget.cart['deliveryCharge'] == 'Free'
                     ? '0.0'
                     : double.parse(widget.cart['deliveryCharge'].toString())),
-            _buildTotalPriceLine('Total including GST',
+            _buildTotalPriceLine(MyLocalizations.of(context).totalIncluding + 'GST',
                 double.parse(widget.cart['grandTotal'].toString())),
             // _buildTotalPriceLine('Used Loyalty Point', usedLoyaltyPoint),
           ],
@@ -797,12 +798,12 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                 children: <Widget>[
                   new Padding(padding: EdgeInsets.only(top: 10.0)),
                   new Text(
-                    "PLACE ORDER NOW",
+                    MyLocalizations.of(context).placeOrderNow,
                     style: subTitleWhiteLightOSR(),
                   ),
                   new Padding(padding: EdgeInsets.only(top: 5.0)),
                   new Text(
-                    'Total: \$' + widget.cart['grandTotal'].toStringAsFixed(2),
+                    MyLocalizations.of(context).total + ': \$ ${widget.cart['grandTotal'].toStringAsFixed(2)}',
                     style: titleWhiteBoldOSB(),
                   ),
                 ],

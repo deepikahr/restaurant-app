@@ -8,6 +8,13 @@ import '../../widgets/location-card.dart';
 import 'product-list.dart';
 import 'location-list.dart';
 import '../../services/sentry-services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'package:RestaurantSaas/initialize_i18n.dart' show initializeI18n;
+import 'package:RestaurantSaas/constant.dart' show languages;
+import 'package:RestaurantSaas/localizations.dart'
+    show MyLocalizations, MyLocalizationsDelegate;
+import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
 
@@ -39,7 +46,7 @@ class LocationListSheet extends StatelessWidget {
           sentryError.reportError(error, null);
           return new Center(
             child: NoData(
-                message: 'Please check your internet connection!',
+                message: MyLocalizations.of(context).connectionError,
                 icon: Icons.block),
           );
         },
@@ -57,8 +64,8 @@ class LocationListSheet extends StatelessWidget {
           buildSheetHeader(
               restaurantInfo['list']['logo'],
               restaurantInfo['list']['restaurantName'],
-              restaurantInfo['list']['reviewCount']),
-          buildOutletInfo(restaurantInfo['locationCount']),
+              restaurantInfo['list']['reviewCount'], context),
+          buildOutletInfo(restaurantInfo['locationCount'], context),
           Divider(),
           asyncLoader,
         ],
@@ -90,7 +97,7 @@ class LocationListSheet extends StatelessWidget {
             }
           });
     } else {
-      return NoData(message: 'No locations found!', icon: null);
+      return NoData(message: MyLocalizations.of(context).noLocationsFound, icon: null);
     }
   }
 
@@ -158,7 +165,7 @@ class LocationListSheet extends StatelessWidget {
     );
   }
 
-  static Widget buildSheetHeader(String logo, String name, int reviewCount) {
+  static Widget buildSheetHeader(String logo, String name, int reviewCount, context) {
     return Container(
       child: Row(
         children: [
@@ -183,7 +190,7 @@ class LocationListSheet extends StatelessWidget {
                 ),
                 reviewCount > 0
                     ? Text(
-                        reviewCount.toString() + ' Reviews given by users',
+                        reviewCount.toString() + MyLocalizations.of(context).usersReview,
                         textAlign: TextAlign.left,
                       )
                     : Text(''),
@@ -195,12 +202,12 @@ class LocationListSheet extends StatelessWidget {
     );
   }
 
-  static Widget buildOutletInfo(int locationCount) {
+  static Widget buildOutletInfo(int locationCount, context) {
     return locationCount != null
         ? Padding(
             padding: EdgeInsets.all(4.0),
             child: Text(
-              locationCount.toString() + ' outlets delivering to you',
+              locationCount.toString() + MyLocalizations.of(context).outletsDelivering,
               style: subBoldTitle(),
               textAlign: TextAlign.left,
             ),
@@ -232,7 +239,7 @@ class LocationListSheet extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Icon(Icons.add, size: 20.0),
-              Text('View More'),
+              Text(MyLocalizations.of(context).viewAll),
             ],
           ),
         ),

@@ -1,3 +1,4 @@
+import 'package:RestaurantSaas/localizations.dart';
 import 'package:RestaurantSaas/screens/other/CounterModel.dart';
 import 'package:flutter/material.dart';
 import 'package:async_loader/async_loader.dart';
@@ -138,12 +139,12 @@ class _ProductListPageState extends State<ProductListPage> {
       renderError: ([error]) {
         sentryError.reportError(error, null);
         return NoData(
-            message: 'Please check your internet connection!',
+            message: MyLocalizations.of(context).connectionError,
             icon: Icons.block);
       },
       renderSuccess: ({data}) {
         if (data['message'] != null) {
-          return NoData(message: 'No products available yet!');
+          return NoData(message: MyLocalizations.of(context).noProducts);
         } else {
           return Container(
             padding: EdgeInsetsDirectional.only(bottom: 16.0),
@@ -256,7 +257,7 @@ class _ProductListPageState extends State<ProductListPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Text(
-                "GO TO CART",
+                MyLocalizations.of(context).goToCart,
                 style: subTitleWhiteBOldOSB(),
               ),
             ],
@@ -348,7 +349,7 @@ class _ProductListPageState extends State<ProductListPage> {
           Container(
             alignment: Alignment.centerLeft,
             child: Text(
-              'Location',
+              MyLocalizations.of(context).location,
               style: hintStyleSmallWhiteLightOSR(),
               textAlign: TextAlign.left,
             ),
@@ -377,7 +378,7 @@ class _ProductListPageState extends State<ProductListPage> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: <Widget>[
                       Text(
-                        'Open',
+                        MyLocalizations.of(context).open,
                         style: hintStyleSmallGreenLightOSS(),
                       ),
                       Padding(padding: EdgeInsets.only(left: 10.0)),
@@ -394,7 +395,7 @@ class _ProductListPageState extends State<ProductListPage> {
           ),
           Row(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
             Text(
-              LocationCard.getCuisines(widget.cuisine),
+              LocationCard.getCuisines(widget.cuisine, context),
               overflow: TextOverflow.ellipsis,
               style: hintStyleSmallWhiteLightOSS(),
             ),
@@ -417,13 +418,12 @@ class _ProductListPageState extends State<ProductListPage> {
           (widget.deliveryInfo != null &&
                   widget.deliveryInfo['freeDelivery'] &&
                   widget.deliveryInfo['amountEligibility'] != null)
-              ? 'Free delivery above \$' +
-                  widget.deliveryInfo['amountEligibility'].toString()
+              ? MyLocalizations.of(context).freeDeliveryAbove  +
+              ' \$ ${widget.deliveryInfo['amountEligibility'].toString()}'
               : (widget.deliveryInfo != null &&
                       !widget.deliveryInfo['freeDelivery'])
-                  ? 'Delivery charge: Only \$' +
-                      widget.deliveryInfo['deliveryCharges'].toString()
-                  : 'Free delivery available',
+                  ? MyLocalizations.of(context).deliveryChargesOnly + ' \$ ${widget.deliveryInfo['deliveryCharges'].toString()}'
+                  : MyLocalizations.of(context).freeDeliveryAvailable,
           style: hintStyleSmallWhiteLightOSL(),
         ),
         // trailing: Icon(

@@ -78,10 +78,10 @@ class _OrdersPageState extends State<OrdersPage>
                 child: TabBarView(
                   children: [
                     OrderUpcoming(
-                      isRatingAllowed: false,
+                      isRatingAllowed: false, locale: widget.locale, localizedValues: widget.localizedValues,
                     ),
                     OrderHistory(
-                      isRatingAllowed: true,
+                      isRatingAllowed: true, locale: widget.locale, localizedValues: widget.localizedValues,
                     ),
                   ],
                 ),

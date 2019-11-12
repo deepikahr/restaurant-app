@@ -97,9 +97,9 @@ class _LocationListPageState extends State<LocationListPage> {
             LocationListSheet.buildSheetHeader(
                 widget.restaurantInfo['list']['logo'],
                 widget.restaurantInfo['list']['restaurantName'],
-                widget.restaurantInfo['list']['reviewCount']),
+                widget.restaurantInfo['list']['reviewCount'], context),
             LocationListSheet.buildOutletInfo(
-                widget.restaurantInfo['locationCount']),
+                widget.restaurantInfo['locationCount'], context),
             Divider(),
             LocationListSheet.buildLocationSheetView(
                 context, widget.locations, widget.restaurantInfo, false),

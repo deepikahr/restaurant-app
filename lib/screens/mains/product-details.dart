@@ -1,3 +1,4 @@
+import 'package:RestaurantSaas/localizations.dart';
 import 'package:RestaurantSaas/screens/other/CounterModel.dart';
 import 'package:flutter/material.dart';
 import '../../styles/styles.dart';
@@ -268,8 +269,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 widget.product['description'],
               ),
               _buildHeadingBlock(
-                'Sizes & Price',
-                'Select which size would you like to add',
+                MyLocalizations.of(context).size + ' & ' + MyLocalizations.of(context).price,
+                MyLocalizations.of(context).selectSize,
               ),
               widget.product['variants'].length > 0
                   ? _buildSingleSelectionBlock(widget.product['variants'])
@@ -597,7 +598,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             new Text(
-              "ADD TO CART",
+              MyLocalizations.of(context).goToCart,
               style: hintStyleWhiteLightOSB(),
             ),
             new Text(

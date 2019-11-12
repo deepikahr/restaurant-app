@@ -50,7 +50,7 @@ class _OrderHistoryState extends State<OrderHistory>
         renderSuccess: ({data}) {
           if (data.length > 0) {
             return OrderUpcomingState.buildOrderList(
-                data, widget.isRatingAllowed, context);
+                data, widget.isRatingAllowed, context, widget.locale, widget.localizedValues);
           } else {
             return OrderUpcomingState.buildEmptyPage(context);
           }

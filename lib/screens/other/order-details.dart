@@ -5,13 +5,22 @@ import '../../services/profile-service.dart';
 import 'package:async_loader/async_loader.dart';
 import '../../widgets/no-data.dart';
 import '../../services/sentry-services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'package:RestaurantSaas/initialize_i18n.dart' show initializeI18n;
+import 'package:RestaurantSaas/constant.dart' show languages;
+import 'package:RestaurantSaas/localizations.dart'
+    show MyLocalizations, MyLocalizationsDelegate;
+import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
 
 class OrderDetails extends StatefulWidget {
   final String orderId;
+  final Map<String, Map<String, String>> localizedValues;
+  var locale;
 
-  OrderDetails({Key key, this.orderId}) : super(key: key);
+  OrderDetails({Key key, this.orderId, this.localizedValues, this.locale}) : super(key: key);
   @override
   _OrderDetailsState createState() => _OrderDetailsState();
 }
@@ -32,7 +41,7 @@ class _OrderDetailsState extends State<OrderDetails> {
         renderError: ([error]) {
           sentryError.reportError(error, null);
           return NoData(
-          message: 'Please check your internet connection!',
+          message: MyLocalizations.of(context).connectionError,
           icon: Icons.block,
           );
         },
@@ -106,11 +115,11 @@ class _OrderDetailsState extends State<OrderDetails> {
                                 new Padding(
                                     padding: EdgeInsets.only(top: 20.0)),
                                 new Text(
-                                  'Name: ' + order['shippingAddress']['name'],
+                                  MyLocalizations.of(context).fullName + ': ' + order['shippingAddress']['name'],
                                   style: textOS(),
                                 ),
                                 new Text(
-                                  'Address: ' +
+                                  MyLocalizations.of(context).address +': ' +
                                       order['shippingAddress']['address'],
                                   style: textOS(),
                                 ),
@@ -123,7 +132,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                                   style: textOS(),
                                 ),
                                 new Text(
-                                  'Contact No: ' +
+                                  MyLocalizations.of(context).mobileNumber +': ' +
                                       order['shippingAddress']['contactNumber']
                                           .toString(),
                                   style: textOS(),

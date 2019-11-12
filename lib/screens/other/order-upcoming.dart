@@ -20,7 +20,6 @@ class OrderUpcoming extends StatefulWidget {
   final bool isRatingAllowed;
   final Map<String, Map<String, String>> localizedValues;
   var locale;
-
   OrderUpcoming({Key key, this.isRatingAllowed, this.locale, this.localizedValues}) : super(key: key);
 
   @override
@@ -50,7 +49,7 @@ class OrderUpcomingState extends State<OrderUpcoming>
         },
         renderSuccess: ({data}) {
           if (data.length > 0) {
-            return buildOrderList(data, widget.isRatingAllowed, context);
+            return buildOrderList(data, widget.isRatingAllowed, context, widget.locale, widget.localizedValues);
           } else {
             return buildEmptyPage(context);
           }
@@ -64,7 +63,7 @@ class OrderUpcomingState extends State<OrderUpcoming>
     );
   }
 
-  static Widget buildOrderList(List<dynamic> orders, bool isRatingAllowed, context) {
+  static Widget buildOrderList(List<dynamic> orders, bool isRatingAllowed, context, var locale,  Map<String, Map<String, String>> localizedValues,) {
     return Container(
       color: Colors.grey[300],
       child: ListView.builder(
@@ -91,7 +90,8 @@ class OrderUpcomingState extends State<OrderUpcoming>
                     orders[index]['orderID'],
                     context,
                     isRatingAllowed,
-                    orders[index]['_id']),
+                    orders[index]['_id'],locale,
+                  localizedValues,),
                 _buildProductList(orders[index]['productDetails']),
                 _buildBottomPriceLine(
                     context,
@@ -139,7 +139,8 @@ class OrderUpcomingState extends State<OrderUpcoming>
   }
 
   static Widget _buildOrderInfo(String status, String time, int orderId,
-      BuildContext context, bool isRatingAllowed, String orderIdUniq) {
+      BuildContext context, bool isRatingAllowed, String orderIdUniq, var locale,
+      Map<String, Map<String, String>> localizedValues,) {
     return Container(
       padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
       child: Row(
@@ -196,7 +197,7 @@ class OrderUpcomingState extends State<OrderUpcoming>
                         context,
                         MaterialPageRoute(
                           builder: (BuildContext context) =>
-                              OrderDetails(orderId: orderIdUniq),
+                              OrderDetails(orderId: orderIdUniq, locale: locale, localizedValues: localizedValues,),
                         ),
                       );
                     } else {
@@ -204,7 +205,7 @@ class OrderUpcomingState extends State<OrderUpcoming>
                         context,
                         MaterialPageRoute(
                           builder: (BuildContext context) =>
-                              OrderTrack(orderId: orderIdUniq, ),
+                              OrderTrack(orderId: orderIdUniq, locale: locale, localizedValues: localizedValues, ),
                         ),
                       );
                     }

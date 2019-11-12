@@ -1,3 +1,4 @@
+import 'package:RestaurantSaas/localizations.dart';
 import 'package:RestaurantSaas/screens/other/CounterModel.dart';
 
 import 'package:flutter/material.dart';
@@ -201,7 +202,7 @@ class _CartPageState extends State<CartPage> {
         backgroundColor: PRIMARY,
         elevation: 0.0,
         title: new Text(
-          'Your Cart',
+          MyLocalizations.of(context).cart,
           style: titleBoldWhiteOSS(),
         ),
         centerTitle: true,
@@ -235,7 +236,7 @@ class _CartPageState extends State<CartPage> {
                               couponDeduction)
                           : Container(),
                       Divider(),
-                      _buildPriceTagLine('Sub Total', subTotal),
+                      _buildPriceTagLine(MyLocalizations.of(context).subTotal, subTotal),
                       Divider(),
                       widget.taxInfo != null
                           ? _buildPriceTagLine(
@@ -244,9 +245,9 @@ class _CartPageState extends State<CartPage> {
                       widget.taxInfo != null
                           ? Divider()
                           : Container(height: 0, width: 0),
-                      _buildPriceTagLine('Delivery Charge', deliveryCharge),
+                      _buildPriceTagLine(MyLocalizations.of(context).deliveryCharges, deliveryCharge),
                       Divider(),
-                      _buildPriceTagLine('Grand Total', grandTotal),
+                      _buildPriceTagLine(MyLocalizations.of(context).grandTotal, grandTotal),
                       Divider(),
                     ],
                   ),
@@ -264,7 +265,7 @@ class _CartPageState extends State<CartPage> {
           : Padding(
               padding: EdgeInsets.only(top: 50.0),
               child: NoData(
-                message: 'Your Cart is Empty',
+                message: MyLocalizations.of(context).cartEmpty,
                 icon: Icons.hourglass_empty,
               ),
             ),
@@ -434,13 +435,13 @@ class _CartPageState extends State<CartPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             new Text(
-              "REVIEW AND COMPLETE YOUR ORDER",
+              MyLocalizations.of(context).completeOrder,
               style: subTitleWhiteLightOSR(),
             ),
             new Padding(padding: EdgeInsets.only(top: 5.0)),
             new Text(
               // //delivery charge deducted because of above line are commented to disable delivery charge in this page
-              'Total: \$' + (grandTotal - deliveryCharge).toStringAsFixed(2),
+              MyLocalizations.of(context).total + ': \$' + (grandTotal - deliveryCharge).toStringAsFixed(2),
               style: titleWhiteBoldOSB(),
             )
           ],
@@ -494,7 +495,7 @@ class _CartPageState extends State<CartPage> {
             _showAddNoteAlert(index);
           },
           child: Text(
-            'Add Note',
+            MyLocalizations.of(context).addNote,
             style: titleBlackLightOSBCoupon(),
           ),
         ),
@@ -527,7 +528,7 @@ class _CartPageState extends State<CartPage> {
         InkWell(
           onTap: _goToCoupons,
           child: Text(
-            'Apply Coupon',
+            MyLocalizations.of(context).applyCoupon,
             style: titleBlackLightOSBCoupon(),
           ),
         ),
@@ -557,7 +558,7 @@ class _CartPageState extends State<CartPage> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('ADD NOTE FOR COOK'),
+          title: Text(MyLocalizations.of(context).cookNote),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
@@ -568,7 +569,7 @@ class _CartPageState extends State<CartPage> {
                     initialValue: cartItems['productDetails'][index]['note'],
                     validator: (String value) {
                       if (value.isEmpty) {
-                        return 'Please enter something';
+                        return MyLocalizations.of(context).pleaseEnter;
                       }
                     },
                     onSaved: (String value) {
@@ -578,7 +579,7 @@ class _CartPageState extends State<CartPage> {
                       });
                     },
                     decoration: InputDecoration(
-                      labelText: "Note",
+                      labelText: MyLocalizations.of(context).note,
                       labelStyle: hintStyleGreyLightOSR(),
                       contentPadding: EdgeInsets.all(10),
                       // border: InputBorder.,
@@ -591,13 +592,13 @@ class _CartPageState extends State<CartPage> {
           ),
           actions: <Widget>[
             FlatButton(
-              child: Text('Cancle'),
+              child: Text(MyLocalizations.of(context).cancel),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             FlatButton(
-              child: Text('Add'),
+              child: Text(MyLocalizations.of(context).add),
               onPressed: () {
                 if (_formKey.currentState.validate()) {
                   _formKey.currentState.save();
