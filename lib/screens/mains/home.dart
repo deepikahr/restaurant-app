@@ -367,7 +367,7 @@ class HomePageState extends State<HomePage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (BuildContext context) => CartPage(localizedValues: widget.localizedValues, locale: widget.locale,),
+                      builder: (BuildContext context) => CartPage(),
                     ),
                   );
                 },
