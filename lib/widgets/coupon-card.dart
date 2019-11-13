@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:RestaurantSaas/localizations.dart';
 
 class CouponCard extends StatelessWidget {
   final Map<String, dynamic> coupon;
@@ -74,7 +75,7 @@ class CouponCard extends StatelessWidget {
                 onTap: () {
                   Navigator.pop(context, coupon);
                 },
-                child: Text('APPLY', style: TextStyle(color: Colors.amber)),
+                child: Text(MyLocalizations.of(context).apply, style: TextStyle(color: Colors.amber)),
               ),
             ),
           ],

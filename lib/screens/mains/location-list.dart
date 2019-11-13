@@ -35,18 +35,19 @@ class _LocationListPageState extends State<LocationListPage> {
   void initState() {
 
     super.initState();
-    selectedLanguage();
+//    selectedLanguage();
   }
 
-  var selectedLanguage;
+//  var selectedLanguage;
+//
+//  selectedLanguages() async {
+//    SharedPreferences prefs = await SharedPreferences.getInstance();
+//    setState(() {
+//      selectedLanguage = prefs.getString('selectedLanguage');
+//    });
+//    print('selectedLanguage ll............$selectedLanguage ${widget.localizedValues}');
+//  }
 
-  selectedLanguages() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      selectedLanguage = prefs.getString('selectedLanguage');
-    });
-    print('selectedLanguage ll............$selectedLanguage ${widget.localizedValues}');
-  }
   Widget build(BuildContext context) {
     CounterModel().getCounter().then((res) {
       try {

@@ -40,18 +40,18 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    selectedLanguages();
+//    selectedLanguages();
   }
 
-  var selectedLanguage;
-
-  selectedLanguages() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      selectedLanguage = prefs.getString('selectedLanguage');
-    });
-    print('selectedLanguage login............$selectedLanguage ${widget.localizedValues}');
-  }
+//  var selectedLanguage;
+//
+//  selectedLanguages() async {
+//    SharedPreferences prefs = await SharedPreferences.getInstance();
+//    setState(() {
+//      selectedLanguage = prefs.getString('selectedLanguage');
+//    });
+//    print('selectedLanguage login............$selectedLanguage ${widget.localizedValues}');
+//  }
 
   login() {
     if (_formKey.currentState.validate()) {

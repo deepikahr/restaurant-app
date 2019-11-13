@@ -25,18 +25,18 @@ class _ThankYouState extends State<ThankYou> {
   @override
   void initState() {
     super.initState();
-    selectedLanguages();
+//    selectedLanguages();
   }
 
-  var selectedLanguage;
-
-  selectedLanguages() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      selectedLanguage = prefs.getString('selectedLanguage');
-    });
-    print('selectedLanguage ty............$selectedLanguage ${widget.localizedValues}');
-  }
+//  var selectedLanguage;
+//
+//  selectedLanguages() async {
+//    SharedPreferences prefs = await SharedPreferences.getInstance();
+//    setState(() {
+//      selectedLanguage = prefs.getString('selectedLanguage');
+//    });
+//    print('selectedLanguage ty............$selectedLanguage ${widget.localizedValues}');
+//  }
 
   Widget build(BuildContext context) {
     Common.removeCart();
