@@ -152,18 +152,18 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
   @override
   void initState() {
     super.initState();
-    selectedLanguages();
+//    selectedLanguages();
   }
 
-  var selectedLanguage;
-
-  selectedLanguages() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      selectedLanguage = prefs.getString('selectedLanguage');
-    });
-    print('selectedLanguage revie...........$selectedLanguage ${widget.localizedValues}');
-  }
+//  var selectedLanguage;
+//
+//  selectedLanguages() async {
+//    SharedPreferences prefs = await SharedPreferences.getInstance();
+//    setState(() {
+//      selectedLanguage = prefs.getString('selectedLanguage');
+//    });
+//    print('selectedLanguage revie...........$selectedLanguage ${widget.localizedValues}');
+//  }
 
   @override
   Widget build(BuildContext context) {

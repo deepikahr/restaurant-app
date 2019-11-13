@@ -119,18 +119,18 @@ class _PaymentMethodState extends State<PaymentMethod> {
   @override
   void initState() {
     super.initState();
-    selectedLanguages();
+//    selectedLanguages();
   }
 
-  var selectedLanguage;
-
-  selectedLanguages() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      selectedLanguage = prefs.getString('selectedLanguage');
-    });
-    print('selectedLanguage pay...........$selectedLanguage ${widget.localizedValues}');
-  }
+//  var selectedLanguage;
+//
+//  selectedLanguages() async {
+//    SharedPreferences prefs = await SharedPreferences.getInstance();
+//    setState(() {
+//      selectedLanguage = prefs.getString('selectedLanguage');
+//    });
+//    print('selectedLanguage pay...........$selectedLanguage ${widget.localizedValues}');
+//  }
 
   @override
   Widget build(BuildContext context) {

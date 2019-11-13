@@ -68,18 +68,18 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
     // TODO: implement initState
 
     super.initState();
-    selectedLanguage();
+//    selectedLanguage();
   }
 
-  var selectedLanguage;
-
-  selectedLanguages() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      selectedLanguage = prefs.getString('selectedLanguage');
-    });
-    print('selectedLanguage rl............$selectedLanguage ${widget.localizedValues}');
-  }
+//  var selectedLanguage;
+//
+//  selectedLanguages() async {
+//    SharedPreferences prefs = await SharedPreferences.getInstance();
+//    setState(() {
+//      selectedLanguage = prefs.getString('selectedLanguage');
+//    });
+//    print('selectedLanguage rl............$selectedLanguage ${widget.localizedValues}');
+//  }
 
   @override
   Widget build(BuildContext context) {

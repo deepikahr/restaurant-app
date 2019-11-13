@@ -103,19 +103,19 @@ class HomePageState extends State<HomePage> {
     _showBottomSheetCallback = _showBottomSheet;
     super.initState();
     _checkLoginStatus();
-    selectedLanguages();
+//    selectedLanguages();
   }
 
-  var selectedLanguage;
-
-  selectedLanguages() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      selectedLanguage = prefs.getString('selectedLanguage');
-    });
-    print(
-        'selectedLanguage home............$selectedLanguage ${widget.localizedValues}');
-  }
+//  var selectedLanguage;
+//
+//  selectedLanguages() async {
+//    SharedPreferences prefs = await SharedPreferences.getInstance();
+//    setState(() {
+//      selectedLanguage = prefs.getString('selectedLanguage');
+//    });
+//    print(
+//        'selectedLanguage home............$selectedLanguage ${widget.localizedValues}');
+//  }
 
   String fullname;
   bool isLoggedIn = false;
@@ -379,8 +379,8 @@ class HomePageState extends State<HomePage> {
                         padding: EdgeInsets.only(top: 20.0, right: 10),
                         child: Icon(Icons.shopping_cart)),
                     Positioned(
-                        right: 3,
-                        top: 5,
+                        right: 1,
+                        top: 6,
                         child: (cartCount == null || cartCount == 0)
                             ? Text(
                                 '',
@@ -392,7 +392,7 @@ class HomePageState extends State<HomePage> {
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: Colors.black,
+                                  color: Colors.black26,
                                 ),
                                 child: Text('${cartCount.toString()}',
                                     style: TextStyle(

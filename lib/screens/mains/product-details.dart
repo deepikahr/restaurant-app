@@ -117,18 +117,18 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
     _calculatePrice();
     super.initState();
-    selectedLanguages();
+//    selectedLanguages();
   }
 
-  var selectedLanguage;
-
-  selectedLanguages() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      selectedLanguage = prefs.getString('selectedLanguage');
-    });
-    print('selectedLanguage pdl............$selectedLanguage ${widget.localizedValues}');
-  }
+//  var selectedLanguage;
+//
+//  selectedLanguages() async {
+//    SharedPreferences prefs = await SharedPreferences.getInstance();
+//    setState(() {
+//      selectedLanguage = prefs.getString('selectedLanguage');
+//    });
+//    print('selectedLanguage pdl............$selectedLanguage ${widget.localizedValues}');
+//  }
 
   void _checkFavourite() async {
     ProfileService.checkFavourite(widget.product['_id']).then((onValue) {
