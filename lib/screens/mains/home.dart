@@ -35,7 +35,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
 
-
 //class App extends StatefulWidget {
 //  final Map<String, Map<String, String>> localizedValues;
 //  String locale;
@@ -61,7 +60,6 @@ SentryError sentryError = new SentryError();
 //    );
 //  }
 //}
-
 
 class HomePage extends StatefulWidget {
   final Map<String, Map<String, String>> localizedValues;
@@ -115,7 +113,8 @@ class HomePageState extends State<HomePage> {
     setState(() {
       selectedLanguage = prefs.getString('selectedLanguage');
     });
-    print('selectedLanguage home............$selectedLanguage ${widget.localizedValues}');
+    print(
+        'selectedLanguage home............$selectedLanguage ${widget.localizedValues}');
   }
 
   String fullname;
@@ -326,7 +325,6 @@ class HomePageState extends State<HomePage> {
   String review, branches;
 
   Widget build(BuildContext context) {
-
     review = MyLocalizations.of(context).reviews;
     branches = MyLocalizations.of(context).branches;
     CounterModel().getCounter().then((res) {
@@ -342,8 +340,7 @@ class HomePageState extends State<HomePage> {
     }).catchError((onError) {
       sentryError.reportError(onError, null);
     });
-    return
-      MaterialApp(
+    return MaterialApp(
       locale: Locale(widget.locale),
       debugShowCheckedModeBanner: false,
       localizationsDelegates: [
@@ -352,11 +349,13 @@ class HomePageState extends State<HomePage> {
         GlobalWidgetsLocalizations.delegate,
       ],
       supportedLocales: languages.map((language) => Locale(language, '')),
-      home:
-      Scaffold(
+      home: Scaffold(
         backgroundColor: whitec,
         key: scaffoldKey,
-        drawer: Menu(scaffoldKey: scaffoldKey, locale: widget.locale, localizedValues: widget.localizedValues),
+        drawer: Menu(
+            scaffoldKey: scaffoldKey,
+            locale: widget.locale,
+            localizedValues: widget.localizedValues),
         appBar: AppBar(
           backgroundColor: PRIMARY,
           title: Text(APP_NAME),
@@ -367,27 +366,40 @@ class HomePageState extends State<HomePage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (BuildContext context) => CartPage(localizedValues: widget.localizedValues, locale: widget.locale,),
+                      builder: (BuildContext context) => CartPage(
+                        localizedValues: widget.localizedValues,
+                        locale: widget.locale,
+                      ),
                     ),
                   );
                 },
-                child: Column(
+                child: Stack(
                   children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.only(top: 2.0),
-                      child: (cartCount == null || cartCount == 0)
-                          ? Text(
-                              '',
-                              style: TextStyle(fontSize: 14.0),
-                            )
-                          : Text(
-                              '${cartCount.toString()}',
-                              style: TextStyle(fontSize: 14.0),
-                            ),
-                    ),
                     Container(
-                        padding: EdgeInsets.only(right: 10.0),
+                        padding: EdgeInsets.only(top: 20.0, right: 10),
                         child: Icon(Icons.shopping_cart)),
+                    Positioned(
+                        right: 3,
+                        top: 5,
+                        child: (cartCount == null || cartCount == 0)
+                            ? Text(
+                                '',
+                                style: TextStyle(fontSize: 14.0),
+                              )
+                            : Container(
+                                height: 20,
+                                width: 20,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.black,
+                                ),
+                                child: Text('${cartCount.toString()}',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontFamily: "bold",
+                                        fontSize: 11)),
+                              )),
                   ],
                 )),
             Padding(padding: EdgeInsets.only(left: 7.0)),
@@ -407,11 +419,20 @@ class HomePageState extends State<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  Text(MyLocalizations.of(context).hello , style: hintStyleWhiteLightOSR(),),
+                  Text(
+                    MyLocalizations.of(context).hello,
+                    style: hintStyleWhiteLightOSR(),
+                  ),
                   Text(" "),
-                  fullname == null ?
-                  Text(MyLocalizations.of(context).greetTo('User'), style: hintStyleWhiteLightOSR(),) :
-                  Text(MyLocalizations.of(context).greetTo('$fullname'), style: hintStyleWhiteLightOSR(),),
+                  fullname == null
+                      ? Text(
+                          MyLocalizations.of(context).greetTo('User'),
+                          style: hintStyleWhiteLightOSR(),
+                        )
+                      : Text(
+                          MyLocalizations.of(context).greetTo('$fullname'),
+                          style: hintStyleWhiteLightOSR(),
+                        ),
                 ],
               ),
             ),
@@ -429,8 +450,8 @@ class HomePageState extends State<HomePage> {
                     alignment: AlignmentDirectional.center,
                     margin: EdgeInsets.only(left: 5.0, right: 5.0),
                     height: 56.0,
-                    decoration:
-                        BoxDecoration(border: Border.all(color: Colors.white70)),
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.white70)),
                     child: Image.asset(
                       'lib/assets/icon/spinner.gif',
                       width: 40.0,
@@ -446,7 +467,8 @@ class HomePageState extends State<HomePage> {
                 children: <Widget>[
                   isNearByRestaurants != true
                       ? Container()
-                      : _buildGridHeader(MyLocalizations.of(context).restaurantsNearYou),
+                      : _buildGridHeader(
+                          MyLocalizations.of(context).restaurantsNearYou),
                   _buildGetNearByLocationLoader(),
                   isNearByRestaurants != true
                       ? Container()
@@ -463,7 +485,8 @@ class HomePageState extends State<HomePage> {
                 children: <Widget>[
                   isTopRatedRestaurants != true
                       ? Container()
-                      : _buildGridHeader(MyLocalizations.of(context).topRatedRestaurants),
+                      : _buildGridHeader(
+                          MyLocalizations.of(context).topRatedRestaurants),
                   _buildTopRatedRestaurantLoader(),
                   isTopRatedRestaurants != true
                       ? Container()
@@ -480,7 +503,8 @@ class HomePageState extends State<HomePage> {
                 children: <Widget>[
                   isNewlyArrivedRestaurants != true
                       ? Container()
-                      : _buildGridHeader(MyLocalizations.of(context).newlyArrivedRestaurants),
+                      : _buildGridHeader(
+                          MyLocalizations.of(context).newlyArrivedRestaurants),
                   _buildNewlyArrivedRestaurantLoader(),
                   isNewlyArrivedRestaurants != true
                       ? Container()
@@ -561,7 +585,9 @@ class HomePageState extends State<HomePage> {
                             itemBuilder: (BuildContext context, int index) {
                               return InkWell(
                                   child: buildRestaurantCard(
-                                      nearByRestaurentsList[index], review, branches),
+                                      nearByRestaurentsList[index],
+                                      review,
+                                      branches),
                                   onTap: () {
                                     setState(() {
                                       restaurantInfo =
@@ -603,7 +629,8 @@ class HomePageState extends State<HomePage> {
               padding: const EdgeInsets.all(0.0),
               itemBuilder: (BuildContext context, int index) {
                 return InkWell(
-                    child: buildRestaurantCard(topRatedRestaurantsList[index], review, branches),
+                    child: buildRestaurantCard(
+                        topRatedRestaurantsList[index], review, branches),
                     onTap: () {
                       setState(() {
                         restaurantInfo = topRatedRestaurantsList[index];
@@ -712,8 +739,11 @@ class HomePageState extends State<HomePage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (BuildContext context) =>
-                  RestaurantListPage(title: title, localizedValues: widget.localizedValues, locale: widget.locale,),
+              builder: (BuildContext context) => RestaurantListPage(
+                title: title,
+                localizedValues: widget.localizedValues,
+                locale: widget.locale,
+              ),
             ),
           );
         },
@@ -771,28 +801,27 @@ class HomePageState extends State<HomePage> {
               context,
               MaterialPageRoute(
                 builder: (BuildContext context) => ProductListPage(
-
-                    restaurantName: list[index]['restaurantName'],
-                    locationName: list[index]['locationName'],
-                    aboutUs: list[index]['locationInfo']['aboutUs'],
-                    imgUrl: list[index]['restaurantInfo'] != null
-                        ? list[index]['restaurantInfo']['logo']
-                        : null,
-                    address: list[index]['address'],
-                    locationId: list[index]['locationInfo']['_id'],
-                    restaurantId: list[index]['restaurantID'],
-                    cuisine: list[index]['locationInfo']['cuisine'],
-                    deliveryInfo:
-                        list[index]['locationInfo']['deliveryInfo'] != null
-                            ? list[index]['locationInfo']['deliveryInfo']
-                                ['deliveryInfo']
-                            : null,
-                    workingHours:
-                        list[index]['locationInfo']['workingHours'] ?? null,
-                    locationInfo: list[index]['locationInfo'],
-                    taxInfo: list[index]['locationInfo']['restaurantID']
-                        ['taxInfo'],
-                locale: widget.locale,
+                  restaurantName: list[index]['restaurantName'],
+                  locationName: list[index]['locationName'],
+                  aboutUs: list[index]['locationInfo']['aboutUs'],
+                  imgUrl: list[index]['restaurantInfo'] != null
+                      ? list[index]['restaurantInfo']['logo']
+                      : null,
+                  address: list[index]['address'],
+                  locationId: list[index]['locationInfo']['_id'],
+                  restaurantId: list[index]['restaurantID'],
+                  cuisine: list[index]['locationInfo']['cuisine'],
+                  deliveryInfo:
+                      list[index]['locationInfo']['deliveryInfo'] != null
+                          ? list[index]['locationInfo']['deliveryInfo']
+                              ['deliveryInfo']
+                          : null,
+                  workingHours:
+                      list[index]['locationInfo']['workingHours'] ?? null,
+                  locationInfo: list[index]['locationInfo'],
+                  taxInfo: list[index]['locationInfo']['restaurantID']
+                      ['taxInfo'],
+                  locale: widget.locale,
                   localizedValues: widget.localizedValues,
                 ),
               ),
@@ -874,8 +903,7 @@ class HomePageState extends State<HomePage> {
               info['locationCount'],
               info['list']['reviewCount'],
               review,
-            branches
-          ),
+              branches),
         ],
       ),
     );
@@ -918,8 +946,8 @@ class HomePageState extends State<HomePage> {
     );
   }
 
-  static Widget buildCardBottom(
-      String restaurantName, double rating, int locationCounter, int reviews, String review, branches) {
+  static Widget buildCardBottom(String restaurantName, double rating,
+      int locationCounter, int reviews, String review, branches) {
     return Container(
       padding: EdgeInsets.all(6.0),
       child: Row(
@@ -979,7 +1007,11 @@ class HomePageState extends State<HomePage> {
             ),
             child: Padding(
               padding: const EdgeInsets.all(6.0),
-              child: LocationListSheet(restaurantInfo: restaurantInfo, localizedValues: widget.localizedValues, locale: widget.locale,),
+              child: LocationListSheet(
+                restaurantInfo: restaurantInfo,
+                localizedValues: widget.localizedValues,
+                locale: widget.locale,
+              ),
             ),
           );
         })
