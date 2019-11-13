@@ -10,14 +10,17 @@ import '../../widgets/no-data.dart';
 import '../auth/login.dart';
 import '../other/coupons-list.dart';
 import '../../services/sentry-services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
 
 class CartPage extends StatefulWidget {
   Map<String, dynamic> product, taxInfo, locationInfo;
+  final Map<String, Map<String, String>> localizedValues;
+  String locale;
   final Map<String, dynamic> tableInfo;
   CartPage(
-      {Key key, this.product, this.taxInfo, this.locationInfo, this.tableInfo})
+      {Key key, this.product, this.taxInfo, this.locationInfo, this.tableInfo, this.locale, this.localizedValues})
       : super(key: key);
 
   @override
@@ -38,7 +41,18 @@ class _CartPageState extends State<CartPage> {
   void initState() {
     _calculateCart();
     super.initState();
+//    selectedLanguage();
   }
+
+//  var selectedLanguage;
+//
+//  selectedLanguages() async {
+//    SharedPreferences prefs = await SharedPreferences.getInstance();
+//    setState(() {
+//      selectedLanguage = prefs.getString('selectedLanguage');
+//    });
+//    print('selectedLanguage cart............$selectedLanguage ${widget.localizedValues}');
+//  }
 
   void _calculateCart() async {
     // [0] other options when opening cart from menu
@@ -457,7 +471,7 @@ class _CartPageState extends State<CartPage> {
         if (onValue == null) {
           msg = await Navigator.push(
             context,
-            MaterialPageRoute(builder: (BuildContext context) => LoginPage()),
+            MaterialPageRoute(builder: (BuildContext context) => LoginPage(locale: widget.localizedValues, localizedValues: widget.localizedValues,)),
           );
         } else {
           msg = 'Success';
@@ -471,6 +485,8 @@ class _CartPageState extends State<CartPage> {
             context,
             MaterialPageRoute(
                 builder: (BuildContext context) => ConfrimOrderPage(
+localizedValues: widget.localizedValues,
+                    locale: widget.locale,
                     cart: cartItems,
                     deliveryInfo: widget.locationInfo['deliveryInfo']
                     ['deliveryInfo'])),

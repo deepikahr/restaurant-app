@@ -1,7 +1,9 @@
+import 'package:RestaurantSaas/localizations.dart';
 import 'package:flutter/material.dart';
 import '../../styles/styles.dart';
 import '../../services/profile-service.dart';
 import '../../services/sentry-services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 SentryError sentryError = new SentryError();
 
@@ -66,7 +68,7 @@ class _RatingState extends State<Rating> {
     return new Scaffold(
       appBar: new AppBar(
         title: Text(
-          "Rate Your Order",
+          MyLocalizations.of(context).rateYourOrder,
         ),
         backgroundColor: PRIMARY,
         iconTheme: new IconThemeData(color: Colors.white),
@@ -113,14 +115,14 @@ class _RatingState extends State<Rating> {
                       ),
                     ),
                     new Text(
-                      "We're glad you're enjoying...",
+                      MyLocalizations.of(context).wereGlad,
                       style: hintStyleLightOSL(),
                       textAlign: TextAlign.center,
                     ),
                     Padding(
                       padding: new EdgeInsets.only(top: 15.0, bottom: 20.0),
                       child: new Text(
-                        "Would you spare a minute to Rate it then",
+                        MyLocalizations.of(context).rateIt,
                         style: hintStyleLightOSL(),
                         textAlign: TextAlign.center,
                       ),
@@ -179,13 +181,13 @@ class _RatingState extends State<Rating> {
                         child: new TextFormField(
                           decoration: new InputDecoration(
                             hintStyle: hintStyleLightOSL(),
-                            hintText: "Your feedback is important...",
+                            hintText: MyLocalizations.of(context).feedbackImportant,
                           ),
                           style: hintStyleSmallWhiteBoldOSL(),
                           maxLines: 5,
                           validator: (String value) {
                             if (value.isEmpty || value.length < 1) {
-                              return 'Please write your review';
+                              return '';
                             }
                           },
                           onSaved: (String value) {
@@ -236,7 +238,7 @@ class _RatingState extends State<Rating> {
                                     height: 20.0,
                                   ),
                                   Text(
-                                    '  SUBMIT',
+                                    MyLocalizations.of(context).submit,
                                     style: hintStyleGreyLightOSL(),
                                   ),
                                 ],

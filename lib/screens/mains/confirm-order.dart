@@ -11,13 +11,16 @@ import '../../services/main-service.dart';
 import 'package:intl/intl.dart';
 // import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import '../../services/sentry-services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
 
 class ConfrimOrderPage extends StatefulWidget {
   final Map<String, dynamic> cart, deliveryInfo;
+  final Map<String, Map<String, String>> localizedValues;
+  String locale;
 
-  ConfrimOrderPage({Key key, this.cart, this.deliveryInfo}) : super(key: key);
+  ConfrimOrderPage({Key key, this.cart, this.deliveryInfo, this.localizedValues, this.locale}) : super(key: key);
 
   @override
   _ConfrimOrderPageState createState() => _ConfrimOrderPageState();
@@ -144,6 +147,22 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
       });
     }
     _calculateFinalAmount();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    selectedLanguages();
+  }
+
+  var selectedLanguage;
+
+  selectedLanguages() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      selectedLanguage = prefs.getString('selectedLanguage');
+    });
+    print('selectedLanguage revie...........$selectedLanguage ${widget.localizedValues}');
   }
 
   @override
@@ -311,7 +330,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                               Row(
                                 children: [
                                   Text(
-                                    'Dine In',
+                                    MyLocalizations.of(context).dineIn,
                                     textAlign: TextAlign.center,
                                     // style: hintStyleOSBType(),
                                   ),
@@ -380,7 +399,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                                 Row(
                                   children: [
                                     Text(
-                                      'PICKUP',
+                                      MyLocalizations.of(context).pickUp,
                                       textAlign: TextAlign.center,
                                       // style: hintStyleOSBType(),
                                     ),
@@ -748,11 +767,11 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
           if (widget.cart['pickupDate'] != null) {
             _buildBottomBarButton();
           } else {
-            showSnackbar('Please Select Date and Time first for pickup');
+            showSnackbar(MyLocalizations.of(context).selectDateTime);
           }
         } else if (widget.cart['orderType'] == 'Delivery') {
           if (widget.cart['shippingAddress'] == null) {
-            showSnackbar('Please Select/Add shipping address first');
+            showSnackbar(MyLocalizations.of(context).selectAddressFirst);
           } else {
             if (widget.deliveryInfo == null ||
                 widget.deliveryInfo['areaAthority']) {
@@ -784,7 +803,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
             }
           }
         } else {
-          showSnackbar('Something went wrong please restart the app.');
+          showSnackbar(MyLocalizations.of(context).errorMessage);
         }
       },
       child: new Row(
@@ -820,7 +839,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (BuildContext context) => PaymentMethod(cart: widget.cart),
+          builder: (BuildContext context) => PaymentMethod(cart: widget.cart, locale: widget.locale, localizedValues: widget.localizedValues,),
         ));
   }
 
@@ -831,14 +850,14 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Delivery Not availble in Your Area!'),
+          title: Text(MyLocalizations.of(context).deliveryNotAvailable),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
                 Text(restaurant +
-                    ' does not deliver to your postcode ' +
-                    zip +
-                    '. Currently we deliver to the following postcodes :'),
+                    MyLocalizations.of(context).notDeliverToThisPostcode+
+                    zip +MyLocalizations.of(context).deliverToThisPostcode +
+                    ' :'),
                 Divider(),
                 SingleChildScrollView(
                   child: ListView.builder(

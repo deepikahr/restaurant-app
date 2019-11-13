@@ -107,7 +107,31 @@
   "orderSummary": "订单摘要",
   "totalIncluding": "总计包括",
   "placeOrderNow": "立即下单",
-  "paymentMethod": "付款方法"
+  "paymentMethod": "付款方法",
+  "selectDateTime": "请先选择日期和时间以进行提取",
+  "selectAddressFirst": "请先选择/添加送货地址",
+  "errorMessage": "出了点问题，请重新启动应用程序.",
+  "deliveryNotAvailable": "您所在地区无法进行送货",
+  "notDeliverToThisPostcode": "不传递到您的邮政编码",
+  "deliverToThisPostcode": "目前，我们交付给以下邮政编码",
+  "pickUp": "皮卡",
+  "dineIn": "在用餐",
+  "thankYou": "谢谢",
+  "orderPlaced": "您的订单已下达",
+  "thankYouMessage": "我们热爱我们的客户，并竭尽所能提供更好的服务，如果有任何疑问或担忧，请联系我们",
+  "backTo": "回到 ",
+  "rateYourOrder": "为您的订单打分",
+  "wereGlad": "我们很高兴您喜欢...",
+  "rateIt": "然后请您抽出一点时间对其进行评分",
+  "feedbackImportant": "您的反馈很重要...",
+  "submit": "提交",
+  "writeReview": "请写您的评论",
+  "deliveryAddress": "邮寄地址",
+  "whereToDeliver": "告诉我们送货到哪里",
+  "byCreating": "通过创建一个新地址",
+  "enterYour": "输入您的",
+  "please": "请",
+  "city": "市"
 
 
 }

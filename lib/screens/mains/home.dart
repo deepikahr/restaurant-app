@@ -367,7 +367,7 @@ class HomePageState extends State<HomePage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (BuildContext context) => CartPage(),
+                      builder: (BuildContext context) => CartPage(localizedValues: widget.localizedValues, locale: widget.locale,),
                     ),
                   );
                 },
@@ -713,7 +713,7 @@ class HomePageState extends State<HomePage> {
             context,
             MaterialPageRoute(
               builder: (BuildContext context) =>
-                  RestaurantListPage(title: title),
+                  RestaurantListPage(title: title, localizedValues: widget.localizedValues, locale: widget.locale,),
             ),
           );
         },
@@ -771,6 +771,7 @@ class HomePageState extends State<HomePage> {
               context,
               MaterialPageRoute(
                 builder: (BuildContext context) => ProductListPage(
+
                     restaurantName: list[index]['restaurantName'],
                     locationName: list[index]['locationName'],
                     aboutUs: list[index]['locationInfo']['aboutUs'],
@@ -790,7 +791,10 @@ class HomePageState extends State<HomePage> {
                         list[index]['locationInfo']['workingHours'] ?? null,
                     locationInfo: list[index]['locationInfo'],
                     taxInfo: list[index]['locationInfo']['restaurantID']
-                        ['taxInfo']),
+                        ['taxInfo'],
+                locale: widget.locale,
+                  localizedValues: widget.localizedValues,
+                ),
               ),
             );
           },
@@ -975,7 +979,7 @@ class HomePageState extends State<HomePage> {
             ),
             child: Padding(
               padding: const EdgeInsets.all(6.0),
-              child: LocationListSheet(restaurantInfo: restaurantInfo),
+              child: LocationListSheet(restaurantInfo: restaurantInfo, localizedValues: widget.localizedValues, locale: widget.locale,),
             ),
           );
         })

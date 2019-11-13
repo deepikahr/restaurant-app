@@ -359,6 +359,78 @@ class MyLocalizations {
   String get paymentMethod {
     return localizedValues[locale.languageCode]['paymentMethod'];
   }
+  String get selectDateTime {
+    return localizedValues[locale.languageCode]['selectDateTime'];
+  }
+  String get selectAddressFirst {
+    return localizedValues[locale.languageCode]['selectAddressFirst'];
+  }
+  String get errorMessage {
+    return localizedValues[locale.languageCode]['errorMessage'];
+  }
+  String get deliveryNotAvailable {
+    return localizedValues[locale.languageCode]['deliveryNotAvailable'];
+  }
+  String get notDeliverToThisPostcode {
+    return localizedValues[locale.languageCode]['notDeliverToThisPostcode'];
+  }
+  String get deliverToThisPostcode {
+    return localizedValues[locale.languageCode]['deliverToThisPostcode'];
+  }
+  String get pickUp {
+    return localizedValues[locale.languageCode]['pickUp'];
+  }
+  String get dineIn {
+    return localizedValues[locale.languageCode]['dineIn'];
+  }
+  String get thankYou {
+    return localizedValues[locale.languageCode]['thankYou'];
+  }
+  String get orderPlaced {
+    return localizedValues[locale.languageCode]['orderPlaced'];
+  }
+  String get thankYouMessage {
+    return localizedValues[locale.languageCode]['thankYouMessage'];
+  }
+  String get backTo {
+    return localizedValues[locale.languageCode]['backTo'];
+  }
+  String get rateYourOrder {
+    return localizedValues[locale.languageCode]['rateYourOrder'];
+  }
+  String get wereGlad {
+    return localizedValues[locale.languageCode]['wereGlad'];
+  }
+  String get rateIt {
+    return localizedValues[locale.languageCode]['rateIt'];
+  }
+  String get feedbackImportant {
+    return localizedValues[locale.languageCode]['feedbackImportant'];
+  }
+  String get submit {
+    return localizedValues[locale.languageCode]['submit'];
+  }
+  String get writeReview {
+    return localizedValues[locale.languageCode]['writeReview'];
+  }
+  String get deliveryAddress {
+    return localizedValues[locale.languageCode]['deliveryAddress'];
+  }
+  String get whereToDeliver {
+    return localizedValues[locale.languageCode]['whereToDeliver'];
+  }
+  String get byCreating {
+    return localizedValues[locale.languageCode]['byCreating'];
+  }
+  String get please {
+    return localizedValues[locale.languageCode]['please'];
+  }
+  String get enterYour {
+    return localizedValues[locale.languageCode]['enterYour'];
+  }
+  String get city {
+    return localizedValues[locale.languageCode]['city'];
+  }
 
   greetTo(name) {
     return localizedValues[locale.languageCode]['greetTo']

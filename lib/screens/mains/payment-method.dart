@@ -9,13 +9,16 @@ import '../../services/common.dart';
 // import 'package:razorpay_plugin/razorpay_plugin.dart';
 import '../../services/sentry-services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
 
 class PaymentMethod extends StatefulWidget {
   final Map<String, dynamic> cart;
+  final Map<String, Map<String, String>> localizedValues;
+  String locale;
 
-  PaymentMethod({Key key, this.cart}) : super(key: key);
+  PaymentMethod({Key key, this.cart, this.locale, this.localizedValues}) : super(key: key);
 
   @override
   _PaymentMethodState createState() => _PaymentMethodState();
@@ -101,7 +104,7 @@ class _PaymentMethodState extends State<PaymentMethod> {
           });
           Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (BuildContext context) => ThankYou()),
+              MaterialPageRoute(builder: (BuildContext context) => ThankYou(locale: widget.locale, localizedValues: widget.localizedValues,)),
                   (Route<dynamic> route) => route.isFirst);
         }
       }
@@ -111,6 +114,22 @@ class _PaymentMethodState extends State<PaymentMethod> {
     }).catchError((onError) {
       sentryError.reportError(onError, null);
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    selectedLanguages();
+  }
+
+  var selectedLanguage;
+
+  selectedLanguages() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      selectedLanguage = prefs.getString('selectedLanguage');
+    });
+    print('selectedLanguage pay...........$selectedLanguage ${widget.localizedValues}');
   }
 
   @override
