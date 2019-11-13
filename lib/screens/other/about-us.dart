@@ -7,7 +7,6 @@ import 'package:RestaurantSaas/constant.dart' show languages;
 import 'package:RestaurantSaas/localizations.dart'
     show MyLocalizations, MyLocalizationsDelegate;
 
-
 class AboutUs extends StatefulWidget {
   final Map<String, Map<String, String>> localizedValues;
   String locale;
@@ -17,7 +16,6 @@ class AboutUs extends StatefulWidget {
 }
 
 class _AboutUsState extends State<AboutUs> {
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -29,7 +27,7 @@ class _AboutUsState extends State<AboutUs> {
         GlobalWidgetsLocalizations.delegate,
       ],
       supportedLocales: languages.map((language) => Locale(language, '')),
-      home:  Scaffold(
+      home: Scaffold(
         appBar: AppBar(
           backgroundColor: PRIMARY,
           elevation: 0.0,
@@ -60,7 +58,7 @@ class _AboutUsState extends State<AboutUs> {
                       ),
                       new Text(
                         'Grilled Chicken Lorem ipsum dolor sit amet, consectetur adipiscing elit,'
-                            ' sed do eiusmod tempor incididunt ut labore et dolore magna ',
+                        ' sed do eiusmod tempor incididunt ut labore et dolore magna ',
                         style: textOS(),
                       ),
                       new Padding(

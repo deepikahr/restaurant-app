@@ -1,7 +1,5 @@
 import 'package:RestaurantSaas/screens/other/CounterModel.dart';
 import 'package:RestaurantSaas/services/constant.dart';
-import 'package:RestaurantSaas/styles/styles.dart' as prefix0;
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'drawer.dart';
@@ -25,48 +23,11 @@ import 'package:flutter/services.dart';
 import 'dart:convert';
 // import '../other/search.dart';
 import '../../services/sentry-services.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-
-import 'package:RestaurantSaas/initialize_i18n.dart' show initializeI18n;
-import 'package:RestaurantSaas/constant.dart' show languages;
-import 'package:RestaurantSaas/localizations.dart'
-    show MyLocalizations, MyLocalizationsDelegate;
-import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
 
-
-//class App extends StatefulWidget {
-//  final Map<String, Map<String, String>> localizedValues;
-//  String locale;
-//  App({Key key, this.locale, this.localizedValues}) : super(key: key);
-//  @override
-//  _AppState createState() => _AppState();
-//}
-//
-//class _AppState extends State<App> {
-//
-//  @override
-//  Widget build(BuildContext context) {
-//    return new MaterialApp(
-//      locale: Locale(widget.locale),
-//      debugShowCheckedModeBanner: false,
-//      localizationsDelegates: [
-//        MyLocalizationsDelegate(widget.localizedValues),
-//        GlobalMaterialLocalizations.delegate,
-//        GlobalWidgetsLocalizations.delegate,
-//      ],
-//      supportedLocales: languages.map((language) => Locale(language, '')),
-//      home: HomePage(locale: widget.locale, localizedValues: widget.localizedValues),
-//    );
-//  }
-//}
-
-
 class HomePage extends StatefulWidget {
-  final Map<String, Map<String, String>> localizedValues;
-  var locale;
-  HomePage({Key key, this.locale, this.localizedValues}) : super(key: key);
+  HomePage({Key key}) : super(key: key);
 
   @override
   HomePageState createState() => HomePageState();
@@ -104,45 +65,6 @@ class HomePageState extends State<HomePage> {
     // checkAndValidateToken();
     _showBottomSheetCallback = _showBottomSheet;
     super.initState();
-    _checkLoginStatus();
-    selectedLanguages();
-  }
-
-  var selectedLanguage;
-
-  selectedLanguages() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      selectedLanguage = prefs.getString('selectedLanguage');
-    });
-    print('selectedLanguage home............$selectedLanguage ${widget.localizedValues}');
-  }
-
-  String fullname;
-  bool isLoggedIn = false;
-
-  Future _checkLoginStatus() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    Common.getToken().then((token) {
-      if (token != null) {
-        setState(() {
-          isLoggedIn = true;
-        });
-        ProfileService.getUserInfo().then((value) {
-          print(value);
-          if (value != null && mounted) {
-            setState(() {
-              fullname = value['name'];
-              isLoggedIn = true;
-            });
-          }
-        });
-      } else {
-        setState(() {
-          isLoggedIn = false;
-        });
-      }
-    });
   }
 
   StreamSubscription<LocationData> _locationStream;
@@ -323,12 +245,7 @@ class HomePageState extends State<HomePage> {
     }
   }
 
-  String review, branches;
-
   Widget build(BuildContext context) {
-
-    review = MyLocalizations.of(context).reviews;
-    branches = MyLocalizations.of(context).branches;
     CounterModel().getCounter().then((res) {
       try {
         setState(() {
@@ -342,154 +259,136 @@ class HomePageState extends State<HomePage> {
     }).catchError((onError) {
       sentryError.reportError(onError, null);
     });
-    return
-      MaterialApp(
-      locale: Locale(widget.locale),
-      debugShowCheckedModeBanner: false,
-      localizationsDelegates: [
-        MyLocalizationsDelegate(widget.localizedValues),
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ],
-      supportedLocales: languages.map((language) => Locale(language, '')),
-      home:
-      Scaffold(
-        backgroundColor: whitec,
-        key: scaffoldKey,
-        drawer: Menu(scaffoldKey: scaffoldKey, locale: widget.locale, localizedValues: widget.localizedValues),
-        appBar: AppBar(
-          backgroundColor: PRIMARY,
-          title: Text(APP_NAME),
-          centerTitle: true,
-          actions: <Widget>[
-            GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (BuildContext context) => CartPage(),
-                    ),
-                  );
-                },
-                child: Column(
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.only(top: 2.0),
+    return Scaffold(
+      backgroundColor: whitec,
+      key: scaffoldKey,
+      drawer: Menu(scaffoldKey: scaffoldKey),
+      appBar: AppBar(
+        backgroundColor: PRIMARY,
+        title: Text(APP_NAME),
+        centerTitle: true,
+        actions: <Widget>[
+          GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => CartPage(),
+                  ),
+                );
+              },
+              child: Stack(
+                children: <Widget>[
+                  Container(
+                      padding: EdgeInsets.only(top: 20.0, right: 10),
+                      child: Icon(Icons.shopping_cart)),
+                  Positioned(
+                      right: 3,
+                      top: 5,
                       child: (cartCount == null || cartCount == 0)
                           ? Text(
                               '',
                               style: TextStyle(fontSize: 14.0),
                             )
-                          : Text(
-                              '${cartCount.toString()}',
-                              style: TextStyle(fontSize: 14.0),
-                            ),
-                    ),
-                    Container(
-                        padding: EdgeInsets.only(right: 10.0),
-                        child: Icon(Icons.shopping_cart)),
-                  ],
-                )),
-            Padding(padding: EdgeInsets.only(left: 7.0)),
-            // buildLocationIcon(),
-            // Padding(padding: EdgeInsets.only(left: 7.0)),
-          ],
-        ),
-        body: ListView(
-          shrinkWrap: true,
-          physics: ScrollPhysics(),
-          children: <Widget>[
-            Container(
-              alignment: AlignmentDirectional.center,
-              height: 28.0,
-              color: prefix0.PRIMARY.withOpacity(0.7),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Text(MyLocalizations.of(context).hello , style: hintStyleWhiteLightOSR(),),
-                  Text(" "),
-                  fullname == null ?
-                  Text(MyLocalizations.of(context).greetTo('User'), style: hintStyleWhiteLightOSR(),) :
-                  Text(MyLocalizations.of(context).greetTo('$fullname'), style: hintStyleWhiteLightOSR(),),
+                          : Container(
+                              height: 20,
+                              width: 20,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.black,
+                              ),
+                              child: Text('${cartCount.toString()}',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontFamily: "bold",
+                                      fontSize: 11)),
+                            )),
                 ],
-              ),
-            ),
-            Container(
-              height: 180.0,
-              width: screenWidth(context),
-              child: _buildAdvertisementLoader(),
-            ),
-            (isNearByRestaurants == true ||
-                    isTopRatedRestaurants == true ||
-                    isAdvertisementList == true ||
-                    isNewlyArrivedRestaurants == true)
-                ? Container()
-                : Container(
-                    alignment: AlignmentDirectional.center,
-                    margin: EdgeInsets.only(left: 5.0, right: 5.0),
-                    height: 56.0,
-                    decoration:
-                        BoxDecoration(border: Border.all(color: Colors.white70)),
-                    child: Image.asset(
-                      'lib/assets/icon/spinner.gif',
-                      width: 40.0,
-                      height: 40.0,
-                    ),
+              )),
+          Padding(padding: EdgeInsets.only(left: 7.0)),
+          // buildLocationIcon(),
+          // Padding(padding: EdgeInsets.only(left: 7.0)),
+        ],
+      ),
+      body: ListView(
+        shrinkWrap: true,
+        physics: ScrollPhysics(),
+        children: <Widget>[
+          Container(
+            height: 180.0,
+            width: screenWidth(context),
+            child: _buildAdvertisementLoader(),
+          ),
+          (isNearByRestaurants == true ||
+                  isTopRatedRestaurants == true ||
+                  isAdvertisementList == true ||
+                  isNewlyArrivedRestaurants == true)
+              ? Container()
+              : Container(
+                  alignment: AlignmentDirectional.center,
+                  margin: EdgeInsets.only(left: 5.0, right: 5.0),
+                  height: 56.0,
+                  decoration:
+                      BoxDecoration(border: Border.all(color: Colors.white70)),
+                  child: Image.asset(
+                    'lib/assets/icon/spinner.gif',
+                    width: 40.0,
+                    height: 40.0,
                   ),
-            Container(
-              color: Colors.white70,
-              margin: EdgeInsets.only(bottom: 5.0),
-              child: ListView(
-                physics: ScrollPhysics(),
-                shrinkWrap: true,
-                children: <Widget>[
-                  isNearByRestaurants != true
-                      ? Container()
-                      : _buildGridHeader(MyLocalizations.of(context).restaurantsNearYou),
-                  _buildGetNearByLocationLoader(),
-                  isNearByRestaurants != true
-                      ? Container()
-                      : _buildViewAllButton('Near By'),
-                ],
-              ),
+                ),
+          Container(
+            color: Colors.white70,
+            margin: EdgeInsets.only(bottom: 5.0),
+            child: ListView(
+              physics: ScrollPhysics(),
+              shrinkWrap: true,
+              children: <Widget>[
+                isNearByRestaurants != true
+                    ? Container()
+                    : _buildGridHeader('Restaurants Near You'),
+                _buildGetNearByLocationLoader(),
+                isNearByRestaurants != true
+                    ? Container()
+                    : _buildViewAllButton('Near By'),
+              ],
             ),
-            Container(
-              color: Colors.white70,
-              margin: EdgeInsets.only(bottom: 5.0),
-              child: ListView(
-                physics: ScrollPhysics(),
-                shrinkWrap: true,
-                children: <Widget>[
-                  isTopRatedRestaurants != true
-                      ? Container()
-                      : _buildGridHeader(MyLocalizations.of(context).topRatedRestaurants),
-                  _buildTopRatedRestaurantLoader(),
-                  isTopRatedRestaurants != true
-                      ? Container()
-                      : _buildViewAllButton('Top Rated'),
-                ],
-              ),
+          ),
+          Container(
+            color: Colors.white70,
+            margin: EdgeInsets.only(bottom: 5.0),
+            child: ListView(
+              physics: ScrollPhysics(),
+              shrinkWrap: true,
+              children: <Widget>[
+                isTopRatedRestaurants != true
+                    ? Container()
+                    : _buildGridHeader('Top Rated Restaurants'),
+                _buildTopRatedRestaurantLoader(),
+                isTopRatedRestaurants != true
+                    ? Container()
+                    : _buildViewAllButton('Top Rated'),
+              ],
             ),
-            Container(
-              color: Colors.white70,
-              margin: EdgeInsets.only(bottom: 5.0),
-              child: ListView(
-                physics: ScrollPhysics(),
-                shrinkWrap: true,
-                children: <Widget>[
-                  isNewlyArrivedRestaurants != true
-                      ? Container()
-                      : _buildGridHeader(MyLocalizations.of(context).newlyArrivedRestaurants),
-                  _buildNewlyArrivedRestaurantLoader(),
-                  isNewlyArrivedRestaurants != true
-                      ? Container()
-                      : _buildViewAllButton('Newly Arrived'),
-                ],
-              ),
+          ),
+          Container(
+            color: Colors.white70,
+            margin: EdgeInsets.only(bottom: 5.0),
+            child: ListView(
+              physics: ScrollPhysics(),
+              shrinkWrap: true,
+              children: <Widget>[
+                isNewlyArrivedRestaurants != true
+                    ? Container()
+                    : _buildGridHeader('Newly Arrived Restaurants'),
+                _buildNewlyArrivedRestaurantLoader(),
+                isNewlyArrivedRestaurants != true
+                    ? Container()
+                    : _buildViewAllButton('Newly Arrived'),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -561,7 +460,7 @@ class HomePageState extends State<HomePage> {
                             itemBuilder: (BuildContext context, int index) {
                               return InkWell(
                                   child: buildRestaurantCard(
-                                      nearByRestaurentsList[index], review, branches),
+                                      nearByRestaurentsList[index]),
                                   onTap: () {
                                     setState(() {
                                       restaurantInfo =
@@ -603,7 +502,7 @@ class HomePageState extends State<HomePage> {
               padding: const EdgeInsets.all(0.0),
               itemBuilder: (BuildContext context, int index) {
                 return InkWell(
-                    child: buildRestaurantCard(topRatedRestaurantsList[index], review, branches),
+                    child: buildRestaurantCard(topRatedRestaurantsList[index]),
                     onTap: () {
                       setState(() {
                         restaurantInfo = topRatedRestaurantsList[index];
@@ -646,7 +545,7 @@ class HomePageState extends State<HomePage> {
         padding: const EdgeInsets.all(0.0),
         itemBuilder: (BuildContext context, int index) {
           return InkWell(
-              child: buildRestaurantCard(data[index], review, branches),
+              child: buildRestaurantCard(data[index]),
               onTap: () {
                 setState(() {
                   restaurantInfo = data[index];
@@ -723,7 +622,7 @@ class HomePageState extends State<HomePage> {
             Padding(
               padding: const EdgeInsets.only(right: 8.0),
               child: Text(
-                MyLocalizations.of(context).viewAll,
+                "View All",
                 style: hintStylePrimaryLightOSR(),
               ),
             ),
@@ -858,7 +757,7 @@ class HomePageState extends State<HomePage> {
     );
   }
 
-  static Widget buildRestaurantCard(info, review, branches) {
+  static Widget buildRestaurantCard(info) {
     // print(info);
     return Card(
       child: Column(
@@ -868,10 +767,7 @@ class HomePageState extends State<HomePage> {
               info['list']['restaurantName'],
               double.parse(info['list']['rating'].toString()),
               info['locationCount'],
-              info['list']['reviewCount'],
-              review,
-            branches
-          ),
+              info['list']['reviewCount']),
         ],
       ),
     );
@@ -915,7 +811,7 @@ class HomePageState extends State<HomePage> {
   }
 
   static Widget buildCardBottom(
-      String restaurantName, double rating, int locationCounter, int reviews, String review, branches) {
+      String restaurantName, double rating, int locationCounter, int reviews) {
     return Container(
       padding: EdgeInsets.all(6.0),
       child: Row(
@@ -930,32 +826,29 @@ class HomePageState extends State<HomePage> {
               ),
               locationCounter != null
                   ? Text(
-                      locationCounter.toString() + ' $branches',
+                      locationCounter.toString() + ' Branches',
                       style: subBoldTitle(),
                     )
                   : Container(),
             ],
           ),
-          Flexible(
-            child: rating > 0
-                ? Column(
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          Text(rating.toStringAsFixed(1),
-                              style: priceDescription()),
-                          Icon(Icons.star, color: PRIMARY, size: 16.0),
-                        ],
-                      ),
-                      Text(
-                        '(' + reviews.toString() + ')' + review,
-                        style: hintStyleSmallTextDarkOSR(),
-                        overflow: TextOverflow.ellipsis,
-                      )
-                    ],
-                  )
-                : Text(''),
-          ),
+          rating > 0
+              ? Column(
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Text(rating.toStringAsFixed(1),
+                            style: priceDescription()),
+                        Icon(Icons.star, color: PRIMARY, size: 16.0),
+                      ],
+                    ),
+                    Text(
+                      '(' + reviews.toString() + ' Reviews)',
+                      style: hintStyleSmallTextDarkOSR(),
+                    )
+                  ],
+                )
+              : Text(''),
         ],
       ),
     );

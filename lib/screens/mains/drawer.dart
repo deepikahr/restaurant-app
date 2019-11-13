@@ -11,7 +11,6 @@ import '../other/about-us.dart';
 import '../other/profile.dart';
 import '../../services/profile-service.dart';
 
-
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'package:RestaurantSaas/initialize_i18n.dart' show initializeI18n;
@@ -23,7 +22,8 @@ class Menu extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
   final Map<String, Map<String, String>> localizedValues;
   String locale;
-  Menu({Key key, this.scaffoldKey, this.locale, this.localizedValues}) : super(key: key);
+  Menu({Key key, this.scaffoldKey, this.locale, this.localizedValues})
+      : super(key: key);
 
   @override
   _MenuState createState() => _MenuState();
@@ -51,7 +51,8 @@ class _MenuState extends State<Menu> {
     setState(() {
       selectedLanguage = prefs.getString('selectedLanguage');
     });
-    print('selectedLanguage drawer............$selectedLanguage ${widget.localizedValues}');
+    print(
+        'selectedLanguage drawer............$selectedLanguage ${widget.localizedValues}');
   }
 
   void _getCartLength() async {
@@ -164,8 +165,8 @@ class _MenuState extends State<Menu> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
                                     Padding(
-                                      padding:
-                                          EdgeInsets.only(top: 13.0, bottom: 3.0),
+                                      padding: EdgeInsets.only(
+                                          top: 13.0, bottom: 3.0),
                                       child: new Text(
                                           "${fullname == null ? "" : fullname}",
                                           style: TextStyle(
@@ -189,14 +190,18 @@ class _MenuState extends State<Menu> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (BuildContext context) => HomePage(locale: widget.locale, localizedValues: widget.localizedValues,),
+                          builder: (BuildContext context) => HomePage(
+                            locale: widget.locale,
+                            localizedValues: widget.localizedValues,
+                          ),
                         ),
                       );
                     },
                   ),
                   new ListTile(
                     title: new Text(
-                        MyLocalizations.of(context).cart + "   ${cartCounter ==  0 || cartCounter == null  ?  "" : cartCounter.toString()}",
+                        MyLocalizations.of(context).cart +
+                            "   ${cartCounter == 0 || cartCounter == null ? "" : cartCounter.toString()}",
                         style:
                             TextStyle(color: Colors.white, fontFamily: "bold")),
                     leading:
@@ -220,7 +225,8 @@ class _MenuState extends State<Menu> {
                           title: new Text(MyLocalizations.of(context).myOrders,
                               style: TextStyle(
                                   color: Colors.white, fontFamily: "bold")),
-                          leading: Image.asset('lib/assets/icon/orderHistory.png',
+                          leading: Image.asset(
+                              'lib/assets/icon/orderHistory.png',
                               width: 25.0),
                           trailing: new Icon(
                             Icons.keyboard_arrow_right,
@@ -239,7 +245,8 @@ class _MenuState extends State<Menu> {
                       : Container(),
                   isLoggedIn
                       ? new ListTile(
-                          title: new Text(MyLocalizations.of(context).favourites,
+                          title: new Text(
+                              MyLocalizations.of(context).favourites,
                               style: TextStyle(
                                   color: Colors.white, fontFamily: "bold")),
                           leading: Image.asset('lib/assets/icon/favorite.png',
@@ -275,7 +282,9 @@ class _MenuState extends State<Menu> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (BuildContext context) => ProfileApp(locale: widget.locale, localizedValues: widget.localizedValues),
+                                builder: (BuildContext context) => ProfileApp(
+                                    locale: widget.locale,
+                                    localizedValues: widget.localizedValues),
                               ),
                             );
                           },
@@ -296,7 +305,9 @@ class _MenuState extends State<Menu> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (BuildContext context) => AboutUs(locale: widget.locale, localizedValues: widget.localizedValues),
+                          builder: (BuildContext context) => AboutUs(
+                              locale: widget.locale,
+                              localizedValues: widget.localizedValues),
                         ),
                       );
                     },
@@ -316,8 +327,11 @@ class _MenuState extends State<Menu> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (BuildContext context) =>
-                                    LoginPage(isDrawe: true, locale: widget.locale, localizedValues: widget.localizedValues,),
+                                builder: (BuildContext context) => LoginPage(
+                                  isDrawe: true,
+                                  locale: widget.locale,
+                                  localizedValues: widget.localizedValues,
+                                ),
                               ),
                             );
                           })
@@ -342,7 +356,10 @@ class _MenuState extends State<Menu> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (BuildContext context) =>
-                                          HomePage(locale: widget.locale, localizedValues: widget.localizedValues)));
+                                          HomePage(
+                                              locale: widget.locale,
+                                              localizedValues:
+                                                  widget.localizedValues)));
                               showSnackbar('Logout Successfully!');
                               // Navigator.pop(context);
                             });
