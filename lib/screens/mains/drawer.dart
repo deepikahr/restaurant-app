@@ -237,7 +237,7 @@ class _MenuState extends State<Menu> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (BuildContext context) => OrdersPage(),
+                                builder: (BuildContext context) => OrdersPage(locale: widget.locale, localizedValues: widget.localizedValues,),
                               ),
                             );
                           },
@@ -260,7 +260,7 @@ class _MenuState extends State<Menu> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (BuildContext context) => Favorites(),
+                                builder: (BuildContext context) => Favorites(locale: widget.locale, localizedValues: widget.localizedValues,),
                               ),
                             );
                           },

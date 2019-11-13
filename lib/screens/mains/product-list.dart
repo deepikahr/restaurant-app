@@ -1,3 +1,4 @@
+import 'package:RestaurantSaas/localizations.dart';
 import 'package:RestaurantSaas/screens/other/CounterModel.dart';
 import 'package:flutter/material.dart';
 import 'package:async_loader/async_loader.dart';
@@ -9,6 +10,13 @@ import 'product-details.dart';
 import 'cart.dart';
 import 'home.dart';
 import '../../services/sentry-services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'package:RestaurantSaas/initialize_i18n.dart' show initializeI18n;
+import 'package:RestaurantSaas/constant.dart' show languages;
+import 'package:RestaurantSaas/localizations.dart'
+    show MyLocalizations, MyLocalizationsDelegate;
+import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
 
@@ -22,6 +30,8 @@ class ProductListPage extends StatefulWidget {
       restaurantId;
   final Map<String, dynamic> deliveryInfo, workingHours, locationInfo, taxInfo;
   final List<dynamic> cuisine;
+  final Map<String, Map<String, String>> localizedValues;
+  String locale;
 
   ProductListPage(
       {Key key,
@@ -36,7 +46,10 @@ class ProductListPage extends StatefulWidget {
       this.deliveryInfo,
       this.workingHours,
       this.locationInfo,
-      this.taxInfo})
+      this.taxInfo,
+        this.locale,
+        this.localizedValues
+      })
       : super(key: key);
 
   @override
@@ -110,7 +123,18 @@ class _ProductListPageState extends State<ProductListPage> {
     print(widget.cuisine);
 
     super.initState();
+//    selectedLanguage();
   }
+
+//  var selectedLanguage;
+//
+//  selectedLanguages() async {
+//    SharedPreferences prefs = await SharedPreferences.getInstance();
+//    setState(() {
+//      selectedLanguage = prefs.getString('selectedLanguage');
+//    });
+//    print('selectedLanguage pl............$selectedLanguage ${widget.localizedValues}');
+//  }
 
   @override
   Widget build(BuildContext context) {
@@ -138,12 +162,12 @@ class _ProductListPageState extends State<ProductListPage> {
       renderError: ([error]) {
         sentryError.reportError(error, null);
         return NoData(
-            message: 'Please check your internet connection!',
+            message: MyLocalizations.of(context).connectionError,
             icon: Icons.block);
       },
       renderSuccess: ({data}) {
         if (data['message'] != null) {
-          return NoData(message: 'No products available yet!');
+          return NoData(message: MyLocalizations.of(context).noProducts);
         } else {
           return Container(
             padding: EdgeInsetsDirectional.only(bottom: 16.0),
@@ -168,101 +192,113 @@ class _ProductListPageState extends State<ProductListPage> {
         }
       },
     );
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: PRIMARY,
-        elevation: 0.0,
-        title: Text(
-          widget.restaurantName,
-          style: titleBoldWhiteOSS(),
-        ),
-        centerTitle: true,
-        actions: <Widget>[
-          GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => CartPage(),
-                  ),
-                );
-              },
-              child: Stack(
-                children: <Widget>[
-                  Container(
-                      padding: EdgeInsets.only(top: 20.0, right: 10),
-                      child: Icon(Icons.shopping_cart)),
-                  Positioned(
-                      right: 3,
-                      top: 5,
-                      child: (cartCount == null || cartCount == 0)
-                          ? Text(
-                              '',
-                              style: TextStyle(fontSize: 14.0),
-                            )
-                          : Container(
-                              height: 20,
-                              width: 20,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.black,
-                              ),
-                              child: Text('${cartCount.toString()}',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontFamily: "bold",
-                                      fontSize: 11)),
-                            )),
-                ],
-              )),
-          Padding(padding: EdgeInsets.only(left: 7.0)),
-          // buildLocationIcon(),
-          // Padding(padding: EdgeInsets.only(left: 7.0)),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Stack(
-                fit: StackFit.passthrough,
-                children: <Widget>[
-                  _buildBgImg(),
-                  _buildDescription(),
-                  _buildInfoBar(),
-                ],
-              ),
-              asyncLoader
-            ],
+    return
+//      MaterialApp(
+//      locale: Locale(widget.locale),
+//      debugShowCheckedModeBanner: false,
+//      localizationsDelegates: [
+//        MyLocalizationsDelegate(widget.localizedValues),
+//        GlobalMaterialLocalizations.delegate,
+//        GlobalWidgetsLocalizations.delegate,
+//      ],
+//      supportedLocales: languages.map((language) => Locale(language, '')),
+//      home:
+      Scaffold(
+        appBar: AppBar(
+          backgroundColor: PRIMARY,
+          elevation: 0.0,
+          title: Text(
+            widget.restaurantName,
+            style: titleBoldWhiteOSS(),
           ),
+          centerTitle: true,
+          actions: <Widget>[
+            GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (BuildContext context) => CartPage(localizedValues: widget.localizedValues, locale: widget.locale,),
+                    ),
+                  );
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Container(
+                        padding: EdgeInsets.only(top: 20.0, right: 10),
+                        child: Icon(Icons.shopping_cart)),
+                    Positioned(
+                        right: 3,
+                        top: 5,
+                        child: (cartCount == null || cartCount == 0)
+                            ? Text(
+                                '',
+                                style: TextStyle(fontSize: 14.0),
+                              )
+                            : Container(
+                                height: 20,
+                                width: 20,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.black,
+                                ),
+                                child: Text('${cartCount.toString()}',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontFamily: "bold",
+                                        fontSize: 11)),
+                              )),
+                  ],
+                )),
+            Padding(padding: EdgeInsets.only(left: 7.0)),
+            // buildLocationIcon(),
+            // Padding(padding: EdgeInsets.only(left: 7.0)),
+          ],
         ),
-      ),
-      bottomNavigationBar: GestureDetector(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (BuildContext context) => CartPage(),
+        body: SingleChildScrollView(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Stack(
+                  fit: StackFit.passthrough,
+                  children: <Widget>[
+                    _buildBgImg(),
+                    _buildDescription(),
+                    _buildInfoBar(),
+                  ],
+                ),
+                asyncLoader
+              ],
             ),
-          );
-        },
-        child: Container(
-          height: 50.0,
-          color: PRIMARY,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                "GO TO CART",
-                style: subTitleWhiteBOldOSB(),
-              ),
-            ],
           ),
         ),
-      ),
+        bottomNavigationBar: GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (BuildContext context) => CartPage(locale: widget.locale, localizedValues: widget.localizedValues,),
+              ),
+            );
+          },
+          child: Container(
+            height: 50.0,
+            color: PRIMARY,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  MyLocalizations.of(context).goToCart,
+                  style: subTitleWhiteBOldOSB(),
+                ),
+              ],
+            ),
+          ),
+        ),
+//      ),
     );
   }
 
@@ -348,7 +384,7 @@ class _ProductListPageState extends State<ProductListPage> {
           Container(
             alignment: Alignment.centerLeft,
             child: Text(
-              'Location',
+              MyLocalizations.of(context).location,
               style: hintStyleSmallWhiteLightOSR(),
               textAlign: TextAlign.left,
             ),
@@ -377,7 +413,7 @@ class _ProductListPageState extends State<ProductListPage> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: <Widget>[
                       Text(
-                        'Open',
+                        MyLocalizations.of(context).open,
                         style: hintStyleSmallGreenLightOSS(),
                       ),
                       Padding(padding: EdgeInsets.only(left: 10.0)),
@@ -394,7 +430,7 @@ class _ProductListPageState extends State<ProductListPage> {
           ),
           Row(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
             Text(
-              LocationCard.getCuisines(widget.cuisine),
+              LocationCard.getCuisines(widget.cuisine, context),
               overflow: TextOverflow.ellipsis,
               style: hintStyleSmallWhiteLightOSS(),
             ),
@@ -417,13 +453,12 @@ class _ProductListPageState extends State<ProductListPage> {
           (widget.deliveryInfo != null &&
                   widget.deliveryInfo['freeDelivery'] &&
                   widget.deliveryInfo['amountEligibility'] != null)
-              ? 'Free delivery above \$' +
-                  widget.deliveryInfo['amountEligibility'].toString()
+              ? MyLocalizations.of(context).freeDeliveryAbove  +
+              ' \$ ${widget.deliveryInfo['amountEligibility'].toString()}'
               : (widget.deliveryInfo != null &&
                       !widget.deliveryInfo['freeDelivery'])
-                  ? 'Delivery charge: Only \$' +
-                      widget.deliveryInfo['deliveryCharges'].toString()
-                  : 'Free delivery available',
+                  ? MyLocalizations.of(context).deliveryChargesOnly + ' \$ ${widget.deliveryInfo['deliveryCharges'].toString()}'
+                  : MyLocalizations.of(context).freeDeliveryAvailable,
           style: hintStyleSmallWhiteLightOSL(),
         ),
         // trailing: Icon(
@@ -465,6 +500,8 @@ class _ProductListPageState extends State<ProductListPage> {
                     context,
                     MaterialPageRoute(
                       builder: (BuildContext context) => ProductDetailsPage(
+                        localizedValues: widget.localizedValues,
+                          locale: widget.locale,
                           product: products[index],
                           restaurantName: widget.restaurantName,
                           restaurantId: widget.restaurantId,

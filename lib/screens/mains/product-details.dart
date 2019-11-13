@@ -1,3 +1,4 @@
+import 'package:RestaurantSaas/localizations.dart';
 import 'package:RestaurantSaas/screens/other/CounterModel.dart';
 import 'package:flutter/material.dart';
 import '../../styles/styles.dart';
@@ -8,12 +9,15 @@ import '../mains/home.dart';
 import 'dart:convert';
 import 'package:toast/toast.dart';
 import '../../services/sentry-services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
 
 class ProductDetailsPage extends StatefulWidget {
   final Map<String, dynamic> product, locationInfo, taxInfo, tableInfo;
   final String restaurantName, restaurantId, restaurantAddress;
+  final Map<String, Map<String, String>> localizedValues;
+  String locale;
 
   ProductDetailsPage(
       {Key key,
@@ -23,7 +27,9 @@ class ProductDetailsPage extends StatefulWidget {
       this.restaurantId,
       this.taxInfo,
       this.tableInfo,
-      this.restaurantAddress})
+      this.restaurantAddress,
+      this.locale,
+      this.localizedValues})
       : super(key: key);
 
   @override
@@ -111,6 +117,17 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
     _calculatePrice();
     super.initState();
+    selectedLanguages();
+  }
+
+  var selectedLanguage;
+
+  selectedLanguages() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      selectedLanguage = prefs.getString('selectedLanguage');
+    });
+    print('selectedLanguage pdl............$selectedLanguage ${widget.localizedValues}');
   }
 
   void _checkFavourite() async {
@@ -217,7 +234,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (BuildContext context) => CartPage(),
+                    builder: (BuildContext context) => CartPage(locale: widget.locale, localizedValues: widget.localizedValues,),
                   ),
                 );
               },
@@ -268,8 +285,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 widget.product['description'],
               ),
               _buildHeadingBlock(
-                'Sizes & Price',
-                'Select which size would you like to add',
+                MyLocalizations.of(context).size + ' & ' + MyLocalizations.of(context).price,
+                MyLocalizations.of(context).selectSize,
               ),
               widget.product['variants'].length > 0
                   ? _buildSingleSelectionBlock(widget.product['variants'])
@@ -597,7 +614,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             new Text(
-              "ADD TO CART",
+              MyLocalizations.of(context).goToCart,
               style: hintStyleWhiteLightOSB(),
             ),
             new Text(
@@ -637,6 +654,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       context,
       MaterialPageRoute(
         builder: (BuildContext context) => CartPage(
+          localizedValues: widget.localizedValues,
+          locale: widget.locale,
           product: cartProduct,
           taxInfo: widget.taxInfo,
           locationInfo: widget.locationInfo,

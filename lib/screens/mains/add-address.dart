@@ -1,7 +1,15 @@
+import 'package:RestaurantSaas/localizations.dart';
 import 'package:flutter/material.dart';
 import '../../styles/styles.dart';
 import '../../services/profile-service.dart';
 import '../../services/sentry-services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'package:RestaurantSaas/initialize_i18n.dart' show initializeI18n;
+import 'package:RestaurantSaas/constant.dart' show languages;
+import 'package:RestaurantSaas/localizations.dart'
+    show MyLocalizations, MyLocalizationsDelegate;
+import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
 
@@ -56,7 +64,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
         backgroundColor: PRIMARY,
         elevation: 0.0,
         title: new Text(
-          'Delivery Address',
+          MyLocalizations.of(context).deliveryAddress,
           style: titleBoldWhiteOSS(),
         ),
         centerTitle: true,
@@ -77,18 +85,18 @@ class _AddAddressPageState extends State<AddAddressPage> {
                     child: new Column(
                       children: <Widget>[
                         new Text(
-                          'tell us where to deliver',
+                          MyLocalizations.of(context).whereToDeliver,
                           style: titleDarkOSS(),
                         ),
                         new Text(
-                          'by creating a new adress',
+                          MyLocalizations.of(context).byCreating,
                           style: textOSR(),
                         ),
                         new Padding(padding: EdgeInsets.only(top: 20.0)),
                         new Row(
                           children: <Widget>[
                             new Text(
-                              'Name',
+                              MyLocalizations.of(context).fullName,
                               style: hintStyleSmallDarkBoldOSR(),
                             ),
                           ],
@@ -102,13 +110,13 @@ class _AddAddressPageState extends State<AddAddressPage> {
                                       bottom: BorderSide(color: Colors.grey))),
                               child: new TextFormField(
                                 decoration: InputDecoration(
-                                    hintText: 'Recipient name',
+                                    hintText: MyLocalizations.of(context).enterYour +"  "+ MyLocalizations.of(context).fullName,
                                     hintStyle: hintStyleSmallLightOSR(),
                                     border: InputBorder.none),
                                 style: textOSR(),
                                 validator: (String value) {
                                   if (value.isEmpty) {
-                                    return 'Please enter name';
+                                    return MyLocalizations.of(context).please + " "+MyLocalizations.of(context).enterYour +"  "+ MyLocalizations.of(context).fullName;
                                   } else {
                                     address['name'] = value;
                                   }
@@ -121,7 +129,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                         new Row(
                           children: <Widget>[
                             new Text(
-                              'Contact No',
+                              MyLocalizations.of(context).mobileNumber,
                               style: hintStyleSmallDarkBoldOSR(),
                             ),
                           ],
@@ -136,14 +144,15 @@ class _AddAddressPageState extends State<AddAddressPage> {
                             maxLength: 10,
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
-                                hintText: 'Enter Contact no',
+                                hintText: MyLocalizations.of(context).enterYour +"  "+ MyLocalizations.of(context).mobileNumber,
                                 counterText: "",
                                 hintStyle: hintStyleSmallLightOSR(),
                                 border: InputBorder.none),
                             style: textOSR(),
                             validator: (String value) {
                               if (value.isEmpty) {
-                                return 'Please enter contact number';
+                                return
+                                  MyLocalizations.of(context).please + " "+MyLocalizations.of(context).enterYour +"  "+ MyLocalizations.of(context).mobileNumber;
                               } else {
                                 address['contactNumber'] = value;
                               }
@@ -154,7 +163,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                         new Row(
                           children: <Widget>[
                             new Text(
-                              'Pin Code',
+                              MyLocalizations.of(context).postalCode,
                               style: hintStyleSmallDarkBoldOSR(),
                             ),
                           ],
@@ -171,13 +180,14 @@ class _AddAddressPageState extends State<AddAddressPage> {
                                 maxLength: 6,
                                 decoration: InputDecoration(
                                     counterText: "",
-                                    hintText: 'Enter your pincode',
+                                    hintText: MyLocalizations.of(context).enterYour +"  "+ MyLocalizations.of(context).postalCode,
                                     hintStyle: hintStyleSmallLightOSR(),
                                     border: InputBorder.none),
                                 style: textOSR(),
                                 validator: (String value) {
                                   if (value.isEmpty) {
-                                    return 'Please enter your pincode';
+                                    return
+                                      MyLocalizations.of(context).please + " "+MyLocalizations.of(context).enterYour +"  "+ MyLocalizations.of(context).postalCode;
                                   } else {
                                     address['zip'] = value;
                                   }
@@ -190,7 +200,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                         new Row(
                           children: <Widget>[
                             new Text(
-                              'Area',
+                              MyLocalizations.of(context).subUrban,
                               style: hintStyleSmallDarkBoldOSR(),
                             ),
                           ],
@@ -204,13 +214,14 @@ class _AddAddressPageState extends State<AddAddressPage> {
                                       bottom: BorderSide(color: Colors.grey))),
                               child: new TextFormField(
                                 decoration: InputDecoration(
-                                    hintText: 'Enter your Street/area',
+                                    hintText: MyLocalizations.of(context).enterYour +"  "+ MyLocalizations.of(context).subUrban,
                                     hintStyle: hintStyleSmallLightOSR(),
                                     border: InputBorder.none),
                                 style: textOSR(),
                                 validator: (String value) {
                                   if (value.isEmpty) {
-                                    return 'Please enter your area name';
+                                    return
+                                      MyLocalizations.of(context).please + " "+MyLocalizations.of(context).enterYour +"  "+ MyLocalizations.of(context).subUrban;
                                   } else {
                                     address['locationName'] = value;
                                   }
@@ -223,7 +234,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                         new Row(
                           children: <Widget>[
                             new Text(
-                              'City',
+                              MyLocalizations.of(context).city,
                               style: hintStyleSmallDarkBoldOSR(),
                             ),
                           ],
@@ -237,14 +248,15 @@ class _AddAddressPageState extends State<AddAddressPage> {
                                       bottom: BorderSide(color: Colors.grey))),
                               child: new TextFormField(
                                 decoration: InputDecoration(
-                                  hintText: 'Your city',
+                                  hintText: MyLocalizations.of(context).enterYour +"  "+ MyLocalizations.of(context).city,
                                   hintStyle: hintStyleSmallLightOSR(),
                                   border: InputBorder.none,
                                 ),
                                 style: textOSR(),
                                 validator: (String value) {
                                   if (value.isEmpty) {
-                                    return 'Please enter your city name';
+                                    return
+                                      MyLocalizations.of(context).please + " "+MyLocalizations.of(context).enterYour +"  "+ MyLocalizations.of(context).city;
                                   } else {
                                     address['city'] = value;
                                   }
@@ -257,7 +269,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                         new Row(
                           children: <Widget>[
                             new Text(
-                              'State',
+                              MyLocalizations.of(context).state,
                               style: hintStyleSmallDarkBoldOSR(),
                             ),
                           ],
@@ -271,7 +283,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                                       bottom: BorderSide(color: Colors.grey))),
                               child: new TextFormField(
                                 decoration: InputDecoration(
-                                  hintText: 'Your state name',
+                                  hintText: MyLocalizations.of(context).enterYour +"  "+ MyLocalizations.of(context).state,
                                   hintStyle: hintStyleSmallLightOSR(),
                                   border: InputBorder.none,
                                 ),
@@ -287,7 +299,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                         new Row(
                           children: <Widget>[
                             new Text(
-                              'Country',
+                              MyLocalizations.of(context).country,
                               style: hintStyleSmallDarkBoldOSR(),
                             ),
                           ],
@@ -301,7 +313,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                                       bottom: BorderSide(color: Colors.grey))),
                               child: new TextFormField(
                                 decoration: InputDecoration(
-                                  hintText: 'Your country name',
+                                  hintText: MyLocalizations.of(context).enterYour +"  "+ MyLocalizations.of(context).country,
                                   hintStyle: hintStyleSmallLightOSR(),
                                   border: InputBorder.none,
                                 ),
@@ -317,7 +329,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                         new Row(
                           children: <Widget>[
                             new Text(
-                              'Address',
+                              MyLocalizations.of(context).address,
                               style: hintStyleSmallDarkBoldOSR(),
                             ),
                           ],
@@ -331,14 +343,14 @@ class _AddAddressPageState extends State<AddAddressPage> {
                                       bottom: BorderSide(color: Colors.grey))),
                               child: new TextFormField(
                                 decoration: InputDecoration(
-                                  hintText: 'Enter Your address',
+                                  hintText: MyLocalizations.of(context).enterYour +"  "+ MyLocalizations.of(context).address,
                                   hintStyle: hintStyleSmallLightOSR(),
                                   border: InputBorder.none,
                                 ),
                                 style: textOSR(),
                                 validator: (String value) {
                                   if (value.isEmpty) {
-                                    return 'Enter your address first';
+                                    return MyLocalizations.of(context).please + " "+MyLocalizations.of(context).enterYour +"  "+ MyLocalizations.of(context).address;
                                   } else {
                                     address['address'] = value;
                                   }
@@ -388,7 +400,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                           decoration: BoxDecoration(
                               color: PRIMARY,
                               borderRadius: BorderRadius.circular(50.0)),
-                          child: new Text("ADD ADDRESS",
+                          child: new Text(MyLocalizations.of(context).addAddress,
                               style: subTitleWhiteBOldOSB()),
                         ),
                 ),

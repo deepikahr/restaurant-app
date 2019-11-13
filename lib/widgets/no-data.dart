@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'package:RestaurantSaas/initialize_i18n.dart' show initializeI18n;
+import 'package:RestaurantSaas/constant.dart' show languages;
+import 'package:RestaurantSaas/localizations.dart'
+    show MyLocalizations, MyLocalizationsDelegate;
 
 class NoData extends StatelessWidget {
   final String message;
@@ -12,7 +18,7 @@ class NoData extends StatelessWidget {
       child: Column(
         children: [
           _buildIcon(icon),
-          _buildText(message),
+          _buildText(message, context),
         ],
       ),
     );
@@ -26,9 +32,9 @@ class NoData extends StatelessWidget {
     );
   }
 
-  Widget _buildText(message) {
+  Widget _buildText(message, context) {
     return Text(
-      message ?? 'Resources not available!',
+      message ?? MyLocalizations.of(context).noResource,
       style: TextStyle(
         fontSize: 18.0,
         color: Colors.grey[500],
