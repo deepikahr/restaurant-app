@@ -6,13 +6,21 @@ import '../../services/profile-service.dart';
 import 'order-details.dart';
 import 'order-track.dart';
 import '../../services/sentry-services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'package:RestaurantSaas/initialize_i18n.dart' show initializeI18n;
+import 'package:RestaurantSaas/constant.dart' show languages;
+import 'package:RestaurantSaas/localizations.dart'
+    show MyLocalizations, MyLocalizationsDelegate;
+import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
 
 class OrderUpcoming extends StatefulWidget {
   final bool isRatingAllowed;
-
-  OrderUpcoming({Key key, this.isRatingAllowed}) : super(key: key);
+  final Map<String, Map<String, String>> localizedValues;
+  var locale;
+  OrderUpcoming({Key key, this.isRatingAllowed, this.locale, this.localizedValues}) : super(key: key);
 
   @override
   OrderUpcomingState createState() => OrderUpcomingState();
@@ -36,26 +44,26 @@ class OrderUpcomingState extends State<OrderUpcoming>
         renderError: ([error]) {
           sentryError.reportError(error, null);
           return NoData(
-              message: 'Please check your internet connection!',
+              message: MyLocalizations.of(context).connectionError,
               icon: Icons.block);
         },
         renderSuccess: ({data}) {
           if (data.length > 0) {
-            return buildOrderList(data, widget.isRatingAllowed);
+            return buildOrderList(data, widget.isRatingAllowed, context, widget.locale, widget.localizedValues);
           } else {
-            return buildEmptyPage();
+            return buildEmptyPage(context);
           }
         });
   }
 
-  static Widget buildEmptyPage() {
+  static Widget buildEmptyPage(context) {
     return Padding(
       padding: EdgeInsets.only(top: 40.0),
-      child: NoData(message: 'No order has been completed yet!'),
+      child: NoData(message: MyLocalizations.of(context).noCompletedOrders),
     );
   }
 
-  static Widget buildOrderList(List<dynamic> orders, bool isRatingAllowed) {
+  static Widget buildOrderList(List<dynamic> orders, bool isRatingAllowed, context, var locale,  Map<String, Map<String, String>> localizedValues,) {
     return Container(
       color: Colors.grey[300],
       child: ListView.builder(
@@ -82,9 +90,11 @@ class OrderUpcomingState extends State<OrderUpcoming>
                     orders[index]['orderID'],
                     context,
                     isRatingAllowed,
-                    orders[index]['_id']),
+                    orders[index]['_id'],locale,
+                  localizedValues,),
                 _buildProductList(orders[index]['productDetails']),
                 _buildBottomPriceLine(
+                    context,
                     double.parse(orders[index]['grandTotal'].toString()),
                     orders[index]['paymentOption'],
                     orders[index]['createdAt'].substring(0, 10)),
@@ -119,7 +129,7 @@ class OrderUpcomingState extends State<OrderUpcoming>
               style: titleLightWhiteOSR(),
             ),
             Text(
-              "Status: " + status,
+              MyLocalizations.of(context).status + ': $status',
               style: hintStyleSmallWhiteBoldOSL(),
             ),
           ],
@@ -129,7 +139,8 @@ class OrderUpcomingState extends State<OrderUpcoming>
   }
 
   static Widget _buildOrderInfo(String status, String time, int orderId,
-      BuildContext context, bool isRatingAllowed, String orderIdUniq) {
+      BuildContext context, bool isRatingAllowed, String orderIdUniq, var locale,
+      Map<String, Map<String, String>> localizedValues,) {
     return Container(
       padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
       child: Row(
@@ -186,7 +197,7 @@ class OrderUpcomingState extends State<OrderUpcoming>
                         context,
                         MaterialPageRoute(
                           builder: (BuildContext context) =>
-                              OrderDetails(orderId: orderIdUniq),
+                              OrderDetails(orderId: orderIdUniq, locale: locale, localizedValues: localizedValues,),
                         ),
                       );
                     } else {
@@ -194,14 +205,15 @@ class OrderUpcomingState extends State<OrderUpcoming>
                         context,
                         MaterialPageRoute(
                           builder: (BuildContext context) =>
-                              OrderTrack(orderId: orderIdUniq),
+                              OrderTrack(orderId: orderIdUniq, locale: locale, localizedValues: localizedValues, ),
                         ),
                       );
                     }
                   },
                   fillColor: PRIMARY,
                   child: new Text(
-                    isRatingAllowed ? 'View' : 'Track',
+                    isRatingAllowed ? MyLocalizations.of(context).view :
+                    MyLocalizations.of(context).track,
                     style: hintStylesmallWhiteLightOSL(),
                   ),
                 ),
@@ -260,7 +272,7 @@ class OrderUpcomingState extends State<OrderUpcoming>
     );
   }
 
-  static Widget _buildBottomPriceLine(
+  static Widget _buildBottomPriceLine(context,
       double total, String paymentMode, String time) {
     return Container(
       alignment: AlignmentDirectional.centerStart,
@@ -273,11 +285,11 @@ class OrderUpcomingState extends State<OrderUpcoming>
             // crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Text(
-                "Total: \$" + total.toStringAsFixed(2),
+                MyLocalizations.of(context).total + ": \$" + total.toStringAsFixed(2),
                 style: titleBold(),
               ),
               Text(
-                "Payment Mode: " + paymentMode,
+              MyLocalizations.of(context).paymentMode + ":" + paymentMode,
                 style: hintStyleSmallDarkBoldOSL(),
               ),
             ],
@@ -286,7 +298,7 @@ class OrderUpcomingState extends State<OrderUpcoming>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             // crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Text('Including other charges'),
+              Text(MyLocalizations.of(context).chargesIncluding),
               Text(
                 time,
                 style: hintStyleSmallDarkBoldOSL(),

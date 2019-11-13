@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import '../styles/styles.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'package:RestaurantSaas/initialize_i18n.dart' show initializeI18n;
+import 'package:RestaurantSaas/constant.dart' show languages;
+import 'package:RestaurantSaas/localizations.dart'
+    show MyLocalizations, MyLocalizationsDelegate;
 
 class LocationCard extends StatelessWidget {
   final String locationName;
@@ -29,7 +35,7 @@ class LocationCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             buildCardHeader(),
-            buildCuisineHolder(),
+            buildCuisineHolder(context),
             deliveryTime != null ? buildCardBottom() : Text(''),
           ],
         ),
@@ -88,9 +94,9 @@ class LocationCard extends StatelessWidget {
     );
   }
 
-  Widget buildCuisineHolder() {
+  Widget buildCuisineHolder(context) {
     return Text(
-      getCuisines(cuisine),
+      getCuisines(cuisine, context),
       overflow: TextOverflow.ellipsis,
       textAlign: TextAlign.left,
       style: TextStyle(
@@ -148,7 +154,7 @@ class LocationCard extends StatelessWidget {
     );
   }
 
-  static String getCuisines(cuisines) {
+  static String getCuisines(cuisines, context) {
     String cuisine = '';
     cuisines.forEach((c) {
       String cui = c['itemName'] ?? c['cuisineName'] ?? '';
@@ -157,6 +163,6 @@ class LocationCard extends StatelessWidget {
     if (cuisine.length > 2)
       return cuisine.substring(0, cuisine.length - 2).toUpperCase();
     else
-      return 'Cuisines Are Not Added Yet!';
+      return MyLocalizations.of(context).noCuisines;
   }
 }

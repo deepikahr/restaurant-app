@@ -10,13 +10,22 @@ import '../../widgets/no-data.dart';
 import 'location-list-sheet.dart';
 import '../../services/common.dart';
 import '../../services/sentry-services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'package:RestaurantSaas/initialize_i18n.dart' show initializeI18n;
+import 'package:RestaurantSaas/constant.dart' show languages;
+import 'package:RestaurantSaas/localizations.dart'
+    show MyLocalizations, MyLocalizationsDelegate;
+import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
 
 class RestaurantListPage extends StatefulWidget {
   final String title;
+  final Map<String, Map<String, String>> localizedValues;
+  String locale;
 
-  RestaurantListPage({Key key, this.title}) : super(key: key);
+  RestaurantListPage({Key key, this.title, this.locale, this.localizedValues}) : super(key: key);
 
   @override
   _RestaurantListPageState createState() => _RestaurantListPageState();
@@ -59,6 +68,17 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
     // TODO: implement initState
 
     super.initState();
+    selectedLanguage();
+  }
+
+  var selectedLanguage;
+
+  selectedLanguages() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      selectedLanguage = prefs.getString('selectedLanguage');
+    });
+    print('selectedLanguage rl............$selectedLanguage ${widget.localizedValues}');
   }
 
   @override
@@ -94,7 +114,7 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (BuildContext context) => CartPage(),
+                    builder: (BuildContext context) => CartPage(locale: widget.locale, localizedValues: widget.localizedValues,),
                   ),
                 );
               },
@@ -144,7 +164,7 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
         renderError: ([error]) {
           sentryError.reportError(error, null);
           return NoData(
-              message: 'Please check your internet connection!',
+              message: MyLocalizations.of(context).connectionError,
               icon: Icons.block);
         },
         renderSuccess: ({data}) {
@@ -182,7 +202,7 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
             ),
             child: Padding(
               padding: const EdgeInsets.all(6.0),
-              child: LocationListSheet(restaurantInfo: restaurantInfo),
+              child: LocationListSheet(restaurantInfo: restaurantInfo, ),
             ),
           );
         })

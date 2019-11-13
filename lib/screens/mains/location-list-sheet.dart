@@ -8,14 +8,23 @@ import '../../widgets/location-card.dart';
 import 'product-list.dart';
 import 'location-list.dart';
 import '../../services/sentry-services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'package:RestaurantSaas/initialize_i18n.dart' show initializeI18n;
+import 'package:RestaurantSaas/constant.dart' show languages;
+import 'package:RestaurantSaas/localizations.dart'
+    show MyLocalizations, MyLocalizationsDelegate;
+import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
 
 class LocationListSheet extends StatelessWidget {
   final Map<String, dynamic> restaurantInfo, locationInfo;
-
-  LocationListSheet({Key key, this.restaurantInfo, this.locationInfo})
+  final Map<String, Map<String, String>> localizedValues;
+  String locale;
+  LocationListSheet({Key key, this.restaurantInfo, this.locationInfo, this.localizedValues, this.locale})
       : super(key: key);
+
 
   final GlobalKey<AsyncLoaderState> _asyncLoaderState =
       GlobalKey<AsyncLoaderState>();
@@ -39,35 +48,37 @@ class LocationListSheet extends StatelessWidget {
           sentryError.reportError(error, null);
           return new Center(
             child: NoData(
-                message: 'Please check your internet connection!',
+                message: MyLocalizations.of(context).connectionError,
                 icon: Icons.block),
           );
         },
         renderSuccess: ({data}) {
-          return buildLocationSheetView(context, data, restaurantInfo, true);
+          return buildLocationSheetView(context, data, restaurantInfo, true, localizedValues, locale);
         });
 
-    return Container(
-      height: screenHeight(context) * 0.6,
-      width: screenHeight(context),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          buildSheetHeader(
-              restaurantInfo['list']['logo'],
-              restaurantInfo['list']['restaurantName'],
-              restaurantInfo['list']['reviewCount']),
-          buildOutletInfo(restaurantInfo['locationCount']),
-          Divider(),
-          asyncLoader,
-        ],
-      ),
+    return
+      Container(
+        height: screenHeight(context) * 0.6,
+        width: screenHeight(context),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            buildSheetHeader(
+                restaurantInfo['list']['logo'],
+                restaurantInfo['list']['restaurantName'],
+                restaurantInfo['list']['reviewCount'], context),
+            buildOutletInfo(restaurantInfo['locationCount'], context),
+            Divider(),
+            asyncLoader,
+          ],
+        ),
     );
   }
 
   static Widget buildLocationSheetView(BuildContext context, List<dynamic> data,
-      Map<String, dynamic> restaurantInfo, bool isLimited) {
+      Map<String, dynamic> restaurantInfo, bool isLimited,  Map<String, Map<String, String>> localizedValues,
+      String locale, ) {
     if (data.length > 0) {
       return ListView.builder(
           physics: ScrollPhysics(),
@@ -76,21 +87,21 @@ class LocationListSheet extends StatelessWidget {
           itemBuilder: (BuildContext context, int index) {
             if (!isLimited) {
               return getLocationCard(
-                  data, index, context, restaurantInfo, data[index]);
+                  data, index, context, restaurantInfo, data[index], localizedValues, locale);
             } else {
               if (index < 2) {
                 return getLocationCard(
-                    data, index, context, restaurantInfo, data[index]);
+                    data, index, context, restaurantInfo, data[index], localizedValues, locale );
               } else {
                 if (index == 2) {
-                  return buildViewMoreButton(context, restaurantInfo, data);
+                  return buildViewMoreButton(context, restaurantInfo, data, localizedValues, locale);
                 }
                 return null;
               }
             }
           });
     } else {
-      return NoData(message: 'No locations found!', icon: null);
+      return NoData(message: MyLocalizations.of(context).noLocationsFound, icon: null);
     }
   }
 
@@ -99,7 +110,10 @@ class LocationListSheet extends StatelessWidget {
       int index,
       BuildContext context,
       Map<String, dynamic> restaurantInfo,
-      Map<String, dynamic> locationInfo) {
+      Map<String, dynamic> locationInfo,
+          Map<String, Map<String, String>> localizedValues,
+  String locale,
+      ) {
     String locationName = data[index]['locationName'];
     double rating = double.parse(data[index]['rating'].toString());
     dynamic cuisine = data[index]['cuisine'];
@@ -130,6 +144,8 @@ class LocationListSheet extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (BuildContext context) => ProductListPage(
+              localizedValues: localizedValues,
+                locale: locale,
                 restaurantName: restaurantInfo['list']['restaurantName'],
                 locationName: locationName,
                 aboutUs: data[index]['aboutUs'],
@@ -158,7 +174,7 @@ class LocationListSheet extends StatelessWidget {
     );
   }
 
-  static Widget buildSheetHeader(String logo, String name, int reviewCount) {
+  static Widget buildSheetHeader(String logo, String name, int reviewCount, context) {
     return Container(
       child: Row(
         children: [
@@ -183,7 +199,7 @@ class LocationListSheet extends StatelessWidget {
                 ),
                 reviewCount > 0
                     ? Text(
-                        reviewCount.toString() + ' Reviews given by users',
+                        reviewCount.toString() + MyLocalizations.of(context).usersReview,
                         textAlign: TextAlign.left,
                       )
                     : Text(''),
@@ -195,12 +211,12 @@ class LocationListSheet extends StatelessWidget {
     );
   }
 
-  static Widget buildOutletInfo(int locationCount) {
+  static Widget buildOutletInfo(int locationCount, context) {
     return locationCount != null
         ? Padding(
             padding: EdgeInsets.all(4.0),
             child: Text(
-              locationCount.toString() + ' outlets delivering to you',
+              locationCount.toString() + MyLocalizations.of(context).outletsDelivering,
               style: subBoldTitle(),
               textAlign: TextAlign.left,
             ),
@@ -209,7 +225,9 @@ class LocationListSheet extends StatelessWidget {
   }
 
   static Widget buildViewMoreButton(BuildContext context,
-      Map<String, dynamic> restaurantInfo, List<dynamic> locations) {
+      Map<String, dynamic> restaurantInfo, List<dynamic> locations,
+      Map<String, Map<String, String>> localizedValues,
+      String locale, ) {
     return Padding(
       padding: EdgeInsets.only(
         left: 120.0,
@@ -223,7 +241,7 @@ class LocationListSheet extends StatelessWidget {
             context,
             MaterialPageRoute(
                 builder: (BuildContext context) => LocationListPage(
-                    restaurantInfo: restaurantInfo, locations: locations)),
+                    restaurantInfo: restaurantInfo, locations: locations, locale: locale, localizedValues: localizedValues,)),
           );
         },
         child: Container(
@@ -232,7 +250,7 @@ class LocationListSheet extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Icon(Icons.add, size: 20.0),
-              Text('View More'),
+              Text(MyLocalizations.of(context).viewAll),
             ],
           ),
         ),

@@ -1,3 +1,4 @@
+import 'package:RestaurantSaas/localizations.dart';
 import 'package:flutter/material.dart';
 import '../../styles/styles.dart';
 import '../other/thank-you.dart';
@@ -7,13 +8,17 @@ import '../../services/common.dart';
 // import 'package:stripe_payment/stripe_payment.dart';
 // import 'package:razorpay_plugin/razorpay_plugin.dart';
 import '../../services/sentry-services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
 
 class PaymentMethod extends StatefulWidget {
   final Map<String, dynamic> cart;
+  final Map<String, Map<String, String>> localizedValues;
+  String locale;
 
-  PaymentMethod({Key key, this.cart}) : super(key: key);
+  PaymentMethod({Key key, this.cart, this.locale, this.localizedValues}) : super(key: key);
 
   @override
   _PaymentMethodState createState() => _PaymentMethodState();
@@ -99,7 +104,7 @@ class _PaymentMethodState extends State<PaymentMethod> {
           });
           Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (BuildContext context) => ThankYou()),
+              MaterialPageRoute(builder: (BuildContext context) => ThankYou(locale: widget.locale, localizedValues: widget.localizedValues,)),
                   (Route<dynamic> route) => route.isFirst);
         }
       }
@@ -112,6 +117,22 @@ class _PaymentMethodState extends State<PaymentMethod> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    selectedLanguages();
+  }
+
+  var selectedLanguage;
+
+  selectedLanguages() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      selectedLanguage = prefs.getString('selectedLanguage');
+    });
+    print('selectedLanguage pay...........$selectedLanguage ${widget.localizedValues}');
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: whiteTextb,
@@ -119,7 +140,7 @@ class _PaymentMethodState extends State<PaymentMethod> {
         backgroundColor: PRIMARY,
         elevation: 0.0,
         title: new Text(
-          'Payment Method',
+          MyLocalizations.of(context).paymentMethod,
           style: titleBoldWhiteOSS(),
         ),
         centerTitle: true,
@@ -148,13 +169,12 @@ class _PaymentMethodState extends State<PaymentMethod> {
                   children: <Widget>[
                     new Padding(padding: EdgeInsets.only(top: 10.0)),
                     new Text(
-                      "PLACE ORDER NOW",
+                      MyLocalizations.of(context).placeOrderNow,
                       style: subTitleWhiteLightOSR(),
                     ),
                     new Padding(padding: EdgeInsets.only(top: 5.0)),
                     new Text(
-                      'Total: \$' +
-                          widget.cart['grandTotal'].toStringAsFixed(2),
+                     MyLocalizations.of(context).total+ ': \$ ${widget.cart['grandTotal'].toStringAsFixed(2)}',
                       style: titleWhiteBoldOSB(),
                     ),
                   ],
