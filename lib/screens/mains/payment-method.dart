@@ -120,6 +120,15 @@ class _PaymentMethodState extends State<PaymentMethod> {
   void initState() {
     super.initState();
 //    selectedLanguages();
+  getGlobalSettingsData();
+  }
+
+  String currency;
+
+  getGlobalSettingsData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    currency = prefs.getString('currency');
+    print('currency............. $currency');
   }
 
 //  var selectedLanguage;
@@ -174,7 +183,7 @@ class _PaymentMethodState extends State<PaymentMethod> {
                     ),
                     new Padding(padding: EdgeInsets.only(top: 5.0)),
                     new Text(
-                     MyLocalizations.of(context).total+ ': \$ ${widget.cart['grandTotal'].toStringAsFixed(2)}',
+                     MyLocalizations.of(context).total+ ': $currency ${widget.cart['grandTotal'].toStringAsFixed(2)}',
                       style: titleWhiteBoldOSB(),
                     ),
                   ],

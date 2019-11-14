@@ -36,6 +36,21 @@ class OrderUpcomingState extends State<OrderUpcoming>
   }
 
   @override
+  void initState() {
+    super.initState();
+//    selectedLanguages();
+    getGlobalSettingsData();
+  }
+
+  String currency;
+
+  getGlobalSettingsData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    currency = prefs.getString('currency');
+    print('currency............. $currency');
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AsyncLoader(
         key: _asyncLoaderState,
@@ -49,7 +64,7 @@ class OrderUpcomingState extends State<OrderUpcoming>
         },
         renderSuccess: ({data}) {
           if (data.length > 0) {
-            return buildOrderList(data, widget.isRatingAllowed, context, widget.locale, widget.localizedValues);
+            return buildOrderList(data, widget.isRatingAllowed, context, widget.locale, widget.localizedValues, currency);
           } else {
             return buildEmptyPage(context);
           }
@@ -63,7 +78,8 @@ class OrderUpcomingState extends State<OrderUpcoming>
     );
   }
 
-  static Widget buildOrderList(List<dynamic> orders, bool isRatingAllowed, context, var locale,  Map<String, Map<String, String>> localizedValues,) {
+  static Widget buildOrderList(List<dynamic> orders, bool isRatingAllowed, context, var locale,  Map<String, Map<String, String>> localizedValues,
+      String currency) {
     return Container(
       color: Colors.grey[300],
       child: ListView.builder(
@@ -92,12 +108,14 @@ class OrderUpcomingState extends State<OrderUpcoming>
                     isRatingAllowed,
                     orders[index]['_id'],locale,
                   localizedValues,),
-                _buildProductList(orders[index]['productDetails']),
+                _buildProductList(orders[index]['productDetails'], currency),
                 _buildBottomPriceLine(
                     context,
                     double.parse(orders[index]['grandTotal'].toString()),
                     orders[index]['paymentOption'],
-                    orders[index]['createdAt'].substring(0, 10)),
+                    orders[index]['createdAt'].substring(0, 10),
+                  currency
+                ),
               ],
             ),
           );
@@ -225,7 +243,7 @@ class OrderUpcomingState extends State<OrderUpcoming>
     );
   }
 
-  static Widget _buildProductList(List<dynamic> products) {
+  static Widget _buildProductList(List<dynamic> products, String currency) {
     return ListView.builder(
       itemCount: products.length,
       physics: ScrollPhysics(),
@@ -262,7 +280,7 @@ class OrderUpcomingState extends State<OrderUpcoming>
                 Expanded(
                   flex: 3,
                   child: Text(
-                      '\$' + products[index]['totalPrice'].toStringAsFixed(2)),
+                      '$currency' + products[index]['totalPrice'].toStringAsFixed(2)),
                 )
               ],
             ),
@@ -273,7 +291,7 @@ class OrderUpcomingState extends State<OrderUpcoming>
   }
 
   static Widget _buildBottomPriceLine(context,
-      double total, String paymentMode, String time) {
+      double total, String paymentMode, String time, String currency) {
     return Container(
       alignment: AlignmentDirectional.centerStart,
       padding: EdgeInsetsDirectional.only(top: 12.0),
@@ -285,7 +303,7 @@ class OrderUpcomingState extends State<OrderUpcoming>
             // crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Text(
-                MyLocalizations.of(context).total + ": \$" + total.toStringAsFixed(2),
+                MyLocalizations.of(context).total + ": $currency" + total.toStringAsFixed(2),
                 style: titleBold(),
               ),
               Text(

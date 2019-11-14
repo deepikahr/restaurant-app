@@ -36,6 +36,15 @@ class _LocationListPageState extends State<LocationListPage> {
 
     super.initState();
 //    selectedLanguage();
+    getGlobalSettingsData();
+  }
+
+  String currency;
+
+  getGlobalSettingsData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    currency = prefs.getString('currency');
+    print('currency............. $currency');
   }
 
 //  var selectedLanguage;
@@ -137,7 +146,7 @@ class _LocationListPageState extends State<LocationListPage> {
                   widget.restaurantInfo['locationCount'], context),
               Divider(),
               LocationListSheet.buildLocationSheetView(
-                  context, widget.locations, widget.restaurantInfo, false, widget.localizedValues, widget.locale),
+                  context, widget.locations, widget.restaurantInfo, false, widget.localizedValues, widget.locale, currency),
             ],
           ),
         ),
