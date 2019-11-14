@@ -56,4 +56,9 @@ class MainService {
     final response = await client.get(API_ENDPOINT + 'settings/$id');
     return json.decode(response.body);
   }
+
+  static Future<dynamic> getAdminSettings() async {
+    final response = await client.get(API_ENDPOINT + 'adminsettings');
+    return json.decode(response.body);
+  }
 }

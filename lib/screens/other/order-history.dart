@@ -36,6 +36,20 @@ class _OrderHistoryState extends State<OrderHistory>
   }
 
   @override
+  void initState() {
+    super.initState();
+    getGlobalSettingsData();
+  }
+
+  String currency;
+
+  getGlobalSettingsData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    currency = prefs.getString('currency');
+    print('currency............. $currency');
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AsyncLoader(
         key: _asyncLoaderState,
@@ -50,7 +64,7 @@ class _OrderHistoryState extends State<OrderHistory>
         renderSuccess: ({data}) {
           if (data.length > 0) {
             return OrderUpcomingState.buildOrderList(
-                data, widget.isRatingAllowed, context, widget.locale, widget.localizedValues);
+                data, widget.isRatingAllowed, context, widget.locale, widget.localizedValues, currency);
           } else {
             return OrderUpcomingState.buildEmptyPage(context);
           }

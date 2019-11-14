@@ -123,7 +123,16 @@ class _ProductListPageState extends State<ProductListPage> {
     print(widget.cuisine);
 
     super.initState();
+    getGlobalSettingsData();
 //    selectedLanguage();
+  }
+
+  String currency;
+
+  getGlobalSettingsData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    currency = prefs.getString('currency');
+    print('currency............. $currency');
   }
 
 //  var selectedLanguage;
@@ -454,10 +463,10 @@ class _ProductListPageState extends State<ProductListPage> {
                   widget.deliveryInfo['freeDelivery'] &&
                   widget.deliveryInfo['amountEligibility'] != null)
               ? MyLocalizations.of(context).freeDeliveryAbove  +
-              ' \$ ${widget.deliveryInfo['amountEligibility'].toString()}'
+              ' $currency ${widget.deliveryInfo['amountEligibility'].toString()}'
               : (widget.deliveryInfo != null &&
                       !widget.deliveryInfo['freeDelivery'])
-                  ? MyLocalizations.of(context).deliveryChargesOnly + ' \$ ${widget.deliveryInfo['deliveryCharges'].toString()}'
+                  ? MyLocalizations.of(context).deliveryChargesOnly + ' $currency ${widget.deliveryInfo['deliveryCharges'].toString()}'
                   : MyLocalizations.of(context).freeDeliveryAvailable,
           style: hintStyleSmallWhiteLightOSL(),
         ),
@@ -575,7 +584,7 @@ class _ProductListPageState extends State<ProductListPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Text(
-                '\$' + price.toStringAsFixed(2),
+                '$currency' + price.toStringAsFixed(2),
                 style: subTitleDarkBoldOSS(),
               ),
               Container(
@@ -611,7 +620,7 @@ class _ProductListPageState extends State<ProductListPage> {
                 child: Padding(
                   padding: EdgeInsets.only(left: 5.0, right: 5.0),
                   child: Text(
-                    '\$ ' + mrp.toStringAsFixed(2),
+                    '$currency ' + mrp.toStringAsFixed(2),
                     style: hintStyleSmallWhiteLightOSSStrike(),
                   ),
                 ),
