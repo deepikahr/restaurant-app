@@ -129,6 +129,14 @@ class _ProductListPageState extends State<ProductListPage> {
 //    selectedLanguage();
   }
 
+  String currency;
+
+  getGlobalSettingsData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    currency = prefs.getString('currency');
+    print('currency............. $currency');
+  }
+
   getRestaurantOpenAndCloseTime() async {
     setState(() {
       isopenAndCloseTimeLoading = true;

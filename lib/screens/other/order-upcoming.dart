@@ -69,7 +69,7 @@ class OrderUpcomingState extends State<OrderUpcoming>
         renderSuccess: ({data}) {
           if (data.length > 0) {
             return buildOrderList(data, widget.isRatingAllowed, context,
-                widget.locale, widget.localizedValues);
+                widget.locale, widget.localizedValues, currency);
           } else {
             return buildEmptyPage(context);
           }
@@ -84,12 +84,12 @@ class OrderUpcomingState extends State<OrderUpcoming>
   }
 
   static Widget buildOrderList(
-    List<dynamic> orders,
-    bool isRatingAllowed,
-    context,
-    var locale,
-    Map<String, Map<String, String>> localizedValues,
-  ) {
+      List<dynamic> orders,
+      bool isRatingAllowed,
+      context,
+      var locale,
+      Map<String, Map<String, String>> localizedValues,
+      String currency) {
     return Container(
       color: Colors.grey[300],
       child: ListView.builder(

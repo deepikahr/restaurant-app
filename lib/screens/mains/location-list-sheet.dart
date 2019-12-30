@@ -34,7 +34,7 @@ class LocationListSheet extends StatelessWidget {
       GlobalKey<AsyncLoaderState>();
   int cartCount;
 
-
+  String currency;
   getLocationListByRestaurantId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     currency = prefs.getString('currency');
@@ -42,11 +42,6 @@ class LocationListSheet extends StatelessWidget {
     return await MainService.getLocationsByRestaurantId(
         restaurantInfo['list']['_id']);
   }
-
-
-  String currency;
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +58,8 @@ class LocationListSheet extends StatelessWidget {
           );
         },
         renderSuccess: ({data}) {
-          return buildLocationSheetView(context, data, restaurantInfo, true, localizedValues, locale, currency);
+          return buildLocationSheetView(context, data, restaurantInfo, true,
+              localizedValues, locale, currency);
         });
 
     return Container(
@@ -87,13 +83,13 @@ class LocationListSheet extends StatelessWidget {
   }
 
   static Widget buildLocationSheetView(
-    BuildContext context,
-    List<dynamic> data,
-    Map<String, dynamic> restaurantInfo,
-    bool isLimited,
-    Map<String, Map<String, String>> localizedValues,
-    var locale,
-  ) {
+      BuildContext context,
+      List<dynamic> data,
+      Map<String, dynamic> restaurantInfo,
+      bool isLimited,
+      Map<String, Map<String, String>> localizedValues,
+      String locale,
+      String currency) {
     if (data.length > 0) {
       return ListView.builder(
           physics: ScrollPhysics(),
@@ -102,15 +98,15 @@ class LocationListSheet extends StatelessWidget {
           itemBuilder: (BuildContext context, int index) {
             if (!isLimited) {
               return getLocationCard(data, index, context, restaurantInfo,
-                  data[index]['location'], localizedValues, locale);
+                  data[index]['location'], localizedValues, locale, currency);
             } else {
               if (index < 2) {
                 return getLocationCard(data, index, context, restaurantInfo,
-                    data[index]['location'], localizedValues, locale);
+                    data[index]['location'], localizedValues, locale, currency);
               } else {
                 if (index == 2) {
-                  return buildViewMoreButton(
-                      context, restaurantInfo, data, localizedValues, locale);
+                  return buildViewMoreButton(context, restaurantInfo, data,
+                      localizedValues, locale);
                 }
                 return null;
               }
@@ -123,14 +119,14 @@ class LocationListSheet extends StatelessWidget {
   }
 
   static Widget getLocationCard(
-    List<dynamic> data,
-    int index,
-    BuildContext context,
-    Map<String, dynamic> restaurantInfo,
-    Map<String, dynamic> locationInfo,
-    Map<String, Map<String, String>> localizedValues,
-    var locale,
-  ) {
+      List<dynamic> data,
+      int index,
+      BuildContext context,
+      Map<String, dynamic> restaurantInfo,
+      Map<String, dynamic> locationInfo,
+      Map<String, Map<String, String>> localizedValues,
+      var locale,
+      String currency) {
     String locationName = data[index]['location']['locationName'];
     double rating = double.parse(data[index]['location']['rating'].toString());
     dynamic cuisine = data[index]['location']['cuisine'];
