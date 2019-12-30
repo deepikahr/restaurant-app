@@ -44,4 +44,14 @@ class AuthService {
         body: json.encode(body));
     return json.decode(response.body);
   }
+
+  static Future verifyTokenOTP(String token) async {
+    final response = await client.get(API_ENDPOINT + 'users/verify/token',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        });
+
+    return json.decode(response.body);
+  }
 }

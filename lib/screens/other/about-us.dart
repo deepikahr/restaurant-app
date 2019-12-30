@@ -9,7 +9,7 @@ import 'package:RestaurantSaas/localizations.dart'
 
 class AboutUs extends StatefulWidget {
   final Map<String, Map<String, String>> localizedValues;
-  String locale;
+  var locale;
   AboutUs({Key key, this.locale, this.localizedValues}) : super(key: key);
   @override
   _AboutUsState createState() => _AboutUsState();
@@ -31,8 +31,14 @@ class _AboutUsState extends State<AboutUs> {
         appBar: AppBar(
           backgroundColor: PRIMARY,
           elevation: 0.0,
+          centerTitle: true,
           title: Text(MyLocalizations.of(context).aboutUs),
-          leading: BackButton(),
+          leading: InkWell(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Icon(Icons.arrow_back),
+          ),
         ),
         body: new SingleChildScrollView(
           child: new Column(
@@ -46,7 +52,7 @@ class _AboutUsState extends State<AboutUs> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
                       new Text(
-                        'Restaurant Sass',
+                        MyLocalizations.of(context).restaurantSass,
                         style: titleBoldOSL(),
                       ),
                       new Padding(

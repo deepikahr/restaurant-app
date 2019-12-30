@@ -41,10 +41,8 @@ class ProfileService {
     await Common.getToken().then((onValue) {
       token = 'bearer ' + onValue;
     });
-    print("$token ");
     final response = await client.delete(API_ENDPOINT + 'users/profile/delete',
         headers: {'Content-Type': 'application/json', 'Authorization': token});
-    print(json.decode(response.body));
     return json.decode(response.body);
   }
 
@@ -53,14 +51,11 @@ class ProfileService {
     String token;
     await Common.getToken().then((onValue) {
       token = 'bearer ' + onValue;
-      print("id profile $id");
     });
-    // print("auto set $body");
 
     final response = await client.put(API_ENDPOINT + 'users/$id',
         headers: {'Content-Type': 'application/json', 'Authorization': token},
         body: json.encode(body));
-    print("set user info ${json.decode(response.body)}");
     return json.decode(response.body);
   }
 
@@ -70,11 +65,9 @@ class ProfileService {
     await Common.getToken().then((onValue) {
       token = 'bearer ' + onValue;
     });
-    print("id userprofile $id $body $token");
     final response = await client.put(API_ENDPOINT + 'users/userProfile/$id',
         headers: {'Content-Type': 'application/json', 'Authorization': token},
         body: json.encode(body));
-    print("set user info ${json.decode(response.body)}");
     return json.decode(response.body);
   }
 
@@ -86,23 +79,16 @@ class ProfileService {
     await Common.getToken().then((onValue) {
       authToken = 'bearer ' + onValue;
     });
-    print("token $authToken");
-    print("image $image");
-    print("stream $stream");
 
     var length = await image.length();
     String uri = API_ENDPOINT + 'users/upload/to/cloud';
-    print("$uri");
     var request = new http.MultipartRequest("POST", Uri.parse(uri));
     var multipartFile = new http.MultipartFile('file', stream, length,
         filename: basename(image.path));
-    //print(' $multipartFile');
     request.files.add(multipartFile);
     var response = await request.send();
-    print('$response');
     response.stream.transform(utf8.decoder).listen((value) {
       var profileImageRes;
-      print('value ${value.substring(value.length - 1, value.length)}');
       if (value.substring(value.length - 1, value.length) == "}") {
         profileImageRes = value;
       } else {
@@ -111,15 +97,11 @@ class ProfileService {
 
       if (value.length > 3) {
         var profileValue = json.decode(profileImageRes);
-        print('PROFILERES   $profileValue');
         // prefs.setString("logo", profileValue['url']);
-        print("auto set ${profileValue['public_id']} ${profileValue['url']}");
         ProfileService.setUserProfileInfo(id, {
           'publicId': profileValue['public_id'],
           'logo': profileValue['url']
-        }).then((dmdkc) {
-          print(dmdkc);
-        });
+        }).then((dmdkc) {});
       }
     });
   }
@@ -258,6 +240,41 @@ class ProfileService {
       token = 'bearer ' + onValue;
     });
     final response = await client.post(API_ENDPOINT + 'productRatings',
+        headers: {'Content-Type': 'application/json', 'Authorization': token},
+        body: json.encode(body));
+    return json.decode(response.body);
+  }
+
+  static Future<List<dynamic>> getCardList() async {
+    String token;
+    await Common.getToken().then((onValue) {
+      token = 'bearer ' + onValue;
+    });
+    final response = await client.get(
+      API_ENDPOINT + 'carddetails/list/byuser',
+      headers: {'Content-Type': 'application/json', 'Authorization': token},
+    );
+    return json.decode(response.body);
+  }
+
+  static Future<Map<String, dynamic>> placeOrderForCreditCard(
+      Map<String, dynamic> body) async {
+    String token;
+    await Common.getToken().then((onValue) {
+      token = 'bearer ' + onValue;
+    });
+    final response = await client.post(API_ENDPOINT + 'carddetails/payment/',
+        headers: {'Content-Type': 'application/json', 'Authorization': token},
+        body: json.encode(body));
+    return json.decode(response.body);
+  }
+
+  static Future<Map<String, dynamic>> addCard(body) async {
+    String token;
+    await Common.getToken().then((onValue) {
+      token = 'bearer ' + onValue;
+    });
+    final response = await client.post(API_ENDPOINT + 'carddetails',
         headers: {'Content-Type': 'application/json', 'Authorization': token},
         body: json.encode(body));
     return json.decode(response.body);

@@ -19,9 +19,14 @@ class LocationListPage extends StatefulWidget {
   final Map<String, dynamic> restaurantInfo;
   final List<dynamic> locations;
   final Map<String, Map<String, String>> localizedValues;
-  String locale;
+  var locale;
 
-  LocationListPage({Key key, this.restaurantInfo, this.locations, this.locale, this.localizedValues})
+  LocationListPage(
+      {Key key,
+      this.restaurantInfo,
+      this.locations,
+      this.locale,
+      this.localizedValues})
       : super(key: key);
 
   @override
@@ -31,22 +36,10 @@ class LocationListPage extends StatefulWidget {
 class _LocationListPageState extends State<LocationListPage> {
   int cartCount;
   @override
-
   void initState() {
-
     super.initState();
 //    selectedLanguage();
   }
-
-//  var selectedLanguage;
-//
-//  selectedLanguages() async {
-//    SharedPreferences prefs = await SharedPreferences.getInstance();
-//    setState(() {
-//      selectedLanguage = prefs.getString('selectedLanguage');
-//    });
-//    print('selectedLanguage ll............$selectedLanguage ${widget.localizedValues}');
-//  }
 
   Widget build(BuildContext context) {
     CounterModel().getCounter().then((res) {
@@ -54,7 +47,6 @@ class _LocationListPageState extends State<LocationListPage> {
         setState(() {
           cartCount = res;
         });
-        print("responce   $cartCount");
       } catch (error, stackTrace) {
         sentryError.reportError(error, stackTrace);
       }
@@ -85,7 +77,10 @@ class _LocationListPageState extends State<LocationListPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (BuildContext context) => CartPage(localizedValues: widget.localizedValues, locale: widget.locale,),
+                      builder: (BuildContext context) => CartPage(
+                        localizedValues: widget.localizedValues,
+                        locale: widget.locale,
+                      ),
                     ),
                   );
                 },
@@ -132,12 +127,18 @@ class _LocationListPageState extends State<LocationListPage> {
               LocationListSheet.buildSheetHeader(
                   widget.restaurantInfo['list']['logo'],
                   widget.restaurantInfo['list']['restaurantName'],
-                  widget.restaurantInfo['list']['reviewCount'], context),
+                  widget.restaurantInfo['list']['reviewCount'],
+                  context),
               LocationListSheet.buildOutletInfo(
                   widget.restaurantInfo['locationCount'], context),
               Divider(),
               LocationListSheet.buildLocationSheetView(
-                  context, widget.locations, widget.restaurantInfo, false, widget.localizedValues, widget.locale),
+                  context,
+                  widget.locations,
+                  widget.restaurantInfo,
+                  false,
+                  widget.localizedValues,
+                  widget.locale),
             ],
           ),
         ),

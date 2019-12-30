@@ -17,7 +17,8 @@ class OtpVerify extends StatefulWidget {
   final String otpToken;
   var locale;
   final Map<String, Map<String, String>> localizedValues;
-  OtpVerify({Key key, this.otpToken, this.locale, this.localizedValues}) : super(key: key);
+  OtpVerify({Key key, this.otpToken, this.locale, this.localizedValues})
+      : super(key: key);
   @override
   _OtpVerifyState createState() => _OtpVerifyState();
 }
@@ -35,28 +36,30 @@ class _OtpVerifyState extends State<OtpVerify> {
         isLoading = true;
       });
       AuthService.verifyOTP({'otp': otp}, widget.otpToken).then((onValue) {
-       try{
-         if (onValue['message'] != null) {
-           showSnackbar(onValue['message']);
-           if (onValue['token'] != null) {
-             Future.delayed(Duration(milliseconds: 1500), () {
-               Navigator.push(
-                 context,
-                 MaterialPageRoute(
-                   builder: (BuildContext context) =>
-                       NewPassword(otpToken: onValue['token'], locale: widget.locale, localizedValues: widget.localizedValues,),
-                 ),
-               );
-             });
-           }
-         }
-         setState(() {
-           isLoading = false;
-         });
-       }
-       catch (error, stackTrace) {
-         sentryError.reportError(error, stackTrace);
-       }
+        try {
+          if (onValue['message'] != null) {
+            showSnackbar(onValue['message']);
+            if (onValue['token'] != null) {
+              Future.delayed(Duration(milliseconds: 1500), () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => NewPassword(
+                      otpToken: onValue['token'],
+                      locale: widget.locale,
+                      localizedValues: widget.localizedValues,
+                    ),
+                  ),
+                );
+              });
+            }
+          }
+          setState(() {
+            isLoading = false;
+          });
+        } catch (error, stackTrace) {
+          sentryError.reportError(error, stackTrace);
+        }
       }).catchError((onError) {
         sentryError.reportError(onError, null);
         setState(() {
@@ -89,6 +92,15 @@ class _OtpVerifyState extends State<OtpVerify> {
       home: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
+          leading: InkWell(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Icon(
+              Icons.arrow_back,
+              color: Colors.white,
+            ),
+          ),
           title: Text(MyLocalizations.of(context).verifyOtp),
           centerTitle: true,
           backgroundColor: PRIMARY,
@@ -149,7 +161,7 @@ class _OtpVerifyState extends State<OtpVerify> {
                   flex: 9,
                   child: TextFormField(
                     decoration: new InputDecoration(
-                      labelText: "OTP",
+                      labelText:MyLocalizations.of(context).otp,
                       hintStyle: hintStyleGreyLightOSR(),
                       contentPadding: EdgeInsets.all(12.0),
                       border: InputBorder.none,

@@ -31,6 +31,7 @@ class MainService {
   static Future<dynamic> getAdvertisementList() async {
     final response =
         await client.get(API_ENDPOINT + 'locations/home/restaurant');
+    print(json.decode(response.body));
     return json.decode(response.body);
   }
 
@@ -54,6 +55,25 @@ class MainService {
 
   static Future<dynamic> getLoyaltyInfoByRestaurantId(String id) async {
     final response = await client.get(API_ENDPOINT + 'settings/$id');
+    return json.decode(response.body);
+  }
+
+  static Future<dynamic> getRestaurantOpenAndCloseTime(
+      String id, String time, String day) async {
+    final response = await client
+        .get(API_ENDPOINT + 'locations/timing/verify/$id/$time/$day');
+
+    return json.decode(response.body);
+  }
+
+  static Future<dynamic> getTodayAndOtherDaysWorkingTimimgs(
+      String id, String day, String time, String todayDay) async {
+    print(day);
+    print(time);
+    print(todayDay);
+    final response = await client
+        .get(API_ENDPOINT + 'locations/timing/slot/$id/$day/$time/$todayDay');
+    print(json.decode(response.body));
     return json.decode(response.body);
   }
 }

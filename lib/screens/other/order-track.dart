@@ -16,12 +16,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
 
-
 class OrderTrack extends StatefulWidget {
   final String orderId;
   final Map<String, Map<String, String>> localizedValues;
   var locale;
-  OrderTrack({Key key, this.orderId, this.locale, this.localizedValues}) : super(key: key);
+  OrderTrack({Key key, this.orderId, this.locale, this.localizedValues})
+      : super(key: key);
   @override
   OrderTrackState createState() => OrderTrackState();
 }
@@ -52,16 +52,25 @@ class OrderTrackState extends State<OrderTrack> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: prefix0.PRIMARY,
-        iconTheme: IconThemeData(color: Colors.white),
-        title: new Text(
-          MyLocalizations.of(context).trackOrder,
-        ),
-      ),
-      body: _retriveOrderTrack(),
-    );
+    return MaterialApp(
+        locale: Locale(widget.locale),
+        debugShowCheckedModeBanner: false,
+        localizationsDelegates: [
+          MyLocalizationsDelegate(widget.localizedValues),
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        supportedLocales: languages.map((language) => Locale(language, '')),
+        home: Scaffold(
+          appBar: AppBar(
+            backgroundColor: prefix0.PRIMARY,
+            iconTheme: IconThemeData(color: Colors.white),
+            title: new Text(
+              MyLocalizations.of(context).trackOrder,
+            ),
+          ),
+          body: _retriveOrderTrack(),
+        ));
   }
 
   Widget _buildOrderTrackBody(Map<String, dynamic> order) {
@@ -105,11 +114,7 @@ class OrderTrackState extends State<OrderTrack> {
                         children: <Widget>[
                           new Padding(padding: EdgeInsets.only(top: 0.0)),
                           new Text(
-                            MyLocalizations.of(context).orderProgress,
-                            style: textOSl(),
-                          ),
-                          new Text(
-                            '...',
+                            MyLocalizations.of(context).orderProgress + '...',
                             style: textOSl(),
                           ),
                         ],
@@ -118,9 +123,13 @@ class OrderTrackState extends State<OrderTrack> {
                     new Padding(padding: EdgeInsets.all(5.0)),
                     Column(
                       children: <Widget>[
-                        new Text('Order ID: ' + order['orderID'].toString()),
+                        new Text(MyLocalizations.of(context).orderID +
+                            ': ' +
+                            order['orderID'].toString()),
                         new Text(
-                          MyLocalizations.of(context).status + ': ${order['status']}',
+                          MyLocalizations.of(context).status +
+                              ': ' +
+                              order['status'],
                           style: TextStyle(color: Colors.green),
                         ),
                       ],
@@ -186,8 +195,9 @@ class OrderTrackState extends State<OrderTrack> {
                                 ),
                                 // new Padding(padding: EdgeInsets.only(top: 5.0)),
                                 new Text(
-                                  readTimestamp(
-                                      order['userNotification'][index]['time'], context),
+                                  DateFormat('dd-MMM-yy hh:mm a').format(
+                                      new DateTime.fromMillisecondsSinceEpoch(
+                                          order['createdAtTime'])),
                                   style: textOS(),
                                 ),
                               ],
@@ -205,9 +215,9 @@ class OrderTrackState extends State<OrderTrack> {
     );
   }
 
-  static String readTimestamp(int timestamp, context) {
+  static String readTimestamp(int timestamp) {
     var now = new DateTime.now();
-    var format = new DateFormat('HH:mm a dd/MM/yyyy');
+    var format = new DateFormat('hh:mma dd/MM/yyyy');
     var date = new DateTime.fromMillisecondsSinceEpoch(timestamp);
     var diff = now.difference(date);
     String time = '';
@@ -218,17 +228,186 @@ class OrderTrackState extends State<OrderTrack> {
       time = format.format(date);
     } else if (diff.inDays > 0 && diff.inDays < 7) {
       if (diff.inDays == 1) {
-        time = diff.inDays.toString() + ' ' + MyLocalizations.of(context).dayAgo;
+        time = diff.inDays.toString() + ' DAY AGO';
       } else {
-        time = diff.inDays.toString() + ' ' + MyLocalizations.of(context).daysAgo;
+        time = diff.inDays.toString() + ' DAYS AGO';
       }
     } else {
       if (diff.inDays == 7) {
-        time = (diff.inDays / 7).floor().toString() + ' ' + MyLocalizations.of(context).weekAgo;
+        time = (diff.inDays / 7).floor().toString() + ' WEEK AGO';
       } else {
-        time = (diff.inDays / 7).floor().toString() + ' ' + MyLocalizations.of(context).weeksAgo;
+        time = (diff.inDays / 7).floor().toString() + ' WEEKS AGO';
       }
     }
     return time;
   }
 }
+
+//   Widget _buildOrderTrackBody(Map<String, dynamic> order) {
+//     return SingleChildScrollView(
+//       child: new Column(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: <Widget>[
+//           Container(
+//             padding: EdgeInsets.all(10.0),
+//             color: Colors.black12,
+//             child: new Column(
+//               children: <Widget>[
+//                 new Row(
+//                   children: <Widget>[
+//                     Flexible(
+//                         flex: 2,
+//                         fit: FlexFit.tight,
+//                         child: new Column(
+//                           crossAxisAlignment: CrossAxisAlignment.start,
+//                           children: <Widget>[
+//                             new Container(
+//                               width: 25.0,
+//                               height: 25.0,
+//                               decoration: new BoxDecoration(
+//                                 shape: BoxShape.circle,
+//                                 color: PRIMARY,
+//                               ),
+//                               child: Icon(
+//                                 Icons.check,
+//                                 color: Colors.white,
+//                               ),
+//                             ),
+//                           ],
+//                         )),
+//                     Flexible(
+//                       flex: 12,
+//                       fit: FlexFit.tight,
+//                       child: new Column(
+//                         crossAxisAlignment: CrossAxisAlignment.start,
+//                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//                         children: <Widget>[
+//                           new Padding(padding: EdgeInsets.only(top: 0.0)),
+//                           new Text(
+//                             MyLocalizations.of(context).orderProgress,
+//                             style: textOSl(),
+//                           ),
+//                           new Text(
+//                             '...',
+//                             style: textOSl(),
+//                           ),
+//                         ],
+//                       ),
+//                     ),
+//                     new Padding(padding: EdgeInsets.all(5.0)),
+//                     Column(
+//                       children: <Widget>[
+//                         new Text('Order ID: ' + order['orderID'].toString()),
+//                         new Text(
+//                           MyLocalizations.of(context).status + ': ${order['status']}',
+//                           style: TextStyle(color: Colors.green),
+//                         ),
+//                       ],
+//                     )
+//                   ],
+//                 ),
+//               ],
+//             ),
+//           ),
+//           ListView.builder(
+//               physics: ScrollPhysics(),
+//               shrinkWrap: true,
+//               itemCount: order['userNotification'].length,
+//               itemBuilder: (BuildContext context, int index) {
+//                 return new Padding(
+//                   padding: EdgeInsets.all(10.0),
+//                   child: new Column(
+//                     children: <Widget>[
+//                       new Row(
+//                         children: <Widget>[
+//                           Flexible(
+//                             flex: 2,
+//                             fit: FlexFit.tight,
+//                             child: new Column(
+//                               crossAxisAlignment: CrossAxisAlignment.start,
+//                               children: <Widget>[
+//                                 // Padding(
+//                                 //     padding:
+//                                 //         EdgeInsets.only(top: 0.0, bottom: 10)),
+//                                 new Container(
+//                                   width: 20.0,
+//                                   height: 15.0,
+//                                   decoration: new BoxDecoration(
+//                                     shape: BoxShape.circle,
+//                                     color: PRIMARY,
+//                                   ),
+//                                 ),
+//                                 new Container(
+//                                   width: 3.0,
+//                                   height: 10.0,
+//                                   margin: EdgeInsets.only(left: 9.0, top: 5.0),
+//                                   decoration: new BoxDecoration(
+//                                     border: Border.all(color: Colors.grey),
+//                                     color: Colors.grey,
+//                                   ),
+//                                 ),
+//                               ],
+//                             ),
+//                           ),
+//                           Flexible(
+//                             flex: 12,
+//                             fit: FlexFit.tight,
+//                             child: Column(
+//                               crossAxisAlignment: CrossAxisAlignment.start,
+//                               mainAxisAlignment: MainAxisAlignment.start,
+//                               children: <Widget>[
+//                                 new Text(
+//                                   (index + 1).toString() +
+//                                       '. ' +
+//                                       order['userNotification'][index]
+//                                           ['status'],
+//                                   style: textOSl(),
+//                                 ),
+//                                 // new Padding(padding: EdgeInsets.only(top: 5.0)),
+//                                 new Text(
+//                                   readTimestamp(
+//                                       order['userNotification'][index]['time'], context),
+//                                   style: textOS(),
+//                                 ),
+//                               ],
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                     ],
+//                   ),
+//                 );
+//               }),
+//           Divider(),
+//         ],
+//       ),
+//     );
+//   }
+
+//   static String readTimestamp(int timestamp, context) {
+//     var now = new DateTime.now();
+//     var format = new DateFormat('HH:mm a dd/MM/yyyy');
+//     var date = new DateTime.fromMillisecondsSinceEpoch(timestamp);
+//     var diff = now.difference(date);
+//     String time = '';
+//     if (diff.inSeconds <= 0 ||
+//         diff.inSeconds > 0 && diff.inMinutes == 0 ||
+//         diff.inMinutes > 0 && diff.inHours == 0 ||
+//         diff.inHours > 0 && diff.inDays == 0) {
+//       time = format.format(date);
+//     } else if (diff.inDays > 0 && diff.inDays < 7) {
+//       if (diff.inDays == 1) {
+//         time = diff.inDays.toString() + ' ' + MyLocalizations.of(context).dayAgo;
+//       } else {
+//         time = diff.inDays.toString() + ' ' + MyLocalizations.of(context).daysAgo;
+//       }
+//     } else {
+//       if (diff.inDays == 7) {
+//         time = (diff.inDays / 7).floor().toString() + ' ' + MyLocalizations.of(context).weekAgo;
+//       } else {
+//         time = (diff.inDays / 7).floor().toString() + ' ' + MyLocalizations.of(context).weeksAgo;
+//       }
+//     }
+//     return time;
+//   }
+// }

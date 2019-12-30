@@ -1,12 +1,13 @@
 import 'package:RestaurantSaas/screens/other/CounterModel.dart';
+import 'package:RestaurantSaas/services/auth-service.dart';
+import 'package:RestaurantSaas/services/common.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'initialize_i18n.dart' show initializeI18n;
 import 'constant.dart' show languages;
-import 'localizations.dart'
-    show MyLocalizations, MyLocalizationsDelegate;
+import 'localizations.dart' show MyLocalizations, MyLocalizationsDelegate;
 
 import './styles/styles.dart';
 import './services/constant.dart';
@@ -36,11 +37,33 @@ main() async {
       Zone.current.handleUncaughtError(details.exception, details.stack);
     }
   };
-
+  tokenCheck();
   runZoned<Future<Null>>(() async {
-    runApp(new EntryPage(_locale, localizedValues,));
+    runApp(new EntryPage(
+      _locale,
+      localizedValues,
+    ));
   }, onError: (error, stackTrace) async {
     await sentryError.reportError(error, stackTrace);
+  });
+}
+
+void tokenCheck() {
+  Common.getToken().then((tokenVerification) async {
+    print(tokenVerification);
+    if (tokenVerification != null) {
+      AuthService.verifyTokenOTP(tokenVerification).then((verifyInfo) async {
+        print(verifyInfo);
+
+        if (verifyInfo['success'] == true) {
+          print(verifyInfo['success']);
+        } else {
+          Common.removeToken().then((removeVerification) async {
+            print(removeVerification);
+          });
+        }
+      });
+    } else {}
   });
 }
 
@@ -54,7 +77,6 @@ void initOneSignal() {
   );
 }
 
-
 class EntryPage extends StatefulWidget {
   final Map<String, Map<String, String>> localizedValues;
   var locale;
@@ -64,7 +86,6 @@ class EntryPage extends StatefulWidget {
 }
 
 class _EntryPageState extends State<EntryPage> {
-
   @override
   void initState() {
     super.initState();
@@ -78,14 +99,13 @@ class _EntryPageState extends State<EntryPage> {
     setState(() {
       selectedLanguage = prefs.getString('selectedLanguage');
     });
-    print('selectedLanguage............$selectedLanguage ${widget.localizedValues}');
   }
 
   @override
   Widget build(BuildContext context) {
-
     return MaterialApp(
-        locale: Locale(selectedLanguage == null ? widget.locale : selectedLanguage),
+        locale:
+            Locale(selectedLanguage == null ? widget.locale : selectedLanguage),
         localizationsDelegates: [
           MyLocalizationsDelegate(widget.localizedValues),
           GlobalMaterialLocalizations.delegate,
@@ -102,10 +122,8 @@ class _EntryPageState extends State<EntryPage> {
         home: ChangeNotifierProvider<CounterModel>(
             builder: (_) => CounterModel(),
             child: HomePage(
-                locale:selectedLanguage == null ? widget.locale : selectedLanguage,
-                localizedValues: widget.localizedValues
-            )
-        )
-    );
+                locale:
+                    selectedLanguage == null ? widget.locale : selectedLanguage,
+                localizedValues: widget.localizedValues)));
   }
 }
