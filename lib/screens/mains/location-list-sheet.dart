@@ -33,10 +33,20 @@ class LocationListSheet extends StatelessWidget {
   final GlobalKey<AsyncLoaderState> _asyncLoaderState =
       GlobalKey<AsyncLoaderState>();
   int cartCount;
+
+
   getLocationListByRestaurantId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    currency = prefs.getString('currency');
+    print('currency............. $currency');
     return await MainService.getLocationsByRestaurantId(
         restaurantInfo['list']['_id']);
   }
+
+
+  String currency;
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -53,8 +63,7 @@ class LocationListSheet extends StatelessWidget {
           );
         },
         renderSuccess: ({data}) {
-          return buildLocationSheetView(
-              context, data, restaurantInfo, true, localizedValues, locale);
+          return buildLocationSheetView(context, data, restaurantInfo, true, localizedValues, locale, currency);
         });
 
     return Container(
@@ -136,9 +145,8 @@ class LocationListSheet extends StatelessWidget {
       deliveryChargeText = data[index]['location']['deliveryInfo']
               ['deliveryInfo']['freeDelivery']
           ? 'No Delivery charge'
-          : 'Delivery charge \$' +
-              data[index]['location']['deliveryInfo']['deliveryInfo']
-                      ['deliveryCharges']
+          : 'Delivery charge $currency' +
+              data[index]['deliveryInfo']['deliveryInfo']['deliveryCharges']
                   .toString();
       freeDeliveryText = data[index]['location']['deliveryInfo']['deliveryInfo']
               ['freeDelivery']

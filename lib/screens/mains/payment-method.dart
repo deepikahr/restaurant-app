@@ -242,6 +242,16 @@ class _PaymentMethodState extends State<PaymentMethod> {
     fetchCardInfo();
     getPaymentMethod();
     super.initState();
+//    selectedLanguages();
+  getGlobalSettingsData();
+  }
+
+  String currency;
+
+  getGlobalSettingsData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    currency = prefs.getString('currency');
+    print('currency............. $currency');
   }
 
   @override

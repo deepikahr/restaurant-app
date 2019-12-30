@@ -54,6 +54,21 @@ class _OrderDetailsState extends State<OrderDetails> {
   }
 
   @override
+  void initState() {
+    super.initState();
+//    selectedLanguages();
+    getGlobalSettingsData();
+  }
+
+  String currency;
+
+  getGlobalSettingsData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    currency = prefs.getString('currency');
+    print('currency............. $currency');
+  }
+
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
         locale: Locale(widget.locale),
@@ -316,7 +331,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                             child: new Text(
                               order['productDetails'][index]['Quantity']
                                       .toString() +
-                                  'x\$' +
+                                  'x$currency' +
                                   order['productDetails'][index]['price']
                                       .toStringAsFixed(2),
                               textAlign: TextAlign.end,
@@ -340,7 +355,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                     )),
                     Expanded(
                         child: new Text(
-                      '\$' + order['subTotal'].toStringAsFixed(2),
+                      '$currency' + order['subTotal'].toStringAsFixed(2),
                       textAlign: TextAlign.end,
                       style: textOS(),
                     ))
@@ -372,7 +387,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                     )),
                     Expanded(
                         child: new Text(
-                      '\$' + order['deliveryCharge'].toString(),
+                      '$currency' + order['deliveryCharge'].toString(),
                       textAlign: TextAlign.end,
                       style: textOS(),
                     ))
@@ -388,7 +403,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                     )),
                     Expanded(
                         child: new Text(
-                      '\$' + order['grandTotal'].toStringAsFixed(2),
+                      '$currency' + order['grandTotal'].toStringAsFixed(2),
                       textAlign: TextAlign.end,
                       style: textOSl(),
                     ))

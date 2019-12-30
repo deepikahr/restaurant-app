@@ -117,136 +117,299 @@ class _drawerState extends State<drawer> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        child: Drawer(
-            child: MaterialApp(
-      locale: Locale(widget.locale),
-      debugShowCheckedModeBanner: false,
-      localizationsDelegates: [
-        MyLocalizationsDelegate(widget.localizedValues),
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ],
-      supportedLocales: languages.map((language) => Locale(language, '')),
-      home: Container(
-        child: Drawer(
-          child: Center(
-            child: ListView(
-              children: <Widget>[
-                Stack(
-                  fit: StackFit.passthrough,
-                  children: <Widget>[
-                    _buildMenuBg(),
-                    Column(
-                      children: <Widget>[
-                        _buildMenuProfileLogo(profileImage),
-                        fullname != null
-                            ? Text(fullname.toUpperCase(),
-                                style: TextStyle(color: Colors.white))
-                            : Container(height: 0, width: 0),
-                        _buildMenuTileList(
-                          'lib/assets/icon/spoon.png',
-                          MyLocalizations.of(context).home,
-                          0,
-                          route: HomePage(
-                            locale: widget.locale,
-                            localizedValues: widget.localizedValues,
-                          ),
-                        ),
-                        _buildMenuTileList(
-                          'lib/assets/icon/carte.png',
-                          MyLocalizations.of(context).cart,
-                          cartCounter != null ? cartCounter : 0,
-                          route: CartPage(
-                            locale: widget.locale,
-                            localizedValues: widget.localizedValues,
-                          ),
-                        ),
-                        // _buildMenuTileList(
-                        //   'lib/assets/icon/carte.png',
-                        //   MyLocalizations.of(context).o,
-                        //   0,
-                        //   route: offers(
-                        //     locale: widget.locale,
-                        //     localizedValues: widget.localizedValues,
-                        //   ),
-                        // ),
-                        isLoggedIn
-                            ? _buildMenuTileList(
-                                'lib/assets/icon/orderHistory.png',
-                                MyLocalizations.of(context).myOrders,
-                                0,
-                                route: OrdersPage(
-                                  locale: widget.locale,
-                                  localizedValues: widget.localizedValues,
-                                ),
-                              )
-                            : Container(height: 0, width: 0),
-                        isLoggedIn
-                            ? _buildMenuTileList(
-                                'lib/assets/icon/favorite.png',
-                                MyLocalizations.of(context).favourites,
-                                0,
-                                route: Favorites(
-                                  locale: widget.locale,
-                                  localizedValues: widget.localizedValues,
-                                ),
-                              )
-                            : Container(height: 0, width: 0),
-                        // isLoggedIn
-                        //     ? _buildMenuTileList('lib/assets/icon/chat.png',
-                        //         MyLocalizations.of(context).chat, 0,
-                        //         route: Chat(
-                        //           locale: widget.locale,
-                        //           localizedValues: widget.localizedValues,
-                        //         ))
-                        //     : Container(height: 0, width: 0),
-                        isLoggedIn
-                            ? _buildMenuTileList(
-                                'lib/assets/icon/settings.png',
-                                MyLocalizations.of(context).profile,
-                                0,
-                                route: ProfileApp(
-                                    locale: widget.locale,
-                                    localizedValues: widget.localizedValues),
-                              )
-                            : Container(height: 0, width: 0),
-                        _buildMenuTileList(
-                          'lib/assets/icon/about.png',
-                          MyLocalizations.of(context).aboutUs,
-                          0,
-                          route: AboutUs(
-                            locale: widget.locale,
-                            localizedValues: widget.localizedValues,
-                          ),
-                        ),
-                        !isLoggedIn
-                            ? _buildMenuTileList(
-                                'lib/assets/icon/loginIcon.png',
-                                MyLocalizations.of(context).login,
-                                0,
-                                route: LoginPage(
-                                  locale: widget.locale,
-                                  localizedValues: widget.localizedValues,
-                                ),
-                              )
-                            : Container(height: 0, width: 0),
-                        isLoggedIn
-                            ? _buildMenuTileList(
-                                'lib/assets/icon/loginIcon.png',
-                                MyLocalizations.of(context).logout,
-                                0,
-                                check: false)
-                            : Container(height: 0, width: 0),
-                      ],
+        child: new Drawer(
+              child: MaterialApp(
+                locale: Locale(widget.locale),
+                debugShowCheckedModeBanner: false,
+                localizationsDelegates: [
+                  MyLocalizationsDelegate(widget.localizedValues),
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                ],
+                supportedLocales: languages.map((language) => Locale(language, '')),
+                home: Center(
+                  child: new Container(
+                  alignment: FractionalOffset.center,
+                  decoration: new BoxDecoration(
+                    image: new DecorationImage(
+                      image: AssetImage("lib/assets/bgImgs/confirmedbg.png"),
+                      fit: BoxFit.fill,
+                      //     height: 710.0,
+                      colorFilter: new ColorFilter.mode(
+                          Colors.black.withOpacity(0.65), BlendMode.lighten),
                     ),
-                  ],
+                  ),
+                  child: new ListView(
+                    children: <Widget>[
+//                      fullname == null && profilePic == null
+//                          ? Container(
+//                              height: 100.0,
+//                            )
+//                          : Row(children: <Widget>[
+//                              Flexible(
+//                                  flex: 3,
+//                                  fit: FlexFit.tight,
+//                                  child: Container(
+//                                    padding: EdgeInsets.only(
+//                                        left: 20.0, right: 20.0, top: 20.0),
+//                                    height: 80.0,
+//                                    child: profilePic != null
+//                                        ? new CircleAvatar(
+//                                            backgroundImage: new NetworkImage(
+//                                              "$profilePic",
+//                                            ),
+//                                          )
+//                                        : new CircleAvatar(
+//                                            backgroundImage: new AssetImage(
+//                                                'lib/assets/imgs/na.jpg')),
+//                                  )),
+//                              Flexible(
+//                                  flex: 6,
+//                                  fit: FlexFit.tight,
+//                                  child: Column(
+//                                      crossAxisAlignment: CrossAxisAlignment.start,
+//                                      children: <Widget>[
+//                                        Padding(
+//                                          padding: EdgeInsets.only(
+//                                              top: 13.0, bottom: 3.0),
+//                                          child: new Text(
+//                                              "${fullname == null ? "" : fullname}",
+//                                              style: TextStyle(
+//                                                  color: Colors.white,
+//                                                  fontFamily: "bold")),
+//                                        ),
+//                                      ]))
+//                            ]),
+                    ListTile(
+                      leading: Container(
+                                    padding: EdgeInsets.only(
+                                        left: 20.0, right: 20.0, top: 20.0),
+                                    height: 180.0,
+                                    child: profilePic != null
+                                        ? new ClipOval(
+                                            child: Image(
+                                              image: NetworkImage(
+                                                "$profilePic",
+                                              ),
+                                            )
+                                          )
+                                        : new CircleAvatar(
+                                            backgroundImage: new AssetImage(
+                                                'lib/assets/imgs/na.jpg')),
+                                  ),
+                      title: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                      Padding(
+                      padding: EdgeInsets.only(
+                          top: 13.0, bottom: 3.0),
+                  child: new Text(
+                      "${fullname == null ? "" : fullname}",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: "bold")),
                 ),
-              ],
+              ]),
+                    ),
+                      new ListTile(
+                        title: new Text(MyLocalizations.of(context).home,
+                            style:
+                                TextStyle(color: Colors.white, fontFamily: "bold")),
+                        leading:
+                            Image.asset("lib/assets/icon/spoon.png", width: 25.0),
+                        trailing: new Icon(
+                          Icons.keyboard_arrow_right,
+                          color: Colors.white70,
+                        ),
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (BuildContext context) => HomePage(
+                                locale: widget.locale,
+                                localizedValues: widget.localizedValues,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      new ListTile(
+                        title: new Text(
+                            MyLocalizations.of(context).cart +
+                                "   ${cartCounter == 0 || cartCounter == null ? "" : cartCounter.toString()}",
+                            style:
+                                TextStyle(color: Colors.white, fontFamily: "bold")),
+                        leading:
+                            Image.asset("lib/assets/icon/carte.png", width: 25.0),
+                        trailing: new Icon(
+                          Icons.keyboard_arrow_right,
+                          color: Colors.white70,
+                        ),
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (BuildContext context) => CartPage(),
+                            ),
+                          );
+                        },
+                      ),
+                      isLoggedIn
+                          ? new ListTile(
+                              title: new Text(MyLocalizations.of(context).myOrders,
+                                  style: TextStyle(
+                                      color: Colors.white, fontFamily: "bold")),
+                              leading: Image.asset(
+                                  'lib/assets/icon/orderHistory.png',
+                                  width: 25.0),
+                              trailing: new Icon(
+                                Icons.keyboard_arrow_right,
+                                color: Colors.white70,
+                              ),
+                              onTap: () {
+                                Navigator.of(context).pop();
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (BuildContext context) => OrdersPage(locale: widget.locale, localizedValues: widget.localizedValues,),
+                                  ),
+                                );
+                              },
+                            )
+                          : Container(),
+                      isLoggedIn
+                          ? new ListTile(
+                              title: new Text(
+                                  MyLocalizations.of(context).favourites,
+                                  style: TextStyle(
+                                      color: Colors.white, fontFamily: "bold")),
+                              leading: Image.asset('lib/assets/icon/favorite.png',
+                                  width: 25.0),
+                              trailing: new Icon(
+                                Icons.keyboard_arrow_right,
+                                color: Colors.white70,
+                              ),
+                              onTap: () {
+                                Navigator.of(context).pop();
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (BuildContext context) => Favorites(locale: widget.locale, localizedValues: widget.localizedValues,),
+                                  ),
+                                );
+                              },
+                            )
+                          : Container(),
+                      isLoggedIn
+                          ? new ListTile(
+                              title: new Text(MyLocalizations.of(context).profile,
+                                  style: TextStyle(
+                                      color: Colors.white, fontFamily: "bold")),
+                              leading: Image.asset('lib/assets/icon/settings.png',
+                                  width: 25.0),
+                              trailing: new Icon(
+                                Icons.keyboard_arrow_right,
+                                color: Colors.white70,
+                              ),
+                              onTap: () {
+                                Navigator.of(context).pop();
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (BuildContext context) => ProfileApp(
+                                        locale: widget.locale,
+                                        localizedValues: widget.localizedValues),
+                                  ),
+                                );
+                              },
+                            )
+                          : Container(),
+                      new ListTile(
+                        title: new Text(MyLocalizations.of(context).aboutUs,
+                            style:
+                                TextStyle(color: Colors.white, fontFamily: "bold")),
+                        leading:
+                            Image.asset('lib/assets/icon/about.png', width: 25.0),
+                        trailing: new Icon(
+                          Icons.keyboard_arrow_right,
+                          color: Colors.white70,
+                        ),
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (BuildContext context) => AboutUs(
+                                  locale: widget.locale,
+                                  localizedValues: widget.localizedValues),
+                            ),
+                          );
+                        },
+                      ),
+                      !isLoggedIn
+                          ? new ListTile(
+                              leading: Image.asset("lib/assets/icon/loginIcon.png",
+                                  width: 25.0),
+                              title: new Text(MyLocalizations.of(context).login,
+                                  style: TextStyle(
+                                      color: Colors.white, fontFamily: "bold")),
+                              trailing: new Icon(
+                                Icons.exit_to_app,
+                                color: Colors.white70,
+                              ),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (BuildContext context) => LoginPage(
+                                      isDrawe: true,
+                                      locale: widget.locale,
+                                      localizedValues: widget.localizedValues,
+                                    ),
+                                  ),
+                                );
+                              })
+                          : Container(),
+                      isLoggedIn
+                          ? new ListTile(
+                              leading: Image.asset("lib/assets/icon/loginIcon.png",
+                                  width: 25.0),
+                              title: new Text(MyLocalizations.of(context).logout,
+                                  style: TextStyle(
+                                      color: Colors.white, fontFamily: "bold")),
+                              trailing: new Icon(
+                                Icons.exit_to_app,
+                                color: Colors.white70,
+                              ),
+                              onTap: () {
+                                Common.removeToken().then((onValue) {
+                                  setState(() {
+                                    isLoggedIn = false;
+                                  });
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (BuildContext context) =>
+                                              HomePage(
+                                                  locale: widget.locale,
+                                                  localizedValues:
+                                                      widget.localizedValues)));
+                                  showSnackbar('Logout Successfully!');
+                                  // Navigator.pop(context);
+                                });
+                              })
+                          : Container(
+                              height: 50.0,
+                            ),
+                    ],
+                  ),
+              ),
+                ),
             ),
           ),
-        ),
-      ),
-    )));
+    );
   }
 
   Widget _buildMenuBg() {

@@ -226,8 +226,15 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
   void initState() {
     super.initState();
 //    selectedLanguages();
-    print(widget.localizedValues);
-    print(widget.locale);
+  getGlobalSettingsData();
+  }
+
+  String currency;
+
+  getGlobalSettingsData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    currency = prefs.getString('currency');
+    print('currency............. $currency');
   }
 
 //  var selectedLanguage;
@@ -362,7 +369,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                 style: hintStyleSmallWhiteLightOSL(),
               ),
               new Text(
-                '\$' + widget.cart['grandTotal'].toStringAsFixed(2),
+                '$currency' + widget.cart['grandTotal'].toStringAsFixed(2),
                 style: hintStyleSmallWhiteLightOSL(),
               ),
             ],
@@ -1294,7 +1301,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                           flex: 3,
                           fit: FlexFit.tight,
                           child: new Text(
-                            '\$' +
+                            '$currency' +
                                 products[index]['totalPrice']
                                     .toStringAsFixed(2),
                             style: hintStyleOSB(),
@@ -1367,7 +1374,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
             style: titleBlackLightOSB(),
           ),
           new Text(
-            '\$' + value.toStringAsFixed(2),
+            '$currency' + value.toStringAsFixed(2),
             style: textLightOSR(),
           ),
         ],
@@ -1508,8 +1515,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                   ),
                   new Padding(padding: EdgeInsets.only(top: 5.0)),
                   new Text(
-                    MyLocalizations.of(context).total +
-                        ': \$ ${widget.cart['grandTotal'].toStringAsFixed(2)}',
+                    MyLocalizations.of(context).total + ': $currency ${widget.cart['grandTotal'].toStringAsFixed(2)}',
                     style: titleWhiteBoldOSB(),
                   ),
                 ],

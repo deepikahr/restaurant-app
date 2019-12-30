@@ -125,6 +125,7 @@ class _ProductListPageState extends State<ProductListPage> {
     print(widget.cuisine);
     getRestaurantOpenAndCloseTime();
     super.initState();
+    getGlobalSettingsData();
 //    selectedLanguage();
   }
 
@@ -730,7 +731,7 @@ class _ProductListPageState extends State<ProductListPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Text(
-                '\$' + price.toStringAsFixed(2),
+                '$currency' + price.toStringAsFixed(2),
                 style: subTitleDarkBoldOSS(),
               ),
               Container(
@@ -766,7 +767,7 @@ class _ProductListPageState extends State<ProductListPage> {
                 child: Padding(
                   padding: EdgeInsets.only(left: 5.0, right: 5.0),
                   child: Text(
-                    '\$ ' + mrp.toStringAsFixed(2),
+                    '$currency ' + mrp.toStringAsFixed(2),
                     style: hintStyleSmallWhiteLightOSSStrike(),
                   ),
                 ),

@@ -40,6 +40,21 @@ class OrderUpcomingState extends State<OrderUpcoming>
   }
 
   @override
+  void initState() {
+    super.initState();
+//    selectedLanguages();
+    getGlobalSettingsData();
+  }
+
+  String currency;
+
+  getGlobalSettingsData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    currency = prefs.getString('currency');
+    print('currency............. $currency');
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AsyncLoader(
         key: _asyncLoaderState,

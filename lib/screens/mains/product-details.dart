@@ -123,7 +123,16 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
     _calculatePrice();
     super.initState();
+    getGlobalSettingsData();
 //    selectedLanguages();
+  }
+
+  String currency;
+
+  getGlobalSettingsData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    currency = prefs.getString('currency');
+    print('currency............. $currency');
   }
 
 //  var selectedLanguage;
@@ -504,7 +513,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           child: Padding(
                               padding: const EdgeInsets.only(right: 15.0),
                               child: new Text(
-                                '\$' +
+                                currency +
                                     (extras[index]['price']).toStringAsFixed(2),
                                 textAlign: TextAlign.end,
                                 style: hintStyleTitleBlueOSR(),
@@ -560,7 +569,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   : Text(''),
               secondary: sizes[index]['price'] != null
                   ? new Text(
-                      '\$' + sizes[index]['price'].toStringAsFixed(2),
+                      currency + sizes[index]['price'].toStringAsFixed(2),
                       textAlign: TextAlign.end,
                       style: hintStyleTitleBlueOSR(),
                     )
@@ -649,7 +658,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               style: hintStyleWhiteLightOSB(),
             ),
             new Text(
-              '\$' + price.toStringAsFixed(2),
+              currency + price.toStringAsFixed(2),
               style: titleLightWhiteOSR(),
             ),
           ],

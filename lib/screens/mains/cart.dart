@@ -55,6 +55,16 @@ class _CartPageState extends State<CartPage> {
     _calculateCart();
 
     super.initState();
+//    selectedLanguage();
+    getGlobalSettingsData();
+  }
+
+  String currency;
+
+  getGlobalSettingsData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    currency = prefs.getString('currency');
+    print('currency............. $currency');
   }
 
   void _calculateCart() async {
@@ -347,7 +357,7 @@ class _CartPageState extends State<CartPage> {
                                 style: hintStylePrimaryOSR(),
                               ),
                         Text(
-                          '\$' + products[index]['price'].toStringAsFixed(2),
+                          '$currency' + products[index]['price'].toStringAsFixed(2),
                           style: titleBlackBoldOSB(),
                         ),
                         IconButton(
@@ -428,7 +438,7 @@ class _CartPageState extends State<CartPage> {
                     Expanded(
                       flex: 4,
                       child: new Text(
-                        '\$' +
+                        '$currency' +
                             extraIngredients[index]['price'].toStringAsFixed(2),
                         //  style: darkTextSmallHN(),
                       ),
@@ -453,7 +463,7 @@ class _CartPageState extends State<CartPage> {
             style: titleBlackLightOSB(),
           ),
           new Text(
-            '\$' + value.toStringAsFixed(2),
+            '$currency' + value.toStringAsFixed(2),
             style: textPrimaryOSR(),
           ),
         ],
@@ -477,9 +487,7 @@ class _CartPageState extends State<CartPage> {
             new Padding(padding: EdgeInsets.only(top: 5.0)),
             new Text(
               // //delivery charge deducted because of above line are commented to disable delivery charge in this page
-              MyLocalizations.of(context).total +
-                  ': \$' +
-                  (grandTotal - deliveryCharge).toStringAsFixed(2),
+              MyLocalizations.of(context).total + ': $currency' + (grandTotal - deliveryCharge).toStringAsFixed(2),
               style: titleWhiteBoldOSB(),
             )
           ],

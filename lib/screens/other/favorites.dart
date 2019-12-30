@@ -36,6 +36,20 @@ class _FavoritesState extends State<Favorites> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    getGlobalSettingsData();
+  }
+
+  String currency;
+
+  getGlobalSettingsData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    currency = prefs.getString('currency');
+    print('currency............. $currency');
+  }
+
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
       locale: Locale(widget.locale),
@@ -164,7 +178,7 @@ class _FavoritesState extends State<Favorites> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
-                          Text('\$' +
+                          Text('$currency' +
                               favs[index]['product']['variants'][0]['price']
                                   .toStringAsFixed(2)),
                           Divider(),

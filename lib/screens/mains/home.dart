@@ -104,8 +104,27 @@ class HomePageState extends State<HomePage> {
     super.initState();
     _checkLoginStatus();
 //    selectedLanguages();
-    print(widget.locale);
-    print(widget.localizedValues);
+    getGlobalSettingsData();
+  }
+
+  getGlobalSettingsData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await MainService.getAdminSettings().then((onValue) {
+      try{
+        var adminSettings = onValue;
+        print('on.............. ${adminSettings['currency']['currencyName']}');
+        if(adminSettings['currency'] == null){
+          prefs.setString('currency', '\$');
+        }else{
+          prefs.setString('currency', '${adminSettings['currency']['currencySymbol']}');
+        }
+      }
+      catch (error, stackTrace) {
+        sentryError.reportError(error, stackTrace);
+      }
+    }).catchError((error){
+      sentryError.reportError(error, null);
+    });
   }
 
   String fullname;
