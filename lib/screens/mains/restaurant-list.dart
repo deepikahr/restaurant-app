@@ -23,9 +23,10 @@ SentryError sentryError = new SentryError();
 class RestaurantListPage extends StatefulWidget {
   final String title;
   final Map<String, Map<String, String>> localizedValues;
-  String locale;
+  var locale;
 
-  RestaurantListPage({Key key, this.title, this.locale, this.localizedValues}) : super(key: key);
+  RestaurantListPage({Key key, this.title, this.locale, this.localizedValues})
+      : super(key: key);
 
   @override
   _RestaurantListPageState createState() => _RestaurantListPageState();
@@ -40,9 +41,9 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   getRestaurantsList() async {
-    if (widget.title == 'Top Rated') {
+    if (widget.title == MyLocalizations.of(context).topRated) {
       return await MainService.getTopRatedRestaurants();
-    } else if (widget.title == 'Newly Arrived') {
+    } else if (widget.title == MyLocalizations.of(context).newlyArrived) {
       return await MainService.getNewlyArrivedRestaurants();
     } else {
       List<dynamic> restaurants;
@@ -64,26 +65,7 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
   }
 
   @override
-  void initState() {
-    // TODO: implement initState
-
-    super.initState();
-//    selectedLanguage();
-  }
-
-//  var selectedLanguage;
-//
-//  selectedLanguages() async {
-//    SharedPreferences prefs = await SharedPreferences.getInstance();
-//    setState(() {
-//      selectedLanguage = prefs.getString('selectedLanguage');
-//    });
-//    print('selectedLanguage rl............$selectedLanguage ${widget.localizedValues}');
-//  }
-
-  @override
   Widget build(BuildContext context) {
-
 //    String review = MyLocalizations.of(context).reviews;
 
     CounterModel().getCounter().then((res) {
@@ -91,69 +73,80 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
         setState(() {
           cartCount = res;
         });
-        print("responcencdc   $cartCount");
       } catch (error, stackTrace) {
         sentryError.reportError(error, stackTrace);
       }
     }).catchError((onError) {
       sentryError.reportError(onError, null);
     });
-    return Scaffold(
-      key: scaffoldKey,
-      appBar: AppBar(
-        backgroundColor: PRIMARY,
-        elevation: 0.0,
-        title: Text(
-          widget.title + ' Restaurants',
-          style: titleBoldWhiteOSS(),
-        ),
-        centerTitle: true,
-        actions: <Widget>[
-          GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => CartPage(locale: widget.locale, localizedValues: widget.localizedValues,),
-                  ),
-                );
-              },
-              child: Stack(
-                children: <Widget>[
-                  Container(
-                      padding: EdgeInsets.only(top: 20.0, right: 10),
-                      child: Icon(Icons.shopping_cart)),
-                  Positioned(
-                      right: 3,
-                      top: 5,
-                      child: (cartCount == null || cartCount == 0)
-                          ? Text(
-                              '',
-                              style: TextStyle(fontSize: 14.0),
-                            )
-                          : Container(
-                              height: 20,
-                              width: 20,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.black,
-                              ),
-                              child: Text('${cartCount.toString()}',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontFamily: "bold",
-                                      fontSize: 11)),
-                            )),
-                ],
-              )),
-          Padding(padding: EdgeInsets.only(left: 7.0)),
-          // buildLocationIcon(),
-          // Padding(padding: EdgeInsets.only(left: 7.0)),
+    return MaterialApp(
+        locale: Locale(widget.locale),
+        debugShowCheckedModeBanner: false,
+        localizationsDelegates: [
+          MyLocalizationsDelegate(widget.localizedValues),
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
         ],
-      ),
-      body: _buildGetRestaurantLoader(),
-    );
+        supportedLocales: languages.map((language) => Locale(language, '')),
+        home: Scaffold(
+          key: scaffoldKey,
+          appBar: AppBar(
+            backgroundColor: PRIMARY,
+            elevation: 0.0,
+            title: Text(
+              widget.title + MyLocalizations.of(context).restaurants,
+              style: titleBoldWhiteOSS(),
+            ),
+            centerTitle: true,
+            actions: <Widget>[
+              GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (BuildContext context) => CartPage(
+                          locale: widget.locale,
+                          localizedValues: widget.localizedValues,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Stack(
+                    children: <Widget>[
+                      Container(
+                          padding: EdgeInsets.only(top: 20.0, right: 10),
+                          child: Icon(Icons.shopping_cart)),
+                      Positioned(
+                          right: 3,
+                          top: 5,
+                          child: (cartCount == null || cartCount == 0)
+                              ? Text(
+                                  '',
+                                  style: TextStyle(fontSize: 14.0),
+                                )
+                              : Container(
+                                  height: 20,
+                                  width: 20,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.black,
+                                  ),
+                                  child: Text('${cartCount.toString()}',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontFamily: "bold",
+                                          fontSize: 11)),
+                                )),
+                    ],
+                  )),
+              Padding(padding: EdgeInsets.only(left: 7.0)),
+              // buildLocationIcon(),
+              // Padding(padding: EdgeInsets.only(left: 7.0)),
+            ],
+          ),
+          body: _buildGetRestaurantLoader(),
+        ));
   }
 
   Widget _buildGetRestaurantLoader() {
@@ -176,14 +169,17 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
               itemCount: data.length,
               padding: const EdgeInsets.all(0.0),
               itemBuilder: (BuildContext context, int index) {
-//                return InkWell(
-//                    child: HomePageState.buildRestaurantCard(data[index], review),
-//                    onTap: () {
-//                      setState(() {
-//                        restaurantInfo = data[index];
-//                      });
-//                      _showBottomSheet();
-//                    });
+                return InkWell(
+                    child: HomePageState.buildRestaurantCard(
+                        data[index],
+                        MyLocalizations.of(context).reviews,
+                        MyLocalizations.of(context).branches),
+                    onTap: () {
+                      setState(() {
+                        restaurantInfo = data[index];
+                      });
+                      _showBottomSheet();
+                    });
               });
         });
   }
@@ -202,7 +198,9 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
             ),
             child: Padding(
               padding: const EdgeInsets.all(6.0),
-              child: LocationListSheet(restaurantInfo: restaurantInfo, ),
+              child: LocationListSheet(
+                restaurantInfo: restaurantInfo,
+              ),
             ),
           );
         })

@@ -35,31 +35,31 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
 
-//class App extends StatefulWidget {
-//  final Map<String, Map<String, String>> localizedValues;
-//  String locale;
-//  App({Key key, this.locale, this.localizedValues}) : super(key: key);
-//  @override
-//  _AppState createState() => _AppState();
-//}
-//
-//class _AppState extends State<App> {
-//
-//  @override
-//  Widget build(BuildContext context) {
-//    return new MaterialApp(
-//      locale: Locale(widget.locale),
-//      debugShowCheckedModeBanner: false,
-//      localizationsDelegates: [
-//        MyLocalizationsDelegate(widget.localizedValues),
-//        GlobalMaterialLocalizations.delegate,
-//        GlobalWidgetsLocalizations.delegate,
-//      ],
-//      supportedLocales: languages.map((language) => Locale(language, '')),
-//      home: HomePage(locale: widget.locale, localizedValues: widget.localizedValues),
-//    );
-//  }
-//}
+// class App extends StatefulWidget {
+//   final Map<String, Map<String, String>> localizedValues;
+//   var locale;
+//   App({Key key, this.locale, this.localizedValues}) : super(key: key);
+//   @override
+//   _AppState createState() => _AppState();
+// }
+
+// class _AppState extends State<App> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return new MaterialApp(
+//       locale: Locale(widget.locale),
+//       debugShowCheckedModeBanner: false,
+//       localizationsDelegates: [
+//         MyLocalizationsDelegate(widget.localizedValues),
+//         GlobalMaterialLocalizations.delegate,
+//         GlobalWidgetsLocalizations.delegate,
+//       ],
+//       supportedLocales: languages.map((language) => Locale(language, '')),
+//       home: HomePage(
+//           locale: widget.locale, localizedValues: widget.localizedValues),
+//     );
+//   }
+// }
 
 class HomePage extends StatefulWidget {
   final Map<String, Map<String, String>> localizedValues;
@@ -127,17 +127,6 @@ class HomePageState extends State<HomePage> {
     });
   }
 
-//  var selectedLanguage;
-//
-//  selectedLanguages() async {
-//    SharedPreferences prefs = await SharedPreferences.getInstance();
-//    setState(() {
-//      selectedLanguage = prefs.getString('selectedLanguage');
-//    });
-//    print(
-//        'selectedLanguage home............$selectedLanguage ${widget.localizedValues}');
-//  }
-
   String fullname;
   bool isLoggedIn = false;
 
@@ -149,7 +138,6 @@ class HomePageState extends State<HomePage> {
           isLoggedIn = true;
         });
         ProfileService.getUserInfo().then((value) {
-          print(value);
           if (value != null && mounted) {
             setState(() {
               fullname = value['name'];
@@ -188,7 +176,6 @@ class HomePageState extends State<HomePage> {
           setState(() {
             cartCounter = onValue['productDetails'].length;
           });
-          // print(cartCounter);
         } else {
           setState(() {
             cartCounter = 0;
@@ -299,9 +286,7 @@ class HomePageState extends State<HomePage> {
         try {
           addresses =
               await Geocoder.local.findAddressesFromCoordinates(coordinates);
-        } catch (e) {
-          print(e);
-        }
+        } catch (e) {}
         if (addresses != null && mounted) {
           setState(() {
             position = {
@@ -353,9 +338,7 @@ class HomePageState extends State<HomePage> {
         setState(() {
           cartCount = res;
         });
-      }
-      // print("res   $cartCount");
-      catch (error, stackTrace) {
+      } catch (error, stackTrace) {
         sentryError.reportError(error, stackTrace);
       }
     }).catchError((onError) {
@@ -373,7 +356,7 @@ class HomePageState extends State<HomePage> {
       home: Scaffold(
         backgroundColor: whitec,
         key: scaffoldKey,
-        drawer: Menu(
+        drawer: drawer(
             scaffoldKey: scaffoldKey,
             locale: widget.locale,
             localizedValues: widget.localizedValues),
@@ -413,7 +396,7 @@ class HomePageState extends State<HomePage> {
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: Colors.black26,
+                                  color: Colors.black,
                                 ),
                                 child: Text('${cartCount.toString()}',
                                     style: TextStyle(
@@ -432,31 +415,31 @@ class HomePageState extends State<HomePage> {
           shrinkWrap: true,
           physics: ScrollPhysics(),
           children: <Widget>[
-            Container(
-              alignment: AlignmentDirectional.center,
-              height: 28.0,
-              color: prefix0.PRIMARY.withOpacity(0.7),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    MyLocalizations.of(context).hello,
-                    style: hintStyleWhiteLightOSR(),
-                  ),
-                  Text(" "),
-                  fullname == null
-                      ? Text(
-                          MyLocalizations.of(context).greetTo('User'),
-                          style: hintStyleWhiteLightOSR(),
-                        )
-                      : Text(
-                          MyLocalizations.of(context).greetTo('$fullname'),
-                          style: hintStyleWhiteLightOSR(),
-                        ),
-                ],
-              ),
-            ),
+            // Container(
+            //   alignment: AlignmentDirectional.center,
+            //   height: 28.0,
+            //   color: prefix0.PRIMARY.withOpacity(0.7),
+            //   child: Row(
+            //     mainAxisAlignment: MainAxisAlignment.center,
+            //     crossAxisAlignment: CrossAxisAlignment.center,
+            //     children: <Widget>[
+            //       Text(
+            //         MyLocalizations.of(context).hello,
+            //         style: hintStyleWhiteLightOSR(),
+            //       ),
+            //       Text(" "),
+            //       fullname == null
+            //           ? Text(
+            //               MyLocalizations.of(context).greetTo('User'),
+            //               style: hintStyleWhiteLightOSR(),
+            //             )
+            //           : Text(
+            //               MyLocalizations.of(context).greetTo('$fullname'),
+            //               style: hintStyleWhiteLightOSR(),
+            //             ),
+            //     ],
+            //   ),
+            // ),
             Container(
               height: 180.0,
               width: screenWidth(context),
@@ -467,18 +450,7 @@ class HomePageState extends State<HomePage> {
                     isAdvertisementList == true ||
                     isNewlyArrivedRestaurants == true)
                 ? Container()
-                : Container(
-                    alignment: AlignmentDirectional.center,
-                    margin: EdgeInsets.only(left: 5.0, right: 5.0),
-                    height: 56.0,
-                    decoration: BoxDecoration(
-                        border: Border.all(color: Colors.white70)),
-                    child: Image.asset(
-                      'lib/assets/icon/spinner.gif',
-                      width: 40.0,
-                      height: 40.0,
-                    ),
-                  ),
+                : Container(),
             Container(
               color: Colors.white70,
               margin: EdgeInsets.only(bottom: 5.0),
@@ -493,7 +465,7 @@ class HomePageState extends State<HomePage> {
                   _buildGetNearByLocationLoader(),
                   isNearByRestaurants != true
                       ? Container()
-                      : _buildViewAllButton('Near By'),
+                      : _buildViewAllButton(MyLocalizations.of(context).nearBy),
                 ],
               ),
             ),
@@ -511,7 +483,8 @@ class HomePageState extends State<HomePage> {
                   _buildTopRatedRestaurantLoader(),
                   isTopRatedRestaurants != true
                       ? Container()
-                      : _buildViewAllButton('Top Rated'),
+                      : _buildViewAllButton(
+                          MyLocalizations.of(context).topRated),
                 ],
               ),
             ),
@@ -529,7 +502,8 @@ class HomePageState extends State<HomePage> {
                   _buildNewlyArrivedRestaurantLoader(),
                   isNewlyArrivedRestaurants != true
                       ? Container()
-                      : _buildViewAllButton('Newly Arrived'),
+                      : _buildViewAllButton(
+                          MyLocalizations.of(context).newlyArrived),
                 ],
               ),
             ),
@@ -811,109 +785,118 @@ class HomePageState extends State<HomePage> {
   // }
 
   Widget _buildOfferSlider(List<dynamic> list) {
-    return Swiper(
-      autoplay: true,
-      itemCount: list.length,
-      pagination: new SwiperPagination(),
-      itemBuilder: (BuildContext context, int index) {
-        return InkWell(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (BuildContext context) => ProductListPage(
-                  restaurantName: list[index]['restaurantName'],
-                  locationName: list[index]['locationName'],
-                  aboutUs: list[index]['locationInfo']['aboutUs'],
-                  imgUrl: list[index]['restaurantInfo'] != null
-                      ? list[index]['restaurantInfo']['logo']
-                      : null,
-                  address: list[index]['address'],
-                  locationId: list[index]['locationInfo']['_id'],
-                  restaurantId: list[index]['restaurantID'],
-                  cuisine: list[index]['locationInfo']['cuisine'],
-                  deliveryInfo:
-                      list[index]['locationInfo']['deliveryInfo'] != null
-                          ? list[index]['locationInfo']['deliveryInfo']
-                              ['deliveryInfo']
-                          : null,
-                  workingHours:
-                      list[index]['locationInfo']['workingHours'] ?? null,
-                  locationInfo: list[index]['locationInfo'],
-                  taxInfo: list[index]['locationInfo']['restaurantID']
-                      ['taxInfo'],
-                  locale: widget.locale,
-                  localizedValues: widget.localizedValues,
-                ),
-              ),
-            );
-          },
-          child: Stack(
-            children: <Widget>[
-              new Image(
-                image: list[index]['homeUrl'] != null
-                    ? NetworkImage(list[index]['homeUrl'])
-                    : AssetImage('lib/assets/imgs/chicken.png'),
-                fit: BoxFit.cover,
-                width: screenWidth(context),
-                height: 200.0,
-              ),
-              new Positioned(
-                bottom: 0.0,
-                left: 0.0,
-                right: 0.0,
-                child: new Container(
-                  decoration: new BoxDecoration(
-                    gradient: new LinearGradient(
-                      colors: [
-                        Color.fromARGB(200, 0, 0, 0),
-                        Color.fromARGB(0, 0, 0, 0)
-                      ],
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
+    return list.length > 0
+        ? Swiper(
+            autoplay: true,
+            itemCount: list.length,
+            pagination: new SwiperPagination(),
+            itemBuilder: (BuildContext context, int index) {
+              return InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (BuildContext context) => ProductListPage(
+                        restaurantName: list[index]['restaurantName'],
+                        locationName: list[index]['locationName'],
+                        aboutUs: list[index]['locationInfo']['aboutUs'],
+                        imgUrl: list[index]['restaurantInfo'] != null
+                            ? list[index]['restaurantInfo']['logo']
+                            : null,
+                        address: list[index]['address'],
+                        locationId: list[index]['locationInfo']['_id'],
+                        restaurantId: list[index]['restaurantID'],
+                        cuisine: list[index]['locationInfo']['cuisine'],
+                        deliveryInfo:
+                            list[index]['locationInfo']['deliveryInfo'] != null
+                                ? list[index]['locationInfo']['deliveryInfo']
+                                    ['deliveryInfo']
+                                : null,
+                        workingHours:
+                            list[index]['locationInfo']['workingHours'] ?? null,
+                        locationInfo: list[index]['locationInfo'],
+                        taxInfo: list[index]['locationInfo']['restaurantID']
+                            ['taxInfo'],
+                        locale: widget.locale,
+                        localizedValues: widget.localizedValues,
+                      ),
                     ),
-                  ),
-                  padding:
-                      EdgeInsets.symmetric(vertical: 0.0, horizontal: 00.0),
-                  child: new Container(
-                    color: Colors.black26,
-                    height: 200.0,
-                    padding: new EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0),
-                    alignment: FractionalOffset.centerLeft,
-                    child: new Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        new Text(
-                          list[index]['restaurantName'],
-                          style: hintStyleGreyLightOSL(),
-                        ),
-                        new Padding(
-                          padding:
-                              new EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 15.0),
-                          child: new Text(
-                            list[index]['locationName'],
-                            style: hintStyleSmallYellowLightOSR(),
+                  );
+                },
+                child: Stack(
+                  children: <Widget>[
+                    new Image(
+                      image: list[index]['homeUrl'] != null
+                          ? NetworkImage(list[index]['homeUrl'])
+                          : AssetImage('lib/assets/imgs/chicken.png'),
+                      fit: BoxFit.cover,
+                      width: screenWidth(context),
+                      height: 200.0,
+                    ),
+                    new Positioned(
+                      bottom: 0.0,
+                      left: 0.0,
+                      right: 0.0,
+                      child: new Container(
+                        decoration: new BoxDecoration(
+                          gradient: new LinearGradient(
+                            colors: [
+                              Color.fromARGB(200, 0, 0, 0),
+                              Color.fromARGB(0, 0, 0, 0)
+                            ],
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.topCenter,
                           ),
                         ),
-                        new Text(
-                          list[index]['message'],
-                          style: category(),
+                        padding: EdgeInsets.symmetric(
+                            vertical: 0.0, horizontal: 00.0),
+                        child: new Container(
+                          color: Colors.black26,
+                          height: 200.0,
+                          padding:
+                              new EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0),
+                          alignment: FractionalOffset.centerLeft,
+                          child: new Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              new Text(
+                                list[index]['restaurantName'],
+                                style: hintStyleGreyLightOSL(),
+                              ),
+                              new Padding(
+                                padding: new EdgeInsets.fromLTRB(
+                                    0.0, 15.0, 0.0, 15.0),
+                                child: new Text(
+                                  list[index]['locationName'],
+                                  style: hintStyleSmallYellowLightOSR(),
+                                ),
+                              ),
+                              new Text(
+                                list[index]['message'],
+                                style: category(),
+                              ),
+                            ],
+                          ),
                         ),
-                      ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
+              );
+            },
+          )
+        : Container(
+            child: new Image(
+              image: AssetImage('lib/assets/imgs/chicken.png'),
+              fit: BoxFit.cover,
+              width: screenWidth(context),
+              height: 200.0,
+            ),
+          );
   }
 
   static Widget buildRestaurantCard(info, review, branches) {
-    // print(info);
     return Card(
       child: Column(
         children: <Widget>[

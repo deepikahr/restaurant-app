@@ -13,7 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ThankYou extends StatefulWidget {
   final Map<String, Map<String, String>> localizedValues;
-  String locale;
+  var locale;
   ThankYou({Key key, this.localizedValues, this.locale}) : super(key: key);
   @override
   _ThankYouState createState() => _ThankYouState();
@@ -21,36 +21,24 @@ class ThankYou extends StatefulWidget {
 
 class _ThankYouState extends State<ThankYou> {
   @override
-
   @override
   void initState() {
     super.initState();
 //    selectedLanguages();
   }
 
-//  var selectedLanguage;
-//
-//  selectedLanguages() async {
-//    SharedPreferences prefs = await SharedPreferences.getInstance();
-//    setState(() {
-//      selectedLanguage = prefs.getString('selectedLanguage');
-//    });
-//    print('selectedLanguage ty............$selectedLanguage ${widget.localizedValues}');
-//  }
-
   Widget build(BuildContext context) {
     Common.removeCart();
     return MaterialApp(
-        locale: Locale(widget.locale),
-        debugShowCheckedModeBanner: false,
-        localizationsDelegates: [
-          MyLocalizationsDelegate(widget.localizedValues),
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-        ],
-        supportedLocales: languages.map((language) => Locale(language, '')),
-        home:
-       Scaffold(
+      locale: Locale(widget.locale),
+      debugShowCheckedModeBanner: false,
+      localizationsDelegates: [
+        MyLocalizationsDelegate(widget.localizedValues),
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: languages.map((language) => Locale(language, '')),
+      home: Scaffold(
         body: Container(
           color: PRIMARY,
           height: screenHeight(context),
@@ -88,7 +76,10 @@ class _ThankYouState extends State<ThankYou> {
                           Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(
-                                  builder: (BuildContext context) => HomePage(localizedValues: widget.localizedValues, locale: widget.locale,)),
+                                  builder: (BuildContext context) => HomePage(
+                                        localizedValues: widget.localizedValues,
+                                        locale: widget.locale,
+                                      )),
                               (Route<dynamic> route) => false);
                         },
                         fillColor: Colors.white,

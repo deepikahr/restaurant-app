@@ -18,9 +18,6 @@ class LoginBloc extends Object with Validators {
   submit() {
     final validEmail = _email.value;
     final validPassword = _password.value;
-
-    print('Email is $validEmail');
-    print('Password is $validPassword');
   }
 
   dispose() {

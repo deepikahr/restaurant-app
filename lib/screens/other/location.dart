@@ -42,7 +42,6 @@
 //         addresses =
 //             await Geocoder.local.findAddressesFromCoordinates(coordinates);
 //       } catch (e) {
-//         print(e);
 //       }
 //       if (addresses != null && mounted) {
 //         setState(() {

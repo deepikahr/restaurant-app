@@ -37,7 +37,7 @@ class _ResetPasswordState extends State<ResetPassword> {
         isLoading = true;
       });
       AuthService.sendOTP({'email': email}).then((onValue) {
-        try{
+        try {
           if (onValue['message'] != null) {
             showSnackbar(onValue['message']);
             if (onValue['token'] != null) {
@@ -45,8 +45,11 @@ class _ResetPasswordState extends State<ResetPassword> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (BuildContext context) =>
-                        OtpVerify(otpToken: onValue['token'], locale: widget.locale, localizedValues: widget.localizedValues,),
+                    builder: (BuildContext context) => OtpVerify(
+                      otpToken: onValue['token'],
+                      locale: widget.locale,
+                      localizedValues: widget.localizedValues,
+                    ),
                   ),
                 );
               });
@@ -55,8 +58,7 @@ class _ResetPasswordState extends State<ResetPassword> {
           setState(() {
             isLoading = false;
           });
-        }
-        catch (error, stackTrace) {
+        } catch (error, stackTrace) {
           sentryError.reportError(error, stackTrace);
         }
       }).catchError((onError) {
@@ -91,6 +93,15 @@ class _ResetPasswordState extends State<ResetPassword> {
       home: Scaffold(
           key: _scaffoldKey,
           appBar: AppBar(
+            leading: InkWell(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: Icon(
+                Icons.arrow_back,
+                color: Colors.white,
+              ),
+            ),
             title: Text(
               MyLocalizations.of(context).resetPassword,
             ),
@@ -153,7 +164,8 @@ class _ResetPasswordState extends State<ResetPassword> {
                     validator: (String value) {
                       if (value.isEmpty ||
                           !RegExp(Validators.emailPattern).hasMatch(value)) {
-                        return MyLocalizations.of(context).pleaseEnterValidEmail;
+                        return MyLocalizations.of(context)
+                            .pleaseEnterValidEmail;
                       }
                     },
                     onSaved: (value) {

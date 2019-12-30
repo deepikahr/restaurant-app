@@ -18,7 +18,8 @@ class NewPassword extends StatefulWidget {
   final String otpToken;
   var locale;
   final Map<String, Map<String, String>> localizedValues;
-  NewPassword({Key key, this.otpToken, this.locale, this.localizedValues}) : super(key: key);
+  NewPassword({Key key, this.otpToken, this.locale, this.localizedValues})
+      : super(key: key);
   @override
   _NewPasswordState createState() => _NewPasswordState();
 }
@@ -37,7 +38,7 @@ class _NewPasswordState extends State<NewPassword> {
       });
       AuthService.createNewPassword({'newPass': newPassword}, widget.otpToken)
           .then((onValue) {
-        try{
+        try {
           if (onValue['message'] != null) {
             showSnackbar(onValue['message']);
             if (onValue['token'] != null) {
@@ -46,9 +47,12 @@ class _NewPasswordState extends State<NewPassword> {
                   Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(
-                        builder: (BuildContext context) => HomePage(locale: widget.locale, localizedValues: widget.localizedValues,),
+                        builder: (BuildContext context) => HomePage(
+                          locale: widget.locale,
+                          localizedValues: widget.localizedValues,
+                        ),
                       ),
-                          (Route<dynamic> route) => route.isFirst);
+                      (Route<dynamic> route) => route.isFirst);
                 }
               });
             }
@@ -56,9 +60,8 @@ class _NewPasswordState extends State<NewPassword> {
           setState(() {
             isLoading = false;
           });
-        }
-        catch (error, stackTrace) {
-        sentryError.reportError(error, stackTrace);
+        } catch (error, stackTrace) {
+          sentryError.reportError(error, stackTrace);
         }
       }).catchError((onError) {
         sentryError.reportError(onError, null);
@@ -95,6 +98,15 @@ class _NewPasswordState extends State<NewPassword> {
           title: Text(MyLocalizations.of(context).createPassword),
           centerTitle: true,
           backgroundColor: PRIMARY,
+          leading: InkWell(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Icon(
+              Icons.arrow_back,
+              color: Colors.white,
+            ),
+          ),
         ),
         body: ListView(
           children: <Widget>[
@@ -155,10 +167,11 @@ class _NewPasswordState extends State<NewPassword> {
                       contentPadding: EdgeInsets.all(12.0),
                       border: InputBorder.none,
                     ),
-                    keyboardType: TextInputType.number,
+                    keyboardType: TextInputType.text,
                     validator: (String value) {
                       if (value.isEmpty || value.length < 6) {
-                        return MyLocalizations.of(context).pleaseEnterValidPassword;
+                        return MyLocalizations.of(context)
+                            .pleaseEnterValidPassword;
                       }
                     },
                     onSaved: (value) {

@@ -47,6 +47,13 @@ class _OrdersPageState extends State<OrdersPage>
       supportedLocales: languages.map((language) => Locale(language, '')),
       home: Scaffold(
         appBar: AppBar(
+          leading: InkWell(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Icon(Icons.arrow_back),
+          ),
+          centerTitle: true,
           backgroundColor: PRIMARY,
           elevation: 0.0,
           title: Text(MyLocalizations.of(context).myOrders),
@@ -78,10 +85,14 @@ class _OrdersPageState extends State<OrdersPage>
                 child: TabBarView(
                   children: [
                     OrderUpcoming(
-                      isRatingAllowed: false, locale: widget.locale, localizedValues: widget.localizedValues,
+                      isRatingAllowed: false,
+                      locale: widget.locale,
+                      localizedValues: widget.localizedValues,
                     ),
                     OrderHistory(
-                      isRatingAllowed: true, locale: widget.locale, localizedValues: widget.localizedValues,
+                      isRatingAllowed: true,
+                      locale: widget.locale,
+                      localizedValues: widget.localizedValues,
                     ),
                   ],
                 ),

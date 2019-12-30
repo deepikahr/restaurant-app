@@ -9,16 +9,14 @@ class CounterModel with ChangeNotifier {
 
   getCounter() async {
     await Common.getCart().then((onValue) {
-      try{
+      try {
         if (onValue != null) {
           cartCounter = onValue['productDetails'].length;
-          // print(cartCounter);
         } else {
           cartCounter = 0;
         }
-      }
-      catch (error, stackTrace) {
-      sentryError.reportError(error, stackTrace);
+      } catch (error, stackTrace) {
+        sentryError.reportError(error, stackTrace);
       }
     }).catchError((onError) {
       sentryError.reportError(onError, null);

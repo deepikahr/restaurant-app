@@ -17,7 +17,6 @@ import 'package:RestaurantSaas/localizations.dart'
     show MyLocalizations, MyLocalizationsDelegate;
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 SentryError sentryError = new SentryError();
 
 class LoginPage extends StatefulWidget {
@@ -25,7 +24,8 @@ class LoginPage extends StatefulWidget {
   var locale;
   final Map<String, Map<String, String>> localizedValues;
 
-  LoginPage({Key key, this.isDrawe, this.locale, this.localizedValues}) : super(key: key);
+  LoginPage({Key key, this.isDrawe, this.locale, this.localizedValues})
+      : super(key: key);
 
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -42,16 +42,6 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
 //    selectedLanguages();
   }
-
-//  var selectedLanguage;
-//
-//  selectedLanguages() async {
-//    SharedPreferences prefs = await SharedPreferences.getInstance();
-//    setState(() {
-//      selectedLanguage = prefs.getString('selectedLanguage');
-//    });
-//    print('selectedLanguage login............$selectedLanguage ${widget.localizedValues}');
-//  }
 
   login() {
     if (_formKey.currentState.validate()) {
@@ -74,12 +64,17 @@ class _LoginPageState extends State<LoginPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (BuildContext context) => HomePage
-                          (locale: widget.locale, localizedValues:widget.localizedValues),
+                        builder: (BuildContext context) => HomePage(
+                            locale: widget.locale,
+                            localizedValues: widget.localizedValues),
                       ),
                     );
                   } else {
-                    Navigator.of(context).pop('Success');
+                    Navigator.of(context).pop(
+                      MyLocalizations.of(context).success,
+                      // locale: widget.locale,
+                      // localizedValues: widget.localizedValues,
+                    );
                   }
                 });
               }
@@ -201,6 +196,7 @@ class _LoginPageState extends State<LoginPage> {
     return Container(
       color: Colors.white,
       child: TextFormField(
+        initialValue: "user@ionicfirebaseapp.com",
         keyboardType: TextInputType.emailAddress,
         validator: (String value) {
           if (value.isEmpty ||
@@ -227,6 +223,7 @@ class _LoginPageState extends State<LoginPage> {
       margin: EdgeInsets.only(top: 4.0),
       color: Colors.white,
       child: TextFormField(
+        initialValue: "123456",
         keyboardType: TextInputType.text,
         validator: (String value) {
           if (value.isEmpty || value.length < 6) {
@@ -300,7 +297,10 @@ class _LoginPageState extends State<LoginPage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (BuildContext context) => ResetPassword(locale: widget.locale, localizedValues: widget.localizedValues,),
+                builder: (BuildContext context) => ResetPassword(
+                  locale: widget.locale,
+                  localizedValues: widget.localizedValues,
+                ),
               ),
             );
           },
@@ -327,7 +327,10 @@ class _LoginPageState extends State<LoginPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (BuildContext context) => RegisterForm(locale: widget.locale, localizedValues: widget.localizedValues,),
+            builder: (BuildContext context) => RegisterForm(
+              locale: widget.locale,
+              localizedValues: widget.localizedValues,
+            ),
           ),
         );
       },

@@ -63,8 +63,15 @@ class _FavoritesState extends State<Favorites> {
       home: Scaffold(
         backgroundColor: whiteTextb,
         appBar: AppBar(
+          leading: InkWell(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Icon(Icons.arrow_back),
+          ),
           backgroundColor: PRIMARY,
-          title: new Text(MyLocalizations.of(context).favourites, style: titleBoldWhiteOSS()),
+          title: new Text(MyLocalizations.of(context).favourites,
+              style: titleBoldWhiteOSS()),
           centerTitle: true,
         ),
         body: AsyncLoader(
@@ -193,7 +200,8 @@ class _FavoritesState extends State<Favorites> {
                                           .then((onValue) {
                                         try {
                                           Toast.show(
-                                              MyLocalizations.of(context).removedFavoriteItem,
+                                              MyLocalizations.of(context)
+                                                  .removedFavoriteItem,
                                               context,
                                               duration: Toast.LENGTH_LONG,
                                               gravity: Toast.BOTTOM);

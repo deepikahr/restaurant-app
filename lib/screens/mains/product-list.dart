@@ -2,6 +2,7 @@ import 'package:RestaurantSaas/localizations.dart';
 import 'package:RestaurantSaas/screens/other/CounterModel.dart';
 import 'package:flutter/material.dart';
 import 'package:async_loader/async_loader.dart';
+import 'package:intl/intl.dart';
 import '../../styles/styles.dart';
 import '../../widgets/location-card.dart';
 import '../../services/main-service.dart';
@@ -31,7 +32,7 @@ class ProductListPage extends StatefulWidget {
   final Map<String, dynamic> deliveryInfo, workingHours, locationInfo, taxInfo;
   final List<dynamic> cuisine;
   final Map<String, Map<String, String>> localizedValues;
-  String locale;
+  var locale;
 
   ProductListPage(
       {Key key,
@@ -47,9 +48,8 @@ class ProductListPage extends StatefulWidget {
       this.workingHours,
       this.locationInfo,
       this.taxInfo,
-        this.locale,
-        this.localizedValues
-      })
+      this.locale,
+      this.localizedValues})
       : super(key: key);
 
   @override
@@ -60,7 +60,9 @@ class _ProductListPageState extends State<ProductListPage> {
   final GlobalKey<AsyncLoaderState> _asyncLoaderState =
       GlobalKey<AsyncLoaderState>();
   bool isShopOpen = true;
+  bool isopenAndCloseTimeLoading = false;
   int cartCount;
+  String openAndCloseTime;
   getProductList() async {
     // _checkLocationOpenClose();
     return await MainService.getProductsBylocationId(widget.locationId);
@@ -121,18 +123,30 @@ class _ProductListPageState extends State<ProductListPage> {
   void initState() {
     print(widget.cuisine.length);
     print(widget.cuisine);
-
+    getRestaurantOpenAndCloseTime();
     super.initState();
     getGlobalSettingsData();
 //    selectedLanguage();
   }
 
-  String currency;
+  getRestaurantOpenAndCloseTime() async {
+    setState(() {
+      isopenAndCloseTimeLoading = true;
+    });
+    return await MainService.getRestaurantOpenAndCloseTime(
+            widget.locationId,
+            DateFormat('HH:mm').format(DateTime.now()),
+            DateFormat('EEEE').format(DateTime.now()))
+        .then((verifyOpenAndCloseTime) {
+      print('.........$verifyOpenAndCloseTime');
 
-  getGlobalSettingsData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    currency = prefs.getString('currency');
-    print('currency............. $currency');
+      setState(() {
+        openAndCloseTime = verifyOpenAndCloseTime['message'];
+        isopenAndCloseTimeLoading = false;
+      });
+    }).catchError((onError) {
+      print(onError);
+    });
   }
 
 //  var selectedLanguage;
@@ -152,7 +166,6 @@ class _ProductListPageState extends State<ProductListPage> {
         setState(() {
           cartCount = res;
         });
-        print("responcencdc   $cartCount");
       } catch (error, stackTrace) {
         sentryError.reportError(error, stackTrace);
       }
@@ -201,19 +214,23 @@ class _ProductListPageState extends State<ProductListPage> {
         }
       },
     );
-    return
-//      MaterialApp(
-//      locale: Locale(widget.locale),
-//      debugShowCheckedModeBanner: false,
-//      localizationsDelegates: [
-//        MyLocalizationsDelegate(widget.localizedValues),
-//        GlobalMaterialLocalizations.delegate,
-//        GlobalWidgetsLocalizations.delegate,
-//      ],
-//      supportedLocales: languages.map((language) => Locale(language, '')),
-//      home:
-      Scaffold(
+    return MaterialApp(
+      locale: Locale(widget.locale),
+      debugShowCheckedModeBanner: false,
+      localizationsDelegates: [
+        MyLocalizationsDelegate(widget.localizedValues),
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: languages.map((language) => Locale(language, '')),
+      home: Scaffold(
         appBar: AppBar(
+          leading: InkWell(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Icon(Icons.arrow_back, color: Colors.white),
+          ),
           backgroundColor: PRIMARY,
           elevation: 0.0,
           title: Text(
@@ -227,7 +244,10 @@ class _ProductListPageState extends State<ProductListPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (BuildContext context) => CartPage(localizedValues: widget.localizedValues, locale: widget.locale,),
+                      builder: (BuildContext context) => CartPage(
+                        localizedValues: widget.localizedValues,
+                        locale: widget.locale,
+                      ),
                     ),
                   );
                 },
@@ -289,7 +309,10 @@ class _ProductListPageState extends State<ProductListPage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (BuildContext context) => CartPage(locale: widget.locale, localizedValues: widget.localizedValues,),
+                builder: (BuildContext context) => CartPage(
+                  locale: widget.locale,
+                  localizedValues: widget.localizedValues,
+                ),
               ),
             );
           },
@@ -307,7 +330,7 @@ class _ProductListPageState extends State<ProductListPage> {
             ),
           ),
         ),
-//      ),
+      ),
     );
   }
 
@@ -421,16 +444,26 @@ class _ProductListPageState extends State<ProductListPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: <Widget>[
-                      Text(
-                        MyLocalizations.of(context).open,
-                        style: hintStyleSmallGreenLightOSS(),
-                      ),
-                      Padding(padding: EdgeInsets.only(left: 10.0)),
-                      Image.asset(
-                        'lib/assets/icon/about.png',
-                        width: 18.0,
-                      ),
                       Padding(padding: EdgeInsets.only(left: 5.0)),
+                      !isopenAndCloseTimeLoading
+                          ? Text(
+                              openAndCloseTime,
+                              style: hintStyleSmallGreenLightOSS(),
+                            )
+                          : Text(
+                              "",
+                              style: hintStyleSmallGreenLightOSS(),
+                            ),
+                      Padding(padding: EdgeInsets.only(left: 10.0)),
+                      InkWell(
+                        onTap: () {
+                          _showTimingAlert();
+                        },
+                        child: Image.asset(
+                          'lib/assets/icon/about.png',
+                          width: 18.0,
+                        ),
+                      )
                     ],
                   ),
                 ),
@@ -449,92 +482,206 @@ class _ProductListPageState extends State<ProductListPage> {
     );
   }
 
+  // Widget _buildInfoBar() {
+  //   return Container(
+  //     margin: EdgeInsetsDirectional.only(top: 220.0),
+  //     color: PRIMARY,
+  //     child: ListTile(
+  //       leading: Image(
+  //         image: AssetImage('lib/assets/icon/qmark.png'),
+  //         height: 18.0,
+  //       ),
+  //       title: Text(
+  //         (widget.deliveryInfo != null &&
+  //                 widget.deliveryInfo['freeDelivery'] &&
+  //                 widget.deliveryInfo['amountEligibility'] != null)
+  //             ? MyLocalizations.of(context).freeDeliveryAbove +
+  //                 ' \$ ${widget.deliveryInfo['amountEligibility'].toString()}'
+  //             : (widget.deliveryInfo != null &&
+  //                     !widget.deliveryInfo['freeDelivery'])
+  //                 ? MyLocalizations.of(context).deliveryChargesOnly +
+  //                     ' \$ ${widget.deliveryInfo['deliveryCharges'].toString()}'
+  //                 : MyLocalizations.of(context).freeDeliveryAvailable,
+  //         style: hintStyleSmallWhiteLightOSL(),
+  //       ),
+  //       // trailing: Icon(
+  //       //   Icons.chevron_right,
+  //       //   color: Colors.white,
+  //       // ),
+  //     ),
+  //   );
+  // }
   Widget _buildInfoBar() {
-    return Container(
-      margin: EdgeInsetsDirectional.only(top: 220.0),
-      color: PRIMARY,
-      child: ListTile(
-        leading: Image(
-          image: AssetImage('lib/assets/icon/qmark.png'),
-          height: 18.0,
+    if (widget.deliveryInfo != null &&
+        widget.deliveryInfo['isDeliveryAvailable'] != null &&
+        widget.deliveryInfo['isDeliveryAvailable'] == false) {
+      return Container(
+        margin: EdgeInsetsDirectional.only(top: 200.0),
+        color: PRIMARY,
+        child: ListTile(
+          leading: Image(
+            image: AssetImage('lib/assets/icon/qmark.png'),
+            height: 18.0,
+          ),
+          title: Text(
+            MyLocalizations.of(context).nodeliveryavailable,
+            style: hintStyleSmallWhiteLightOSL(),
+          ),
         ),
-        title: Text(
-          (widget.deliveryInfo != null &&
-                  widget.deliveryInfo['freeDelivery'] &&
-                  widget.deliveryInfo['amountEligibility'] != null)
-              ? MyLocalizations.of(context).freeDeliveryAbove  +
-              ' $currency ${widget.deliveryInfo['amountEligibility'].toString()}'
-              : (widget.deliveryInfo != null &&
-                      !widget.deliveryInfo['freeDelivery'])
-                  ? MyLocalizations.of(context).deliveryChargesOnly + ' $currency ${widget.deliveryInfo['deliveryCharges'].toString()}'
-                  : MyLocalizations.of(context).freeDeliveryAvailable,
-          style: hintStyleSmallWhiteLightOSL(),
+      );
+    } else {
+      return Container(
+        margin: EdgeInsetsDirectional.only(top: 200.0),
+        color: PRIMARY,
+        child: ListTile(
+          leading: Image(
+            image: AssetImage('lib/assets/icon/qmark.png'),
+            height: 18.0,
+          ),
+          title: Text(
+            (widget.deliveryInfo != null &&
+                    widget.deliveryInfo['freeDelivery'] &&
+                    widget.deliveryInfo['amountEligibility'] != null)
+                ? MyLocalizations.of(context).freedeliveryabove +
+                    ' \$' +
+                    widget.deliveryInfo['amountEligibility'].toString()
+                : (widget.deliveryInfo != null &&
+                        !widget.deliveryInfo['freeDelivery'])
+                    ? MyLocalizations.of(context).deliveryCharges +
+                        ': Only \$' +
+                        widget.deliveryInfo['deliveryCharges'].toString()
+                    : MyLocalizations.of(context).freedeliveryavailable,
+            style: hintStyleSmallWhiteLightOSL(),
+          ),
         ),
-        // trailing: Icon(
-        //   Icons.chevron_right,
-        //   color: Colors.white,
-        // ),
-      ),
-    );
+      );
+    }
   }
 
   Widget _buildCategoryTitle(
       String categoryName, String imgUrl, List<dynamic> products) {
-    return Stack(
-      fit: StackFit.passthrough,
-      children: <Widget>[
-        Image(
-          image: imgUrl != null
-              ? NetworkImage(imgUrl)
-              : AssetImage("lib/assets/headers/menu.png"),
-          fit: BoxFit.fill,
-          height: 42.0,
-        ),
-        Container(
-          padding: EdgeInsetsDirectional.only(top: 8.0, start: 14.0),
-          alignment: AlignmentDirectional.centerStart,
-          child: Text(
-            "${categoryName[0].toUpperCase()}${categoryName.substring(1)}",
-            style: titleWhiteBoldOSB(),
-          ),
-        ),
-        ListView.builder(
-            physics: ScrollPhysics(),
-            shrinkWrap: true,
-            itemCount: products.length,
-            itemBuilder: (BuildContext context, int index) {
-              return InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (BuildContext context) => ProductDetailsPage(
-                        localizedValues: widget.localizedValues,
-                          locale: widget.locale,
-                          product: products[index],
-                          restaurantName: widget.restaurantName,
-                          restaurantId: widget.restaurantId,
-                          locationInfo: widget.locationInfo,
-                          taxInfo: widget.taxInfo),
-                    ),
+    return Column(
+      children: [
+        ExpansionTile(
+          trailing: Container(
+              height: 70.0,
+              width: 80.0,
+              child: imgUrl != null
+                  ? Image.network(
+                      imgUrl,
+                      fit: BoxFit.fill,
+                    )
+                  : Icon(
+                      Icons.collections_bookmark,
+                      color: Colors.black87,
+                    )),
+          children: [
+            ListView.builder(
+                physics: ScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: products.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (BuildContext context) => ProductDetailsPage(
+                              locale: widget.locale,
+                              localizedValues: widget.localizedValues,
+                              product: products[index],
+                              restaurantName: widget.restaurantName,
+                              restaurantId: widget.restaurantId,
+                              locationInfo: widget.locationInfo,
+                              taxInfo: widget.taxInfo,
+                              restaurantAddress: widget.address),
+                        ),
+                      );
+                    },
+                    child: _buildProductTile(
+                        products[index]['imgUrl'],
+                        products[index]['title'],
+                        double.parse(
+                            products[index]['variants'][0]['MRP'].toString()),
+                        double.parse(products[index]['variants'][0]['Discount']
+                            .toString()),
+                        double.parse(
+                            products[index]['variants'][0]['price'].toString()),
+                        products[index]['description'],
+                        index == 0 ? 42.0 : 0),
                   );
-                },
-                child: _buildProductTile(
-                    products[index]['imgUrl'],
-                    products[index]['title'],
-                    double.parse(
-                        products[index]['variants'][0]['MRP'].toString()),
-                    double.parse(
-                        products[index]['variants'][0]['Discount'].toString()),
-                    double.parse(
-                        products[index]['variants'][0]['price'].toString()),
-                    products[index]['description'],
-                    index == 0 ? 42.0 : 0),
-              );
-            }),
+                }),
+          ],
+          title: categoryName.length > 25
+              ? Text(
+                  categoryName.substring(0, 25) + " ...",
+                  style: subTitleDarkBoldOSS(),
+                )
+              : Text(
+                  categoryName,
+                  style: subTitleDarkBoldOSS(),
+                ),
+        ),
       ],
     );
   }
+  // Widget _buildCategoryTitle(
+  //     String categoryName, String imgUrl, List<dynamic> products) {
+  //   return Stack(
+  //     fit: StackFit.passthrough,
+  //     children: <Widget>[
+  //       Image(
+  //         image: imgUrl != null
+  //             ? NetworkImage(imgUrl)
+  //             : AssetImage("lib/assets/headers/menu.png"),
+  //         fit: BoxFit.fill,
+  //         height: 42.0,
+  //       ),
+  //       Container(
+  //         padding: EdgeInsetsDirectional.only(top: 8.0, start: 14.0),
+  //         alignment: AlignmentDirectional.centerStart,
+  //         child: Text(
+  //           "${categoryName[0].toUpperCase()}${categoryName.substring(1)}",
+  //           style: titleWhiteBoldOSB(),
+  //         ),
+  //       ),
+  //       ListView.builder(
+  //           physics: ScrollPhysics(),
+  //           shrinkWrap: true,
+  //           itemCount: products.length,
+  //           itemBuilder: (BuildContext context, int index) {
+  //             return InkWell(
+  //               onTap: () {
+  //                 Navigator.push(
+  //                   context,
+  //                   MaterialPageRoute(
+  //                     builder: (BuildContext context) => ProductDetailsPage(
+  //                         localizedValues: widget.localizedValues,
+  //                         locale: widget.locale,
+  //                         product: products[index],
+  //                         restaurantName: widget.restaurantName,
+  //                         restaurantId: widget.restaurantId,
+  //                         locationInfo: widget.locationInfo,
+  //                         taxInfo: widget.taxInfo),
+  //                   ),
+  //                 );
+  //               },
+  //               child: _buildProductTile(
+  //                   products[index]['imgUrl'],
+  //                   products[index]['title'],
+  //                   double.parse(
+  //                       products[index]['variants'][0]['MRP'].toString()),
+  //                   double.parse(
+  //                       products[index]['variants'][0]['Discount'].toString()),
+  //                   double.parse(
+  //                       products[index]['variants'][0]['price'].toString()),
+  //                   products[index]['description'],
+  //                   index == 0 ? 42.0 : 0),
+  //             );
+  //           }),
+  //     ],
+  //   );
+  // }
 
   Widget _buildProductTile(String imgUrl, String productName, double mrp,
       double off, double price, String info, double topPadding) {
@@ -627,6 +774,190 @@ class _ProductListPageState extends State<ProductListPage> {
               )
             : Text(''),
       ],
+    );
+  }
+
+  Future<void> _showTimingAlert() {
+    print(widget.locationInfo['workingHours']);
+    print("cb sdv sjbvs  ${widget.locationInfo['workingHours']}");
+    if (widget.locationInfo['workingHours'] != null) {
+      List timingArray = List();
+      print(widget.locationInfo['isAlwaysOpen']);
+
+      if (widget.workingHours['isAlwaysOpen'] == false &&
+          widget.workingHours['daySchedule'].length > 0) {
+        timingArray = widget.workingHours['daySchedule'];
+        showDialogBox(timingArray);
+      } else if (widget.workingHours['isAlwaysOpen'] == true) {
+        showMessageOpenAlert();
+      } else {
+        showMessageCloseAlert();
+      }
+    } else if (widget.locationInfo['workingHours'] == null) {
+      showMessageCloseAlert();
+    } else {
+      showMessageCloseAlert();
+    }
+  }
+
+  showDialogBox(timingArray) {
+    print("bbbbbb${timingArray}");
+    List<Map> weekday = [
+      {"day": 'Monday', "timeSchedule": null},
+      {"day": 'Tuesday', "timeSchedule": null},
+      {"day": 'Wednesday', "timeSchedule": null},
+      {"day": 'Thursday', "timeSchedule": null},
+      {"day": 'Friday', "timeSchedule": null},
+      {"day": 'Saturday', "timeSchedule": null},
+      {"day": 'Sunday', "timeSchedule": null},
+    ];
+
+    for (int i = 0; i < weekday.length; i++) {
+      for (int j = 0; j < timingArray.length; j++) {
+        if (timingArray[j]['day'] == weekday[i]['day']) {
+          if (timingArray[j]['isClosed'] != null &&
+              timingArray[j]['isClosed'] != true) {
+            weekday[i]['timeSchedule'] = timingArray[j]['timeSchedule'];
+            // timingArray['timeSchedule'];
+            print(weekday[i]['timeSchedule']);
+          }
+        }
+      }
+    }
+    timingArray = weekday;
+    print(timingArray);
+    List<Widget> timeTextList = [];
+    timingArray.forEach((timing) {
+      List<Widget> timeScheduleList = [];
+
+      timing['timeSchedule'] != null
+          ? timing['timeSchedule'].forEach((schedule) {
+              timeScheduleList.add(Padding(
+                  padding: EdgeInsets.only(
+                    left: 20.0,
+                  ),
+                  child: Text(
+                      '${schedule['openTimeIn12Hr']} ${schedule['openTimeMeridian']} - ${schedule['closeTimeIn12Hr']} ${schedule['closeTimeMeridian']}')));
+            })
+          : timeScheduleList.add(Padding(
+              padding: EdgeInsets.only(
+                left: 20.0,
+              ),
+              child: Text(
+                  MyLocalizations.of(context).storeisClosed + '         ')));
+
+      timing['timeSchedule'] != null
+          ? timeTextList.add(Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.only(bottom: 5.0),
+                  child: Text(
+                    timing['day'],
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        decoration: TextDecoration.underline,
+                        decorationColor: Colors.black,
+                        fontWeight: FontWeight.w600),
+                  ),
+                ),
+                Column(children: timeScheduleList),
+              ],
+            ))
+          : timeTextList.add(Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.only(bottom: 5.0),
+                  child: Text(
+                    timing['day'],
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        decoration: TextDecoration.underline,
+                        decorationColor: Colors.black,
+                        fontWeight: FontWeight.w600),
+                  ),
+                ),
+                Column(children: timeScheduleList),
+              ],
+            ));
+    });
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(MyLocalizations.of(context).openingTime),
+          content: SingleChildScrollView(
+              child: Column(
+            children: timeTextList,
+          )),
+          actions: <Widget>[
+            FlatButton(
+              child: Text(MyLocalizations.of(context).ok),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  showMessageOpenAlert() {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(MyLocalizations.of(context).openingTime),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text("24 X 7 " + MyLocalizations.of(context).open)
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text(MyLocalizations.of(context).ok),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  showMessageCloseAlert() {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(MyLocalizations.of(context).sorry + '....!!'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(MyLocalizations.of(context).storeisClosed)
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text(MyLocalizations.of(context).ok),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

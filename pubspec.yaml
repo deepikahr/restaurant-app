@@ -28,6 +28,12 @@ dependencies:
   toast: ^0.1.5
   provider: ^3.1.0
   sentry: ^2.2.0
+  path_provider: ^1.4.4
+  datetime_picker_formfield: ^0.1.8
+  flutter_datetime_picker: ^1.2.8
+ 
+ 
+  
   flutter_localizations:
     sdk: flutter
 
@@ -102,3 +108,42 @@ flutter:
     - lib/assets/imgs/image1.jpg
     - lib/assets/imgs/orderimg.png
     - lib/assets/imgs/chicken.png
+    - lib/assets/icon/about.png
+    - lib/assets/icon/fishBone.png
+    - lib/assets/icon/addbtn.png
+    - lib/assets/icon/additem.png
+    - lib/assets/icon/cart.png
+    - lib/assets/icon/cartbtn.png
+    - lib/assets/icon/carte.png
+    - lib/assets/icon/cash.png
+    - lib/assets/icon/cashSelected.png
+    - lib/assets/icon/chat.png
+    - lib/assets/icon/check.png
+    - lib/assets/icon/delivery.png
+    - lib/assets/icon/dinein.png
+    - lib/assets/icon/favorite.png
+    - lib/assets/icon/filter.png
+    - lib/assets/icon/findus.png
+    - lib/assets/icon/go.png
+    - lib/assets/icon/h.png
+    - lib/assets/icon/homedelivery.png
+    - lib/assets/icon/location.png
+    - lib/assets/icon/locationpin.png
+    - lib/assets/icon/marker.png
+    - lib/assets/icon/loginIcon.png
+    - lib/assets/icon/mail.png
+    - lib/assets/icon/minus.png
+    - lib/assets/icon/offer.png
+    - lib/assets/icon/orderHistory.png
+    - lib/assets/icon/orderlater.png
+    - lib/assets/icon/ordernow.png
+    - lib/assets/icon/pin.png
+    - lib/assets/icon/qmark.png
+    - lib/assets/icon/settings.png
+    - lib/assets/icon/spinner.gif
+    - lib/assets/icon/spoon.png
+    - lib/assets/icon/table.png
+    - lib/assets/icon/clearCartIcon.png
+    - lib/assets/icon/home.png
+    
+
