@@ -357,7 +357,8 @@ class _CartPageState extends State<CartPage> {
                                 style: hintStylePrimaryOSR(),
                               ),
                         Text(
-                          '$currency' + products[index]['price'].toStringAsFixed(2),
+                          '$currency' +
+                              products[index]['price'].toStringAsFixed(2),
                           style: titleBlackBoldOSB(),
                         ),
                         IconButton(
@@ -487,7 +488,9 @@ class _CartPageState extends State<CartPage> {
             new Padding(padding: EdgeInsets.only(top: 5.0)),
             new Text(
               // //delivery charge deducted because of above line are commented to disable delivery charge in this page
-              MyLocalizations.of(context).total + ': $currency' + (grandTotal - deliveryCharge).toStringAsFixed(2),
+              MyLocalizations.of(context).total +
+                  ': $currency' +
+                  (grandTotal - deliveryCharge).toStringAsFixed(2),
               style: titleWhiteBoldOSB(),
             )
           ],

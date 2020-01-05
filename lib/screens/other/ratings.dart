@@ -84,15 +84,20 @@ class _RatingState extends State<Rating> {
         supportedLocales: languages.map((language) => Locale(language, '')),
         home: new Scaffold(
           appBar: new AppBar(
+            leading: InkWell(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: Icon(
+                Icons.arrow_back,
+                color: Colors.white,
+              ),
+            ),
             title: Text(
               MyLocalizations.of(context).rateYourOrder,
             ),
             backgroundColor: PRIMARY,
             iconTheme: new IconThemeData(color: Colors.white),
-            leading: new IconButton(
-              icon: new Icon(Icons.arrow_back),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
           ),
           body: new Stack(
             fit: StackFit.expand,

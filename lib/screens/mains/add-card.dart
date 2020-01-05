@@ -12,7 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AddCardPage extends StatefulWidget {
   final Map<String, Map<String, String>> localizedValues;
-   var locale;
+  var locale;
 
   AddCardPage({Key key, this.locale, this.localizedValues}) : super(key: key);
 
@@ -102,6 +102,15 @@ class _AddCardPageState extends State<AddCardPage> {
             appBar: AppBar(
               backgroundColor: PRIMARY,
               elevation: 0.0,
+              leading: InkWell(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: Icon(
+                  Icons.arrow_back,
+                  color: Colors.white,
+                ),
+              ),
               title: new Text(
                 MyLocalizations.of(context).addCard,
                 style: titleBoldWhiteOSS(),
