@@ -63,6 +63,15 @@ class OrderTrackState extends State<OrderTrack> {
         supportedLocales: languages.map((language) => Locale(language, '')),
         home: Scaffold(
           appBar: AppBar(
+            leading: InkWell(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: Icon(
+                Icons.arrow_back,
+                color: Colors.white,
+              ),
+            ),
             backgroundColor: prefix0.PRIMARY,
             iconTheme: IconThemeData(color: Colors.white),
             title: new Text(

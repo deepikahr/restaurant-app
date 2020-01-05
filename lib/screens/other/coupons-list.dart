@@ -48,6 +48,15 @@ class _CouponsListState extends State<CouponsList> {
         home: Scaffold(
           backgroundColor: whiteTextb,
           appBar: AppBar(
+            leading: InkWell(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: Icon(
+                Icons.arrow_back,
+                color: Colors.white,
+              ),
+            ),
             backgroundColor: PRIMARY,
             title: new Text(MyLocalizations.of(context).coupon,
                 style: titleBoldWhiteOSS()),

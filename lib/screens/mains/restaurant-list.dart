@@ -93,6 +93,15 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
           appBar: AppBar(
             backgroundColor: PRIMARY,
             elevation: 0.0,
+            leading: InkWell(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: Icon(
+                Icons.arrow_back,
+                color: Colors.white,
+              ),
+            ),
             title: Text(
               widget.title + MyLocalizations.of(context).restaurants,
               style: titleBoldWhiteOSS(),

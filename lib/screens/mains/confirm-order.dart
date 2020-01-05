@@ -267,6 +267,15 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
           backgroundColor: whiteTextb,
           key: _scaffoldKey,
           appBar: AppBar(
+             leading: InkWell(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: Icon(
+                Icons.arrow_back,
+                color: Colors.white,
+              ),
+            ),
             backgroundColor: PRIMARY,
             elevation: 0.0,
             title: new Text(
