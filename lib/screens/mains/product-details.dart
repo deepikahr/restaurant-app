@@ -124,7 +124,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     _calculatePrice();
     super.initState();
     getGlobalSettingsData();
-//    selectedLanguages();
   }
 
   String currency;
@@ -132,17 +131,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   getGlobalSettingsData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     currency = prefs.getString('currency');
-    print('currency............. $currency');
   }
-
-//  var selectedLanguage;
-//
-//  selectedLanguages() async {
-//    SharedPreferences prefs = await SharedPreferences.getInstance();
-//    setState(() {
-//      selectedLanguage = prefs.getString('selectedLanguage');
-//    });
-//  }
 
   void _checkFavourite() async {
     ProfileService.checkFavourite(widget.product['_id']).then((onValue) {

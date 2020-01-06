@@ -110,19 +110,19 @@ class HomePageState extends State<HomePage> {
   getGlobalSettingsData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await MainService.getAdminSettings().then((onValue) {
-      try{
+      try {
         var adminSettings = onValue;
-        print('on.............. ${adminSettings['currency']['currencyName']}');
-        if(adminSettings['currency'] == null){
+
+        if (adminSettings['currency'] == null) {
           prefs.setString('currency', '\$');
-        }else{
-          prefs.setString('currency', '${adminSettings['currency']['currencySymbol']}');
+        } else {
+          prefs.setString(
+              'currency', '${adminSettings['currency']['currencySymbol']}');
         }
-      }
-      catch (error, stackTrace) {
+      } catch (error, stackTrace) {
         sentryError.reportError(error, stackTrace);
       }
-    }).catchError((error){
+    }).catchError((error) {
       sentryError.reportError(error, null);
     });
   }

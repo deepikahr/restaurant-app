@@ -60,9 +60,6 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
   List<dynamic> paymentMethodList;
   var selectedSlot, selectedLocale;
   DateTime pickupDate, pickupTime;
-  // List<String> todayWorkingHoursSlotList;
-  List<String> todayWorkingHoursSlotList;
-  // Map<String, dynamic> todayWorkingHoursList;
   List<dynamic> todayWorkingHoursList;
   final GlobalKey<AsyncLoaderState> _asyncLoaderState =
       GlobalKey<AsyncLoaderState>();
@@ -70,12 +67,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
       GlobalKey<AsyncLoaderState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<String> languages = ['English', 'French', 'Chinese'];
-  // final formats = {
-  //   InputType.both: DateFormat("hh:mma dd/MM/yyyy"),
-  //   InputType.date: DateFormat('yyyy-MM-dd'),
-  //   InputType.time: DateFormat("HH:mma"),
-  // };
-  // InputType inputType = InputType.both;
+
 
   Future<Map<String, dynamic>> _getUserInfo() async {
     await ProfileService.getUserInfo().then((onValue) {
@@ -104,7 +96,6 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
             DateFormat('HH:mm').format(DateTime.now()),
             DateFormat('EEEE').format(DateTime.now()))
         .then((verifyOpenAndCloseTime) {
-      print(verifyOpenAndCloseTime);
       try {
         openAndCloseTime = verifyOpenAndCloseTime['message'];
       } catch (error, stackTrace) {
@@ -121,7 +112,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
   }
 
   void _calculateFinalAmount() {
-    if ((widget.deliveryInfo != null) &&
+   if ((widget.deliveryInfo != null) &&
         (widget.deliveryInfo['isDeliveryAvailable'] != null) &&
         (widget.deliveryInfo['isDeliveryAvailable'] == false)) {
       setState(() {
@@ -133,7 +124,11 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
         isDeliveryAvailable = true;
       });
     }
-
+    if (widget.tableInfo != null) {
+      widget.cart['isForDineIn'] = true;
+      widget.cart['orderType'] = 'Dine In';
+      widget.cart['tableNumber'] = widget.tableInfo['tableNumber'];
+    }
     if (isFirstTime) {
       setState(() {
         tempGrandTotal = widget.cart['grandTotal'];
@@ -189,21 +184,19 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
   }
 
   getSlotTime(dt, todayDay, time) async {
-    print("m k ");
+    
     await MainService.getTodayAndOtherDaysWorkingTimimgs(
             widget.cart['location'], dt, time, todayDay)
         .then((onValue) {
       setState(() {
         isAlwaysOpenOrCloseLoading = true;
       });
-      print(onValue);
       if (mounted) {
         if (onValue['isAlwaysOpen'] == true) {
           setState(() {
             isAlwaysOpenOrClose = true;
             todayWorkingHoursList = onValue['newDaySlot'];
             showSlotTimimg = !showSlotTimimg;
-            print(todayWorkingHoursList);
           });
           setState(() {
             isAlwaysOpenOrCloseLoading = false;
@@ -212,7 +205,6 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
           setState(() {
             todayWorkingHoursList = onValue['newDaySlot'];
             showSlotTimimg = !showSlotTimimg;
-            print(todayWorkingHoursList);
           });
           setState(() {
             isAlwaysOpenOrCloseLoading = false;
@@ -225,7 +217,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
   @override
   void initState() {
     super.initState();
-//    selectedLanguages();
+
   getGlobalSettingsData();
   }
 
@@ -234,17 +226,8 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
   getGlobalSettingsData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     currency = prefs.getString('currency');
-    print('currency............. $currency');
   }
 
-//  var selectedLanguage;
-//
-//  selectedLanguages() async {
-//    SharedPreferences prefs = await SharedPreferences.getInstance();
-//    setState(() {
-//      selectedLanguage = prefs.getString('selectedLanguage');
-//    });
-//  }
 
   @override
   Widget build(BuildContext context) {
@@ -659,8 +642,6 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                                           DateFormat('HH:mm')
                                               .format(DateTime.now()));
                                     } else {
-                                      print(DateFormat('HH:mm')
-                                          .format(DateTime.now()));
                                       getSlotTime(
                                           DateFormat('EEEE').format(pickupDate),
                                           DateFormat('EEEE')
@@ -1545,7 +1526,6 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
       widget.cart['pickupTime'] = widget.cart['pickupTime'];
       widget.cart['pickupDate'] = widget.cart['pickupDate'];
       widget.cart['shippingAddress'] = null;
-      print(widget.cart['pickupDate']);
 
       Navigator.push(
           context,

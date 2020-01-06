@@ -46,7 +46,6 @@ class _FavoritesState extends State<Favorites> {
   getGlobalSettingsData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     currency = prefs.getString('currency');
-    print('currency............. $currency');
   }
 
   @override

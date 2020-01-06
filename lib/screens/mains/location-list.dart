@@ -47,7 +47,6 @@ class _LocationListPageState extends State<LocationListPage> {
   getGlobalSettingsData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     currency = prefs.getString('currency');
-    print('currency............. $currency');
   }
 
   Widget build(BuildContext context) {

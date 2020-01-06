@@ -48,7 +48,6 @@ class _OrderDetailsState extends State<OrderDetails> {
           );
         },
         renderSuccess: ({data}) {
-          print(data);
           return _buildOrderDetailsBody(data);
         });
   }
@@ -65,7 +64,6 @@ class _OrderDetailsState extends State<OrderDetails> {
   getGlobalSettingsData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     currency = prefs.getString('currency');
-    print('currency............. $currency');
   }
 
   @override

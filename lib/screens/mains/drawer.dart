@@ -48,8 +48,7 @@ class _drawerState extends State<drawer> {
     _checkLoginStatus();
     _getCartLength();
     selectedLanguages();
-    print(widget.locale);
-    print(widget.localizedValues);
+    
     super.initState();
   }
 
@@ -751,8 +750,7 @@ class _drawerState extends State<drawer> {
 // //     setState(() {
 // //       selectedLanguage = prefs.getString('selectedLanguage');
 // //     });
-// //     print(
-// //         'selectedLanguage drawer............$selectedLanguage ${widget.localizedValues}');
+// //    
 // //   }
 
 // //   void _getCartLength() async {
@@ -791,12 +789,12 @@ class _drawerState extends State<drawer> {
 // //           isLoggedIn = true;
 // //         });
 // //         ProfileService.getUserInfo().then((value) {
-// //           print(value);
+// //          
 // //           if (value != null && mounted) {
 // //             setState(() {
 // //               profilePic = value['logo'];
 // //               fullname = value['name'];
-// //               print(profilePic);
+// //              
 // //               isLoggedIn = true;
 // //             });
 // //           }

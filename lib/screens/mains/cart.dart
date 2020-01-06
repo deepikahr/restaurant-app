@@ -64,7 +64,6 @@ class _CartPageState extends State<CartPage> {
   getGlobalSettingsData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     currency = prefs.getString('currency');
-    print('currency............. $currency');
   }
 
   void _calculateCart() async {
@@ -519,8 +518,6 @@ class _CartPageState extends State<CartPage> {
                 widget.locationInfo['deliveryInfo'] != null)
             ? widget.locationInfo['deliveryInfo']['deliveryInfo']
             : null;
-        print(widget.localizedValues);
-        print(widget.locale);
         Navigator.push(
           context,
           MaterialPageRoute(

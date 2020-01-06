@@ -51,7 +51,6 @@ class OrderUpcomingState extends State<OrderUpcoming>
   getGlobalSettingsData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     currency = prefs.getString('currency');
-    print('currency............. $currency');
   }
 
   @override
@@ -346,7 +345,6 @@ class OrderUpcomingState extends State<OrderUpcoming>
 
   static Widget _buildProductList(List<dynamic> products, String orderId,
       String restaurantId, String locationId, bool isRatingAllowed) {
-    print(products);
     return ListView.builder(
       itemCount: products.length,
       physics: ScrollPhysics(),

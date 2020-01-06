@@ -413,7 +413,7 @@ class _RegisterFormState extends State<RegisterForm> {
 //     setState(() {
 //       selectedLanguage = prefs.getString('selectedLanguage');
 //     });
-//     print('selectedLanguage reg............$selectedLanguage ${widget.localizedValues}');
+//
 //   }
 
 //   Map<String, dynamic> register = {
