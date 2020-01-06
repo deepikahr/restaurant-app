@@ -64,69 +64,14 @@ class _ProductListPageState extends State<ProductListPage> {
   int cartCount;
   String openAndCloseTime;
   getProductList() async {
-    // _checkLocationOpenClose();
     return await MainService.getProductsBylocationId(widget.locationId);
   }
 
-  // void _checkLocationOpenClose() {
-  //   List<String> weekday = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-  //   // contactNumber = widget.locationInfo['workingHours'];
-  //   if (widget.locationInfo['workingHours']!=null) {
-  //   var workingHours = widget.locationInfo['workingHours'];
-  //   String today = weekday[DateTime.now().weekday];
-  //       int hour = DateTime.now().hour;
-  //       int minute = new DateTime.now().minute;
-  //       if (!workingHours['isAlwaysOpen']) {
-  //         int indexOfDay;
-  //         for(int i=0; i<workingHours['daySchedule'].toList().length;i++){
-  //           print(workingHours['daySchedule'][i]['day']);
-  //           if(workingHours['daySchedule'][i]['day']==today){
-  //             indexOfDay = i;
-  //           }
-  //         }
-  //         print(indexOfDay);
-  //         if (indexOfDay != -1) {
-  //           print(indexOfDay);
-  //           List<dynamic> timeSchedule = workingHours['daySchedule'][indexOfDay]['timeSchedule'];
-  //           if (timeSchedule != null) {
-  //             print('object of if');
-  //             print(timeSchedule);
-  //             for (int i = 0; i < timeSchedule.length; i++) {
-  //               List<String> shopOpenTime = timeSchedule[i]['openTime'].split(":");
-  //               int shopOpenHour = int.parse(shopOpenTime[0]);
-  //               print(shopOpenHour);
-  //               List<String> shopCloseTime = timeSchedule[i]['closingTime'].split(":");
-  //               int shopCloseHour = int.parse(shopCloseTime[0]);
-  //               if (hour >= shopOpenHour && hour <= shopCloseHour) {
-  //                 if (minute > 0 && hour <= shopCloseHour) {
-  //                   isShopOpen = true;
-  //                 } else {
-  //                   isShopOpen = false;
-  //                 }
-  //                 break;
-  //               } else {
-  //                 isShopOpen = false;
-  //             }
-  //           }
-  //         } else {
-  //           isShopOpen = true;
-  //         }
-  //       } else {
-  //         isShopOpen = true;
-  //       }
-  //     } else
-  //       isShopOpen = true;
-  //     }
-  //     print(isShopOpen.toString());
-  // }
   @override
   void initState() {
-    print(widget.cuisine.length);
-    print(widget.cuisine);
     getRestaurantOpenAndCloseTime();
     super.initState();
     getGlobalSettingsData();
-//    selectedLanguage();
   }
 
   String currency;
@@ -134,7 +79,6 @@ class _ProductListPageState extends State<ProductListPage> {
   getGlobalSettingsData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     currency = prefs.getString('currency');
-    print('currency............. $currency');
   }
 
   getRestaurantOpenAndCloseTime() async {
@@ -146,26 +90,12 @@ class _ProductListPageState extends State<ProductListPage> {
             DateFormat('HH:mm').format(DateTime.now()),
             DateFormat('EEEE').format(DateTime.now()))
         .then((verifyOpenAndCloseTime) {
-      print('.........$verifyOpenAndCloseTime');
-
       setState(() {
         openAndCloseTime = verifyOpenAndCloseTime['message'];
         isopenAndCloseTimeLoading = false;
       });
-    }).catchError((onError) {
-      print(onError);
-    });
+    }).catchError((onError) {});
   }
-
-//  var selectedLanguage;
-//
-//  selectedLanguages() async {
-//    SharedPreferences prefs = await SharedPreferences.getInstance();
-//    setState(() {
-//      selectedLanguage = prefs.getString('selectedLanguage');
-//    });
-//    print('selectedLanguage pl............$selectedLanguage ${widget.localizedValues}');
-//  }
 
   @override
   Widget build(BuildContext context) {
@@ -787,10 +717,9 @@ class _ProductListPageState extends State<ProductListPage> {
 
   Future<void> _showTimingAlert() {
     print(widget.locationInfo['workingHours']);
-    print("cb sdv sjbvs  ${widget.locationInfo['workingHours']}");
+
     if (widget.locationInfo['workingHours'] != null) {
       List timingArray = List();
-      print(widget.locationInfo['isAlwaysOpen']);
 
       if (widget.workingHours['isAlwaysOpen'] == false &&
           widget.workingHours['daySchedule'].length > 0) {
@@ -809,7 +738,6 @@ class _ProductListPageState extends State<ProductListPage> {
   }
 
   showDialogBox(timingArray) {
-    print("bbbbbb${timingArray}");
     List<Map> weekday = [
       {"day": 'Monday', "timeSchedule": null},
       {"day": 'Tuesday', "timeSchedule": null},
@@ -826,14 +754,11 @@ class _ProductListPageState extends State<ProductListPage> {
           if (timingArray[j]['isClosed'] != null &&
               timingArray[j]['isClosed'] != true) {
             weekday[i]['timeSchedule'] = timingArray[j]['timeSchedule'];
-            // timingArray['timeSchedule'];
-            print(weekday[i]['timeSchedule']);
           }
         }
       }
     }
     timingArray = weekday;
-    print(timingArray);
     List<Widget> timeTextList = [];
     timingArray.forEach((timing) {
       List<Widget> timeScheduleList = [];
@@ -851,8 +776,7 @@ class _ProductListPageState extends State<ProductListPage> {
               padding: EdgeInsets.only(
                 left: 20.0,
               ),
-              child: Text(
-                  MyLocalizations.of(context).storeisClosed + '         ')));
+              child: Text(MyLocalizations.of(context).storeisClosed)));
 
       timing['timeSchedule'] != null
           ? timeTextList.add(Column(

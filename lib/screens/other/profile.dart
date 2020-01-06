@@ -101,8 +101,6 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
     } else if (selectedLanguage == 'ka') {
       selectedLocale = 'Kannada';
     }
-    print(
-        'selectedLanguage profile............$selectedLanguage ${widget.localizedValues}');
   }
 
   void _saveProfileInfo() {
@@ -111,7 +109,6 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
         isLoading = true;
       });
       _formKey.currentState.save();
-      print("save button $profileData");
 
       var body = {
         "name": profileData['name'],
@@ -124,7 +121,6 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
       };
       ProfileService.setUserInfo(profileData['_id'], body).then((onValue) {
         try {
-          print(onValue);
           Toast.show("Your profile Successfully UPDATED", context,
               duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
           setState(() {
@@ -204,9 +200,6 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
       isImageUploading = true;
     });
     await ProfileService.deleteUserProfilePic().then((onValue) {
-      // print(onValue['statusCode']);
-      // print(onValue['message']);
-      // if (onValue['statusCode'] == 200) {
       try {
         Toast.show(onValue['message'], context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
@@ -786,8 +779,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 //   void initState() {
 //     super.initState();
 //     getData();
-//     print(widget.locale);
-//     print(widget.localizedValues);
+//
 //   }
 
 //   getData() async {
@@ -795,7 +787,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 //     setState(() {
 //       selectedLanguage = prefs.getString('selectedLanguage');
 //     });
-//     print(selectedLanguage);
+//
 //     if (selectedLanguage == 'en') {
 //       selectedLocale = 'English';
 //     } else if (selectedLanguage == 'fr') {
@@ -805,8 +797,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 //     } else if (selectedLanguage == 'ka') {
 //       selectedLocale = 'Kannada';
 //     }
-//      print(
-//         'selectedLanguage profile............$selectedLanguage ${widget.localizedValues}');
+//
 //   }
 
 //   void _saveProfileInfo() {

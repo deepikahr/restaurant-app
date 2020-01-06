@@ -43,7 +43,7 @@ class _AddCardPageState extends State<AddCardPage> {
       });
 
       await ProfileService.addCard(body).then((onValue) {
-        print(onValue);
+       
         try {
           setState(() {
             isLoading = false;

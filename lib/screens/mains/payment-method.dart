@@ -133,7 +133,6 @@ class _PaymentMethodState extends State<PaymentMethod> {
     await MainService.getLoyaltyInfoByRestaurantId(widget.cart['restaurantID'])
         .then((onValue) {
       try {
-        print(onValue);
         if (onValue['message'] == "No setting data found") {
           setState(() {
             paymentMethodList = [];
@@ -174,10 +173,11 @@ class _PaymentMethodState extends State<PaymentMethod> {
     widget.cart['restaurantID'] =
         widget.cart['productDetails'][0]['restaurantID'];
     ProfileService.placeOrder(widget.cart).then((onValue) {
-      print(onValue);
+      print(widget.cart['paymentOption']);
+
       try {
         if (onValue != null && onValue['message'] != null) {
-          if (widget.cart['paymentOption'] == 'Stripe') {
+          if (widget.cart['paymentOption'] == 'CREDIT CARD') {
             Map<String, dynamic> body = {
               "cardId": cardList[groupValue]['_id'],
               "cardCvv": cvv,
@@ -185,6 +185,7 @@ class _PaymentMethodState extends State<PaymentMethod> {
             };
 
             ProfileService.placeOrderForCreditCard(body).then((res) {
+              print(res);
               try {
                 setState(() {
                   isLoading = false;
@@ -193,8 +194,6 @@ class _PaymentMethodState extends State<PaymentMethod> {
                 if (res['response_code'] == 400) {
                   showAlertMessage(res['message']);
                 } else {
-                  print(widget.locale);
-                  print(widget.localizedValues);
                   Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(
@@ -214,8 +213,6 @@ class _PaymentMethodState extends State<PaymentMethod> {
             setState(() {
               isLoading = false;
             });
-            print(widget.locale);
-            print(widget.localizedValues);
             Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(
@@ -243,7 +240,7 @@ class _PaymentMethodState extends State<PaymentMethod> {
     getPaymentMethod();
     super.initState();
 //    selectedLanguages();
-  getGlobalSettingsData();
+    getGlobalSettingsData();
   }
 
   String currency;
@@ -251,7 +248,6 @@ class _PaymentMethodState extends State<PaymentMethod> {
   getGlobalSettingsData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     currency = prefs.getString('currency');
-    print('currency............. $currency');
   }
 
   @override

@@ -50,17 +50,13 @@ main() async {
 
 void tokenCheck() {
   Common.getToken().then((tokenVerification) async {
-    print(tokenVerification);
+   
     if (tokenVerification != null) {
       AuthService.verifyTokenOTP(tokenVerification).then((verifyInfo) async {
-        print(verifyInfo);
-
-        if (verifyInfo['success'] == true) {
-          print(verifyInfo['success']);
-        } else {
+       if (verifyInfo['success'] == true) {
+         } else {
           Common.removeToken().then((removeVerification) async {
-            print(removeVerification);
-          });
+           });
         }
       });
     } else {}

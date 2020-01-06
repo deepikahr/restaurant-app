@@ -38,7 +38,7 @@ class LocationListSheet extends StatelessWidget {
   getLocationListByRestaurantId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     currency = prefs.getString('currency');
-    print('currency............. $currency');
+
     return await MainService.getLocationsByRestaurantId(
         restaurantInfo['list']['_id']);
   }
@@ -105,8 +105,8 @@ class LocationListSheet extends StatelessWidget {
                     data[index]['location'], localizedValues, locale, currency);
               } else {
                 if (index == 2) {
-                  return buildViewMoreButton(context, restaurantInfo, data,
-                      localizedValues, locale);
+                  return buildViewMoreButton(
+                      context, restaurantInfo, data, localizedValues, locale);
                 }
                 return null;
               }

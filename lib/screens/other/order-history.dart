@@ -12,16 +12,16 @@ import 'package:RestaurantSaas/localizations.dart'
     show MyLocalizations, MyLocalizationsDelegate;
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 SentryError sentryError = new SentryError();
-
 
 class OrderHistory extends StatefulWidget {
   final bool isRatingAllowed;
   final Map<String, Map<String, String>> localizedValues;
   var locale;
 
-  OrderHistory({Key key, this.isRatingAllowed, this.localizedValues, this.locale}) : super(key: key);
+  OrderHistory(
+      {Key key, this.isRatingAllowed, this.localizedValues, this.locale})
+      : super(key: key);
   @override
   _OrderHistoryState createState() => _OrderHistoryState();
 }
@@ -46,7 +46,6 @@ class _OrderHistoryState extends State<OrderHistory>
   getGlobalSettingsData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     currency = prefs.getString('currency');
-    print('currency............. $currency');
   }
 
   @override
@@ -64,7 +63,12 @@ class _OrderHistoryState extends State<OrderHistory>
         renderSuccess: ({data}) {
           if (data.length > 0) {
             return OrderUpcomingState.buildOrderList(
-                data, widget.isRatingAllowed, context, widget.locale, widget.localizedValues, currency);
+                data,
+                widget.isRatingAllowed,
+                context,
+                widget.locale,
+                widget.localizedValues,
+                currency);
           } else {
             return OrderUpcomingState.buildEmptyPage(context);
           }
