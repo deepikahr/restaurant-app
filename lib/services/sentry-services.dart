@@ -5,8 +5,7 @@ final SentryClient sentry = new SentryClient(
 
 class SentryError {
   Future<Null> reportError(dynamic error, dynamic stackTrace) async {
-    print('Caught error: $error');
-    print('Reporting to Sentry.io...');
+    print('Caught error: $error Reporting to Sentry.io...');
     final SentryResponse response = await sentry.captureException(
       exception: error,
       stackTrace: stackTrace,

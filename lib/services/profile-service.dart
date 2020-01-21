@@ -1,5 +1,5 @@
 import 'package:http/http.dart' show Client;
-import 'package:toast/toast.dart';
+
 import 'constant.dart';
 import 'dart:convert';
 import 'common.dart';
@@ -7,7 +7,6 @@ import 'common.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path/path.dart';
 import 'sentry-services.dart';
 
@@ -73,13 +72,6 @@ class ProfileService {
 
   static Future<Map<String, dynamic>> uploadProfileImage(
       image, stream, id) async {
-    Map<String, dynamic> imageData;
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String authToken;
-    await Common.getToken().then((onValue) {
-      authToken = 'bearer ' + onValue;
-    });
-
     var length = await image.length();
     String uri = API_ENDPOINT + 'users/upload/to/cloud';
     var request = new http.MultipartRequest("POST", Uri.parse(uri));

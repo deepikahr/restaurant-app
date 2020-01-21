@@ -7,12 +7,9 @@ import '../../styles/styles.dart';
 import 'cart.dart';
 import '../../services/common.dart';
 import '../../services/profile-service.dart';
-import '../mains/home.dart';
-import 'dart:convert';
 import 'package:toast/toast.dart';
 import '../../services/sentry-services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:RestaurantSaas/initialize_i18n.dart' show initializeI18n;
 import 'package:RestaurantSaas/constant.dart' show languages;
 import 'package:RestaurantSaas/localizations.dart'
     show MyLocalizations, MyLocalizationsDelegate;

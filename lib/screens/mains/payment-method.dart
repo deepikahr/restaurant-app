@@ -14,7 +14,6 @@ import '../../services/common.dart';
 import '../../services/sentry-services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:RestaurantSaas/initialize_i18n.dart' show initializeI18n;
 import 'package:RestaurantSaas/constant.dart' show languages;
 import 'package:RestaurantSaas/localizations.dart'
     show MyLocalizations, MyLocalizationsDelegate;
@@ -173,8 +172,6 @@ class _PaymentMethodState extends State<PaymentMethod> {
     widget.cart['restaurantID'] =
         widget.cart['productDetails'][0]['restaurantID'];
     ProfileService.placeOrder(widget.cart).then((onValue) {
-      print(widget.cart['paymentOption']);
-
       try {
         if (onValue != null && onValue['message'] != null) {
           if (widget.cart['paymentOption'] == 'CREDIT CARD') {
@@ -185,7 +182,6 @@ class _PaymentMethodState extends State<PaymentMethod> {
             };
 
             ProfileService.placeOrderForCreditCard(body).then((res) {
-              print(res);
               try {
                 setState(() {
                   isLoading = false;
