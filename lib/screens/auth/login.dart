@@ -1,4 +1,3 @@
-import 'package:RestaurantSaas/main.dart';
 import 'package:RestaurantSaas/screens/mains/home.dart';
 import 'package:flutter/material.dart';
 import '../../styles/styles.dart';
@@ -8,14 +7,11 @@ import '../../services/common.dart';
 import 'registration.dart';
 import 'forgot-password.dart';
 import '../../services/sentry-services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-import 'package:RestaurantSaas/initialize_i18n.dart' show initializeI18n;
 import 'package:RestaurantSaas/constant.dart' show languages;
 import 'package:RestaurantSaas/localizations.dart'
     show MyLocalizations, MyLocalizationsDelegate;
-import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
 

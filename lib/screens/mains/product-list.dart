@@ -9,11 +9,9 @@ import '../../services/main-service.dart';
 import '../../widgets/no-data.dart';
 import 'product-details.dart';
 import 'cart.dart';
-import 'home.dart';
 import '../../services/sentry-services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-import 'package:RestaurantSaas/initialize_i18n.dart' show initializeI18n;
 import 'package:RestaurantSaas/constant.dart' show languages;
 import 'package:RestaurantSaas/localizations.dart'
     show MyLocalizations, MyLocalizationsDelegate;
@@ -716,8 +714,6 @@ class _ProductListPageState extends State<ProductListPage> {
   }
 
   Future<void> _showTimingAlert() {
-    print(widget.locationInfo['workingHours']);
-
     if (widget.locationInfo['workingHours'] != null) {
       List timingArray = List();
 

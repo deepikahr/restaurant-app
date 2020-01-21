@@ -1,7 +1,6 @@
 import 'package:RestaurantSaas/screens/mains/cart.dart';
 import 'package:RestaurantSaas/screens/other/CounterModel.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../../styles/styles.dart';
 import 'home.dart';
 import '../../services/main-service.dart';
@@ -12,11 +11,9 @@ import '../../services/common.dart';
 import '../../services/sentry-services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-import 'package:RestaurantSaas/initialize_i18n.dart' show initializeI18n;
 import 'package:RestaurantSaas/constant.dart' show languages;
 import 'package:RestaurantSaas/localizations.dart'
     show MyLocalizations, MyLocalizationsDelegate;
-import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
 

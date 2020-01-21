@@ -21,15 +21,15 @@ dependencies:
   geocoder: 0.2.1
   image_picker: ^0.6.0+8
   # stripe_payment: ^0.0.7
-  onesignal: ^1.1.0
+  onesignal_flutter: ^2.3.2
   razorpay_plugin: ^0.2.9
-  intl: ^0.15.8
+  intl: ^0.16.0
   # flutter_stetho: ^0.5.0
   toast: ^0.1.5
   provider: ^3.1.0
   sentry: ^2.2.0
   path_provider: ^1.4.4
-  datetime_picker_formfield: ^0.1.8
+  datetime_picker_formfield: ^1.0.0
   flutter_datetime_picker: ^1.2.8
  
  

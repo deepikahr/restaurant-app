@@ -4,7 +4,6 @@ import 'package:RestaurantSaas/screens/other/CounterModel.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:provider/provider.dart';
 import '../../styles/styles.dart';
 import 'confirm-order.dart';
 import '../../services/common.dart';
@@ -13,7 +12,6 @@ import '../auth/login.dart';
 import '../other/coupons-list.dart';
 import '../../services/sentry-services.dart';
 
-import 'package:RestaurantSaas/initialize_i18n.dart' show initializeI18n;
 import 'package:RestaurantSaas/constant.dart' show languages;
 import 'package:RestaurantSaas/localizations.dart'
     show MyLocalizations, MyLocalizationsDelegate;

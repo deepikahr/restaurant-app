@@ -4,16 +4,17 @@ import 'package:RestaurantSaas/services/common.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 import 'initialize_i18n.dart' show initializeI18n;
 import 'constant.dart' show languages;
-import 'localizations.dart' show MyLocalizations, MyLocalizationsDelegate;
+import 'localizations.dart' show MyLocalizationsDelegate;
 
 import './styles/styles.dart';
 import './services/constant.dart';
 import 'screens/mains/home.dart';
 // import 'package:flutter_stetho/flutter_stetho.dart';
-import 'package:onesignal/onesignal.dart';
+
 import 'package:provider/provider.dart';
 import './services/sentry-services.dart';
 import 'dart:async';
@@ -28,6 +29,7 @@ bool get isInDebugMode {
 SentryError sentryError = new SentryError();
 
 main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   Map<String, Map<String, String>> localizedValues = await initializeI18n();
   String _locale = 'en';
   FlutterError.onError = (FlutterErrorDetails details) async {
@@ -50,13 +52,11 @@ main() async {
 
 void tokenCheck() {
   Common.getToken().then((tokenVerification) async {
-   
     if (tokenVerification != null) {
       AuthService.verifyTokenOTP(tokenVerification).then((verifyInfo) async {
-       if (verifyInfo['success'] == true) {
-         } else {
-          Common.removeToken().then((removeVerification) async {
-           });
+        if (verifyInfo['success'] == true) {
+        } else {
+          Common.removeToken().then((removeVerification) async {});
         }
       });
     } else {}

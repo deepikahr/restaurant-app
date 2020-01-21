@@ -19,47 +19,16 @@ import 'package:location/location.dart';
 import '../../services/common.dart';
 import 'dart:async';
 import '../../services/profile-service.dart';
-// import 'package:barcode_scan/barcode_scan.dart';
-import 'package:flutter/services.dart';
 
-import 'dart:convert';
-// import '../other/search.dart';
 import '../../services/sentry-services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-import 'package:RestaurantSaas/initialize_i18n.dart' show initializeI18n;
 import 'package:RestaurantSaas/constant.dart' show languages;
 import 'package:RestaurantSaas/localizations.dart'
     show MyLocalizations, MyLocalizationsDelegate;
 import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
-
-// class App extends StatefulWidget {
-//   final Map<String, Map<String, String>> localizedValues;
-//   var locale;
-//   App({Key key, this.locale, this.localizedValues}) : super(key: key);
-//   @override
-//   _AppState createState() => _AppState();
-// }
-
-// class _AppState extends State<App> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return new MaterialApp(
-//       locale: Locale(widget.locale),
-//       debugShowCheckedModeBanner: false,
-//       localizationsDelegates: [
-//         MyLocalizationsDelegate(widget.localizedValues),
-//         GlobalMaterialLocalizations.delegate,
-//         GlobalWidgetsLocalizations.delegate,
-//       ],
-//       supportedLocales: languages.map((language) => Locale(language, '')),
-//       home: HomePage(
-//           locale: widget.locale, localizedValues: widget.localizedValues),
-//     );
-//   }
-// }
 
 class HomePage extends StatefulWidget {
   final Map<String, Map<String, String>> localizedValues;
