@@ -121,7 +121,6 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
           setState(() {
             isLoading = false;
           });
-          Navigator.of(context).pop();
         } catch (error, stackTrace) {
           sentryError.reportError(error, stackTrace);
         }

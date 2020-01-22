@@ -28,12 +28,6 @@ class drawer extends StatefulWidget {
 }
 
 class _drawerState extends State<drawer> {
-  String name;
-  String email;
-  String profileImage;
-  String gender;
-  int phone;
-
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   int cartCounter;
@@ -46,7 +40,6 @@ class _drawerState extends State<drawer> {
     _checkLoginStatus();
     _getCartLength();
     selectedLanguages();
-
     super.initState();
   }
 
@@ -121,7 +114,7 @@ class _drawerState extends State<drawer> {
                     _buildMenuBg(),
                     Column(
                       children: <Widget>[
-                        _buildMenuProfileLogo(profileImage),
+                        _buildMenuProfileLogo(profilePic),
                         fullname != null
                             ? Text(fullname.toUpperCase(),
                                 style: TextStyle(color: Colors.white))

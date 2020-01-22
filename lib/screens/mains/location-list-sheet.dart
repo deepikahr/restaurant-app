@@ -29,7 +29,7 @@ class LocationListSheet extends StatelessWidget {
       GlobalKey<AsyncLoaderState>();
   int cartCount;
 
-  String currency;
+  String currency = "";
   getLocationListByRestaurantId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     currency = prefs.getString('currency');
@@ -211,6 +211,7 @@ class LocationListSheet extends StatelessWidget {
                 reviewCount > 0
                     ? Text(
                         reviewCount.toString() +
+                            " " +
                             MyLocalizations.of(context).usersReview,
                         textAlign: TextAlign.left,
                       )
@@ -229,6 +230,7 @@ class LocationListSheet extends StatelessWidget {
             padding: EdgeInsets.all(4.0),
             child: Text(
               locationCount.toString() +
+                  " " +
                   MyLocalizations.of(context).outletsDelivering,
               style: subBoldTitle(),
               textAlign: TextAlign.left,

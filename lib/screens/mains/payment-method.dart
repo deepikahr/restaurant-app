@@ -239,7 +239,7 @@ class _PaymentMethodState extends State<PaymentMethod> {
     getGlobalSettingsData();
   }
 
-  String currency;
+  String currency = '';
 
   getGlobalSettingsData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

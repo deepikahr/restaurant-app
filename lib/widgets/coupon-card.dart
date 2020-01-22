@@ -75,7 +75,8 @@ class CouponCard extends StatelessWidget {
                 onTap: () {
                   Navigator.pop(context, coupon);
                 },
-                child: Text(MyLocalizations.of(context).apply, style: TextStyle(color: Colors.amber)),
+                child: Text(MyLocalizations.of(context).apply,
+                    style: TextStyle(color: Colors.amber)),
               ),
             ),
           ],

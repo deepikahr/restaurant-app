@@ -80,14 +80,92 @@ class _CouponsListState extends State<CouponsList> {
                     shrinkWrap: true,
                     itemCount: data.length,
                     itemBuilder: (BuildContext context, int index) {
-                      return CouponCard(
-                        coupon: data[index],
+                      return couponCard(
+                        data[index],
                       );
                     });
               }
             },
           ),
         ));
+  }
+
+  Widget couponCard(Map data) {
+    return Card(
+      child: Container(
+        padding: EdgeInsets.all(6.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            buildCardHeader(data),
+            buildCuisineHolder(data),
+            buildCardBottom(context, data),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildCardHeader(Map coupon) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            coupon['couponName'],
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 15.0,
+              height: 1.0,
+            ),
+          ),
+          flex: 6,
+        ),
+      ],
+    );
+  }
+
+  Widget buildCuisineHolder(Map coupon) {
+    return Text(
+      coupon['description'].toUpperCase(),
+      overflow: TextOverflow.ellipsis,
+      textAlign: TextAlign.left,
+      style: TextStyle(
+        fontSize: 11.0,
+        height: 1.4,
+      ),
+    );
+  }
+
+  Widget buildCardBottom(BuildContext context, Map coupon) {
+    return Column(
+      children: <Widget>[
+        Divider(),
+        Row(
+          children: <Widget>[
+            Expanded(
+              flex: 10,
+              child: Row(
+                children: <Widget>[
+                  Text(coupon['offPrecentage'].toString() + '% off',
+                      style: TextStyle(color: Colors.green)),
+                ],
+              ),
+            ),
+            Expanded(
+              flex: 2,
+              child: InkWell(
+                onTap: () {
+                  Navigator.pop(context, coupon);
+                },
+                child: Text(MyLocalizations.of(context).apply,
+                    style: TextStyle(color: Colors.amber)),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
   }
 
   static Widget buildEmptyPage(String msg) {

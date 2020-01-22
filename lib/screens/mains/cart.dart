@@ -47,17 +47,16 @@ class _CartPageState extends State<CartPage> {
   int productsLength = 0;
   Map<String, dynamic> selectedCoupon;
   double couponDeduction = 0.0;
+  String currency = '';
 
   @override
   void initState() {
     _calculateCart();
 
+    getGlobalSettingsData();
     super.initState();
 //    selectedLanguage();
-    getGlobalSettingsData();
   }
-
-  String currency;
 
   getGlobalSettingsData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -124,6 +123,7 @@ class _CartPageState extends State<CartPage> {
             widget.locationInfo['deliveryInfo'] != null)
         ? widget.locationInfo['deliveryInfo']['deliveryInfo']
         : null;
+
     if (deliveryInfo != null) {
       if (deliveryInfo['freeDelivery']) {
         if (deliveryInfo['amountEligibility'] > subTotal) {
@@ -191,15 +191,16 @@ class _CartPageState extends State<CartPage> {
         ),
       ),
     );
+
     _calculateCart();
   }
 
   int cartCount;
   @override
   Widget build(BuildContext context) {
-    // if (widget.taxInfo != null && widget.taxInfo['taxName'] == null) {
-    //   widget.taxInfo['taxName'] = '';
-    // }
+    if (widget.taxInfo != null && widget.taxInfo['taxName'] == null) {
+      widget.taxInfo['taxName'] = '';
+    }
     CounterModel().getCounter().then((res) {
       setState(() {
         cartCount = res;
@@ -268,17 +269,17 @@ class _CartPageState extends State<CartPage> {
                           _buildPriceTagLine(
                               MyLocalizations.of(context).subTotal, subTotal),
                           Divider(),
-                          // widget.taxInfo != null
-                          //     ? _buildPriceTagLine(
-                          //         'Tax ' + widget.taxInfo['taxName'], tax)
-                          //     : Container(height: 0, width: 0),
-                          // widget.taxInfo != null
-                          //     ? Divider()
-                          //     : Container(height: 0, width: 0),
-                          // _buildPriceTagLine(
-                          //     MyLocalizations.of(context).deliveryCharges,
-                          //     deliveryCharge),
-                          // Divider(),
+                          widget.taxInfo != null
+                              ? _buildPriceTagLine(
+                                  'Tax ' + widget.taxInfo['taxName'], tax)
+                              : Container(height: 0, width: 0),
+                          widget.taxInfo != null
+                              ? Divider()
+                              : Container(height: 0, width: 0),
+                          _buildPriceTagLine(
+                              MyLocalizations.of(context).deliveryCharges,
+                              deliveryCharge),
+                          Divider(),
                           _buildPriceTagLine(
                               MyLocalizations.of(context).grandTotal,
                               grandTotal),
@@ -523,7 +524,8 @@ class _CartPageState extends State<CartPage> {
                 locale: widget.locale,
                 localizedValues: widget.localizedValues,
                 cart: cartItems,
-                deliveryInfo: info),
+                deliveryInfo: info,
+                currency: currency),
           ),
         );
       }

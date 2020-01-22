@@ -72,7 +72,7 @@ class _ProductListPageState extends State<ProductListPage> {
     getGlobalSettingsData();
   }
 
-  String currency;
+  String currency = '';
 
   getGlobalSettingsData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -624,8 +624,7 @@ class _ProductListPageState extends State<ProductListPage> {
     return Column(
       children: <Widget>[
         ListTile(
-          contentPadding: EdgeInsets.only(
-              top: topPadding, left: 10.0, right: 10.0, bottom: 0.0),
+          contentPadding: EdgeInsets.only(left: 10.0, right: 10.0, bottom: 0.0),
           title: _buildProductTileTitle(
               imgUrl, productName, mrp, off, price, info),
           subtitle: Column(
@@ -763,54 +762,55 @@ class _ProductListPageState extends State<ProductListPage> {
           ? timing['timeSchedule'].forEach((schedule) {
               timeScheduleList.add(Padding(
                   padding: EdgeInsets.only(
-                    left: 20.0,
-                  ),
+                      // left: 20.0,
+                      ),
                   child: Text(
                       '${schedule['openTimeIn12Hr']} ${schedule['openTimeMeridian']} - ${schedule['closeTimeIn12Hr']} ${schedule['closeTimeMeridian']}')));
             })
           : timeScheduleList.add(Padding(
               padding: EdgeInsets.only(
-                left: 20.0,
-              ),
-              child: Text(MyLocalizations.of(context).storeisClosed)));
+                  // left: 20.0,
+                  ),
+              child: Text(MyLocalizations.of(context).storeisClosed.trim())));
 
-      timing['timeSchedule'] != null
-          ? timeTextList.add(Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(bottom: 5.0),
-                  child: Text(
-                    timing['day'],
-                    style: TextStyle(
-                        fontSize: 18.0,
-                        decoration: TextDecoration.underline,
-                        decorationColor: Colors.black,
-                        fontWeight: FontWeight.w600),
-                  ),
-                ),
-                Column(children: timeScheduleList),
-              ],
-            ))
-          : timeTextList.add(Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(bottom: 5.0),
-                  child: Text(
-                    timing['day'],
-                    style: TextStyle(
-                        fontSize: 18.0,
-                        decoration: TextDecoration.underline,
-                        decorationColor: Colors.black,
-                        fontWeight: FontWeight.w600),
-                  ),
-                ),
-                Column(children: timeScheduleList),
-              ],
-            ));
+      timeTextList.add(Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.only(bottom: 5.0),
+            child: Text(
+              timing['day'],
+              style: TextStyle(
+                  fontSize: 18.0,
+                  decoration: TextDecoration.underline,
+                  decorationColor: Colors.black,
+                  fontWeight: FontWeight.w600),
+            ),
+          ),
+          Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: timeScheduleList),
+        ],
+      ));
+      // : timeTextList.add(Column(
+      //     mainAxisAlignment: MainAxisAlignment.start,
+      //     crossAxisAlignment: CrossAxisAlignment.start,
+      //     children: <Widget>[
+      //       Padding(
+      //         padding: EdgeInsets.only(bottom: 5.0),
+      //         child: Text(
+      //           timing['day'],
+      //           style: TextStyle(
+      //               fontSize: 18.0,
+      //               decoration: TextDecoration.underline,
+      //               decorationColor: Colors.black,
+      //               fontWeight: FontWeight.w600),
+      //         ),
+      //       ),
+      //       Column(children: timeScheduleList),
+      //     ],
+      //   ));
     });
     return showDialog<void>(
       context: context,
