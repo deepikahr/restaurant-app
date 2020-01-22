@@ -14,9 +14,7 @@ import 'package:intl/intl.dart';
 // import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import '../../services/sentry-services.dart';
 
-
-import 'package:RestaurantSaas/localizations.dart'
-    show MyLocalizations;
+import 'package:RestaurantSaas/localizations.dart' show MyLocalizations;
 import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
@@ -24,7 +22,7 @@ SentryError sentryError = new SentryError();
 class ConfrimOrderPage extends StatefulWidget {
   final Map<String, dynamic> cart, deliveryInfo, tableInfo;
   final Map<String, Map<String, String>> localizedValues;
-  var locale;
+  var locale, currency;
 
   ConfrimOrderPage(
       {Key key,
@@ -32,7 +30,8 @@ class ConfrimOrderPage extends StatefulWidget {
       this.tableInfo,
       this.deliveryInfo,
       this.localizedValues,
-      this.locale})
+      this.locale,
+      this.currency})
       : super(key: key);
 
   @override
@@ -67,6 +66,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<String> languages = ['English', 'French', 'Chinese'];
 
+    String currency = '';
 
   Future<Map<String, dynamic>> _getUserInfo() async {
     await ProfileService.getUserInfo().then((onValue) {
@@ -111,7 +111,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
   }
 
   void _calculateFinalAmount() {
-   if ((widget.deliveryInfo != null) &&
+    if ((widget.deliveryInfo != null) &&
         (widget.deliveryInfo['isDeliveryAvailable'] != null) &&
         (widget.deliveryInfo['isDeliveryAvailable'] == false)) {
       setState(() {
@@ -183,7 +183,6 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
   }
 
   getSlotTime(dt, todayDay, time) async {
-    
     await MainService.getTodayAndOtherDaysWorkingTimimgs(
             widget.cart['location'], dt, time, todayDay)
         .then((onValue) {
@@ -215,18 +214,14 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
 
   @override
   void initState() {
+    getGlobalSettingsData();
     super.initState();
-
-  getGlobalSettingsData();
   }
-
-  String currency;
 
   getGlobalSettingsData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     currency = prefs.getString('currency');
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -245,30 +240,30 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
           return _buildConfirmOrderView(data);
         });
 
-    return  Scaffold(
-          backgroundColor: whiteTextb,
-          key: _scaffoldKey,
-          appBar: AppBar(
-             leading: InkWell(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: Icon(
-                Icons.arrow_back,
-                color: Colors.white,
-              ),
-            ),
-            backgroundColor: PRIMARY,
-            elevation: 0.0,
-            title: new Text(
-              MyLocalizations.of(context).reviewOrder,
-              style: titleBoldWhiteOSS(),
-            ),
-            centerTitle: true,
+    return Scaffold(
+      backgroundColor: whiteTextb,
+      key: _scaffoldKey,
+      appBar: AppBar(
+        leading: InkWell(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
           ),
-          body: _asyncLoader,
-          bottomNavigationBar: _buildBottomBar(),
-        );
+        ),
+        backgroundColor: PRIMARY,
+        elevation: 0.0,
+        title: new Text(
+          MyLocalizations.of(context).reviewOrder,
+          style: titleBoldWhiteOSS(),
+        ),
+        centerTitle: true,
+      ),
+      body: _asyncLoader,
+      bottomNavigationBar: _buildBottomBar(),
+    );
   }
 
   Widget _buildConfirmOrderView(Map<String, dynamic> userInfo) {
@@ -590,7 +585,8 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                           children: <Widget>[
                             Text(
                               MyLocalizations.of(context).clickToSlot +
-                                  widget.cart['orderType'] +
+                                  " " +
+                                  widget.cart['orderType'] + " " +
                                   MyLocalizations.of(context).dateandTime,
                               style: titleBlackLightOSB(),
                             ),
@@ -1504,7 +1500,8 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                   ),
                   new Padding(padding: EdgeInsets.only(top: 5.0)),
                   new Text(
-                    MyLocalizations.of(context).total + ': $currency ${widget.cart['grandTotal'].toStringAsFixed(2)}',
+                    MyLocalizations.of(context).total +
+                        ': ${widget.currency ?? currency} ${widget.cart['grandTotal'].toStringAsFixed(2)}',
                     style: titleWhiteBoldOSB(),
                   ),
                 ],

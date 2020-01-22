@@ -39,7 +39,7 @@ class _LocationListPageState extends State<LocationListPage> {
     getGlobalSettingsData();
   }
 
-  String currency;
+  String currency = '';
 
   getGlobalSettingsData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

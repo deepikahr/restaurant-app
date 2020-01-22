@@ -123,7 +123,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     getGlobalSettingsData();
   }
 
-  String currency;
+  String currency = '';
 
   getGlobalSettingsData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

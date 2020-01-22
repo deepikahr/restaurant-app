@@ -37,7 +37,7 @@ class _OrderHistoryState extends State<OrderHistory>
     getGlobalSettingsData();
   }
 
-  String currency;
+  String currency = '';
 
   getGlobalSettingsData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

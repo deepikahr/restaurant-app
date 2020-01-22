@@ -42,7 +42,7 @@ class OrderUpcomingState extends State<OrderUpcoming>
     getGlobalSettingsData();
   }
 
-  String currency;
+  String currency = "";
 
   getGlobalSettingsData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

@@ -419,7 +419,11 @@ class HomePageState extends State<HomePage> {
                     isAdvertisementList == true ||
                     isNewlyArrivedRestaurants == true)
                 ? Container()
-                : Container(),
+                : Center(
+                    child: Container(
+                        height: 50,
+                        width: 50,
+                        child: CircularProgressIndicator())),
             Container(
               color: Colors.white70,
               margin: EdgeInsets.only(bottom: 5.0),
@@ -947,13 +951,13 @@ class HomePageState extends State<HomePage> {
                     children: <Widget>[
                       Row(
                         children: <Widget>[
-                          Text(rating.toStringAsFixed(1),
+                          Text(" " + rating.toStringAsFixed(1) + " ",
                               style: priceDescription()),
                           Icon(Icons.star, color: PRIMARY, size: 16.0),
                         ],
                       ),
                       Text(
-                        '(' + reviews.toString() + ')' + review,
+                        '(' + reviews.toString() + ') ' + review,
                         style: hintStyleSmallTextDarkOSR(),
                         overflow: TextOverflow.ellipsis,
                       )

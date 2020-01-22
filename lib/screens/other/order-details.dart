@@ -58,7 +58,7 @@ class _OrderDetailsState extends State<OrderDetails> {
     getGlobalSettingsData();
   }
 
-  String currency;
+  String currency = '';
 
   getGlobalSettingsData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
