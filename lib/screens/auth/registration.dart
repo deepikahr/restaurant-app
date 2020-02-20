@@ -124,8 +124,9 @@ class _RegisterFormState extends State<RegisterForm> {
             centerTitle: true,
             backgroundColor: PRIMARY,
           ),
-          body: SingleChildScrollView(
+          body: Container(
             child: Stack(
+              fit: StackFit.expand,
               children: <Widget>[
                 Image(
                   image: AssetImage("lib/assets/bgImgs/background.png"),
@@ -133,28 +134,25 @@ class _RegisterFormState extends State<RegisterForm> {
                   height: screenHeight(context),
                   width: screenWidth(context),
                 ),
-                Form(
-                  key: _formKey,
-                  child: Container(
-                    padding: EdgeInsetsDirectional.only(start: 14.0, end: 14.0),
+                SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(15.0),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-                        Padding(padding: EdgeInsets.only(top: 60.0)),
                         _buildNameField(),
                         _buildNumberField(),
                         _buildEmailField(),
                         _buildPasswordField(),
                         _buildTermsAndCondiField(),
+                        _buildRegisterButton(),
                       ],
                     ),
                   ),
-                ),
+                )
               ],
             ),
           ),
-          bottomNavigationBar: _buildRegisterButton(),
         ));
   }
 
@@ -333,13 +331,10 @@ class _RegisterFormState extends State<RegisterForm> {
             },
             activeColor: PRIMARY,
           ),
-          Flexible(
-            child: Container(
-              height: 50.0,
-              child: new Text(
-                MyLocalizations.of(context).acceptTerms,
-                style: subTitleWhiteShadeLightOSR(),
-              ),
+          Container(
+            child: new Text(
+              MyLocalizations.of(context).acceptTerms,
+              style: subTitleWhiteShadeLightOSR(),
             ),
           ),
         ],
