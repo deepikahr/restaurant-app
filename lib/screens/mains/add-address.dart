@@ -13,7 +13,7 @@ SentryError sentryError = new SentryError();
 
 class AddAddressPage extends StatefulWidget {
   final Map<String, Map<String, String>> localizedValues;
-  var locale;
+  final String locale;
   AddAddressPage({Key key, this.locale, this.localizedValues})
       : super(key: key);
   @override
@@ -38,16 +38,20 @@ class _AddAddressPageState extends State<AddAddressPage> {
 
   _saveAddress() async {
     if (_formKey.currentState.validate()) {
-      setState(() {
-        isLoading = true;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = true;
+        });
+      }
       _formKey.currentState.save();
       ProfileService.addAddress(address).then((onValue) {
         try {
-          setState(() {
-            isLoading = false;
-            Navigator.of(context).pop(address);
-          });
+          if (mounted) {
+            setState(() {
+              isLoading = false;
+              Navigator.of(context).pop(address);
+            });
+          }
         } catch (error, stackTrace) {
           sentryError.reportError(error, stackTrace);
         }
@@ -150,7 +154,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                                             MyLocalizations.of(context)
                                                 .fullName;
                                       } else {
-                                        address['name'] = value;
+                                        return address['name'] = value;
                                       }
                                     },
                                   ),
@@ -194,7 +198,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                                         MyLocalizations.of(context)
                                             .mobileNumber;
                                   } else {
-                                    address['contactNumber'] = value;
+                                    return address['contactNumber'] = value;
                                   }
                                 },
                               ),
@@ -241,7 +245,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                                             MyLocalizations.of(context)
                                                 .postalCode;
                                       } else {
-                                        address['zip'] = value;
+                                        return address['zip'] = value;
                                       }
                                     },
                                   ),
@@ -287,7 +291,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                                             MyLocalizations.of(context)
                                                 .subUrban;
                                       } else {
-                                        address['locationName'] = value;
+                                        return address['locationName'] = value;
                                       }
                                     },
                                   ),
@@ -332,7 +336,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                                             "  " +
                                             MyLocalizations.of(context).city;
                                       } else {
-                                        address['city'] = value;
+                                        return address['city'] = value;
                                       }
                                     },
                                   ),
@@ -367,7 +371,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                                     ),
                                     style: textOSR(),
                                     validator: (String value) {
-                                      address['state'] = value;
+                                      return address['state'] = value;
                                     },
                                   ),
                                 ))
@@ -401,7 +405,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                                     ),
                                     style: textOSR(),
                                     validator: (String value) {
-                                      address['country'] = value;
+                                      return address['country'] = value;
                                     },
                                   ),
                                 ))
@@ -445,7 +449,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                                             "  " +
                                             MyLocalizations.of(context).address;
                                       } else {
-                                        address['address'] = value;
+                                        return address['address'] = value;
                                       }
                                     },
                                   ),

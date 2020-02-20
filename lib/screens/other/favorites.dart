@@ -17,7 +17,7 @@ SentryError sentryError = new SentryError();
 
 class Favorites extends StatefulWidget {
   final Map<String, Map<String, String>> localizedValues;
-  var locale;
+  final String locale;
   Favorites({Key key, this.locale, this.localizedValues}) : super(key: key);
   @override
   _FavoritesState createState() => _FavoritesState();
@@ -189,10 +189,12 @@ class _FavoritesState extends State<Favorites> {
                               : InkWell(
                                   onTap: () {
                                     if (!isProcessing) {
-                                      setState(() {
-                                        isProcessing = true;
-                                        selectedItemId = favs[index]['_id'];
-                                      });
+                                      if (mounted) {
+                                        setState(() {
+                                          isProcessing = true;
+                                          selectedItemId = favs[index]['_id'];
+                                        });
+                                      }
                                       ProfileService.removeFavouritById(
                                               favs[index]['_id'])
                                           .then((onValue) {
@@ -204,10 +206,12 @@ class _FavoritesState extends State<Favorites> {
                                               duration: Toast.LENGTH_LONG,
                                               gravity: Toast.BOTTOM);
                                           if (onValue) {
-                                            setState(() {
-                                              isProcessing = false;
-                                              favs.removeAt(index);
-                                            });
+                                            if (mounted) {
+                                              setState(() {
+                                                isProcessing = false;
+                                                favs.removeAt(index);
+                                              });
+                                            }
                                           }
                                         } catch (error, stackTrace) {
                                           sentryError.reportError(

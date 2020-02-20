@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:RestaurantSaas/screens/mains/home.dart';
 import 'package:flutter/material.dart';
 import '../../styles/styles.dart';
@@ -17,7 +19,7 @@ SentryError sentryError = new SentryError();
 
 class LoginPage extends StatefulWidget {
   final isDrawe;
-  var locale;
+  final String locale;
   final Map<String, Map<String, String>> localizedValues;
 
   LoginPage({Key key, this.isDrawe, this.locale, this.localizedValues})
@@ -41,9 +43,11 @@ class _LoginPageState extends State<LoginPage> {
 
   login() {
     if (_formKey.currentState.validate()) {
-      setState(() {
-        isLoading = true;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = true;
+        });
+      }
       _formKey.currentState.save();
       Map<String, dynamic> body = {'email': email, 'password': password};
       AuthService.login(body).then((onValue) {
@@ -76,17 +80,21 @@ class _LoginPageState extends State<LoginPage> {
               }
             });
           }
-          setState(() {
-            isLoading = false;
-          });
+          if (mounted) {
+            setState(() {
+              isLoading = false;
+            });
+          }
         } catch (error, stackTrace) {
           sentryError.reportError(error, stackTrace);
         }
       }).catchError((onError) {
         sentryError.reportError(onError, null);
-        setState(() {
-          isLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+          });
+        }
         showSnackbar(onError);
       });
     }
@@ -198,7 +206,8 @@ class _LoginPageState extends State<LoginPage> {
           if (value.isEmpty ||
               !RegExp(Validators.emailPattern).hasMatch(value)) {
             return MyLocalizations.of(context).pleaseEnterValidEmail;
-          }
+          } else
+            return null;
         },
         onSaved: (String value) {
           email = value;
@@ -224,7 +233,8 @@ class _LoginPageState extends State<LoginPage> {
         validator: (String value) {
           if (value.isEmpty || value.length < 6) {
             return MyLocalizations.of(context).pleaseEnterValidPassword;
-          }
+          } else
+            return null;
         },
         onSaved: (String value) {
           password = value;

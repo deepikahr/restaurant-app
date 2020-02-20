@@ -16,7 +16,7 @@ class LocationListPage extends StatefulWidget {
   final Map<String, dynamic> restaurantInfo;
   final List<dynamic> locations;
   final Map<String, Map<String, String>> localizedValues;
-  var locale;
+  final String locale;
 
   LocationListPage(
       {Key key,
@@ -49,9 +49,11 @@ class _LocationListPageState extends State<LocationListPage> {
   Widget build(BuildContext context) {
     CounterModel().getCounter().then((res) {
       try {
-        setState(() {
-          cartCount = res;
-        });
+        if (mounted) {
+          setState(() {
+            cartCount = res;
+          });
+        }
       } catch (error, stackTrace) {
         sentryError.reportError(error, stackTrace);
       }

@@ -25,7 +25,7 @@ SentryError sentryError = new SentryError();
 
 class ProfileApp extends StatefulWidget {
   final Map<String, Map<String, String>> localizedValues;
-  String locale;
+  final String locale;
   ProfileApp({Key key, this.locale, this.localizedValues}) : super(key: key);
   @override
   _ProfileAppState createState() => _ProfileAppState();
@@ -51,7 +51,7 @@ class _ProfileAppState extends State<ProfileApp> {
 
 class Profile extends StatefulWidget {
   final Map<String, Map<String, String>> localizedValues;
-  String locale;
+  final String locale;
   Profile({Key key, this.locale, this.localizedValues}) : super(key: key);
   @override
   _ProfileState createState() => _ProfileState();
@@ -84,25 +84,29 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 
   getData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      selectedLanguage = prefs.getString('selectedLanguage');
-    });
-    if (selectedLanguage == 'en') {
-      selectedLocale = 'English';
-    } else if (selectedLanguage == 'fr') {
-      selectedLocale = 'French';
-    } else if (selectedLanguage == 'zh') {
-      selectedLocale = 'Chinese';
-    } else if (selectedLanguage == 'ka') {
-      selectedLocale = 'Kannada';
+    if (mounted) {
+      setState(() {
+        selectedLanguage = prefs.getString('selectedLanguage');
+      });
+      if (selectedLanguage == 'en') {
+        selectedLocale = 'English';
+      } else if (selectedLanguage == 'fr') {
+        selectedLocale = 'French';
+      } else if (selectedLanguage == 'zh') {
+        selectedLocale = 'Chinese';
+      } else if (selectedLanguage == 'ka') {
+        selectedLocale = 'Kannada';
+      }
     }
   }
 
   void _saveProfileInfo() {
     if (_formKey.currentState.validate()) {
-      setState(() {
-        isLoading = true;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = true;
+        });
+      }
       _formKey.currentState.save();
 
       var body = {
@@ -118,9 +122,11 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
         try {
           Toast.show("Your profile Successfully UPDATED", context,
               duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-          setState(() {
-            isLoading = false;
-          });
+          if (mounted) {
+            setState(() {
+              isLoading = false;
+            });
+          }
         } catch (error, stackTrace) {
           sentryError.reportError(error, stackTrace);
         }
@@ -137,71 +143,83 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   void selectGallary() async {
     var file = await ImagePicker.pickImage(source: ImageSource.gallery);
     // base64Image = base64Encode(file.readAsBytesSync());
-    setState(() {
-      _imageFile = file;
+    if (mounted) {
       setState(() {
-        isPicUploading = true;
+        _imageFile = file;
+        if (mounted) {
+          setState(() {
+            isPicUploading = true;
+          });
+        }
+        if (_imageFile != null) {
+          var stream = new http.ByteStream(
+              DelegatingStream.typed(_imageFile.openRead()));
+          ProfileService.uploadProfileImage(
+            _imageFile,
+            stream,
+            profileData['_id'],
+          );
+          if (mounted) {
+            setState(() {
+              isPicUploading = false;
+            });
+          }
+          Toast.show("Your profile Picture Successfully UPDATED", context,
+              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+        }
       });
-      if (_imageFile != null) {
-        var stream =
-            new http.ByteStream(DelegatingStream.typed(_imageFile.openRead()));
-        Map<String, dynamic> body = {"baseKey": base64Image};
-        Map<String, dynamic> imageData;
-        ProfileService.uploadProfileImage(
-          _imageFile,
-          stream,
-          profileData['_id'],
-        );
-        setState(() {
-          isPicUploading = false;
-        });
-        Toast.show("Your profile Picture Successfully UPDATED", context,
-            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-      }
-    });
+    }
   }
 
   void selectCamera() async {
     var file = await ImagePicker.pickImage(source: ImageSource.camera);
     // base64Image = base64Encode(file.readAsBytesSync());
-    setState(() {
-      _imageFile = file;
+    if (mounted) {
       setState(() {
-        isPicUploading = true;
-      });
-      if (_imageFile != null) {
-        var stream =
-            new http.ByteStream(DelegatingStream.typed(_imageFile.openRead()));
-        Map<String, dynamic> body = {"baseKey": base64Image};
-        Map<String, dynamic> imageData;
-        ProfileService.uploadProfileImage(
-          _imageFile,
-          stream,
-          profileData['_id'],
-        );
+        _imageFile = file;
+        if (mounted) {
+          setState(() {
+            isPicUploading = true;
+          });
+        }
+        if (_imageFile != null) {
+          var stream = new http.ByteStream(
+              DelegatingStream.typed(_imageFile.openRead()));
+          ProfileService.uploadProfileImage(
+            _imageFile,
+            stream,
+            profileData['_id'],
+          );
 
-        setState(() {
-          isPicUploading = false;
-        });
-        Toast.show("Your profile Picture Successfully UPDATED", context,
-            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-      }
-    });
+          if (mounted) {
+            setState(() {
+              isPicUploading = false;
+            });
+          }
+          Toast.show("Your profile Picture Successfully UPDATED", context,
+              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+        }
+      });
+    }
   }
 
   void removeProfilePic() async {
-    setState(() {
-      isImageUploading = true;
-    });
+    if (mounted) {
+      setState(() {
+        isImageUploading = true;
+      });
+    }
     await ProfileService.deleteUserProfilePic().then((onValue) {
       try {
         Toast.show(onValue['message'], context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         profileData['logo'] = null;
         _imageFile = null;
-        setState(() {
-          isImageUploading = false;
-        });
+        if (mounted) {
+          setState(() {
+            isImageUploading = false;
+          });
+        }
       }
       // }
       catch (error, stackTrace) {
@@ -466,7 +484,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           validator: (String value) {
                             if (value.length > 9) {
                               return 'Please Enter Valid Mobile number';
-                            }
+                            } else
+                              return null;
                           },
                           onSaved: (value) {
                             data['contactNumber'] = value;

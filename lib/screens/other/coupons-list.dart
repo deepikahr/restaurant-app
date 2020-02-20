@@ -1,5 +1,6 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import '../../widgets/coupon-card.dart';
 import '../../styles/styles.dart';
 import '../../services/main-service.dart';
 import 'package:async_loader/async_loader.dart';
@@ -16,7 +17,7 @@ SentryError sentryError = new SentryError();
 class CouponsList extends StatefulWidget {
   final String locationId;
   final Map<String, Map<String, String>> localizedValues;
-  var locale;
+  final String locale;
 
   CouponsList({Key key, this.locationId, this.locale, this.localizedValues})
       : super(key: key);

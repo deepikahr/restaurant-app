@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:RestaurantSaas/constant.dart';
 import 'package:RestaurantSaas/localizations.dart';
 import 'package:RestaurantSaas/screens/other/CounterModel.dart';
@@ -20,7 +22,7 @@ class ProductDetailsPage extends StatefulWidget {
   final Map<String, dynamic> product, locationInfo, taxInfo, tableInfo;
   final String restaurantName, restaurantId, restaurantAddress;
   final Map<String, Map<String, String>> localizedValues;
-  var locale;
+  final String locale;
 
   ProductDetailsPage(
       {Key key,
@@ -51,14 +53,18 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   void _changeProductQuantity(bool increase) {
     if (increase) {
-      setState(() {
-        quantity++;
-      });
+      if (mounted) {
+        setState(() {
+          quantity++;
+        });
+      }
     } else {
       if (quantity > 1) {
-        setState(() {
-          quantity--;
-        });
+        if (mounted) {
+          setState(() {
+            quantity--;
+          });
+        }
       }
     }
     _calculatePrice();
@@ -70,9 +76,11 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         widget.product['variants'][selectedSizeIndex];
     price = price + variant['price'];
 
-    setState(() {
-      price = price * quantity;
-    });
+    if (mounted) {
+      setState(() {
+        price = price * quantity;
+      });
+    }
     List<dynamic> extraIngredientsList = List<dynamic>();
     if (widget.product['extraIngredients'].length > 0 &&
         widget.product['extraIngredients'][0] != null) {
@@ -106,10 +114,12 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     Common.getToken().then((onValue) {
       try {
         if (onValue != null) {
-          setState(() {
-            isLoggedIn = true;
-            _checkFavourite();
-          });
+          if (mounted) {
+            setState(() {
+              isLoggedIn = true;
+              _checkFavourite();
+            });
+          }
         }
       } catch (error, stackTrace) {
         sentryError.reportError(error, stackTrace);
@@ -134,17 +144,19 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     ProfileService.checkFavourite(widget.product['_id']).then((onValue) {
       try {
         if (mounted) {
-          setState(() {
-            isLoading = false;
-            if (onValue['_id'] != null) {
-              favouriteId = onValue['_id'];
-            }
-            if (onValue['resflag'] != null) {
-              isFavourite = onValue['resflag'];
-            } else {
-              isFavourite = false;
-            }
-          });
+          if (mounted) {
+            setState(() {
+              isLoading = false;
+              if (onValue['_id'] != null) {
+                favouriteId = onValue['_id'];
+              }
+              if (onValue['resflag'] != null) {
+                isFavourite = onValue['resflag'];
+              } else {
+                isFavourite = false;
+              }
+            });
+          }
         }
       } catch (error, stackTrace) {
         sentryError.reportError(error, stackTrace);
@@ -163,9 +175,11 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   }
 
   void _addToFavourite() async {
-    setState(() {
-      isLoading = true;
-    });
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+      });
+    }
     if (isFavourite) {
       ProfileService.removeFavouritById(favouriteId).then((onValue) {
         try {
@@ -173,11 +187,13 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               MyLocalizations.of(context).productRemovedFromFavourite, context,
               duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
           if (onValue != null) {
-            setState(() {
-              favouriteId = null;
-              isLoading = false;
-              isFavourite = false;
-            });
+            if (mounted) {
+              setState(() {
+                favouriteId = null;
+                isLoading = false;
+                isFavourite = false;
+              });
+            }
           }
         } catch (error, stackTrace) {
           sentryError.reportError(error, stackTrace);
@@ -193,11 +209,13 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           Toast.show(
               MyLocalizations.of(context).productaddedtoFavourites, context,
               duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-          setState(() {
-            favouriteId = onValue['_id'];
-            isLoading = false;
-            isFavourite = true;
-          });
+          if (mounted) {
+            setState(() {
+              favouriteId = onValue['_id'];
+              isLoading = false;
+              isFavourite = true;
+            });
+          }
         } catch (error, stackTrace) {
           sentryError.reportError(error, stackTrace);
         }
@@ -211,9 +229,11 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   Widget build(BuildContext context) {
     CounterModel().getCounter().then((res) {
       try {
-        setState(() {
-          cartCount = res;
-        });
+        if (mounted) {
+          setState(() {
+            cartCount = res;
+          });
+        }
       } catch (error, stackTrace) {
         sentryError.reportError(error, stackTrace);
       }
@@ -378,28 +398,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         ));
   }
 
-  Widget _buildABoutUsBox(String description) {
-    return Container(
-      width: screenWidth(context),
-      child: Column(children: [
-        ExpansionTile(
-          title: Text(
-            MyLocalizations.of(context).description,
-            // style: titleWhiteBoldOSBB(),
-          ),
-          children: <Widget>[
-            Padding(
-                padding: EdgeInsets.only(left: 15.0, right: 15.0, bottom: 10.0),
-                child: Text(
-                  description,
-                  //  style: hintStyleSmallWhiteLightOSRInfo()
-                ))
-          ],
-        ),
-      ]),
-    );
-  }
-
   Widget _buildProductTopImg(String imgUrl, String description) {
     return Stack(
       alignment: AlignmentDirectional.center,
@@ -481,11 +479,13 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         Checkbox(
                           value: extras[index]['isSelected'],
                           onChanged: (bool value) {
-                            setState(() {
-                              extras[index]['isSelected'] =
-                                  !extras[index]['isSelected'];
-                            });
-                            _calculatePrice();
+                            if (mounted) {
+                              setState(() {
+                                extras[index]['isSelected'] =
+                                    !extras[index]['isSelected'];
+                              });
+                              _calculatePrice();
+                            }
                           },
                           activeColor: PRIMARY,
                         ),
@@ -540,11 +540,13 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               groupValue: selectedSizeIndex,
               selected: sizes[index]['isSelected'],
               onChanged: (int selected) {
-                setState(() {
-                  selectedSizeIndex = selected;
-                  sizes[index]['isSelected'] = !sizes[index]['isSelected'];
-                });
-                _calculatePrice();
+                if (mounted) {
+                  setState(() {
+                    selectedSizeIndex = selected;
+                    sizes[index]['isSelected'] = !sizes[index]['isSelected'];
+                  });
+                  _calculatePrice();
+                }
               },
               activeColor: PRIMARY,
               title: sizes[index]['size'] != null

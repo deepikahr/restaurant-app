@@ -20,7 +20,7 @@ SentryError sentryError = new SentryError();
 class RestaurantListPage extends StatefulWidget {
   final String title;
   final Map<String, Map<String, String>> localizedValues;
-  var locale;
+  final String locale;
 
   RestaurantListPage({Key key, this.title, this.locale, this.localizedValues})
       : super(key: key);
@@ -33,7 +33,7 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
   final GlobalKey<AsyncLoaderState> _asyncLoaderState =
       GlobalKey<AsyncLoaderState>();
   Map<String, dynamic> restaurantInfo;
-  VoidCallback _showBottomSheetCallback;
+  VoidCallback showBottomSheetCallback;
   int cartCount;
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -67,9 +67,11 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
 
     CounterModel().getCounter().then((res) {
       try {
-        setState(() {
-          cartCount = res;
-        });
+        if (mounted) {
+          setState(() {
+            cartCount = res;
+          });
+        }
       } catch (error, stackTrace) {
         sentryError.reportError(error, stackTrace);
       }
@@ -181,19 +183,23 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
                         MyLocalizations.of(context).reviews,
                         MyLocalizations.of(context).branches),
                     onTap: () {
-                      setState(() {
-                        restaurantInfo = data[index];
-                      });
-                      _showBottomSheet();
+                      if (mounted) {
+                        setState(() {
+                          restaurantInfo = data[index];
+                        });
+                        _showBottomSheet();
+                      }
                     });
               });
         });
   }
 
   void _showBottomSheet() {
-    setState(() {
-      _showBottomSheetCallback = null;
-    });
+    if (mounted) {
+      setState(() {
+        showBottomSheetCallback = null;
+      });
+    }
     scaffoldKey.currentState
         .showBottomSheet<void>((BuildContext context) {
           return Container(
@@ -213,9 +219,11 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
         .closed
         .whenComplete(() {
           if (mounted) {
-            setState(() {
-              _showBottomSheetCallback = _showBottomSheet;
-            });
+            if (mounted) {
+              setState(() {
+                showBottomSheetCallback = _showBottomSheet;
+              });
+            }
           }
         });
   }

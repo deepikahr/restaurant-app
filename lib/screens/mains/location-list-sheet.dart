@@ -16,7 +16,7 @@ SentryError sentryError = new SentryError();
 class LocationListSheet extends StatelessWidget {
   final Map<String, dynamic> restaurantInfo, locationInfo;
   final Map<String, Map<String, String>> localizedValues;
-  var locale;
+  final String locale;
   LocationListSheet(
       {Key key,
       this.restaurantInfo,
@@ -120,12 +120,14 @@ class LocationListSheet extends StatelessWidget {
       Map<String, dynamic> restaurantInfo,
       Map<String, dynamic> locationInfo,
       Map<String, Map<String, String>> localizedValues,
-      var locale,
+      final String locale,
       String currency) {
     String locationName = data[index]['location']['locationName'];
     double rating = double.parse(data[index]['location']['rating'].toString());
     dynamic cuisine = data[index]['location']['cuisine'];
     String deliveryTime, deliveryChargeText, freeDeliveryText;
+    // print("delivery infor ${data[index]['location']}");
+    print("delivery infor ${data[index]['location']['deliveryInfo']}");
     if (data[index]['location']['deliveryInfo'] == null ||
         data[index]['location']['deliveryInfo']['deliveryInfo'] == null) {
       deliveryTime = deliveryChargeText = freeDeliveryText = null;
@@ -244,7 +246,7 @@ class LocationListSheet extends StatelessWidget {
     Map<String, dynamic> restaurantInfo,
     List<dynamic> locations,
     Map<String, Map<String, String>> localizedValues,
-    var locale,
+    final String locale,
   ) {
     return Padding(
       padding: EdgeInsets.only(

@@ -14,7 +14,7 @@ SentryError sentryError = new SentryError();
 
 class NewPassword extends StatefulWidget {
   final String otpToken;
-  var locale;
+  final String locale;
   final Map<String, Map<String, String>> localizedValues;
   NewPassword({Key key, this.otpToken, this.locale, this.localizedValues})
       : super(key: key);
@@ -31,9 +31,11 @@ class _NewPasswordState extends State<NewPassword> {
   void createPassword() async {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
-      setState(() {
-        isLoading = true;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = true;
+        });
+      }
       AuthService.createNewPassword({'newPass': newPassword}, widget.otpToken)
           .then((onValue) {
         try {
@@ -55,17 +57,21 @@ class _NewPasswordState extends State<NewPassword> {
               });
             }
           }
-          setState(() {
-            isLoading = false;
-          });
+          if (mounted) {
+            setState(() {
+              isLoading = false;
+            });
+          }
         } catch (error, stackTrace) {
           sentryError.reportError(error, stackTrace);
         }
       }).catchError((onError) {
         sentryError.reportError(onError, null);
-        setState(() {
-          isLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+          });
+        }
         showSnackbar(onError);
       });
     }
@@ -170,7 +176,8 @@ class _NewPasswordState extends State<NewPassword> {
                       if (value.isEmpty || value.length < 6) {
                         return MyLocalizations.of(context)
                             .pleaseEnterValidPassword;
-                      }
+                      } else
+                        return null;
                     },
                     onSaved: (value) {
                       newPassword = value;

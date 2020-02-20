@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:RestaurantSaas/styles/styles.dart' as prefix0;
 import 'package:flutter/material.dart';
 import '../../styles/styles.dart';
@@ -17,7 +19,7 @@ SentryError sentryError = new SentryError();
 class OrderTrack extends StatefulWidget {
   final String orderId;
   final Map<String, Map<String, String>> localizedValues;
-  var locale;
+  final String locale;
   OrderTrack({Key key, this.orderId, this.locale, this.localizedValues})
       : super(key: key);
   @override
