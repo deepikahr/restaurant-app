@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:RestaurantSaas/screens/mains/home.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,19 +19,17 @@ import 'package:RestaurantSaas/constant.dart' show languages;
 import 'package:RestaurantSaas/localizations.dart'
     show MyLocalizations, MyLocalizationsDelegate;
 
-class drawer extends StatefulWidget {
+class DrawerPage extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
   final Map<String, Map<String, String>> localizedValues;
-  var locale;
-  drawer({Key key, this.scaffoldKey, this.locale, this.localizedValues})
+  final String locale;
+  DrawerPage({Key key, this.scaffoldKey, this.locale, this.localizedValues})
       : super(key: key);
   @override
-  _drawerState createState() => _drawerState();
+  _DrawerPageState createState() => _DrawerPageState();
 }
 
-class _drawerState extends State<drawer> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
+class _DrawerPageState extends State<DrawerPage> {
   int cartCounter;
   String profilePic;
   String fullname;
@@ -47,45 +47,56 @@ class _drawerState extends State<drawer> {
 
   selectedLanguages() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      selectedLanguage = prefs.getString('selectedLanguage');
-    });
+    if (mounted) {
+      setState(() {
+        selectedLanguage = prefs.getString('selectedLanguage');
+      });
+    }
   }
 
   void _getCartLength() async {
     await Common.getCart().then((onValue) {
       if (onValue != null) {
-        setState(() {
-          cartCounter = onValue['productDetails'].length;
-        });
+        if (mounted) {
+          setState(() {
+            cartCounter = onValue['productDetails'].length;
+          });
+        }
       } else {
-        setState(() {
-          cartCounter = 0;
-        });
+        if (mounted) {
+          setState(() {
+            cartCounter = 0;
+          });
+        }
       }
     });
   }
 
   Future _checkLoginStatus() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
     Common.getToken().then((token) {
       if (token != null) {
-        setState(() {
-          isLoggedIn = true;
-        });
+        if (mounted) {
+          setState(() {
+            isLoggedIn = true;
+          });
+        }
         ProfileService.getUserInfo().then((value) {
           if (value != null && mounted) {
-            setState(() {
-              profilePic = value['logo'];
-              fullname = value['name'];
-              isLoggedIn = true;
-            });
+            if (mounted) {
+              setState(() {
+                profilePic = value['logo'];
+                fullname = value['name'];
+                isLoggedIn = true;
+              });
+            }
           }
         });
       } else {
-        setState(() {
-          isLoggedIn = false;
-        });
+        if (mounted) {
+          setState(() {
+            isLoggedIn = false;
+          });
+        }
       }
     });
   }
@@ -252,18 +263,22 @@ class _drawerState extends State<drawer> {
           }
         } else {
           if (!check) {
-            setState(() {
-              isLoggedIn = true;
-            });
+            if (mounted) {
+              setState(() {
+                isLoggedIn = true;
+              });
+            }
             Common.removeToken().then((onValue) {
               Common.removeCart().then((onValue) {
                 showSnackbar(
                     MyLocalizations.of(context).logoutSuccessfully + '!');
                 //
                 Navigator.pop(context);
-                setState(() {
-                  isLoggedIn = false;
-                });
+                if (mounted) {
+                  setState(() {
+                    isLoggedIn = false;
+                  });
+                }
               });
             });
           }

@@ -23,7 +23,7 @@ SentryError sentryError = new SentryError();
 class PaymentMethod extends StatefulWidget {
   final Map<String, dynamic> cart;
   final Map<String, Map<String, String>> localizedValues;
-  var locale;
+  final String locale;
 
   PaymentMethod({Key key, this.cart, this.locale, this.localizedValues})
       : super(key: key);
@@ -106,17 +106,23 @@ class _PaymentMethodState extends State<PaymentMethod> {
   }
 
   fetchCardInfo() async {
-    setState(() {
-      isCardListLoading = true;
-    });
+    if (mounted) {
+      setState(() {
+        isCardListLoading = true;
+      });
+    }
     await ProfileService.getCardList().then((onValue) {
       try {
-        setState(() {
-          cardList = onValue;
-        });
-        setState(() {
-          isCardListLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            cardList = onValue;
+          });
+        }
+        if (mounted) {
+          setState(() {
+            isCardListLoading = false;
+          });
+        }
       } catch (error, stackTrace) {
         sentryError.reportError(error, stackTrace);
       }
@@ -126,36 +132,53 @@ class _PaymentMethodState extends State<PaymentMethod> {
   }
 
   getPaymentMethod() async {
-    setState(() {
-      isPaymentMethodLoading = true;
-    });
+    if (mounted) {
+      setState(() {
+        isPaymentMethodLoading = true;
+      });
+    }
     await MainService.getLoyaltyInfoByRestaurantId(widget.cart['restaurantID'])
         .then((onValue) {
       try {
         if (onValue['message'] == "No setting data found") {
-          setState(() {
-            paymentMethodList = [];
-          });
+          if (mounted) {
+            setState(() {
+              paymentMethodList = [];
+            });
+          }
 
-          setState(() {
-            isPaymentMethodLoading = false;
-          });
-        } else if (onValue['restaurantID']['paymentMethod'] == null) {
-          setState(() {
-            paymentMethodList = onValue['restaurantID']['paymentMethod'] = [];
-          });
+          if (mounted) {
+            setState(() {
+              isPaymentMethodLoading = false;
+            });
+          }
+        } else if (onValue['setting']['restaurantID']['paymentMethod'] ==
+            null) {
+          if (mounted) {
+            setState(() {
+              paymentMethodList =
+                  onValue['setting']['restaurantID']['paymentMethod'] = [];
+            });
+          }
 
-          setState(() {
-            isPaymentMethodLoading = false;
-          });
+          if (mounted) {
+            setState(() {
+              isPaymentMethodLoading = false;
+            });
+          }
         } else {
-          setState(() {
-            paymentMethodList = onValue['restaurantID']['paymentMethod'];
-          });
+          if (mounted) {
+            setState(() {
+              paymentMethodList =
+                  onValue['setting']['restaurantID']['paymentMethod'];
+            });
+          }
 
-          setState(() {
-            isPaymentMethodLoading = false;
-          });
+          if (mounted) {
+            setState(() {
+              isPaymentMethodLoading = false;
+            });
+          }
         }
       } catch (error, stackTrace) {
         sentryError.reportError(error, stackTrace);
@@ -183,9 +206,11 @@ class _PaymentMethodState extends State<PaymentMethod> {
 
             ProfileService.placeOrderForCreditCard(body).then((res) {
               try {
-                setState(() {
-                  isLoading = false;
-                });
+                if (mounted) {
+                  setState(() {
+                    isLoading = false;
+                  });
+                }
 
                 if (res['response_code'] == 400) {
                   showAlertMessage(res['message']);
@@ -206,9 +231,11 @@ class _PaymentMethodState extends State<PaymentMethod> {
               sentryError.reportError(onError, null);
             });
           } else {
-            setState(() {
-              isLoading = false;
-            });
+            if (mounted) {
+              setState(() {
+                isLoading = false;
+              });
+            }
             Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(
@@ -295,10 +322,12 @@ class _PaymentMethodState extends State<PaymentMethod> {
                         : GestureDetector(
                             onTap: () {
                               if (!isLoading) {
-                                setState(() {
-                                  isLoading = true;
-                                });
-                                _placeOrder();
+                                if (mounted) {
+                                  setState(() {
+                                    isLoading = true;
+                                  });
+                                  _placeOrder();
+                                }
                               }
                             },
                             child: Column(
@@ -346,15 +375,18 @@ class _PaymentMethodState extends State<PaymentMethod> {
                                         ['isSelected'],
                                     onChanged: (int selected) {
                                       if (!isLoading) {
-                                        setState(() {
-                                          selectedPaymentIndex = selected;
-                                          paymentMethodList[index]
-                                                  ['isSelected'] =
-                                              !paymentMethodList[index]
-                                                  ['isSelected'];
-                                          widget.cart['paymentOption'] =
-                                              paymentMethodList[index]['type'];
-                                        });
+                                        if (mounted) {
+                                          setState(() {
+                                            selectedPaymentIndex = selected;
+                                            paymentMethodList[index]
+                                                    ['isSelected'] =
+                                                !paymentMethodList[index]
+                                                    ['isSelected'];
+                                            widget.cart['paymentOption'] =
+                                                paymentMethodList[index]
+                                                    ['type'];
+                                          });
+                                        }
                                       }
                                     },
                                     activeColor: PRIMARY,
@@ -400,11 +432,13 @@ class _PaymentMethodState extends State<PaymentMethod> {
                         selected: true,
                         onChanged: (int selected) {
                           if (!isLoading) {
-                            setState(() {
-                              selectedPaymentIndex = selected;
+                            if (mounted) {
+                              setState(() {
+                                selectedPaymentIndex = selected;
 
-                              widget.cart['paymentOption'] = "COD";
-                            });
+                                widget.cart['paymentOption'] = "COD";
+                              });
+                            }
                           }
                         },
                         activeColor: PRIMARY,
@@ -463,10 +497,12 @@ class _PaymentMethodState extends State<PaymentMethod> {
                     result.then((onValue) {
                       fetchCardInfo();
 
-                      setState(() {
-                        // cardList.add(onValue);
-                        cardList = cardList;
-                      });
+                      if (mounted) {
+                        setState(() {
+                          // cardList.add(onValue);
+                          cardList = cardList;
+                        });
+                      }
                     });
                     // }
                   },
@@ -544,9 +580,11 @@ class _PaymentMethodState extends State<PaymentMethod> {
                                                   return null;
                                               },
                                               onSaved: (String value) {
-                                                setState(() {
-                                                  cvv = int.parse(value);
-                                                });
+                                                if (mounted) {
+                                                  setState(() {
+                                                    cvv = int.parse(value);
+                                                  });
+                                                }
                                               },
                                             ),
                                           ),

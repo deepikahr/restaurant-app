@@ -9,7 +9,7 @@ import 'package:RestaurantSaas/localizations.dart'
 
 class AddCardPage extends StatefulWidget {
   final Map<String, Map<String, String>> localizedValues;
-  var locale;
+  final String locale;
 
   AddCardPage({Key key, this.locale, this.localizedValues}) : super(key: key);
 
@@ -35,16 +35,18 @@ class _AddCardPageState extends State<AddCardPage> {
         'cardCvv': cardCvv,
         'cardType': 'CARD',
       };
-      setState(() {
-        isLoading = true;
-      });
-
+      if (mounted) {
+        setState(() {
+          isLoading = true;
+        });
+      }
       await ProfileService.addCard(body).then((onValue) {
-       
         try {
-          setState(() {
-            isLoading = false;
-          });
+          if (mounted) {
+            setState(() {
+              isLoading = false;
+            });
+          }
           if (onValue['data'] != null &&
               onValue['data']['_id'] != null &&
               onValue['response_code'] == 200) {

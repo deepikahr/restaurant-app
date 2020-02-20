@@ -13,7 +13,7 @@ SentryError sentryError = new SentryError();
 class OrderHistory extends StatefulWidget {
   final bool isRatingAllowed;
   final Map<String, Map<String, String>> localizedValues;
-  var locale;
+  final String locale;
 
   OrderHistory(
       {Key key, this.isRatingAllowed, this.localizedValues, this.locale})

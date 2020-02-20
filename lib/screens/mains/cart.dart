@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:RestaurantSaas/constant.dart';
 import 'package:RestaurantSaas/localizations.dart';
 import 'package:RestaurantSaas/screens/other/CounterModel.dart';
@@ -22,7 +24,7 @@ SentryError sentryError = new SentryError();
 class CartPage extends StatefulWidget {
   Map<String, dynamic> product, taxInfo, locationInfo;
   final Map<String, Map<String, String>> localizedValues;
-  var locale;
+  final String locale;
   final Map<String, dynamic> tableInfo;
   CartPage(
       {Key key,
@@ -173,10 +175,12 @@ class _CartPageState extends State<CartPage> {
     // [8] set cart state and save to storage
     if (widget.locationInfo != null) {
       await Common.setCart(cart);
-      setState(() {
-        cartItems = cart;
-        productsLength = products.length;
-      });
+      if (mounted) {
+        setState(() {
+          cartItems = cart;
+          productsLength = products.length;
+        });
+      }
     }
   }
 
@@ -202,9 +206,11 @@ class _CartPageState extends State<CartPage> {
       widget.taxInfo['taxName'] = '';
     }
     CounterModel().getCounter().then((res) {
-      setState(() {
-        cartCount = res;
-      });
+      if (mounted) {
+        setState(() {
+          cartCount = res;
+        });
+      }
     });
     return MaterialApp(
         locale: Locale(widget.locale),
@@ -550,11 +556,13 @@ class _CartPageState extends State<CartPage> {
         cartItems['productDetails'][index]['note'] != null
             ? InkWell(
                 onTap: () {
-                  setState(() {
-                    cartItems['productDetails'][index]['note'] = null;
-                    Common.setCart(cartItems);
-                  });
-                  _calculateCart();
+                  if (mounted) {
+                    setState(() {
+                      cartItems['productDetails'][index]['note'] = null;
+                      Common.setCart(cartItems);
+                    });
+                    _calculateCart();
+                  }
                 },
                 child: Icon(
                   Icons.cancel,
@@ -583,10 +591,12 @@ class _CartPageState extends State<CartPage> {
         selectedCoupon != null
             ? InkWell(
                 onTap: () {
-                  setState(() {
-                    selectedCoupon = null;
-                  });
-                  _calculateCart();
+                  if (mounted) {
+                    setState(() {
+                      selectedCoupon = null;
+                    });
+                    _calculateCart();
+                  }
                 },
                 child: Icon(
                   Icons.cancel,
@@ -617,13 +627,16 @@ class _CartPageState extends State<CartPage> {
                     validator: (String value) {
                       if (value.isEmpty) {
                         return MyLocalizations.of(context).pleaseEnter;
-                      }
+                      } else
+                        return null;
                     },
                     onSaved: (String value) {
-                      setState(() {
-                        cartItems['productDetails'][index]['note'] = value;
-                        Common.setCart(cartItems);
-                      });
+                      if (mounted) {
+                        setState(() {
+                          cartItems['productDetails'][index]['note'] = value;
+                          Common.setCart(cartItems);
+                        });
+                      }
                     },
                     decoration: InputDecoration(
                       labelText: MyLocalizations.of(context).note,
@@ -798,7 +811,8 @@ class _CartPageState extends State<CartPage> {
 //     // [8] set cart state and save to storage
 //     if (widget.locationInfo != null) {
 //       await Common.setCart(cart);
-//       setState(() {
+//         if (mounted) {
+// setState(() {
 //         cartItems = cart;
 //         productsLength = products.length;
 //       });
@@ -1146,7 +1160,8 @@ class _CartPageState extends State<CartPage> {
 //         cartItems['productDetails'][index]['note'] != null
 //             ? InkWell(
 //                 onTap: () {
-//                   setState(() {
+//                     if (mounted) {
+// setState(() {
 //                     cartItems['productDetails'][index]['note'] = null;
 //                     Common.setCart(cartItems);
 //                   });
@@ -1179,7 +1194,8 @@ class _CartPageState extends State<CartPage> {
 //         selectedCoupon != null
 //             ? InkWell(
 //                 onTap: () {
-//                   setState(() {
+//                     if (mounted) {
+// setState(() {
 //                     selectedCoupon = null;
 //                   });
 //                   _calculateCart();
@@ -1216,7 +1232,8 @@ class _CartPageState extends State<CartPage> {
 //                       }
 //                     },
 //                     onSaved: (String value) {
-//                       setState(() {
+//                         if (mounted) {
+// setState(() {
 //                         cartItems['productDetails'][index]['note'] = value;
 //                         Common.setCart(cartItems);
 //                       });
@@ -1385,7 +1402,8 @@ class _CartPageState extends State<CartPage> {
 //     // [8] set cart state and save to storage
 //     if (widget.locationInfo != null) {
 //       await Common.setCart(cart);
-//       setState(() {
+//         if (mounted) {
+// setState(() {
 //         cartItems = cart;
 //         productsLength = products.length;
 //       });
@@ -1637,7 +1655,8 @@ class _CartPageState extends State<CartPage> {
 //         selectedCoupon != null
 //             ? InkWell(
 //                 onTap: () {
-//                   setState(() {
+//                     if (mounted) {
+// setState(() {
 //                     selectedCoupon = null;
 //                   });
 //                   _calculateCart();

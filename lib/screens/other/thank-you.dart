@@ -11,7 +11,7 @@ import 'package:RestaurantSaas/localizations.dart'
 
 class ThankYou extends StatefulWidget {
   final Map<String, Map<String, String>> localizedValues;
-  var locale;
+  final String locale;
   ThankYou({Key key, this.localizedValues, this.locale}) : super(key: key);
   @override
   _ThankYouState createState() => _ThankYouState();

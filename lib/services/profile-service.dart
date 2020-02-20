@@ -96,6 +96,7 @@ class ProfileService {
         }).then((dmdkc) {});
       }
     });
+    return null;
   }
 
   static Future<List<dynamic>> getAddressList() async {

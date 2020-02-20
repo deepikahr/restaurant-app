@@ -17,7 +17,7 @@ SentryError sentryError = new SentryError();
 class OrderUpcoming extends StatefulWidget {
   final bool isRatingAllowed;
   final Map<String, Map<String, String>> localizedValues;
-  var locale;
+  final String locale;
   OrderUpcoming(
       {Key key, this.isRatingAllowed, this.locale, this.localizedValues})
       : super(key: key);
@@ -82,7 +82,7 @@ class OrderUpcomingState extends State<OrderUpcoming>
       List<dynamic> orders,
       bool isRatingAllowed,
       context,
-      var locale,
+      final String locale,
       Map<String, Map<String, String>> localizedValues,
       String currency) {
     return Container(
@@ -244,7 +244,7 @@ class OrderUpcomingState extends State<OrderUpcoming>
       BuildContext context,
       bool isRatingAllowed,
       String orderIdUniq,
-      var locale,
+      final String locale,
       Map<String, Map<String, String>> localizedValues) {
     return Container(
       padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
@@ -509,7 +509,7 @@ class OrderUpcomingState extends State<OrderUpcoming>
 //   }
 
 //   static Widget _buildOrderInfo(String status, String time, int orderId,
-//       BuildContext context, bool isRatingAllowed, String orderIdUniq, var locale,
+//       BuildContext context, bool isRatingAllowed, String orderIdUniq, final String locale,
 //       Map<String, Map<String, String>> localizedValues,) {
 //     return Container(
 //       padding: EdgeInsets.only(top: 10.0, bottom: 10.0),

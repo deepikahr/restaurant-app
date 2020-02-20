@@ -75,7 +75,7 @@ void initOneSignal() {
 
 class EntryPage extends StatefulWidget {
   final Map<String, Map<String, String>> localizedValues;
-  var locale;
+  final String locale;
   EntryPage(this.locale, this.localizedValues);
   @override
   _EntryPageState createState() => _EntryPageState();
@@ -92,9 +92,11 @@ class _EntryPageState extends State<EntryPage> {
 
   getData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      selectedLanguage = prefs.getString('selectedLanguage');
-    });
+    if (mounted) {
+      setState(() {
+        selectedLanguage = prefs.getString('selectedLanguage');
+      });
+    }
   }
 
   @override
@@ -116,7 +118,7 @@ class _EntryPageState extends State<EntryPage> {
           accentColor: PRIMARY,
         ),
         home: ChangeNotifierProvider<CounterModel>(
-            builder: (_) => CounterModel(),
+            create: (_) => CounterModel(),
             child: HomePage(
                 locale:
                     selectedLanguage == null ? widget.locale : selectedLanguage,

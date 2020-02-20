@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../../styles/styles.dart';
 import '../../services/auth-service.dart';
@@ -13,7 +15,7 @@ SentryError sentryError = new SentryError();
 
 class OtpVerify extends StatefulWidget {
   final String otpToken;
-  var locale;
+  final String locale;
   final Map<String, Map<String, String>> localizedValues;
   OtpVerify({Key key, this.otpToken, this.locale, this.localizedValues})
       : super(key: key);
@@ -30,9 +32,11 @@ class _OtpVerifyState extends State<OtpVerify> {
   void verifyOTP() async {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
-      setState(() {
-        isLoading = true;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = true;
+        });
+      }
       AuthService.verifyOTP({'otp': otp}, widget.otpToken).then((onValue) {
         try {
           if (onValue['message'] != null) {
@@ -52,17 +56,21 @@ class _OtpVerifyState extends State<OtpVerify> {
               });
             }
           }
-          setState(() {
-            isLoading = false;
-          });
+          if (mounted) {
+            setState(() {
+              isLoading = false;
+            });
+          }
         } catch (error, stackTrace) {
           sentryError.reportError(error, stackTrace);
         }
       }).catchError((onError) {
         sentryError.reportError(onError, null);
-        setState(() {
-          isLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+          });
+        }
         showSnackbar(onError);
       });
     }
@@ -159,7 +167,7 @@ class _OtpVerifyState extends State<OtpVerify> {
                   flex: 9,
                   child: TextFormField(
                     decoration: new InputDecoration(
-                      labelText:MyLocalizations.of(context).otp,
+                      labelText: MyLocalizations.of(context).otp,
                       hintStyle: hintStyleGreyLightOSR(),
                       contentPadding: EdgeInsets.all(12.0),
                       border: InputBorder.none,
@@ -168,7 +176,8 @@ class _OtpVerifyState extends State<OtpVerify> {
                     validator: (String value) {
                       if (value.isEmpty || value.length < 6) {
                         return MyLocalizations.of(context).otpErrorMessage;
-                      }
+                      } else
+                        return null;
                     },
                     onSaved: (value) {
                       otp = value;

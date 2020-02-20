@@ -10,7 +10,7 @@ import 'package:RestaurantSaas/localizations.dart'
 
 class OrdersPage extends StatefulWidget {
   final Map<String, Map<String, String>> localizedValues;
-  var locale;
+  final String locale;
   OrdersPage({Key key, this.locale, this.localizedValues}) : super(key: key);
   @override
   _OrdersPageState createState() => _OrdersPageState();

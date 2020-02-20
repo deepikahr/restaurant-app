@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../../styles/styles.dart';
 import '../../services/auth-service.dart';
@@ -13,7 +15,7 @@ import 'package:RestaurantSaas/localizations.dart'
 SentryError sentryError = new SentryError();
 
 class ResetPassword extends StatefulWidget {
-  var locale;
+  final String locale;
   final Map<String, Map<String, String>> localizedValues;
 
   ResetPassword({Key key, this.locale, this.localizedValues}) : super(key: key);
@@ -31,9 +33,11 @@ class _ResetPasswordState extends State<ResetPassword> {
   void sendOTP() async {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
-      setState(() {
-        isLoading = true;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = true;
+        });
+      }
       AuthService.sendOTP({'email': email}).then((onValue) {
         try {
           if (onValue['message'] != null) {
@@ -53,18 +57,22 @@ class _ResetPasswordState extends State<ResetPassword> {
               });
             }
           }
-          setState(() {
-            isLoading = false;
-          });
+          if (mounted) {
+            setState(() {
+              isLoading = false;
+            });
+          }
         } catch (error, stackTrace) {
           sentryError.reportError(error, stackTrace);
         }
       }).catchError((onError) {
         sentryError.reportError(onError, null);
         showSnackbar(onError);
-        setState(() {
-          isLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+          });
+        }
       });
     }
   }
@@ -164,7 +172,8 @@ class _ResetPasswordState extends State<ResetPassword> {
                           !RegExp(Validators.emailPattern).hasMatch(value)) {
                         return MyLocalizations.of(context)
                             .pleaseEnterValidEmail;
-                      }
+                      } else
+                        return null;
                     },
                     onSaved: (value) {
                       email = value;

@@ -14,7 +14,7 @@ SentryError sentryError = new SentryError();
 class Rating extends StatefulWidget {
   final String productId, orderId, locationId, restaurantId;
   final Map<String, Map<String, String>> localizedValues;
-  var locale;
+  final String locale;
   Rating(
       {Key key,
       this.productId,
@@ -46,14 +46,18 @@ class _RatingState extends State<Rating> {
         'rating': _rating,
         'restaurantID': widget.restaurantId
       };
-      setState(() {
-        isLoading = true;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = true;
+        });
+      }
       await ProfileService.postProductRating(body).then((onValue) {
         try {
-          setState(() {
-            isLoading = false;
-          });
+          if (mounted) {
+            setState(() {
+              isLoading = false;
+            });
+          }
           Navigator.popUntil(context, (Route<dynamic> route) => route.isFirst);
         } catch (error, stackTrace) {
           sentryError.reportError(error, stackTrace);
@@ -65,9 +69,11 @@ class _RatingState extends State<Rating> {
   }
 
   void rate(int rating) {
-    setState(() {
-      _rating = rating;
-    });
+    if (mounted) {
+      setState(() {
+        _rating = rating;
+      });
+    }
   }
 
   @override
@@ -214,7 +220,8 @@ class _RatingState extends State<Rating> {
                               validator: (String value) {
                                 if (value.isEmpty || value.length < 1) {
                                   return '';
-                                }
+                                } else
+                                  return null;
                               },
                               onSaved: (String value) {
                                 comment = value;

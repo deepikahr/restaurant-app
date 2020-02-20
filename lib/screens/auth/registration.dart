@@ -11,11 +11,10 @@ import 'package:RestaurantSaas/constant.dart' show languages;
 import 'package:RestaurantSaas/localizations.dart'
     show MyLocalizations, MyLocalizationsDelegate;
 
-
 import 'package:flutter/foundation.dart';
 
 class RegisterForm extends StatefulWidget {
-  var locale;
+  final String locale;
   final Map<String, Map<String, String>> localizedValues;
 
   RegisterForm({Key key, this.locale, this.localizedValues}) : super(key: key);
@@ -45,17 +44,21 @@ class _RegisterFormState extends State<RegisterForm> {
 
   selectedLanguages() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      selectedLanguage = prefs.getString('selectedLanguage');
-    });
+    if (mounted) {
+      setState(() {
+        selectedLanguage = prefs.getString('selectedLanguage');
+      });
+    }
   }
 
   _onRegister() async {
     if (_formKey.currentState.validate()) {
       if (isChecked) {
-        setState(() {
-          isLoading = true;
-        });
+        if (mounted) {
+          setState(() {
+            isLoading = true;
+          });
+        }
         _formKey.currentState.save();
         await AuthService.register(register).then((onValue) {
           if (onValue['message'] != null) {
@@ -64,19 +67,24 @@ class _RegisterFormState extends State<RegisterForm> {
               if (onValue['_id'] != null) {
                 Navigator.pop(context);
               }
-              setState(() {
-                isLoading = false;
-              });
+              if (mounted) {
+                setState(() {
+                  isLoading = false;
+                });
+              }
             });
           }
         }).catchError((onError) {
           showSnackbar(onError);
-          setState(() {
-            isLoading = false;
-          });
+          if (mounted) {
+            setState(() {
+              isLoading = false;
+            });
+          }
         });
       } else {
-        showSnackbar(MyLocalizations.of(context).pleaseAccepttermsandconditions);
+        showSnackbar(
+            MyLocalizations.of(context).pleaseAccepttermsandconditions);
       }
     }
   }
@@ -165,7 +173,8 @@ class _RegisterFormState extends State<RegisterForm> {
               validator: (String value) {
                 if (value.isEmpty) {
                   return MyLocalizations.of(context).pleaseEnterValidName;
-                }
+                } else
+                  return null;
               },
               onSaved: (String value) {
                 register['name'] = value;
@@ -204,7 +213,8 @@ class _RegisterFormState extends State<RegisterForm> {
                 if (value.isEmpty || value.length < 9) {
                   return MyLocalizations.of(context)
                       .pleaseEnterValidMobileNumber;
-                }
+                } else
+                  return null;
               },
               onSaved: (String value) {
                 register['contactNumber'] = value;
@@ -249,7 +259,8 @@ class _RegisterFormState extends State<RegisterForm> {
                 if (value.isEmpty ||
                     !RegExp(Validators.emailPattern).hasMatch(value)) {
                   return MyLocalizations.of(context).pleaseEnterValidEmail;
-                }
+                } else
+                  return null;
               },
               onSaved: (String value) {
                 register['email'] = value;
@@ -288,7 +299,8 @@ class _RegisterFormState extends State<RegisterForm> {
               validator: (String value) {
                 if (value.isEmpty || value.length < 6) {
                   return MyLocalizations.of(context).pleaseEnterValidPassword;
-                }
+                } else
+                  return null;
               },
               onSaved: (String value) {
                 register['password'] = value;
@@ -313,9 +325,11 @@ class _RegisterFormState extends State<RegisterForm> {
           new Checkbox(
             value: isChecked,
             onChanged: (bool value) {
-              setState(() {
-                isChecked = value;
-              });
+              if (mounted) {
+                setState(() {
+                  isChecked = value;
+                });
+              }
             },
             activeColor: PRIMARY,
           ),
@@ -385,7 +399,7 @@ class _RegisterFormState extends State<RegisterForm> {
 // SentryError sentryError = new SentryError();
 
 // class RegisterForm extends StatefulWidget {
-//   var locale;
+//   final String locale;
 //   final Map<String, Map<String, String>> localizedValues;
 
 //   RegisterForm({Key key, this.locale, this.localizedValues}) : super(key: key);
@@ -407,7 +421,8 @@ class _RegisterFormState extends State<RegisterForm> {
 
 //   selectedLanguages() async {
 //     SharedPreferences prefs = await SharedPreferences.getInstance();
-//     setState(() {
+//       if (mounted) {
+// setState(() {
 //       selectedLanguage = prefs.getString('selectedLanguage');
 //     });
 //
@@ -426,7 +441,8 @@ class _RegisterFormState extends State<RegisterForm> {
 //   _onRegister() async {
 //     if (_formKey.currentState.validate()) {
 //       if (isChecked) {
-//         setState(() {
+//           if (mounted) {
+// setState(() {
 //           isLoading = true;
 //         });
 //         _formKey.currentState.save();
@@ -438,7 +454,8 @@ class _RegisterFormState extends State<RegisterForm> {
 //                 if (onValue['_id'] != null) {
 //                   Navigator.pop(context);
 //                 }
-//                 setState(() {
+//                   if (mounted) {
+// setState(() {
 //                   isLoading = false;
 //                 });
 //               });
@@ -449,7 +466,8 @@ class _RegisterFormState extends State<RegisterForm> {
 //         }).catchError((onError) {
 //           sentryError.reportError(onError, null);
 //           showSnackbar(onError);
-//           setState(() {
+//             if (mounted) {
+// setState(() {
 //             isLoading = false;
 //           });
 //         });
@@ -682,7 +700,8 @@ class _RegisterFormState extends State<RegisterForm> {
 //           new Checkbox(
 //             value: isChecked,
 //             onChanged: (bool value) {
-//               setState(() {
+//                 if (mounted) {
+// setState(() {
 //                 isChecked = value;
 //               });
 //             },

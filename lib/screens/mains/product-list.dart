@@ -30,7 +30,7 @@ class ProductListPage extends StatefulWidget {
   final Map<String, dynamic> deliveryInfo, workingHours, locationInfo, taxInfo;
   final List<dynamic> cuisine;
   final Map<String, Map<String, String>> localizedValues;
-  var locale;
+  final String locale;
 
   ProductListPage(
       {Key key,
@@ -80,18 +80,22 @@ class _ProductListPageState extends State<ProductListPage> {
   }
 
   getRestaurantOpenAndCloseTime() async {
-    setState(() {
-      isopenAndCloseTimeLoading = true;
-    });
+    if (mounted) {
+      setState(() {
+        isopenAndCloseTimeLoading = true;
+      });
+    }
     return await MainService.getRestaurantOpenAndCloseTime(
             widget.locationId,
             DateFormat('HH:mm').format(DateTime.now()),
             DateFormat('EEEE').format(DateTime.now()))
         .then((verifyOpenAndCloseTime) {
-      setState(() {
-        openAndCloseTime = verifyOpenAndCloseTime['message'];
-        isopenAndCloseTimeLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          openAndCloseTime = verifyOpenAndCloseTime['message'];
+          isopenAndCloseTimeLoading = false;
+        });
+      }
     }).catchError((onError) {});
   }
 
@@ -99,9 +103,11 @@ class _ProductListPageState extends State<ProductListPage> {
   Widget build(BuildContext context) {
     CounterModel().getCounter().then((res) {
       try {
-        setState(() {
-          cartCount = res;
-        });
+        if (mounted) {
+          setState(() {
+            cartCount = res;
+          });
+        }
       } catch (error, stackTrace) {
         sentryError.reportError(error, stackTrace);
       }
@@ -712,7 +718,7 @@ class _ProductListPageState extends State<ProductListPage> {
     );
   }
 
-  Future<void> _showTimingAlert() {
+  _showTimingAlert() {
     if (widget.locationInfo['workingHours'] != null) {
       List timingArray = List();
 

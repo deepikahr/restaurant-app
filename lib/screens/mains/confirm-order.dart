@@ -1,7 +1,8 @@
+import 'dart:async';
+
 import 'package:RestaurantSaas/localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import '../../styles/styles.dart';
 import 'add-address.dart';
 import 'payment-method.dart';
@@ -11,7 +12,6 @@ import '../../services/profile-service.dart';
 import 'dart:core';
 import '../../services/main-service.dart';
 import 'package:intl/intl.dart';
-// import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import '../../services/sentry-services.dart';
 
 import 'package:RestaurantSaas/localizations.dart' show MyLocalizations;
@@ -22,7 +22,7 @@ SentryError sentryError = new SentryError();
 class ConfrimOrderPage extends StatefulWidget {
   final Map<String, dynamic> cart, deliveryInfo, tableInfo;
   final Map<String, Map<String, String>> localizedValues;
-  var locale, currency;
+  final String locale, currency;
 
   ConfrimOrderPage(
       {Key key,
@@ -66,10 +66,11 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<String> languages = ['English', 'French', 'Chinese'];
 
-    String currency = '';
+  String currency = '';
 
   Future<Map<String, dynamic>> _getUserInfo() async {
     await ProfileService.getUserInfo().then((onValue) {
+      print(onValue);
       try {
         userInfo = onValue;
       } catch (error, stackTrace) {
@@ -78,10 +79,14 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
     }).catchError((onError) {
       sentryError.reportError(onError, null);
     });
+
     await MainService.getLoyaltyInfoByRestaurantId(widget.cart['restaurantID'])
         .then((onValue) {
+      print("njnnjmkn $onValue");
+
       try {
-        userInfo['loyaltyInfo'] = onValue;
+        userInfo['loyaltyInfo'] = onValue['adminSet'];
+        print("njnnjmkn ${userInfo['loyaltyInfo']}");
         remainingLoyaltyPoint =
             double.parse(userInfo['totalLoyaltyPoints'].toString());
       } catch (error, stackTrace) {
@@ -114,14 +119,18 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
     if ((widget.deliveryInfo != null) &&
         (widget.deliveryInfo['isDeliveryAvailable'] != null) &&
         (widget.deliveryInfo['isDeliveryAvailable'] == false)) {
-      setState(() {
-        isDeliveryAvailable = false;
-        widget.cart['orderType'] = 'Pickup';
-      });
+      if (mounted) {
+        setState(() {
+          isDeliveryAvailable = false;
+          widget.cart['orderType'] = 'Pickup';
+        });
+      }
     } else {
-      setState(() {
-        isDeliveryAvailable = true;
-      });
+      if (mounted) {
+        setState(() {
+          isDeliveryAvailable = true;
+        });
+      }
     }
     if (widget.tableInfo != null) {
       widget.cart['isForDineIn'] = true;
@@ -129,28 +138,35 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
       widget.cart['tableNumber'] = widget.tableInfo['tableNumber'];
     }
     if (isFirstTime) {
-      setState(() {
-        tempGrandTotal = widget.cart['grandTotal'];
-        grandTotal = tempGrandTotal;
-        deliveryCharge = double.parse(widget.cart['deliveryCharge'].toString());
-        isFirstTime = false;
-      });
+      if (mounted) {
+        setState(() {
+          tempGrandTotal = widget.cart['grandTotal'];
+          grandTotal = tempGrandTotal;
+          deliveryCharge =
+              double.parse(widget.cart['deliveryCharge'].toString());
+          isFirstTime = false;
+        });
+      }
     }
     if (widget.cart['orderType'] == 'Delivery') {
-      setState(() {
-        widget.cart['deliveryCharge'] = deliveryCharge;
-        widget.cart['grandTotal'] = grandTotal;
-        widget.cart['payableAmount'] = grandTotal;
-      });
+      if (mounted) {
+        setState(() {
+          widget.cart['deliveryCharge'] = deliveryCharge;
+          widget.cart['grandTotal'] = grandTotal;
+          widget.cart['payableAmount'] = grandTotal;
+        });
+      }
     } else if (widget.cart['orderType'] == 'Pickup' ||
         widget.cart['orderType'] == 'Dine In') {
-      setState(() {
-        if (grandTotal > 0) {
-          widget.cart['grandTotal'] = grandTotal - deliveryCharge;
-        }
-        widget.cart['deliveryCharge'] = 0;
-        widget.cart['payableAmount'] = widget.cart['grandTotal'];
-      });
+      if (mounted) {
+        setState(() {
+          if (grandTotal > 0) {
+            widget.cart['grandTotal'] = grandTotal - deliveryCharge;
+          }
+          widget.cart['deliveryCharge'] = 0;
+          widget.cart['payableAmount'] = widget.cart['grandTotal'];
+        });
+      }
     }
   }
 
@@ -165,19 +181,23 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
         grandTotal = grandTotal - userInfo['totalLoyaltyPoints'];
         points = 0.0;
       }
-      setState(() {
-        usedLoyaltyPoint =
-            double.parse(userInfo['totalLoyaltyPoints'].toString()) - points;
-        remainingLoyaltyPoint = points;
-        grandTotal = grandTotal;
-      });
+      if (mounted) {
+        setState(() {
+          usedLoyaltyPoint =
+              double.parse(userInfo['totalLoyaltyPoints'].toString()) - points;
+          remainingLoyaltyPoint = points;
+          grandTotal = grandTotal;
+        });
+      }
     } else {
-      setState(() {
-        usedLoyaltyPoint = 0.0;
-        remainingLoyaltyPoint =
-            double.parse(userInfo['totalLoyaltyPoints'].toString());
-        grandTotal = grandTotal;
-      });
+      if (mounted) {
+        setState(() {
+          usedLoyaltyPoint = 0.0;
+          remainingLoyaltyPoint =
+              double.parse(userInfo['totalLoyaltyPoints'].toString());
+          grandTotal = grandTotal;
+        });
+      }
     }
     _calculateFinalAmount();
   }
@@ -186,27 +206,37 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
     await MainService.getTodayAndOtherDaysWorkingTimimgs(
             widget.cart['location'], dt, time, todayDay)
         .then((onValue) {
-      setState(() {
-        isAlwaysOpenOrCloseLoading = true;
-      });
+      if (mounted) {
+        setState(() {
+          isAlwaysOpenOrCloseLoading = true;
+        });
+      }
       if (mounted) {
         if (onValue['isAlwaysOpen'] == true) {
-          setState(() {
-            isAlwaysOpenOrClose = true;
-            todayWorkingHoursList = onValue['newDaySlot'];
-            showSlotTimimg = !showSlotTimimg;
-          });
-          setState(() {
-            isAlwaysOpenOrCloseLoading = false;
-          });
+          if (mounted) {
+            setState(() {
+              isAlwaysOpenOrClose = true;
+              todayWorkingHoursList = onValue['newDaySlot'];
+              showSlotTimimg = !showSlotTimimg;
+            });
+          }
+          if (mounted) {
+            setState(() {
+              isAlwaysOpenOrCloseLoading = false;
+            });
+          }
         } else {
-          setState(() {
-            todayWorkingHoursList = onValue['newDaySlot'];
-            showSlotTimimg = !showSlotTimimg;
-          });
-          setState(() {
-            isAlwaysOpenOrCloseLoading = false;
-          });
+          if (mounted) {
+            setState(() {
+              todayWorkingHoursList = onValue['newDaySlot'];
+              showSlotTimimg = !showSlotTimimg;
+            });
+          }
+          if (mounted) {
+            setState(() {
+              isAlwaysOpenOrCloseLoading = false;
+            });
+          }
         }
       }
     });
@@ -483,9 +513,11 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                       children: <Widget>[
                         InkWell(
                           onTap: () {
-                            setState(() {
-                              widget.cart['orderType'] = 'Pickup';
-                            });
+                            if (mounted) {
+                              setState(() {
+                                widget.cart['orderType'] = 'Pickup';
+                              });
+                            }
                           },
                           child: Container(
                             width: screenWidth(context) * 0.3,
@@ -529,11 +561,13 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                         isDeliveryAvailable
                             ? InkWell(
                                 onTap: () {
-                                  setState(() {
-                                    widget.cart['orderType'] = 'Delivery';
-                                    widget.cart['pickupDate'] = null;
-                                    widget.cart['pickupTime'] = null;
-                                  });
+                                  if (mounted) {
+                                    setState(() {
+                                      widget.cart['orderType'] = 'Delivery';
+                                      widget.cart['pickupDate'] = null;
+                                      widget.cart['pickupTime'] = null;
+                                    });
+                                  }
                                 },
                                 child: Container(
                                   width: screenWidth(context) * 0.3,
@@ -586,7 +620,8 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                             Text(
                               MyLocalizations.of(context).clickToSlot +
                                   " " +
-                                  widget.cart['orderType'] + " " +
+                                  widget.cart['orderType'] +
+                                  " " +
                                   MyLocalizations.of(context).dateandTime,
                               style: titleBlackLightOSB(),
                             ),
@@ -608,22 +643,26 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                                 : Container(),
                             RaisedButton(
                               onPressed: () async {
-                                setState(() {
-                                  showSlotTimimg = false;
-                                  widget.cart['pickupDate'] = null;
-                                  widget.cart['pickupTime'] = null;
-                                });
+                                if (mounted) {
+                                  setState(() {
+                                    showSlotTimimg = false;
+                                    widget.cart['pickupDate'] = null;
+                                    widget.cart['pickupTime'] = null;
+                                  });
+                                }
                                 DatePicker.showDatePicker(
                                   context,
                                   showTitleActions: true,
-                                  onChanged: (dt) => setState(
-                                    () {
-                                      pickupDate = dt;
-                                      widget.cart['pickupDate'] =
-                                          DateFormat('dd-MMM-yy')
-                                              .format(pickupDate);
-                                    },
-                                  ),
+                                  onChanged: (dt) {
+                                    if (mounted) {
+                                      setState(() {
+                                        pickupDate = dt;
+                                        widget.cart['pickupDate'] =
+                                            DateFormat('dd-MMM-yy')
+                                                .format(pickupDate);
+                                      });
+                                    }
+                                  },
                                   onConfirm: (date) {
                                     if (widget.cart['pickupDate'] == null) {
                                       widget.cart['pickupDate'] =
@@ -682,11 +721,13 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                                                             null
                                                         ? InkWell(
                                                             onTap: () {
-                                                              setState(() {
-                                                                widget.cart[
-                                                                        'pickupTime'] =
-                                                                    null;
-                                                              });
+                                                              if (mounted) {
+                                                                setState(() {
+                                                                  widget.cart[
+                                                                          'pickupTime'] =
+                                                                      null;
+                                                                });
+                                                              }
                                                             },
                                                             child: Icon(
                                                               Icons
@@ -742,22 +783,21 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                                                                         child: RaisedButton(
                                                                       onPressed:
                                                                           () {
-                                                                        setState(
-                                                                            () {
+                                                                        if (mounted) {
                                                                           setState(
                                                                               () {
-                                                                            showSlot =
-                                                                                !showSlot;
-                                                                          });
-                                                                          if (todayWorkingHoursList[index]['slotList'][indexx] !=
-                                                                              "No slot available") {
-                                                                            selectedSlot =
-                                                                                todayWorkingHoursList[index]['slotList'][indexx];
+                                                                            if (mounted) {
+                                                                              setState(() {
+                                                                                showSlot = !showSlot;
+                                                                              });
+                                                                              if (todayWorkingHoursList[index]['slotList'][indexx] != "No slot available") {
+                                                                                selectedSlot = todayWorkingHoursList[index]['slotList'][indexx];
 
-                                                                            widget.cart['pickupTime'] =
-                                                                                selectedSlot;
-                                                                          }
-                                                                        });
+                                                                                widget.cart['pickupTime'] = selectedSlot;
+                                                                              }
+                                                                            }
+                                                                          });
+                                                                        }
                                                                       },
                                                                       color:
                                                                           PRIMARY,
@@ -1008,7 +1048,8 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
 //                                                       child: Container(
 //                                                           child: RaisedButton(
 //                                                         onPressed: () {
-//                                                           setState(() {
+//                                                             if (mounted) {
+            // setState(() {
 //                                                             selectedSlot =
 //                                                                 todayWorkingHoursList[
 //                                                                             index]
@@ -1096,6 +1137,64 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
               value,
               style: hintLightOSR(),
             ),
+            Divider(),
+            (userInfo['loyaltyInfo']['message'] == null &&
+                    userInfo['loyaltyInfo']['loyaltyProgram'])
+                ? userInfo['loyaltyInfo']['minLoyaltyPoints'] <
+                        userInfo['totalLoyaltyPoints']
+                    ? userInfo['loyaltyInfo']['minOrdLoyalty'] <= tempGrandTotal
+                        ? Row(
+                            children: <Widget>[
+                              Checkbox(
+                                value: isLoyaltyApplied,
+                                onChanged: (bool value) {
+                                  if (mounted) {
+                                    setState(() {
+                                      isLoyaltyApplied = !isLoyaltyApplied;
+                                    });
+                                    _calculateLoyaltyInfo();
+                                  }
+                                },
+                                activeColor: PRIMARY,
+                              ),
+                              Text(
+                                'Use Loyalty Points',
+                                style: hintStyleSmallDarkLightOSR(),
+                              ),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(right: 15.0),
+                                  child: new Text(
+                                    remainingLoyaltyPoint.toStringAsFixed(2),
+                                    textAlign: TextAlign.end,
+                                    style: hintStyleTitleBlueOSR(),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )
+                        : Container(
+                            child: Text('Your order amount should be more than \$' +
+                                userInfo['loyaltyInfo']['minOrdLoyalty']
+                                    .toString() +
+                                ' to use loyalty point. You have ' +
+                                userInfo['totalLoyaltyPoints']
+                                    .toStringAsFixed(2) +
+                                ' points on your account! Place orders to get more.'),
+                          )
+                    : Container(
+                        child: Text(
+                            'You dont have enough loyalty points. Minimum ' +
+                                userInfo['loyaltyInfo']['minLoyaltyPoints']
+                                    .toString() +
+                                ' points required to use it, You have only ' +
+                                userInfo['totalLoyaltyPoints']
+                                    .toStringAsFixed(2) +
+                                ' points on your account! Place orders to get more.'),
+                      )
+                : Container(
+                    child: Text('Loyalty is not applicable!'),
+                  ),
           ],
         ),
       ),
@@ -1160,12 +1259,14 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                           value: index,
                           selected: data[index]['isSelected'],
                           onChanged: (int selected) {
-                            setState(() {
-                              selectedAddressIndex = selected;
-                              data[index]['isSelected'] =
-                                  !data[index]['isSelected'];
-                              widget.cart['shippingAddress'] = data[index];
-                            });
+                            if (mounted) {
+                              setState(() {
+                                selectedAddressIndex = selected;
+                                data[index]['isSelected'] =
+                                    !data[index]['isSelected'];
+                                widget.cart['shippingAddress'] = data[index];
+                              });
+                            }
                           },
                           activeColor: PRIMARY,
                           title: Column(

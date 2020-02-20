@@ -1,9 +1,7 @@
 import 'package:RestaurantSaas/screens/other/CounterModel.dart';
 import 'package:RestaurantSaas/services/constant.dart';
-import 'package:RestaurantSaas/styles/styles.dart' as prefix0;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'drawer.dart';
 import 'package:async_loader/async_loader.dart';
 import '../../styles/styles.dart';
@@ -32,7 +30,7 @@ SentryError sentryError = new SentryError();
 
 class HomePage extends StatefulWidget {
   final Map<String, Map<String, String>> localizedValues;
-  var locale;
+  final String locale;
   HomePage({Key key, this.locale, this.localizedValues}) : super(key: key);
 
   @override
@@ -42,8 +40,7 @@ class HomePage extends StatefulWidget {
 class HomePageState extends State<HomePage> {
   final GlobalKey<AsyncLoaderState> _asyncLoaderStateForAdvertisement =
       GlobalKey<AsyncLoaderState>();
-  final GlobalKey<AsyncLoaderState> _asyncLoaderStateForTableInfo =
-      GlobalKey<AsyncLoaderState>();
+
   final GlobalKey<AsyncLoaderState> _asyncLoaderStateForNearByLocations =
       GlobalKey<AsyncLoaderState>();
   final GlobalKey<AsyncLoaderState> _asyncLoaderStateForTopRatedRestaurants =
@@ -52,7 +49,7 @@ class HomePageState extends State<HomePage> {
       _asyncLoaderStateForNewlyArrivedRestaurants =
       GlobalKey<AsyncLoaderState>();
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-  VoidCallback _showBottomSheetCallback;
+  VoidCallback showBottomSheetCallback;
   Map<String, dynamic> restaurantInfo;
   int nearByLength;
   int cartCount;
@@ -69,7 +66,7 @@ class HomePageState extends State<HomePage> {
   @override
   void initState() {
     // checkAndValidateToken();
-    _showBottomSheetCallback = _showBottomSheet;
+    showBottomSheetCallback = _showBottomSheet;
     super.initState();
     _checkLoginStatus();
 //    selectedLanguages();
@@ -100,24 +97,30 @@ class HomePageState extends State<HomePage> {
   bool isLoggedIn = false;
 
   Future _checkLoginStatus() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
     Common.getToken().then((token) {
       if (token != null) {
-        setState(() {
-          isLoggedIn = true;
-        });
+        if (mounted) {
+          setState(() {
+            isLoggedIn = true;
+          });
+        }
         ProfileService.getUserInfo().then((value) {
           if (value != null && mounted) {
-            setState(() {
-              fullname = value['name'];
-              isLoggedIn = true;
-            });
+            if (mounted) {
+              setState(() {
+                fullname = value['name'];
+
+                isLoggedIn = true;
+              });
+            }
           }
         });
       } else {
-        setState(() {
-          isLoggedIn = false;
-        });
+        if (mounted) {
+          setState(() {
+            isLoggedIn = false;
+          });
+        }
       }
     });
   }
@@ -133,30 +136,10 @@ class HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
-    super.dispose();
-    // _getCartLength();
     if (_locationStream != null) _locationStream.cancel();
+    super.dispose();
   }
 
-  void _getCartLength() async {
-    await Common.getCart().then((onValue) {
-      try {
-        if (onValue != null) {
-          setState(() {
-            cartCounter = onValue['productDetails'].length;
-          });
-        } else {
-          setState(() {
-            cartCounter = 0;
-          });
-        }
-      } catch (error, stackTrace) {
-        sentryError.reportError(error, stackTrace);
-      }
-    }).catchError((onError) {
-      sentryError.reportError(onError, null);
-    });
-  }
   // getLocationInfoByTableId() async {
   //   showDialog<void>(
   //     context: context,
@@ -214,16 +197,20 @@ class HomePageState extends State<HomePage> {
   //     // _showBottomSheetForBarcodeView();
   //   } on PlatformException catch (e) {
   //     if (e.code == BarcodeScanner.CameraAccessDenied) {
-  //       setState(() {
+  //         if (mounted) {
+  // setState(() {
   //         barcodeError = 'No camera permission!';
   //       });
   //     } else {
-  //       setState(() => barcodeError = 'Unknown error: $e');
+  //         if (mounted) {
+  // setState(() => barcodeError = 'Unknown error: $e');
   //     }
   //   } on FormatException {
-  //     setState(() => barcodeError = 'Nothing captured.');
+  //       if (mounted) {
+  // setState(() => barcodeError = 'Nothing captured.');
   //   } catch (e) {
-  //     setState(() => barcodeError = 'Unknown error: $e');
+  //       if (mounted) {
+  // setState(() => barcodeError = 'Unknown error: $e');
   //   }
   // }
 
@@ -257,13 +244,15 @@ class HomePageState extends State<HomePage> {
               await Geocoder.local.findAddressesFromCoordinates(coordinates);
         } catch (e) {}
         if (addresses != null && mounted) {
-          setState(() {
-            position = {
-              'lat': result.latitude,
-              'long': result.longitude,
-              'name': addresses.first.addressLine
-            };
-          });
+          if (mounted) {
+            setState(() {
+              position = {
+                'lat': result.latitude,
+                'long': result.longitude,
+                'name': addresses.first.addressLine
+              };
+            });
+          }
           await Common.savePositionInfo(position).then((onValue) {});
         }
       });
@@ -304,9 +293,11 @@ class HomePageState extends State<HomePage> {
     branches = MyLocalizations.of(context).branches;
     CounterModel().getCounter().then((res) {
       try {
-        setState(() {
-          cartCount = res;
-        });
+        if (mounted) {
+          setState(() {
+            cartCount = res;
+          });
+        }
       } catch (error, stackTrace) {
         sentryError.reportError(error, stackTrace);
       }
@@ -325,7 +316,7 @@ class HomePageState extends State<HomePage> {
       home: Scaffold(
         backgroundColor: whitec,
         key: scaffoldKey,
-        drawer: drawer(
+        drawer: DrawerPage(
             scaffoldKey: scaffoldKey,
             locale: widget.locale,
             localizedValues: widget.localizedValues),
@@ -557,11 +548,13 @@ class HomePageState extends State<HomePage> {
                                       review,
                                       branches),
                                   onTap: () {
-                                    setState(() {
-                                      restaurantInfo =
-                                          nearByRestaurentsList[index];
-                                    });
-                                    _showBottomSheet();
+                                    if (mounted) {
+                                      setState(() {
+                                        restaurantInfo =
+                                            nearByRestaurentsList[index];
+                                      });
+                                      _showBottomSheet();
+                                    }
                                   });
                             }),
                         // _buildViewAllButton('Near By'),
@@ -600,10 +593,12 @@ class HomePageState extends State<HomePage> {
                     child: buildRestaurantCard(
                         topRatedRestaurantsList[index], review, branches),
                     onTap: () {
-                      setState(() {
-                        restaurantInfo = topRatedRestaurantsList[index];
-                      });
-                      _showBottomSheet();
+                      if (mounted) {
+                        setState(() {
+                          restaurantInfo = topRatedRestaurantsList[index];
+                        });
+                        _showBottomSheet();
+                      }
                     });
               });
         });
@@ -643,10 +638,12 @@ class HomePageState extends State<HomePage> {
           return InkWell(
               child: buildRestaurantCard(data[index], review, branches),
               onTap: () {
-                setState(() {
-                  restaurantInfo = data[index];
-                });
-                _showBottomSheet();
+                if (mounted) {
+                  setState(() {
+                    restaurantInfo = data[index];
+                  });
+                  _showBottomSheet();
+                }
               });
         });
   }
@@ -971,9 +968,11 @@ class HomePageState extends State<HomePage> {
   }
 
   void _showBottomSheet() {
-    setState(() {
-      _showBottomSheetCallback = null;
-    });
+    if (mounted) {
+      setState(() {
+        showBottomSheetCallback = null;
+      });
+    }
     scaffoldKey.currentState
         .showBottomSheet<void>((BuildContext context) {
           return Container(
@@ -995,9 +994,11 @@ class HomePageState extends State<HomePage> {
         .closed
         .whenComplete(() {
           if (mounted) {
-            setState(() {
-              _showBottomSheetCallback = _showBottomSheet;
-            });
+            if (mounted) {
+              setState(() {
+                showBottomSheetCallback = _showBottomSheet;
+              });
+            }
           }
         });
   }
