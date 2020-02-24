@@ -135,6 +135,8 @@ class _RegisterFormState extends State<RegisterForm> {
                   width: screenWidth(context),
                 ),
                 SingleChildScrollView(
+                    child: Form(
+                  key: _formKey,
                   child: Padding(
                     padding: const EdgeInsets.all(15.0),
                     child: Column(
@@ -149,7 +151,7 @@ class _RegisterFormState extends State<RegisterForm> {
                       ],
                     ),
                   ),
-                )
+                ))
               ],
             ),
           ),
@@ -206,6 +208,7 @@ class _RegisterFormState extends State<RegisterForm> {
             fit: FlexFit.tight,
             flex: 9,
             child: TextFormField(
+              maxLength: 10,
               keyboardType: TextInputType.number,
               validator: (String value) {
                 if (value.isEmpty || value.length < 9) {
@@ -218,6 +221,7 @@ class _RegisterFormState extends State<RegisterForm> {
                 register['contactNumber'] = value;
               },
               decoration: new InputDecoration(
+                counterText: "",
                 labelText: MyLocalizations.of(context).mobileNumber,
                 hintStyle: hintStyleGreyLightOSR(),
                 contentPadding: EdgeInsets.all(12.0),

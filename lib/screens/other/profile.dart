@@ -481,14 +481,15 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                         ),
                         child: TextFormField(
                           maxLength: 10,
-                          validator: (String value) {
-                            if (value.length > 9) {
-                              return 'Please Enter Valid Mobile number';
-                            } else
-                              return null;
-                          },
                           onSaved: (value) {
                             data['contactNumber'] = value;
+                          },
+                          validator: (String value) {
+                            if (value.isEmpty || value.length < 9) {
+                              return MyLocalizations.of(context)
+                                  .pleaseEnterValidMobileNumber;
+                            } else
+                              return null;
                           },
                           initialValue: data['contactNumber'].toString(),
                           decoration: new InputDecoration(
