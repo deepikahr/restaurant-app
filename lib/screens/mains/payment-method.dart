@@ -41,6 +41,8 @@ class _PaymentMethodState extends State<PaymentMethod> {
   bool isCardListLoading = false;
   bool isPaymentMethodLoading = false;
   List<dynamic> paymentMethodList;
+  bool paymentMethodAvaiilable = true, paymentMethodAvaiilableCon = true;
+
   List<Map<String, dynamic>> paymentTypes = [
     {
       'type': 'Cash On Delivery',
@@ -144,40 +146,50 @@ class _PaymentMethodState extends State<PaymentMethod> {
           if (mounted) {
             setState(() {
               paymentMethodList = [];
-            });
-          }
-
-          if (mounted) {
-            setState(() {
               isPaymentMethodLoading = false;
-            });
-          }
-        } else if (onValue['setting']['restaurantID']['paymentMethod'] ==
-            null) {
-          if (mounted) {
-            setState(() {
-              paymentMethodList =
-                  onValue['setting']['restaurantID']['paymentMethod'] = [];
-            });
-          }
-
-          if (mounted) {
-            setState(() {
-              isPaymentMethodLoading = false;
+              paymentMethodAvaiilableCon = false;
             });
           }
         } else {
-          if (mounted) {
-            setState(() {
-              paymentMethodList =
-                  onValue['setting']['restaurantID']['paymentMethod'];
-            });
-          }
-
-          if (mounted) {
-            setState(() {
-              isPaymentMethodLoading = false;
-            });
+          if (onValue['message'] == null || onValue['message'] == "") {
+            if (onValue['setting']['restaurantID']['paymentMethod'].length ==
+                0) {
+              if (mounted) {
+                setState(() {
+                  paymentMethodList = [];
+                  isPaymentMethodLoading = false;
+                  paymentMethodAvaiilableCon = true;
+                  paymentMethodAvaiilable = false;
+                });
+              }
+            } else if (onValue['setting']['restaurantID']['paymentMethod'][0]
+                        ['isSelected'] ==
+                    false &&
+                onValue['setting']['restaurantID']['paymentMethod'][1]
+                        ['isSelected'] ==
+                    false) {
+              if (mounted) {
+                setState(() {
+                  paymentMethodList = [];
+                  paymentMethodAvaiilable = false;
+                  paymentMethodAvaiilableCon = true;
+                  isPaymentMethodLoading = false;
+                });
+              }
+            } else {
+              if (mounted) {
+                setState(() {
+                  paymentMethodList =
+                      onValue['setting']['restaurantID']['paymentMethod'];
+                });
+              }
+              if (mounted) {
+                setState(() {
+                  isPaymentMethodLoading = false;
+                  paymentMethodAvaiilableCon = false;
+                });
+              }
+            }
           }
         }
       } catch (error, stackTrace) {
@@ -276,127 +288,254 @@ class _PaymentMethodState extends State<PaymentMethod> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        locale: Locale(widget.locale),
-        debugShowCheckedModeBanner: false,
-        localizationsDelegates: [
-          MyLocalizationsDelegate(widget.localizedValues),
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-        ],
-        supportedLocales: languages.map((language) => Locale(language, '')),
-        home: Scaffold(
-            backgroundColor: whiteTextb,
-            appBar: AppBar(
-              backgroundColor: PRIMARY,
-              elevation: 0.0,
-              leading: InkWell(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: Icon(
-                    Icons.arrow_back,
-                    color: Colors.white,
-                  )),
-              title: new Text(
-                MyLocalizations.of(context).paymentMethod,
-                style: titleBoldWhiteOSS(),
-              ),
-              centerTitle: true,
-            ),
-            body: isPaymentMethodLoading
-                ? Center(
-                    child: CircularProgressIndicator(
-                    backgroundColor: PRIMARY,
-                  ))
-                : _buildPaymentMethodSelector(),
-            bottomNavigationBar: !isPaymentMethodLoading
-                ? Container(
-                    height: 70.0,
-                    color: PRIMARY,
-                    child: isLoading
-                        ? Image.asset(
-                            'lib/assets/icon/spinner.gif',
-                            width: 10.0,
-                            height: 10.0,
-                          )
-                        : GestureDetector(
-                            onTap: () {
-                              if (!isLoading) {
-                                if (mounted) {
-                                  setState(() {
-                                    isLoading = true;
-                                  });
-                                  _placeOrder();
-                                }
-                              }
-                            },
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                new Padding(
-                                    padding: EdgeInsets.only(top: 10.0)),
-                                new Text(
-                                  MyLocalizations.of(context).placeOrderNow,
-                                  style: subTitleWhiteLightOSR(),
-                                ),
-                                new Padding(padding: EdgeInsets.only(top: 5.0)),
-                                new Text(
-                                  MyLocalizations.of(context).total +
-                                      ': \$ ${widget.cart['grandTotal'].toStringAsFixed(2)}',
-                                  style: titleWhiteBoldOSB(),
-                                ),
-                              ],
+      locale: Locale(widget.locale),
+      debugShowCheckedModeBanner: false,
+      localizationsDelegates: [
+        MyLocalizationsDelegate(widget.localizedValues),
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: languages.map((language) => Locale(language, '')),
+      home: Scaffold(
+        backgroundColor: whiteTextb,
+        appBar: AppBar(
+          backgroundColor: PRIMARY,
+          elevation: 0.0,
+          leading: InkWell(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: Icon(
+                Icons.arrow_back,
+                color: Colors.white,
+              )),
+          title: new Text(
+            MyLocalizations.of(context).paymentMethod,
+            style: titleBoldWhiteOSS(),
+          ),
+          centerTitle: true,
+        ),
+        body: isPaymentMethodLoading
+            ? Center(
+                child: CircularProgressIndicator(
+                backgroundColor: PRIMARY,
+              ))
+            : _buildPaymentMethodSelector(),
+        bottomNavigationBar: (!isPaymentMethodLoading &&
+                !paymentMethodAvaiilableCon)
+            ? Container(
+                height: 70.0,
+                color: PRIMARY,
+                child: isLoading
+                    ? Image.asset(
+                        'lib/assets/icon/spinner.gif',
+                        width: 10.0,
+                        height: 10.0,
+                      )
+                    : GestureDetector(
+                        onTap: () {
+                          if (!isLoading) {
+                            if (mounted) {
+                              setState(() {
+                                isLoading = true;
+                              });
+                              _placeOrder();
+                            }
+                          }
+                        },
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            new Padding(padding: EdgeInsets.only(top: 10.0)),
+                            new Text(
+                              MyLocalizations.of(context).placeOrderNow,
+                              style: subTitleWhiteLightOSR(),
                             ),
-                          ),
-                  )
-                : Container()));
+                            new Padding(padding: EdgeInsets.only(top: 5.0)),
+                            new Text(
+                              MyLocalizations.of(context).total +
+                                  ': \$ ${widget.cart['grandTotal'].toStringAsFixed(2)}',
+                              style: titleWhiteBoldOSB(),
+                            ),
+                          ],
+                        ),
+                      ),
+              )
+            : Container(
+                child: Text(""),
+              ),
+      ),
+    );
   }
 
+  // Widget _buildPaymentMethodSelector() {
+  //   return paymentMethodList != []
+  //       ? paymentMethodList.length > 0
+  //           ? SingleChildScrollView(
+  //               child: Column(
+  //                 children: [
+  //                   ListView.builder(
+  //                     physics: ScrollPhysics(),
+  //                     shrinkWrap: true,
+  //                     padding: EdgeInsets.only(right: 0.0),
+  //                     itemCount: paymentMethodList.length,
+  //                     itemBuilder: (BuildContext context, int index) {
+  //                       return paymentMethodList[index]['isSelected'] == true
+  //                           ? Container(
+  //                               margin: EdgeInsets.all(8.0),
+  //                               color: Colors.white,
+  //                               child: RadioListTile(
+  //                                   value: index,
+  //                                   groupValue: selectedPaymentIndex,
+  //                                   selected: paymentMethodList[index]
+  //                                       ['isSelected'],
+  //                                   onChanged: (int selected) {
+  //                                     if (!isLoading) {
+  //                                       if (mounted) {
+  //                                         setState(() {
+  //                                           selectedPaymentIndex = selected;
+  //                                           paymentMethodList[index]
+  //                                                   ['isSelected'] =
+  //                                               !paymentMethodList[index]
+  //                                                   ['isSelected'];
+  //                                           widget.cart['paymentOption'] =
+  //                                               paymentMethodList[index]
+  //                                                   ['type'];
+  //                                         });
+  //                                       }
+  //                                     }
+  //                                   },
+  //                                   activeColor: PRIMARY,
+  //                                   title: Text(
+  //                                     paymentMethodList[index]['type'],
+  //                                     style: TextStyle(color: PRIMARY),
+  //                                   ),
+  //                                   secondary: paymentMethodList[index]
+  //                                               ['type'] ==
+  //                                           "COD"
+  //                                       ? Icon(
+  //                                           Icons.attach_money,
+  //                                           color: PRIMARY,
+  //                                           size: 16.0,
+  //                                         )
+  //                                       : Icon(
+  //                                           Icons.credit_card,
+  //                                           color: PRIMARY,
+  //                                           size: 16.0,
+  //                                         )),
+  //                             )
+  //                           : Container();
+  //                     },
+  //                   ),
+  //                   widget.cart['paymentOption'] == 'CREDIT CARD'
+  //                       ? paymentMethod()
+  //                       : Container(),
+  //                   widget.cart['paymentOption'] == 'CREDIT CARD'
+  //                       ? buildSaveCardInfo()
+  //                       : Container()
+  //                 ],
+  //               ),
+  //             )
+  //           : Container(
+  //               child: Column(
+  //               children: <Widget>[
+  //                 Container(
+  //                   margin: EdgeInsets.all(8.0),
+  //                   color: Colors.white,
+  //                   child: RadioListTile(
+  //                       value: 0,
+  //                       groupValue: selectedPaymentIndex,
+  //                       selected: true,
+  //                       onChanged: (int selected) {
+  //                         if (!isLoading) {
+  //                           if (mounted) {
+  //                             setState(() {
+  //                               selectedPaymentIndex = selected;
+
+  //                               widget.cart['paymentOption'] = "COD";
+  //                             });
+  //                           }
+  //                         }
+  //                       },
+  //                       activeColor: PRIMARY,
+  //                       title: Text(
+  //                         MyLocalizations.of(context).cod,
+  //                         style: TextStyle(color: PRIMARY),
+  //                       ),
+  //                       secondary: Icon(
+  //                         Icons.attach_money,
+  //                         color: PRIMARY,
+  //                         size: 16.0,
+  //                       )),
+  //                 )
+  //               ],
+  //             ))
+  //       : Container(
+  //           child: Center(
+  //             child: Text(
+  //               MyLocalizations.of(context).noPaymentMethods,
+  //               style: TextStyle(color: Colors.black),
+  //             ),
+  //           ),
+  //         );
+  // }
   Widget _buildPaymentMethodSelector() {
-    return paymentMethodList != []
-        ? paymentMethodList.length > 0
-            ? SingleChildScrollView(
-                child: Column(
-                  children: [
-                    ListView.builder(
-                      physics: ScrollPhysics(),
-                      shrinkWrap: true,
-                      padding: EdgeInsets.only(right: 0.0),
-                      itemCount: paymentMethodList.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return paymentMethodList[index]['isSelected'] == true
-                            ? Container(
-                                margin: EdgeInsets.all(8.0),
-                                color: Colors.white,
-                                child: RadioListTile(
-                                    value: index,
-                                    groupValue: selectedPaymentIndex,
-                                    selected: paymentMethodList[index]
-                                        ['isSelected'],
-                                    onChanged: (int selected) {
-                                      if (!isLoading) {
-                                        if (mounted) {
-                                          setState(() {
-                                            selectedPaymentIndex = selected;
-                                            paymentMethodList[index]
-                                                    ['isSelected'] =
-                                                !paymentMethodList[index]
-                                                    ['isSelected'];
-                                            widget.cart['paymentOption'] =
-                                                paymentMethodList[index]
-                                                    ['type'];
-                                          });
-                                        }
-                                      }
-                                    },
-                                    activeColor: PRIMARY,
-                                    title: Text(
-                                      paymentMethodList[index]['type'],
-                                      style: TextStyle(color: PRIMARY),
-                                    ),
-                                    secondary: paymentMethodList[index]
-                                                ['type'] ==
-                                            "COD"
+    return paymentMethodAvaiilable &&
+            (paymentMethodList != [] && paymentMethodList.length > 0)
+        ? SingleChildScrollView(
+            child: Column(
+              children: [
+                ListView.builder(
+                  physics: ScrollPhysics(),
+                  shrinkWrap: true,
+                  padding: EdgeInsets.only(right: 0.0),
+                  itemCount: paymentMethodList.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    if (paymentMethodList[index]['isSelected']) {
+                      paymentMethodAvaiilable = true;
+                    } else {
+                      paymentMethodAvaiilable = false;
+                    }
+                    if (paymentMethodList[index]['isBoxSelected'] == null) {
+                      if (index == 0) {
+                        paymentMethodList[0]['isBoxSelected'] = true;
+                      } else {
+                        paymentMethodList[index]['isBoxSelected'] = true;
+                      }
+                    }
+                    return paymentMethodList[index]['isSelected'] == true
+                        ? Container(
+                            margin: EdgeInsets.all(8.0),
+                            color: Colors.white,
+                            child: RadioListTile(
+                                value: index,
+                                groupValue: selectedPaymentIndex,
+                                selected: paymentMethodList[index]
+                                    ['isBoxSelected'],
+                                onChanged: (int selected) {
+                                  if (!isLoading) {
+                                    if (paymentMethodList[index]['type'] ==
+                                        'COD') {
+                                      groupValue = null;
+                                    }
+                                    setState(() {
+                                      selectedPaymentIndex = selected;
+                                      paymentMethodList[index]
+                                              ['isBoxSelected'] =
+                                          !paymentMethodList[index]
+                                              ['isBoxSelected'];
+                                      widget.cart['paymentOption'] =
+                                          paymentMethodList[index]['type'];
+                                    });
+                                  }
+                                },
+                                activeColor: PRIMARY,
+                                title: Text(
+                                  paymentMethodList[index]['type'],
+                                  style: TextStyle(color: PRIMARY),
+                                ),
+                                secondary:
+                                    paymentMethodList[index]['type'] == "COD"
                                         ? Icon(
                                             Icons.attach_money,
                                             color: PRIMARY,
@@ -407,61 +546,60 @@ class _PaymentMethodState extends State<PaymentMethod> {
                                             color: PRIMARY,
                                             size: 16.0,
                                           )),
-                              )
-                            : Container();
-                      },
-                    ),
-                    widget.cart['paymentOption'] == 'CREDIT CARD'
-                        ? paymentMethod()
-                        : Container(),
-                    widget.cart['paymentOption'] == 'CREDIT CARD'
-                        ? buildSaveCardInfo()
-                        : Container()
-                  ],
+                          )
+                        : Container();
+                  },
                 ),
-              )
-            : Container(
-                child: Column(
-                children: <Widget>[
-                  Container(
-                    margin: EdgeInsets.all(8.0),
-                    color: Colors.white,
-                    child: RadioListTile(
-                        value: 0,
-                        groupValue: selectedPaymentIndex,
-                        selected: true,
-                        onChanged: (int selected) {
-                          if (!isLoading) {
-                            if (mounted) {
-                              setState(() {
-                                selectedPaymentIndex = selected;
-
-                                widget.cart['paymentOption'] = "COD";
-                              });
-                            }
-                          }
-                        },
-                        activeColor: PRIMARY,
-                        title: Text(
-                          MyLocalizations.of(context).cod,
-                          style: TextStyle(color: PRIMARY),
-                        ),
-                        secondary: Icon(
-                          Icons.attach_money,
-                          color: PRIMARY,
-                          size: 16.0,
-                        )),
-                  )
-                ],
-              ))
+                widget.cart['paymentOption'] == 'CREDIT CARD'
+                    ? paymentMethod()
+                    : Container(),
+                widget.cart['paymentOption'] == 'CREDIT CARD'
+                    ? buildSaveCardInfo()
+                    : Container(),
+              ],
+            ),
+          )
         : Container(
-            child: Center(
-              child: Text(
-                MyLocalizations.of(context).noPaymentMethods,
-                style: TextStyle(color: Colors.black),
-              ),
+            padding: EdgeInsets.all(60),
+            child: NoData(
+              message: MyLocalizations.of(context).noPaymentMethods,
+              icon: Icons.hourglass_empty,
             ),
           );
+    // Container(
+    //   child: Column(
+    //     children: <Widget>[
+    //       Container(
+    //         margin: EdgeInsets.all(8.0),
+    //         color: Colors.white,
+    //         child: RadioListTile(
+    //           value: 0,
+    //           groupValue: selectedPaymentIndex,
+    //           selected: true,
+    //           onChanged: (int selected) {
+    //             if (!isLoading) {
+    //               setState(() {
+    //                 selectedPaymentIndex = selected;
+
+    //                 widget.cart['paymentOption'] = "COD";
+    //               });
+    //             }
+    //           },
+    //           activeColor: PRIMARY,
+    //           title: Text(
+    //             "COD",
+    //             style: TextStyle(color: PRIMARY),
+    //           ),
+    //           secondary: Icon(
+    //             Icons.attach_money,
+    //             color: PRIMARY,
+    //             size: 16.0,
+    //           ),
+    //         ),
+    //       )
+    //     ],
+    //   ),
+    // );
   }
 
   Widget paymentMethod() {

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:RestaurantSaas/localizations.dart';
+import 'package:RestaurantSaas/screens/other/thank-you.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import '../../styles/styles.dart';
@@ -65,12 +66,12 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
       GlobalKey<AsyncLoaderState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<String> languages = ['English', 'French', 'Chinese'];
+  bool placeOrderLoading = false;
 
   String currency = '';
 
   Future<Map<String, dynamic>> _getUserInfo() async {
     await ProfileService.getUserInfo().then((onValue) {
-      print(onValue);
       try {
         userInfo = onValue;
       } catch (error, stackTrace) {
@@ -82,11 +83,8 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
 
     await MainService.getLoyaltyInfoByRestaurantId(widget.cart['restaurantID'])
         .then((onValue) {
-      print("njnnjmkn $onValue");
-
       try {
         userInfo['loyaltyInfo'] = onValue['adminSet'];
-        print("njnnjmkn ${userInfo['loyaltyInfo']}");
         remainingLoyaltyPoint =
             double.parse(userInfo['totalLoyaltyPoints'].toString());
       } catch (error, stackTrace) {
@@ -1515,103 +1513,110 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
   //       }
   //     },
   Widget _buildBottomBar() {
-    return RawMaterialButton(
-      onPressed: () {
-        if (widget.cart['orderType'] == 'Dine In') {
-          // if (widget.tableInfo == null) {
-          //   showSnackbar('Wrong Table Info please scan barcode again!');
-          // } else {
-          _buildBottomBarButton();
-          // }
-        } else if (widget.cart['orderType'] == 'Pickup') {
-          if (widget.cart['pickupDate'] != null &&
-              widget.cart['pickupTime'] != null) {
-            _buildBottomBarButton();
-          } else if (widget.cart['pickupDate'] == null) {
-            showSnackbar(
-                MyLocalizations.of(context).pleaseSelectDatefirstforpickup);
-          } else if (widget.cart['pickupTime'] == null) {
-            showSnackbar(
-                MyLocalizations.of(context).pleaseSelectTimefirstforpickup);
-          } else {
-            showSnackbar('Please Select Date and Time first for pickup');
-          }
-        } else if (widget.cart['orderType'] == 'Delivery') {
-          if (widget.cart['shippingAddress'] == null) {
-            showSnackbar(MyLocalizations.of(context)
-                .pleaseSelectAddshippingaddressfirst);
-          } else {
-            if (widget.deliveryInfo == null ||
-                widget.deliveryInfo['areaAthority']) {
-              openAndCloseTime == "Open"
-                  ? _buildBottomBarButton()
-                  : showSnackbar(MyLocalizations.of(context)
-                      .storeisClosedPleaseTryAgainduringouropeninghours);
-            } else {
-              if (widget.deliveryInfo['areaCode'] == null ||
-                  widget.deliveryInfo['areaCode'][0] == null) {
-                openAndCloseTime == "Open"
-                    ? _buildBottomBarButton()
-                    : showSnackbar(MyLocalizations.of(context)
-                        .storeisClosedPleaseTryAgainduringouropeninghours);
-              } else {
-                bool isPinFound = false;
-                for (int i = 0;
-                    i < widget.deliveryInfo['areaCode'].length;
-                    i++) {
-                  if (widget.deliveryInfo['areaCode'][i]['pinCode']
-                          .toString() ==
-                      widget.cart['shippingAddress']['zip'].toString()) {
-                    isPinFound = true;
+    return placeOrderLoading
+        ? Center(child: CircularProgressIndicator())
+        : RawMaterialButton(
+            onPressed: () {
+              if (mounted) {
+                setState(() {
+                  placeOrderLoading = true;
+                });
+              }
+              if (widget.cart['orderType'] == 'Dine In') {
+                // if (widget.tableInfo == null) {
+                //   showSnackbar('Wrong Table Info please scan barcode again!');
+                // } else {
+                _buildBottomBarButton();
+                // }
+              } else if (widget.cart['orderType'] == 'Pickup') {
+                if (widget.cart['pickupDate'] != null &&
+                    widget.cart['pickupTime'] != null) {
+                  _buildBottomBarButton();
+                } else if (widget.cart['pickupDate'] == null) {
+                  showSnackbar(MyLocalizations.of(context)
+                      .pleaseSelectDatefirstforpickup);
+                } else if (widget.cart['pickupTime'] == null) {
+                  showSnackbar(MyLocalizations.of(context)
+                      .pleaseSelectTimefirstforpickup);
+                } else {
+                  showSnackbar('Please Select Date and Time first for pickup');
+                }
+              } else if (widget.cart['orderType'] == 'Delivery') {
+                if (widget.cart['shippingAddress'] == null) {
+                  showSnackbar(MyLocalizations.of(context)
+                      .pleaseSelectAddshippingaddressfirst);
+                } else {
+                  if (widget.deliveryInfo == null ||
+                      widget.deliveryInfo['areaAthority']) {
+                    openAndCloseTime == "Open"
+                        ? _buildBottomBarButton()
+                        : showSnackbar(MyLocalizations.of(context)
+                            .storeisClosedPleaseTryAgainduringouropeninghours);
+                  } else {
+                    if (widget.deliveryInfo['areaCode'] == null ||
+                        widget.deliveryInfo['areaCode'][0] == null) {
+                      openAndCloseTime == "Open"
+                          ? _buildBottomBarButton()
+                          : showSnackbar(MyLocalizations.of(context)
+                              .storeisClosedPleaseTryAgainduringouropeninghours);
+                    } else {
+                      bool isPinFound = false;
+                      for (int i = 0;
+                          i < widget.deliveryInfo['areaCode'].length;
+                          i++) {
+                        if (widget.deliveryInfo['areaCode'][i]['pinCode']
+                                .toString() ==
+                            widget.cart['shippingAddress']['zip'].toString()) {
+                          isPinFound = true;
+                        }
+                      }
+                      if (isPinFound) {
+                        openAndCloseTime == "Open"
+                            ? _buildBottomBarButton()
+                            : showSnackbar(MyLocalizations.of(context)
+                                .storeisClosedPleaseTryAgainduringouropeninghours);
+                      } else {
+                        _showAvailablePincodeAlert(
+                            widget.cart['restaurant'],
+                            widget.cart['shippingAddress']['zip'].toString(),
+                            widget.deliveryInfo['areaCode']);
+                      }
+                    }
                   }
                 }
-                if (isPinFound) {
-                  openAndCloseTime == "Open"
-                      ? _buildBottomBarButton()
-                      : showSnackbar(MyLocalizations.of(context)
-                          .storeisClosedPleaseTryAgainduringouropeninghours);
-                } else {
-                  _showAvailablePincodeAlert(
-                      widget.cart['restaurant'],
-                      widget.cart['shippingAddress']['zip'].toString(),
-                      widget.deliveryInfo['areaCode']);
-                }
+              } else {
+                showSnackbar(MyLocalizations.of(context)
+                        .somethingwentwrongpleaserestarttheapp +
+                    '.');
               }
-            }
-          }
-        } else {
-          showSnackbar(MyLocalizations.of(context)
-                  .somethingwentwrongpleaserestarttheapp +
-              '.');
-        }
-      },
-      child: new Row(
-        children: <Widget>[
-          Expanded(
-            child: new Container(
-              height: 70.0,
-              color: PRIMARY,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  new Padding(padding: EdgeInsets.only(top: 10.0)),
-                  new Text(
-                    MyLocalizations.of(context).placeOrderNow,
-                    style: subTitleWhiteLightOSR(),
+            },
+            child: new Row(
+              children: <Widget>[
+                Expanded(
+                  child: new Container(
+                    height: 70.0,
+                    color: PRIMARY,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        new Padding(padding: EdgeInsets.only(top: 10.0)),
+                        new Text(
+                          MyLocalizations.of(context).placeOrderNow,
+                          style: subTitleWhiteLightOSR(),
+                        ),
+                        new Padding(padding: EdgeInsets.only(top: 5.0)),
+                        new Text(
+                          MyLocalizations.of(context).total +
+                              ': ${widget.currency ?? currency} ${widget.cart['grandTotal'].toStringAsFixed(2)}',
+                          style: titleWhiteBoldOSB(),
+                        ),
+                      ],
+                    ),
                   ),
-                  new Padding(padding: EdgeInsets.only(top: 5.0)),
-                  new Text(
-                    MyLocalizations.of(context).total +
-                        ': ${widget.currency ?? currency} ${widget.cart['grandTotal'].toStringAsFixed(2)}',
-                    style: titleWhiteBoldOSB(),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
-    );
+          );
   }
 
   void _buildBottomBarButton() {
@@ -1623,31 +1628,73 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
       widget.cart['pickupTime'] = widget.cart['pickupTime'];
       widget.cart['pickupDate'] = widget.cart['pickupDate'];
       widget.cart['shippingAddress'] = null;
-
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (BuildContext context) => PaymentMethod(
-              cart: widget.cart,
-              locale: widget.locale,
-              localizedValues: widget.localizedValues,
-            ),
-          ));
+      if (widget.cart['grandTotal'] != 0) {
+        if (mounted) {
+          setState(() {
+            placeOrderLoading = false;
+          });
+        }
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (BuildContext context) => PaymentMethod(
+                cart: widget.cart,
+                locale: widget.locale,
+                localizedValues: widget.localizedValues,
+              ),
+            ));
+      } else {
+        orderInfo();
+      }
     } else {
       widget.cart['loyalty'] =
           double.parse(usedLoyaltyPoint.toStringAsFixed(2));
       widget.cart['shippingAddress'] = widget.cart['shippingAddress'];
-
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (BuildContext context) => PaymentMethod(
-              cart: widget.cart,
-              locale: widget.locale,
-              localizedValues: widget.localizedValues,
-            ),
-          ));
+      if (widget.cart['grandTotal'] != 0) {
+        if (mounted) {
+          setState(() {
+            placeOrderLoading = false;
+          });
+        }
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (BuildContext context) => PaymentMethod(
+                cart: widget.cart,
+                locale: widget.locale,
+                localizedValues: widget.localizedValues,
+              ),
+            ));
+      } else {
+        orderInfo();
+      }
     }
+  }
+
+  void orderInfo() {
+    widget.cart['createdAtTime'] = DateTime.now().millisecondsSinceEpoch;
+    widget.cart['restaurant'] = widget.cart['productDetails'][0]['restaurant'];
+    widget.cart['restaurant'] = widget.cart['productDetails'][0]['restaurant'];
+    widget.cart['restaurantID'] =
+        widget.cart['productDetails'][0]['restaurantID'];
+    widget.cart['paymentOption'] = "COD";
+    ProfileService.placeOrder(widget.cart).then((onValue) {
+      if (mounted) {
+        setState(() {
+          placeOrderLoading = false;
+        });
+      }
+      if (onValue != null && onValue['message'] != null) {
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext context) => ThankYou(
+                      localizedValues: widget.localizedValues,
+                      locale: widget.locale,
+                    )),
+            (Route<dynamic> route) => route.isFirst);
+      }
+    });
   }
 
   Future<void> _showAvailablePincodeAlert(
