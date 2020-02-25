@@ -125,17 +125,20 @@ class _CartPageState extends State<CartPage> {
             widget.locationInfo['deliveryInfo'] != null)
         ? widget.locationInfo['deliveryInfo']['deliveryInfo']
         : null;
-
     if (deliveryInfo != null) {
-      if (deliveryInfo['freeDelivery']) {
-        if (deliveryInfo['amountEligibility'] > subTotal) {
+      print(deliveryInfo);
+      if (!deliveryInfo['freeDelivery']) {
+        if (deliveryInfo['amountEligibility'] <= subTotal) {
+          deliveryCharge = 0.0;
+        } else {
           deliveryCharge =
               double.parse(deliveryInfo['deliveryCharges'].toString());
         }
       } else {
-        deliveryCharge =
-            double.parse(deliveryInfo['deliveryCharges'].toString());
+        deliveryCharge = 0.0;
       }
+    } else {
+      deliveryCharge = 0.0;
     }
 
     // [6] calculate grand total
