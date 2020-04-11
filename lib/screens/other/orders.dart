@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
+import '../../services/constant.dart';
 import '../../styles/styles.dart';
 import 'order-upcoming.dart';
 import 'order-history.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-
-import 'package:RestaurantSaas/constant.dart' show languages;
-import 'package:RestaurantSaas/localizations.dart'
-    show MyLocalizations, MyLocalizationsDelegate;
+import '../../services/localizations.dart';
 
 class OrdersPage extends StatefulWidget {
   final Map<String, Map<String, String>> localizedValues;
@@ -42,7 +40,7 @@ class _OrdersPageState extends State<OrdersPage>
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
       ],
-      supportedLocales: languages.map((language) => Locale(language, '')),
+      supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
       home: Scaffold(
         appBar: AppBar(
           leading: InkWell(

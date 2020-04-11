@@ -1,6 +1,8 @@
 import 'package:RestaurantSaas/screens/mains/home.dart';
+import 'package:RestaurantSaas/services/initialize_i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:toast/toast.dart';
+import '../../services/constant.dart';
 import '../../styles/styles.dart';
 import '../../services/profile-service.dart';
 import 'package:async_loader/async_loader.dart';
@@ -16,10 +18,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
-
-import 'package:RestaurantSaas/constant.dart' show languages;
-import 'package:RestaurantSaas/localizations.dart'
-    show MyLocalizations, MyLocalizationsDelegate;
+import '../../services/localizations.dart';
 
 SentryError sentryError = new SentryError();
 
@@ -42,7 +41,7 @@ class _ProfileAppState extends State<ProfileApp> {
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
       ],
-      supportedLocales: languages.map((language) => Locale(language, '')),
+      supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
       home: Profile(
           locale: widget.locale, localizedValues: widget.localizedValues),
     );
@@ -96,6 +95,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
         selectedLocale = 'Chinese';
       } else if (selectedLanguage == 'ka') {
         selectedLocale = 'Kannada';
+      } else if (selectedLanguage == 'ar') {
+        selectedLocale = 'Arabic';
       }
     }
   }
@@ -232,7 +233,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 
   String selectedLanguages, selectedLang;
 
-  List<String> languages = ['English', 'French', 'Chinese'];
+  List<String> languages = ['English', 'French', 'Chinese', 'Arabic'];
 
   @override
   Widget build(BuildContext context) {
@@ -395,55 +396,65 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                   : selectedLocale),
                               value: selectedLanguages,
                               onChanged: (newValue) async {
-                                if (newValue == 'English') {
-                                  SharedPreferences prefs =
-                                      await SharedPreferences.getInstance();
-                                  prefs.setString('selectedLanguage', 'en');
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (BuildContext context) =>
-                                          EntryPage(widget.locale,
-                                              widget.localizedValues),
-                                    ),
-                                  );
-                                } else if (newValue == 'Chinese') {
-                                  SharedPreferences prefs =
-                                      await SharedPreferences.getInstance();
-                                  prefs.setString('selectedLanguage', 'zh');
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (BuildContext context) =>
-                                          EntryPage(widget.locale,
-                                              widget.localizedValues),
-                                    ),
-                                  );
-                                } else if (newValue == 'Kannada') {
-                                  SharedPreferences prefs =
-                                      await SharedPreferences.getInstance();
-                                  prefs.setString('selectedLanguage', 'ka');
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (BuildContext context) =>
-                                          EntryPage(widget.locale,
-                                              widget.localizedValues),
-                                    ),
-                                  );
-                                } else {
-                                  SharedPreferences prefs =
-                                      await SharedPreferences.getInstance();
-                                  prefs.setString('selectedLanguage', 'fr');
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (BuildContext context) =>
-                                          EntryPage(widget.locale,
-                                              widget.localizedValues),
-                                    ),
-                                  );
-                                }
+                                await initializeI18n().then((value) async {
+                                  localizedValues = value;
+                                  if (newValue == 'English') {
+                                    SharedPreferences prefs =
+                                        await SharedPreferences.getInstance();
+                                    prefs.setString('selectedLanguage', 'en');
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            EntryPage('en', localizedValues),
+                                      ),
+                                    );
+                                  } else if (newValue == 'Chinese') {
+                                    SharedPreferences prefs =
+                                        await SharedPreferences.getInstance();
+                                    prefs.setString('selectedLanguage', 'zh');
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            EntryPage('zh', localizedValues),
+                                      ),
+                                    );
+                                  } else if (newValue == 'Kannada') {
+                                    SharedPreferences prefs =
+                                        await SharedPreferences.getInstance();
+                                    prefs.setString('selectedLanguage', 'ka');
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            EntryPage('ka', localizedValues),
+                                      ),
+                                    );
+                                  } else if (newValue == 'Arabic') {
+                                    SharedPreferences prefs =
+                                        await SharedPreferences.getInstance();
+                                    prefs.setString('selectedLanguage', 'ar');
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            EntryPage('ar', localizedValues),
+                                      ),
+                                    );
+                                  } else {
+                                    SharedPreferences prefs =
+                                        await SharedPreferences.getInstance();
+                                    prefs.setString('selectedLanguage', 'fr');
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            EntryPage('fr', localizedValues),
+                                      ),
+                                    );
+                                  }
+                                });
                               },
                               items: languages.map((lang) {
                                 return DropdownMenuItem(

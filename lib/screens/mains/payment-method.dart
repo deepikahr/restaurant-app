@@ -1,9 +1,8 @@
-import 'package:RestaurantSaas/localizations.dart';
 import 'package:RestaurantSaas/screens/mains/add-card.dart';
 import 'package:RestaurantSaas/services/main-service.dart';
 import 'package:RestaurantSaas/widgets/no-data.dart';
 import 'package:flutter/material.dart';
-import '../../constant.dart';
+import '../../services/constant.dart';
 import '../../styles/styles.dart';
 import '../other/thank-you.dart';
 import '../../services/profile-service.dart';
@@ -14,9 +13,7 @@ import '../../services/common.dart';
 import '../../services/sentry-services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:RestaurantSaas/constant.dart' show languages;
-import 'package:RestaurantSaas/localizations.dart'
-    show MyLocalizations, MyLocalizationsDelegate;
+import '../../services/localizations.dart';
 
 SentryError sentryError = new SentryError();
 
@@ -295,7 +292,7 @@ class _PaymentMethodState extends State<PaymentMethod> {
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
       ],
-      supportedLocales: languages.map((language) => Locale(language, '')),
+      supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
       home: Scaffold(
         backgroundColor: whiteTextb,
         appBar: AppBar(

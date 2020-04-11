@@ -1,16 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../../services/constant.dart';
 import '../../styles/styles.dart';
 import '../../services/auth-service.dart';
-import '../../blocs/validators.dart';
 import 'otp-verify.dart';
 import '../../services/sentry-services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-
-import 'package:RestaurantSaas/constant.dart' show languages;
-import 'package:RestaurantSaas/localizations.dart'
-    show MyLocalizations, MyLocalizationsDelegate;
+import '../../services/localizations.dart';
 
 SentryError sentryError = new SentryError();
 
@@ -95,7 +92,7 @@ class _ResetPasswordState extends State<ResetPassword> {
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
       ],
-      supportedLocales: languages.map((language) => Locale(language, '')),
+      supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
       home: Scaffold(
           key: _scaffoldKey,
           appBar: AppBar(
@@ -169,7 +166,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                     keyboardType: TextInputType.emailAddress,
                     validator: (String value) {
                       if (value.isEmpty ||
-                          !RegExp(Validators.emailPattern).hasMatch(value)) {
+                          !RegExp(EMAIL_PATTERN).hasMatch(value)) {
                         return MyLocalizations.of(context)
                             .pleaseEnterValidEmail;
                       } else

@@ -7,8 +7,7 @@ import '../../widgets/location-card.dart';
 import 'product-list.dart';
 import 'location-list.dart';
 import '../../services/sentry-services.dart';
-
-import 'package:RestaurantSaas/localizations.dart' show MyLocalizations;
+import '../../services/localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
@@ -17,6 +16,10 @@ class LocationListSheet extends StatelessWidget {
   final Map<String, dynamic> restaurantInfo, locationInfo;
   final Map<String, Map<String, String>> localizedValues;
   final String locale;
+  String currency = "";
+  final GlobalKey<AsyncLoaderState> _asyncLoaderState =
+      GlobalKey<AsyncLoaderState>();
+
   LocationListSheet(
       {Key key,
       this.restaurantInfo,
@@ -25,11 +28,6 @@ class LocationListSheet extends StatelessWidget {
       this.locale})
       : super(key: key);
 
-  final GlobalKey<AsyncLoaderState> _asyncLoaderState =
-      GlobalKey<AsyncLoaderState>();
-  int cartCount;
-
-  String currency = "";
   getLocationListByRestaurantId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     currency = prefs.getString('currency');
@@ -135,13 +133,13 @@ class LocationListSheet extends StatelessWidget {
           ' M';
       deliveryChargeText = data[index]['location']['deliveryInfo']
               ['deliveryInfo']['freeDelivery']
-          ? 'No Delivery charge'
-          : 'Delivery charge $currency' +
+          ? MyLocalizations.of(context).noDeliverycharge
+          : '${MyLocalizations.of(context).deliveryCharges} $currency' +
               data[index]['deliveryInfo']['deliveryInfo']['deliveryCharges']
                   .toString();
       freeDeliveryText = data[index]['location']['deliveryInfo']['deliveryInfo']
               ['freeDelivery']
-          ? 'Free delivery available'
+          ? MyLocalizations.of(context).freeDeliveryAvailable
           : 'Free delivery above \$' +
               data[index]['location']['deliveryInfo']['deliveryInfo']
                       ['amountEligibility']

@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import '../../services/constant.dart';
 import '../../styles/styles.dart';
-import '../../blocs/validators.dart';
 import '../../services/auth-service.dart';
 import 'dart:async';
 import 'package:flutter_localizations/flutter_localizations.dart';
-
-import 'package:RestaurantSaas/constant.dart' show languages;
-import 'package:RestaurantSaas/localizations.dart'
-    show MyLocalizations, MyLocalizationsDelegate;
-
+import '../../services/localizations.dart';
 import 'package:flutter/foundation.dart';
 
 class RegisterForm extends StatefulWidget {
@@ -107,7 +102,7 @@ class _RegisterFormState extends State<RegisterForm> {
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
         ],
-        supportedLocales: languages.map((language) => Locale(language, '')),
+        supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
         home: Scaffold(
           key: _scaffoldKey,
           appBar: AppBar(
@@ -258,8 +253,7 @@ class _RegisterFormState extends State<RegisterForm> {
               ),
               keyboardType: TextInputType.emailAddress,
               validator: (String value) {
-                if (value.isEmpty ||
-                    !RegExp(Validators.emailPattern).hasMatch(value)) {
+                if (value.isEmpty || !RegExp(EMAIL_PATTERN).hasMatch(value)) {
                   return MyLocalizations.of(context).pleaseEnterValidEmail;
                 } else
                   return null;

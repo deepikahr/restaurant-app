@@ -1,8 +1,8 @@
-import 'package:RestaurantSaas/localizations.dart';
-import 'package:RestaurantSaas/screens/other/CounterModel.dart';
+import '../../services/counter-service.dart';
 import 'package:flutter/material.dart';
 import 'package:async_loader/async_loader.dart';
 import 'package:intl/intl.dart';
+import '../../services/constant.dart';
 import '../../styles/styles.dart';
 import '../../widgets/location-card.dart';
 import '../../services/main-service.dart';
@@ -11,10 +11,7 @@ import 'product-details.dart';
 import 'cart.dart';
 import '../../services/sentry-services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-
-import 'package:RestaurantSaas/constant.dart' show languages;
-import 'package:RestaurantSaas/localizations.dart'
-    show MyLocalizations, MyLocalizationsDelegate;
+import '../../services/localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
@@ -57,7 +54,6 @@ class ProductListPage extends StatefulWidget {
 class _ProductListPageState extends State<ProductListPage> {
   final GlobalKey<AsyncLoaderState> _asyncLoaderState =
       GlobalKey<AsyncLoaderState>();
-  bool isShopOpen = true;
   bool isopenAndCloseTimeLoading = false;
   int cartCount;
   String openAndCloseTime;
@@ -101,7 +97,7 @@ class _ProductListPageState extends State<ProductListPage> {
 
   @override
   Widget build(BuildContext context) {
-    CounterModel().getCounter().then((res) {
+    CounterService().getCounter().then((res) {
       try {
         if (mounted) {
           setState(() {
@@ -164,7 +160,7 @@ class _ProductListPageState extends State<ProductListPage> {
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
       ],
-      supportedLocales: languages.map((language) => Locale(language, '')),
+      supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
       home: Scaffold(
         appBar: AppBar(
           leading: InkWell(

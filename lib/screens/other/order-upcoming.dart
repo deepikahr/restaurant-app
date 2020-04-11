@@ -8,8 +8,7 @@ import '../../services/profile-service.dart';
 import 'order-details.dart';
 import 'order-track.dart';
 import '../../services/sentry-services.dart';
-
-import 'package:RestaurantSaas/localizations.dart' show MyLocalizations;
+import '../../services/localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
@@ -137,7 +136,8 @@ class OrderUpcomingState extends State<OrderUpcoming>
                         ? ""
                         : DateFormat('dd-MMM-yy hh:mm a').format(
                             new DateTime.fromMillisecondsSinceEpoch(
-                                orders[index]['createdAtTime'])))
+                                orders[index]['createdAtTime'])),
+                    context)
               ],
             ),
           );
@@ -434,7 +434,7 @@ class OrderUpcomingState extends State<OrderUpcoming>
   }
 
   static Widget _buildBottomPriceLine(
-      double total, String paymentMode, String time) {
+      double total, String paymentMode, String time, context) {
     return Container(
       alignment: AlignmentDirectional.centerStart,
       padding: EdgeInsetsDirectional.only(top: 12.0),
@@ -446,11 +446,12 @@ class OrderUpcomingState extends State<OrderUpcoming>
             // crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Text(
-                "Total including GST: \$" + total.toStringAsFixed(2),
+                "${MyLocalizations.of(context).totalincludingGST}: \$" +
+                    total.toStringAsFixed(2),
                 style: hintStyleSmallDarkBoldOSL(),
               ),
               Text(
-                "Payment Mode: " +
+                "${MyLocalizations.of(context).paymentMode}: " +
                     (paymentMode == 'Stripe' || paymentMode == "CREDIT CARD"
                         ? 'CC'
                         : paymentMode),
@@ -463,7 +464,7 @@ class OrderUpcomingState extends State<OrderUpcoming>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             // crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Text('Including other charges'),
+              Text(MyLocalizations.of(context).chargesIncluding),
               Text(
                 time == null ? "" : time.toString(),
                 style: hintStyleSmallDarkBoldOSL(),

@@ -1,6 +1,5 @@
 import 'dart:async';
-
-import 'package:RestaurantSaas/localizations.dart';
+import '../../services/localizations.dart';
 import 'package:RestaurantSaas/screens/other/thank-you.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
@@ -14,8 +13,6 @@ import 'dart:core';
 import '../../services/main-service.dart';
 import 'package:intl/intl.dart';
 import '../../services/sentry-services.dart';
-
-import 'package:RestaurantSaas/localizations.dart' show MyLocalizations;
 import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();

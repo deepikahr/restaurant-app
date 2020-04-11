@@ -1,16 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../../services/constant.dart';
 import '../../styles/styles.dart';
 import '../../services/main-service.dart';
 import 'package:async_loader/async_loader.dart';
 import '../../widgets/no-data.dart';
 import '../../services/sentry-services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-
-import 'package:RestaurantSaas/constant.dart' show languages;
-import 'package:RestaurantSaas/localizations.dart'
-    show MyLocalizations, MyLocalizationsDelegate;
+import '../../services/localizations.dart';
 
 SentryError sentryError = new SentryError();
 
@@ -44,7 +42,7 @@ class _CouponsListState extends State<CouponsList> {
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
         ],
-        supportedLocales: languages.map((language) => Locale(language, '')),
+        supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
         home: Scaffold(
           backgroundColor: whiteTextb,
           appBar: AppBar(
@@ -85,6 +83,10 @@ class _CouponsListState extends State<CouponsList> {
                         data[index],
                       );
                     });
+              } else {
+                return Container(
+                  child: Text('Invalid response'),
+                );
               }
             },
           ),

@@ -1,4 +1,3 @@
-import 'package:RestaurantSaas/screens/other/CounterModel.dart';
 import 'package:RestaurantSaas/services/auth-service.dart';
 import 'package:RestaurantSaas/services/common.dart';
 
@@ -6,19 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
-import 'initialize_i18n.dart' show initializeI18n;
-import 'constant.dart' show languages;
-import 'localizations.dart' show MyLocalizationsDelegate;
+import 'services/initialize_i18n.dart';
+import 'services/localizations.dart';
 
 import './styles/styles.dart';
 import './services/constant.dart';
 import 'screens/mains/home.dart';
-// import 'package:flutter_stetho/flutter_stetho.dart';
 
-import 'package:provider/provider.dart';
 import './services/sentry-services.dart';
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'services/constant.dart';
 
 bool get isInDebugMode {
   bool inDebugMode = false;
@@ -31,7 +29,8 @@ SentryError sentryError = new SentryError();
 main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Map<String, Map<String, String>> localizedValues = await initializeI18n();
-  String _locale = 'en';
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String locale = prefs.getString('selectedLanguage') ?? 'en';
   FlutterError.onError = (FlutterErrorDetails details) async {
     if (isInDebugMode) {
       FlutterError.dumpErrorToConsole(details);
@@ -40,11 +39,10 @@ main() async {
     }
   };
   tokenCheck();
+  initOneSignal();
+
   runZoned<Future<Null>>(() async {
-    runApp(new EntryPage(
-      _locale,
-      localizedValues,
-    ));
+    runApp(new EntryPage(locale, localizedValues));
   }, onError: (error, stackTrace) async {
     await sentryError.reportError(error, stackTrace);
   });
@@ -59,7 +57,7 @@ void tokenCheck() {
           Common.removeToken().then((removeVerification) async {});
         }
       });
-    } else {}
+    }
   });
 }
 
@@ -77,51 +75,33 @@ class EntryPage extends StatefulWidget {
   final Map<String, Map<String, String>> localizedValues;
   final String locale;
   EntryPage(this.locale, this.localizedValues);
+
   @override
   _EntryPageState createState() => _EntryPageState();
 }
 
 class _EntryPageState extends State<EntryPage> {
   @override
-  void initState() {
-    super.initState();
-    getData();
-  }
-
-  var selectedLanguage;
-
-  getData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (mounted) {
-      setState(() {
-        selectedLanguage = prefs.getString('selectedLanguage');
-      });
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        locale:
-            Locale(selectedLanguage == null ? widget.locale : selectedLanguage),
-        localizationsDelegates: [
-          MyLocalizationsDelegate(widget.localizedValues),
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-        ],
-        supportedLocales: languages.map((language) => Locale(language, '')),
-        debugShowCheckedModeBanner: false,
-        title: APP_NAME,
-        theme: ThemeData(
-          fontFamily: FONT_FAMILY,
-          primaryColor: PRIMARY,
-          accentColor: PRIMARY,
-        ),
-        home: ChangeNotifierProvider<CounterModel>(
-            create: (_) => CounterModel(),
-            child: HomePage(
-                locale:
-                    selectedLanguage == null ? widget.locale : selectedLanguage,
-                localizedValues: widget.localizedValues)));
+      locale: Locale(widget.locale),
+      localizationsDelegates: [
+        MyLocalizationsDelegate(widget.localizedValues),
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
+      debugShowCheckedModeBanner: false,
+      title: APP_NAME,
+      theme: ThemeData(
+        fontFamily: FONT_FAMILY,
+        primaryColor: PRIMARY,
+        accentColor: PRIMARY,
+      ),
+      home: HomePage(
+        locale: widget.locale,
+        localizedValues: widget.localizedValues,
+      ),
+    );
   }
 }

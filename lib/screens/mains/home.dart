@@ -1,13 +1,14 @@
-import 'package:RestaurantSaas/screens/other/CounterModel.dart';
+import '../../services/counter-service.dart';
 import 'package:RestaurantSaas/services/constant.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import '../../services/constant.dart';
+import '../../widgets/no-data.dart';
 import 'drawer.dart';
 import 'package:async_loader/async_loader.dart';
 import '../../styles/styles.dart';
 import '../../services/main-service.dart';
 import 'location-list-sheet.dart';
-import '../../widgets/no-data.dart';
 import 'cart.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'restaurant-list.dart';
@@ -17,13 +18,9 @@ import 'package:location/location.dart';
 import '../../services/common.dart';
 import 'dart:async';
 import '../../services/profile-service.dart';
-
 import '../../services/sentry-services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-
-import 'package:RestaurantSaas/constant.dart' show languages;
-import 'package:RestaurantSaas/localizations.dart'
-    show MyLocalizations, MyLocalizationsDelegate;
+import '../../services/localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
@@ -51,7 +48,6 @@ class HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   VoidCallback showBottomSheetCallback;
   Map<String, dynamic> restaurantInfo;
-  int nearByLength;
   int cartCount;
   bool isNearByRestaurants = false;
   List nearByRestaurentsList;
@@ -235,7 +231,7 @@ class HomePageState extends State<HomePage> {
   getNearByRestaurants() async {
     if (!isNearByRestaurants) {
       _locationStream =
-          _location.onLocationChanged().listen((LocationData result) async {
+          _location.onLocationChanged.listen((LocationData result) async {
         Coordinates coordinates =
             Coordinates(result.latitude, result.longitude);
         List<Address> addresses;
@@ -249,7 +245,7 @@ class HomePageState extends State<HomePage> {
               position = {
                 'lat': result.latitude,
                 'long': result.longitude,
-                'name': addresses.first.addressLine
+                'name': addresses
               };
             });
           }
@@ -291,7 +287,7 @@ class HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     review = MyLocalizations.of(context).reviews;
     branches = MyLocalizations.of(context).branches;
-    CounterModel().getCounter().then((res) {
+    CounterService().getCounter().then((res) {
       try {
         if (mounted) {
           setState(() {
@@ -312,7 +308,7 @@ class HomePageState extends State<HomePage> {
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
       ],
-      supportedLocales: languages.map((language) => Locale(language, '')),
+      supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
       home: Scaffold(
         backgroundColor: whitec,
         key: scaffoldKey,
@@ -427,7 +423,7 @@ class HomePageState extends State<HomePage> {
                       : _buildGridHeader(
                           MyLocalizations.of(context).restaurantsNearYou),
                   _buildGetNearByLocationLoader(),
-                  isNearByRestaurants != true
+                  isNearByRestaurants != true || nearByRestaurentsList == null
                       ? Container()
                       : _buildViewAllButton(MyLocalizations.of(context).nearBy),
                 ],
@@ -445,7 +441,8 @@ class HomePageState extends State<HomePage> {
                       : _buildGridHeader(
                           MyLocalizations.of(context).topRatedRestaurants),
                   _buildTopRatedRestaurantLoader(),
-                  isTopRatedRestaurants != true
+                  isTopRatedRestaurants != true ||
+                          topRatedRestaurantsList == null
                       ? Container()
                       : _buildViewAllButton(
                           MyLocalizations.of(context).topRated),
@@ -464,7 +461,8 @@ class HomePageState extends State<HomePage> {
                       : _buildGridHeader(
                           MyLocalizations.of(context).newlyArrivedRestaurants),
                   _buildNewlyArrivedRestaurantLoader(),
-                  isNewlyArrivedRestaurants != true
+                  isNewlyArrivedRestaurants != true ||
+                          newlyArrivedRestaurantsList == null
                       ? Container()
                       : _buildViewAllButton(
                           MyLocalizations.of(context).newlyArrived),
@@ -520,46 +518,43 @@ class HomePageState extends State<HomePage> {
           } else {
             return Container();
           }
-          nearByLength = nearByRestaurentsList.length;
-          return nearByLength > 0
-              ? Container(
-                  color: Colors.white70,
-                  margin: EdgeInsets.only(bottom: 5.0),
-                  child: ListView(
-                      physics: ScrollPhysics(),
-                      shrinkWrap: true,
-                      children: <Widget>[
-                        // _buildGridHeader('Restaurants Near You'),
-                        GridView.builder(
-                            physics: ScrollPhysics(),
-                            shrinkWrap: true,
-                            gridDelegate:
-                                new SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2),
-                            itemCount: nearByRestaurentsList.length <
-                                    int.parse(itemCount)
+          return Container(
+              color: Colors.white70,
+              margin: EdgeInsets.only(bottom: 5.0),
+              child: ListView(
+                  physics: ScrollPhysics(),
+                  shrinkWrap: true,
+                  children: <Widget>[
+                    // _buildGridHeader('Restaurants Near You'),
+                    GridView.builder(
+                        physics: ScrollPhysics(),
+                        shrinkWrap: true,
+                        gridDelegate:
+                            new SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2),
+                        itemCount:
+                            nearByRestaurentsList.length < int.parse(itemCount)
                                 ? nearByRestaurentsList.length
                                 : int.parse(itemCount),
-                            padding: const EdgeInsets.all(0.0),
-                            itemBuilder: (BuildContext context, int index) {
-                              return InkWell(
-                                  child: buildRestaurantCard(
-                                      nearByRestaurentsList[index],
-                                      review,
-                                      branches),
-                                  onTap: () {
-                                    if (mounted) {
-                                      setState(() {
-                                        restaurantInfo =
-                                            nearByRestaurentsList[index];
-                                      });
-                                      _showBottomSheet();
-                                    }
+                        padding: const EdgeInsets.all(0.0),
+                        itemBuilder: (BuildContext context, int index) {
+                          return InkWell(
+                              child: buildRestaurantCard(
+                                  nearByRestaurentsList[index],
+                                  review,
+                                  branches),
+                              onTap: () {
+                                if (mounted) {
+                                  setState(() {
+                                    restaurantInfo =
+                                        nearByRestaurentsList[index];
                                   });
-                            }),
-                        // _buildViewAllButton('Near By'),
-                      ]))
-              : Container();
+                                  _showBottomSheet();
+                                }
+                              });
+                        }),
+                    // _buildViewAllButton('Near By'),
+                  ]));
         });
   }
 

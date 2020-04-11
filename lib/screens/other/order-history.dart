@@ -4,8 +4,7 @@ import '../../widgets/no-data.dart';
 import '../../screens/other/order-upcoming.dart';
 import '../../services/profile-service.dart';
 import '../../services/sentry-services.dart';
-
-import 'package:RestaurantSaas/localizations.dart' show MyLocalizations;
+import '../../services/localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();

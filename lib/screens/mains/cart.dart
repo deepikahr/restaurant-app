@@ -1,11 +1,8 @@
 import 'dart:async';
-
-import 'package:RestaurantSaas/constant.dart';
-import 'package:RestaurantSaas/localizations.dart';
-import 'package:RestaurantSaas/screens/other/CounterModel.dart';
-
+import '../../services/counter-service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import '../../services/constant.dart';
 import '../../styles/styles.dart';
 import 'confirm-order.dart';
 import '../../services/common.dart';
@@ -13,10 +10,7 @@ import '../../widgets/no-data.dart';
 import '../auth/login.dart';
 import '../other/coupons-list.dart';
 import '../../services/sentry-services.dart';
-
-import 'package:RestaurantSaas/constant.dart' show languages;
-import 'package:RestaurantSaas/localizations.dart'
-    show MyLocalizations, MyLocalizationsDelegate;
+import '../../services/localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
@@ -57,7 +51,7 @@ class _CartPageState extends State<CartPage> {
 
     getGlobalSettingsData();
     super.initState();
-//    selectedLanguage();
+    // selectedLanguage();
   }
 
   getGlobalSettingsData() async {
@@ -126,7 +120,6 @@ class _CartPageState extends State<CartPage> {
         ? widget.locationInfo['deliveryInfo']['deliveryInfo']
         : null;
     if (deliveryInfo != null) {
-      print(deliveryInfo);
       if (!deliveryInfo['freeDelivery']) {
         if (deliveryInfo['amountEligibility'] <= subTotal) {
           deliveryCharge = 0.0;
@@ -208,7 +201,7 @@ class _CartPageState extends State<CartPage> {
     if (widget.taxInfo != null && widget.taxInfo['taxName'] == null) {
       widget.taxInfo['taxName'] = '';
     }
-    CounterModel().getCounter().then((res) {
+    CounterService().getCounter().then((res) {
       if (mounted) {
         setState(() {
           cartCount = res;
@@ -223,7 +216,7 @@ class _CartPageState extends State<CartPage> {
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
         ],
-        supportedLocales: languages.map((language) => Locale(language, '')),
+        supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
         home: Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
@@ -376,7 +369,7 @@ class _CartPageState extends State<CartPage> {
                           ),
                           onPressed: () async {
                             products.removeAt(index);
-                            CounterModel().calculateCounter();
+                            CounterService().calculateCounter();
                             widget.product = null;
                             if (products.length == 0) {
                               cartItems = null;

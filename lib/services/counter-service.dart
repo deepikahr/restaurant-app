@@ -1,10 +1,10 @@
 import 'package:RestaurantSaas/services/common.dart';
 import 'package:flutter/cupertino.dart';
-import '../../services/sentry-services.dart';
+import 'sentry-services.dart';
 
 SentryError sentryError = new SentryError();
 
-class CounterModel with ChangeNotifier {
+class CounterService with ChangeNotifier {
   int cartCounter = 0;
 
   getCounter() async {
@@ -26,6 +26,5 @@ class CounterModel with ChangeNotifier {
 
   void calculateCounter() {
     getCounter();
-    notifyListeners();
   }
 }

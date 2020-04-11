@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:RestaurantSaas/styles/styles.dart' as prefix0;
 import 'package:flutter/material.dart';
+import '../../services/constant.dart';
 import '../../styles/styles.dart';
 import 'package:intl/intl.dart';
 import '../../services/profile-service.dart';
@@ -9,10 +10,7 @@ import 'package:async_loader/async_loader.dart';
 import '../../widgets/no-data.dart';
 import '../../services/sentry-services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-
-import 'package:RestaurantSaas/constant.dart' show languages;
-import 'package:RestaurantSaas/localizations.dart'
-    show MyLocalizations, MyLocalizationsDelegate;
+import '../../services/localizations.dart';
 
 SentryError sentryError = new SentryError();
 
@@ -60,7 +58,7 @@ class OrderTrackState extends State<OrderTrack> {
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
         ],
-        supportedLocales: languages.map((language) => Locale(language, '')),
+        supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
         home: Scaffold(
           appBar: AppBar(
             leading: InkWell(
@@ -206,7 +204,7 @@ class OrderTrackState extends State<OrderTrack> {
                                 new Text(
                                   DateFormat('dd-MMM-yy hh:mm a').format(
                                       new DateTime.fromMillisecondsSinceEpoch(
-                                          order['createdAtTime'])),
+                                          order['createdAtTime'] ?? 0)),
                                   style: textOS(),
                                 ),
                               ],
@@ -224,7 +222,7 @@ class OrderTrackState extends State<OrderTrack> {
     );
   }
 
-  static String readTimestamp(int timestamp) {
+  static String readTimestamp(int timestamp, context) {
     var now = new DateTime.now();
     var format = new DateFormat('hh:mma dd/MM/yyyy');
     var date = new DateTime.fromMillisecondsSinceEpoch(timestamp);
@@ -237,15 +235,19 @@ class OrderTrackState extends State<OrderTrack> {
       time = format.format(date);
     } else if (diff.inDays > 0 && diff.inDays < 7) {
       if (diff.inDays == 1) {
-        time = diff.inDays.toString() + ' DAY AGO';
+        time =
+            diff.inDays.toString() + ' ${MyLocalizations.of(context).dayAgo}';
       } else {
-        time = diff.inDays.toString() + ' DAYS AGO';
+        time =
+            diff.inDays.toString() + ' ${MyLocalizations.of(context).daysAgo}';
       }
     } else {
       if (diff.inDays == 7) {
-        time = (diff.inDays / 7).floor().toString() + ' WEEK AGO';
+        time = (diff.inDays / 7).floor().toString() +
+            ' ${MyLocalizations.of(context).weekAgo}';
       } else {
-        time = (diff.inDays / 7).floor().toString() + ' WEEKS AGO';
+        time = (diff.inDays / 7).floor().toString() +
+            ' ${MyLocalizations.of(context).weeksAgo}';
       }
     }
     return time;

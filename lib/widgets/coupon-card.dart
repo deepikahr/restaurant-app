@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:RestaurantSaas/localizations.dart';
+import '../services/localizations.dart';
 
 class CouponCard extends StatelessWidget {
   final Map<String, dynamic> coupon;

@@ -1,6 +1,7 @@
 import 'package:RestaurantSaas/screens/mains/cart.dart';
-import 'package:RestaurantSaas/screens/other/CounterModel.dart';
+import '../../services/counter-service.dart';
 import 'package:flutter/material.dart';
+import '../../services/constant.dart';
 import '../../styles/styles.dart';
 import 'home.dart';
 import '../../services/main-service.dart';
@@ -10,10 +11,7 @@ import 'location-list-sheet.dart';
 import '../../services/common.dart';
 import '../../services/sentry-services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-
-import 'package:RestaurantSaas/constant.dart' show languages;
-import 'package:RestaurantSaas/localizations.dart'
-    show MyLocalizations, MyLocalizationsDelegate;
+import '../../services/localizations.dart';
 
 SentryError sentryError = new SentryError();
 
@@ -65,7 +63,7 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
   Widget build(BuildContext context) {
 //    String review = MyLocalizations.of(context).reviews;
 
-    CounterModel().getCounter().then((res) {
+    CounterService().getCounter().then((res) {
       try {
         if (mounted) {
           setState(() {
@@ -86,7 +84,7 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
         ],
-        supportedLocales: languages.map((language) => Locale(language, '')),
+        supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
         home: Scaffold(
           key: scaffoldKey,
           appBar: AppBar(

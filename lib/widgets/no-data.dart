@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'package:RestaurantSaas/localizations.dart' show MyLocalizations;
+import '../services/localizations.dart';
 
 class NoData extends StatelessWidget {
   final String message;

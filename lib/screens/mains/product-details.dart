@@ -1,10 +1,9 @@
 import 'dart:async';
-
-import 'package:RestaurantSaas/constant.dart';
-import 'package:RestaurantSaas/localizations.dart';
-import 'package:RestaurantSaas/screens/other/CounterModel.dart';
+import '../../services/localizations.dart';
+import '../../services/counter-service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import '../../services/constant.dart';
 import '../../styles/styles.dart';
 import 'cart.dart';
 import '../../services/common.dart';
@@ -12,9 +11,6 @@ import '../../services/profile-service.dart';
 import 'package:toast/toast.dart';
 import '../../services/sentry-services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:RestaurantSaas/constant.dart' show languages;
-import 'package:RestaurantSaas/localizations.dart'
-    show MyLocalizations, MyLocalizationsDelegate;
 
 SentryError sentryError = new SentryError();
 
@@ -227,7 +223,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    CounterModel().getCounter().then((res) {
+    CounterService().getCounter().then((res) {
       try {
         if (mounted) {
           setState(() {
@@ -248,7 +244,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
         ],
-        supportedLocales: languages.map((language) => Locale(language, '')),
+        supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
         home: Scaffold(
           appBar: AppBar(
             backgroundColor: PRIMARY,

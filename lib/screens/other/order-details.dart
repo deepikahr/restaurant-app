@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../../services/constant.dart';
 import '../../styles/styles.dart';
 import '../other/ratings.dart';
 import '../../services/profile-service.dart';
@@ -8,10 +9,7 @@ import 'package:async_loader/async_loader.dart';
 import '../../widgets/no-data.dart';
 import '../../services/sentry-services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-
-import 'package:RestaurantSaas/constant.dart' show languages;
-import 'package:RestaurantSaas/localizations.dart'
-    show MyLocalizations, MyLocalizationsDelegate;
+import '../../services/localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
@@ -54,9 +52,9 @@ class _OrderDetailsState extends State<OrderDetails> {
 
   @override
   void initState() {
-    super.initState();
-//    selectedLanguages();
+    // selectedLanguages();
     getGlobalSettingsData();
+    super.initState();
   }
 
   String currency = '';
@@ -76,7 +74,7 @@ class _OrderDetailsState extends State<OrderDetails> {
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
         ],
-        supportedLocales: languages.map((language) => Locale(language, '')),
+        supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
         home: Scaffold(
           appBar: AppBar(
             leading: InkWell(
