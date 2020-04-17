@@ -18,11 +18,16 @@ import '../../services/localizations.dart';
 SentryError sentryError = new SentryError();
 
 class PaymentMethod extends StatefulWidget {
-  final Map<String, dynamic> cart;
+  final Map<String, dynamic> cart, paymentMethods;
   final Map<String, Map<String, String>> localizedValues;
   final String locale;
 
-  PaymentMethod({Key key, this.cart, this.locale, this.localizedValues})
+  PaymentMethod(
+      {Key key,
+      this.cart,
+      this.locale,
+      this.localizedValues,
+      this.paymentMethods})
       : super(key: key);
 
   @override
@@ -39,33 +44,6 @@ class _PaymentMethodState extends State<PaymentMethod> {
   bool isPaymentMethodLoading = false;
   List<dynamic> paymentMethodList;
   bool paymentMethodAvaiilable = true, paymentMethodAvaiilableCon = true;
-
-  List<Map<String, dynamic>> paymentTypes = [
-    {
-      'type': 'Cash On Delivery',
-      'icon': Icons.attach_money,
-      'gateway': 'COD',
-      'isSelected': true
-    },
-    // {
-    //   'type': 'Stripe Payment',
-    //   'icon': Icons.credit_card,
-    //   'gateway': 'Stripe',
-    //   'isSelected': false
-    // },
-    // {
-    //   'type': 'PayPal Payment',
-    //   'icon': Icons.credit_card,
-    //   'gateway': 'PayPal',
-    //   'isSelected': false
-    // },
-    // {
-    //   'type': 'RazorPay Payment',
-    //   'icon': Icons.credit_card,
-    //   'gateway': 'RazorPay',
-    //   'isSelected': false
-    // }
-  ];
 
   void _placeOrder() async {
     await Common.getPositionInfo().then((onValue) {
@@ -131,70 +109,54 @@ class _PaymentMethodState extends State<PaymentMethod> {
   }
 
   getPaymentMethod() async {
-    if (mounted) {
-      setState(() {
-        isPaymentMethodLoading = true;
-      });
-    }
-    await MainService.getLoyaltyInfoByRestaurantId(widget.cart['restaurantID'])
-        .then((onValue) {
-      try {
-        if (onValue['message'] == "No setting data found") {
+    if (widget.paymentMethods['message'] == "No setting data found") {
+      if (mounted) {
+        setState(() {
+          paymentMethodList = [];
+          paymentMethodAvaiilableCon = true;
+        });
+      }
+    } else {
+      if (widget.paymentMethods['message'] == null ||
+          widget.paymentMethods['message'] == "") {
+        if (widget.paymentMethods['restaurantID']['paymentMethod'].length ==
+                0 ||
+            widget.paymentMethods['restaurantID']['paymentMethod'] == []) {
           if (mounted) {
             setState(() {
               paymentMethodList = [];
-              isPaymentMethodLoading = false;
-              paymentMethodAvaiilableCon = false;
+              paymentMethodAvaiilableCon = true;
+              paymentMethodAvaiilable = false;
+            });
+          }
+        } else if (widget.paymentMethods['restaurantID']['paymentMethod'][0]
+                    ['isSelected'] ==
+                false &&
+            widget.paymentMethods['restaurantID']['paymentMethod'][1]
+                    ['isSelected'] ==
+                false) {
+          if (mounted) {
+            setState(() {
+              paymentMethodList = [];
+              paymentMethodAvaiilable = false;
+              paymentMethodAvaiilableCon = true;
             });
           }
         } else {
-          if (onValue['message'] == null || onValue['message'] == "") {
-            if (onValue['setting']['restaurantID']['paymentMethod'].length ==
-                0) {
-              if (mounted) {
-                setState(() {
-                  paymentMethodList = [];
-                  isPaymentMethodLoading = false;
-                  paymentMethodAvaiilableCon = true;
-                  paymentMethodAvaiilable = false;
-                });
-              }
-            } else if (onValue['setting']['restaurantID']['paymentMethod'][0]
-                        ['isSelected'] ==
-                    false &&
-                onValue['setting']['restaurantID']['paymentMethod'][1]
-                        ['isSelected'] ==
-                    false) {
-              if (mounted) {
-                setState(() {
-                  paymentMethodList = [];
-                  paymentMethodAvaiilable = false;
-                  paymentMethodAvaiilableCon = true;
-                  isPaymentMethodLoading = false;
-                });
-              }
-            } else {
-              if (mounted) {
-                setState(() {
-                  paymentMethodList =
-                      onValue['setting']['restaurantID']['paymentMethod'];
-                });
-              }
-              if (mounted) {
-                setState(() {
-                  isPaymentMethodLoading = false;
-                  paymentMethodAvaiilableCon = false;
-                });
-              }
-            }
+          if (mounted) {
+            setState(() {
+              paymentMethodList =
+                  widget.paymentMethods['restaurantID']['paymentMethod'];
+            });
+          }
+          if (mounted) {
+            setState(() {
+              paymentMethodAvaiilableCon = false;
+            });
           }
         }
-      } catch (error, stackTrace) {
-        sentryError.reportError(error, stackTrace);
       }
-    }).catchError((onError) {
-      sentryError.reportError(onError, null);
-    });
+    }
   }
 
   void _orderInfo() {
@@ -265,11 +227,12 @@ class _PaymentMethodState extends State<PaymentMethod> {
 
   @override
   void initState() {
+    getPaymentMethod();
     Common.getPositionInfo().then((onValue) {
       widget.cart['position'] = onValue;
     });
+    print(widget.paymentMethods);
     fetchCardInfo();
-    getPaymentMethod();
     super.initState();
 //    selectedLanguages();
     getGlobalSettingsData();

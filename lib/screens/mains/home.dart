@@ -129,7 +129,8 @@ class HomePageState extends State<HomePage> {
   bool isFirstStart = true;
   Map<String, dynamic> tableInfo;
   String barcodeError;
-
+  LocationData currentLocation;
+  var addressData;
   @override
   void dispose() {
     if (_locationStream != null) _locationStream.cancel();
@@ -230,28 +231,24 @@ class HomePageState extends State<HomePage> {
 
   getNearByRestaurants() async {
     if (!isNearByRestaurants) {
-      _locationStream =
-          _location.onLocationChanged.listen((LocationData result) async {
-        Coordinates coordinates =
-            Coordinates(result.latitude, result.longitude);
-        List<Address> addresses;
-        try {
-          addresses =
-              await Geocoder.local.findAddressesFromCoordinates(coordinates);
-        } catch (e) {}
-        if (addresses != null && mounted) {
-          if (mounted) {
-            setState(() {
-              position = {
-                'lat': result.latitude,
-                'long': result.longitude,
-                'name': addresses
-              };
-            });
-          }
-          await Common.savePositionInfo(position).then((onValue) {});
-        }
-      });
+      currentLocation = await _location.getLocation();
+      final coordinates =
+          new Coordinates(currentLocation.latitude, currentLocation.longitude);
+      var addresses =
+          await Geocoder.local.findAddressesFromCoordinates(coordinates);
+      var first = addresses.first;
+      addressData = first.addressLine;
+      if (addressData != null && mounted) {
+        setState(() {
+          position = {
+            'lat': currentLocation.latitude,
+            'long': currentLocation.longitude,
+            'name': addressData
+          };
+        });
+        await Common.savePositionInfo(position).then((onValue) {});
+      }
+
       if (isFirstStart) {
         await Future.delayed(Duration(milliseconds: 5000), () {});
         isFirstStart = false;
@@ -261,6 +258,7 @@ class HomePageState extends State<HomePage> {
             position['lat'], position['long'],
             count: itemCount);
       }
+      return first;
     }
   }
 
