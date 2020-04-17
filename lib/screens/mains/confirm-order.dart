@@ -51,7 +51,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
   bool isAlwaysOpenOrCloseLoading = false;
   bool showSlot = false;
   bool showSlotTimimg = false;
-  Map<String, dynamic> userInfo;
+  Map<String, dynamic> userInfo, paymentMethods;
   String openAndCloseTime;
   List<dynamic> paymentMethodList;
   var selectedSlot, selectedLocale;
@@ -80,8 +80,10 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
 
     await MainService.getLoyaltyInfoByRestaurantId(widget.cart['restaurantID'])
         .then((onValue) {
+      print(onValue);
       try {
         userInfo['loyaltyInfo'] = onValue['adminSet'];
+        paymentMethods = onValue['setting'];
         remainingLoyaltyPoint =
             double.parse(userInfo['totalLoyaltyPoints'].toString());
       } catch (error, stackTrace) {
@@ -1514,11 +1516,6 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
         ? Center(child: CircularProgressIndicator())
         : RawMaterialButton(
             onPressed: () {
-              if (mounted) {
-                setState(() {
-                  placeOrderLoading = true;
-                });
-              }
               if (widget.cart['orderType'] == 'Dine In') {
                 // if (widget.tableInfo == null) {
                 //   showSnackbar('Wrong Table Info please scan barcode again!');
@@ -1631,6 +1628,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
             placeOrderLoading = false;
           });
         }
+        print("  csdcsd");
         Navigator.push(
             context,
             MaterialPageRoute(
@@ -1638,6 +1636,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                 cart: widget.cart,
                 locale: widget.locale,
                 localizedValues: widget.localizedValues,
+                paymentMethods: paymentMethods,
               ),
             ));
       } else {
