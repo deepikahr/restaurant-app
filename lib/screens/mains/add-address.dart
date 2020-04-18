@@ -151,7 +151,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                                             MyLocalizations.of(context)
                                                 .fullName;
                                       } else {
-                                        return address['name'] = value;
+                                         address['name'] = value;
                                       }
                                     },
                                   ),
@@ -195,7 +195,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                                         MyLocalizations.of(context)
                                             .mobileNumber;
                                   } else {
-                                    return address['contactNumber'] = value;
+                                     address['contactNumber'] = value;
                                   }
                                 },
                               ),
@@ -242,7 +242,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                                             MyLocalizations.of(context)
                                                 .postalCode;
                                       } else {
-                                        return address['zip'] = value;
+                                         address['zip'] = value;
                                       }
                                     },
                                   ),
@@ -288,7 +288,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                                             MyLocalizations.of(context)
                                                 .subUrban;
                                       } else {
-                                        return address['locationName'] = value;
+                                         address['locationName'] = value;
                                       }
                                     },
                                   ),
@@ -333,7 +333,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                                             "  " +
                                             MyLocalizations.of(context).city;
                                       } else {
-                                        return address['city'] = value;
+                                         address['city'] = value;
                                       }
                                     },
                                   ),
@@ -368,7 +368,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                                     ),
                                     style: textOSR(),
                                     validator: (String value) {
-                                      return address['state'] = value;
+                                       address['state'] = value;
                                     },
                                   ),
                                 ))
@@ -402,7 +402,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                                     ),
                                     style: textOSR(),
                                     validator: (String value) {
-                                      return address['country'] = value;
+                                       address['country'] = value;
                                     },
                                   ),
                                 ))
@@ -446,7 +446,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                                             "  " +
                                             MyLocalizations.of(context).address;
                                       } else {
-                                        return address['address'] = value;
+                                         address['address'] = value;
                                       }
                                     },
                                   ),
