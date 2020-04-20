@@ -103,7 +103,8 @@ class _PaymentMethodState extends State<PaymentMethod> {
   }
 
   getPaymentMethod() async {
-    if (widget.paymentMethods['message'] == "No setting data found") {
+    if (widget.paymentMethods == null ||
+        widget.paymentMethods['message'] == "No setting data found") {
       if (mounted) {
         setState(() {
           paymentMethodList = [];
