@@ -1,15 +1,14 @@
 import 'dart:async';
 
 import 'package:RestaurantSaas/screens/mains/home.dart';
+import 'package:RestaurantSaas/services/constant.dart';
 import 'package:flutter/material.dart';
-import '../../services/constant.dart';
 import '../../styles/styles.dart';
 import '../../services/auth-service.dart';
 import '../../services/common.dart';
 import 'registration.dart';
 import 'forgot-password.dart';
 import '../../services/sentry-services.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import '../../services/localizations.dart';
 
 SentryError sentryError = new SentryError();
@@ -107,34 +106,24 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      locale: Locale(widget.locale),
-      debugShowCheckedModeBanner: false,
-      localizationsDelegates: [
-        MyLocalizationsDelegate(widget.localizedValues),
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ],
-      supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
-      home: Scaffold(
-        key: _scaffoldKey,
-        backgroundColor: Colors.transparent,
-        body: Container(
-          child: Stack(
-            fit: StackFit.expand,
-            children: <Widget>[
-              buildLoginPageBg(),
-              SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    buildLoginPageLogo(),
-                    buildLoginPageForm(),
-                  ],
-                ),
-              )
-            ],
-          ),
+    return Scaffold(
+      key: _scaffoldKey,
+      backgroundColor: Colors.transparent,
+      body: Container(
+        child: Stack(
+          fit: StackFit.expand,
+          children: <Widget>[
+            buildLoginPageBg(),
+            SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  buildLoginPageLogo(),
+                  buildLoginPageForm(),
+                ],
+              ),
+            )
+          ],
         ),
       ),
     );
@@ -154,7 +143,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget buildLoginPageLogo() {
     return Padding(
-      padding: EdgeInsets.only(top: 30.0, bottom: 45.0),
+      padding: EdgeInsets.only(top: 70.0, bottom: 40.0),
       child: Image(
         image: AssetImage("lib/assets/logos/logo.png"),
         fit: BoxFit.cover,

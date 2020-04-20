@@ -1,4 +1,8 @@
 import 'dart:async';
+import 'package:RestaurantSaas/services/constant.dart';
+import 'package:google_map_location_picker/google_map_location_picker.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
 import '../../services/localizations.dart';
 import 'package:RestaurantSaas/screens/other/thank-you.dart';
 import 'package:flutter/material.dart';
@@ -50,17 +54,18 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
   bool isAlwaysOpenOrClose = false;
   bool isAlwaysOpenOrCloseLoading = false;
   bool showSlot = false;
-  bool showSlotTimimg = false;
+  bool showSlotTimimg = false, isAddressget = false;
   Map<String, dynamic> userInfo, paymentMethods;
   String openAndCloseTime;
   List<dynamic> paymentMethodList;
   var selectedSlot, selectedLocale;
   DateTime pickupDate, pickupTime;
   List<dynamic> todayWorkingHoursList;
+  List addressList;
+
   final GlobalKey<AsyncLoaderState> _asyncLoaderState =
       GlobalKey<AsyncLoaderState>();
-  final GlobalKey<AsyncLoaderState> _asyncLoaderStateAddress =
-      GlobalKey<AsyncLoaderState>();
+
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<String> languages = ['English', 'French', 'Chinese'];
   bool placeOrderLoading = false;
@@ -80,7 +85,6 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
 
     await MainService.getLoyaltyInfoByRestaurantId(widget.cart['restaurantID'])
         .then((onValue) {
-      print(onValue);
       try {
         userInfo['loyaltyInfo'] = onValue['adminSet'];
         paymentMethods = onValue['setting'];
@@ -108,8 +112,35 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
     return userInfo;
   }
 
-  Future<List<dynamic>> _getAddressList() async {
-    return await ProfileService.getAddressList();
+  _getAddressList() async {
+    if (mounted) {
+      setState(() {
+        isAddressget = true;
+      });
+    }
+    await ProfileService.getAddressList().then((value) {
+      if (mounted) {
+        setState(() {
+          addressList = value;
+          isAddressget = false;
+        });
+      }
+    });
+  }
+
+  _deleteAddressList(index) async {
+    if (mounted) {
+      setState(() {
+        isAddressget = true;
+      });
+    }
+    await ProfileService.deleteAddress(index).then((value) {
+      if (mounted) {
+        setState(() {
+          _getAddressList();
+        });
+      }
+    });
   }
 
   void _calculateFinalAmount() {
@@ -214,6 +245,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
             setState(() {
               isAlwaysOpenOrClose = true;
               todayWorkingHoursList = onValue['newDaySlot'];
+
               showSlotTimimg = !showSlotTimimg;
             });
           }
@@ -242,6 +274,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
   @override
   void initState() {
     getGlobalSettingsData();
+    _getAddressList();
     super.initState();
   }
 
@@ -518,7 +551,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                           },
                           child: Container(
                             width: screenWidth(context) * 0.3,
-                            height: 34,
+                            height: 48,
                             color: PRIMARY,
                             child: Column(
                               children: [
@@ -568,7 +601,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                                 },
                                 child: Container(
                                   width: screenWidth(context) * 0.3,
-                                  height: 34,
+                                  height: 42,
                                   color: PRIMARY,
                                   child: Column(
                                     children: [
@@ -1217,21 +1250,9 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
         ),
       );
     } else {
-      return AsyncLoader(
-          key: _asyncLoaderStateAddress,
-          initState: () async => await _getAddressList(),
-          renderLoad: () => Center(child: CircularProgressIndicator()),
-          renderError: ([error]) {
-            sentryError.reportError(error, null);
-            return NoData(
-                message: MyLocalizations.of(context).connectionError,
-                icon: Icons.block);
-          },
-          renderSuccess: ({data}) {
-            if (widget.cart['shippingAddress'] == null) {
-              widget.cart['shippingAddress'] = data.length > 0 ? data[0] : null;
-            }
-            return Padding(
+      return isAddressget
+          ? CircularProgressIndicator()
+          : Padding(
               padding: EdgeInsets.only(
                 left: 10.0,
                 right: 10.0,
@@ -1247,67 +1268,91 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                       physics: ScrollPhysics(),
                       shrinkWrap: true,
                       padding: EdgeInsets.only(right: 0.0),
-                      itemCount: data.length,
+                      itemCount: addressList.length,
                       itemBuilder: (BuildContext context, int index) {
-                        if (data[index]['isSelected'] == null)
-                          data[index]['isSelected'] = false;
-                        return RadioListTile(
-                          groupValue: selectedAddressIndex,
-                          value: index,
-                          selected: data[index]['isSelected'],
-                          onChanged: (int selected) {
-                            if (mounted) {
-                              setState(() {
-                                selectedAddressIndex = selected;
-                                data[index]['isSelected'] =
-                                    !data[index]['isSelected'];
-                                widget.cart['shippingAddress'] = data[index];
-                              });
-                            }
-                          },
-                          activeColor: PRIMARY,
-                          title: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              new Text(
-                                data[index]['name'],
-                                style: hintStyleSmallTextDarkOSR(),
-                              ),
-                              new Text(
-                                data[index]['address'],
-                                style: hintStyleSmallTextDarkOSR(),
-                              ),
-                              new Text(
-                                data[index]['contactNumber'].toString(),
-                                style: hintStyleSmallTextDarkOSR(),
-                              ),
-                              new Text(
-                                data[index]['zip'].toString(),
-                                style: hintStyleSmallTextDarkOSR(),
-                              ),
-                            ],
-                          ),
-                        );
+                        if (addressList[index]['isSelected'] == null) {
+                          addressList[index]['isSelected'] = false;
+                        }
+                        return addressList[index]['name'] == null
+                            ? RadioListTile(
+                                groupValue: selectedAddressIndex,
+                                value: index,
+                                selected: addressList[index]['isSelected'],
+                                onChanged: (int selected) {
+                                  if (mounted) {
+                                    setState(() {
+                                      selectedAddressIndex = selected;
+                                      addressList[index]['isSelected'] =
+                                          !addressList[index]['isSelected'];
+                                      widget.cart['shippingAddress'] =
+                                          addressList[index];
+                                    });
+                                  }
+                                },
+                                activeColor: PRIMARY,
+                                title: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    new Text(
+                                      addressList[index]['addressType'],
+                                      style: subTitleDarkLightOSS(),
+                                    ),
+                                    new Text(
+                                      addressList[index]['faltNo'],
+                                      style: hintStyleSmallTextDarkOSR(),
+                                    ),
+                                    new Text(
+                                      addressList[index]['address'],
+                                      style: hintStyleSmallTextDarkOSR(),
+                                    ),
+                                    new Text(
+                                      addressList[index]['contactNumber']
+                                          .toString(),
+                                      style: hintStyleSmallTextDarkOSR(),
+                                    ),
+                                    new Text(
+                                      addressList[index]['postalCode']
+                                          .toString(),
+                                      style: hintStyleSmallTextDarkOSR(),
+                                    ),
+                                  ],
+                                ),
+                                secondary: InkWell(
+                                  onTap: () {
+                                    _deleteAddressList(index);
+                                  },
+                                  child: Icon(
+                                    Icons.delete,
+                                    color: PRIMARY,
+                                  ),
+                                ),
+                              )
+                            : Container();
                       },
                     ),
                     Divider(),
                     InkWell(
                       onTap: () async {
-                        Map<String, dynamic> address = await Navigator.push(
+                        LocationResult result = await showLocationPicker(
+                          context,
+                          GOOGLE_API_KEY,
+                          initialCenter: LatLng(31.1975844, 29.9598339),
+                          myLocationButtonEnabled: true,
+                          layersButtonEnabled: true,
+                        );
+
+                        await Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (BuildContext context) => AddAddressPage(
                                 localizedValues: widget.localizedValues,
-                                locale: widget.locale),
+                                locale: widget.locale,
+                                loactionAddress: result),
                           ),
                         );
-                        if (address != null &&
-                            address['name'] != null &&
-                            address['address'] != null &&
-                            address['zip'] != null) {
-                          data.add(address);
-                        }
+
+                        _getAddressList();
                       },
                       child: Row(
                         children: <Widget>[
@@ -1330,7 +1375,6 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                 ),
               ),
             );
-          });
     }
   }
 
@@ -1420,21 +1464,20 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
             Divider(),
             _buildTotalPriceLine(
                 MyLocalizations.of(context).subTotal, widget.cart['subTotal']),
-            // widget.cart['taxInfo'] != null
-            //     ? _buildTotalPriceLine(
-            //         'Tax ' + widget.cart['taxInfo']['taxName'],
-            //         (double.parse(
-            //                 widget.cart['taxInfo']['taxRate'].toString()) *
-            //             widget.cart['subTotal'] /
-            //             100))
-            //     : Container(height: 0, width: 0),
+            widget.cart['taxInfo'] != null
+                ? _buildTotalPriceLine(
+                    widget.cart['taxInfo']['taxName'],
+                    (double.parse(
+                            widget.cart['taxInfo']['taxRate'].toString()) *
+                        widget.cart['subTotal'] /
+                        100))
+                : Container(height: 0, width: 0),
             _buildTotalPriceLine(
                 MyLocalizations.of(context).deliveryCharges,
                 widget.cart['deliveryCharge'] == 'Free'
                     ? '0.0'
                     : double.parse(widget.cart['deliveryCharge'].toString())),
-            _buildTotalPriceLine(
-                MyLocalizations.of(context).totalIncluding + ' GST',
+            _buildTotalPriceLine(MyLocalizations.of(context).grandTotal,
                 double.parse(widget.cart['grandTotal'].toString())),
             // _buildTotalPriceLine('Used Loyalty Point', usedLoyaltyPoint),
           ],
@@ -1465,52 +1508,6 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
     );
   }
 
-  // Widget _buildBottomBar() {
-  //   return RawMaterialButton(
-  //     onPressed: () {
-  //       if (widget.cart['orderType'] == 'Pickup') {
-  //         if (widget.cart['pickupDate'] != null) {
-  //           _buildBottomBarButton();
-  //         } else {
-  //           showSnackbar(MyLocalizations.of(context).selectDateTime);
-  //         }
-  //       } else if (widget.cart['orderType'] == 'Delivery') {
-  //         if (widget.cart['shippingAddress'] == null) {
-  //           showSnackbar(MyLocalizations.of(context).selectAddressFirst);
-  //         } else {
-  //           if (widget.deliveryInfo == null ||
-  //               widget.deliveryInfo['areaAthority']) {
-  //             _buildBottomBarButton();
-  //           } else {
-  //             if (widget.deliveryInfo['areaCode'] == null ||
-  //                 widget.deliveryInfo['areaCode'][0] == null) {
-  //               _buildBottomBarButton();
-  //             } else {
-  //               bool isPinFound = false;
-  //               for (int i = 0;
-  //                   i < widget.deliveryInfo['areaCode'].length;
-  //                   i++) {
-  //                 if (widget.deliveryInfo['areaCode'][i]['pinCode']
-  //                         .toString() ==
-  //                     widget.cart['shippingAddress']['zip'].toString()) {
-  //                   isPinFound = true;
-  //                 }
-  //               }
-  //               if (isPinFound) {
-  //                 _buildBottomBarButton();
-  //               } else {
-  //                 _showAvailablePincodeAlert(
-  //                     widget.cart['restaurant'],
-  //                     widget.cart['shippingAddress']['zip'].toString(),
-  //                     widget.deliveryInfo['areaCode']);
-  //               }
-  //             }
-  //           }
-  //         }
-  //       } else {
-  //         showSnackbar(MyLocalizations.of(context).errorMessage);
-  //       }
-  //     },
   Widget _buildBottomBar() {
     return placeOrderLoading
         ? Center(child: CircularProgressIndicator())
@@ -1537,8 +1534,9 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                 }
               } else if (widget.cart['orderType'] == 'Delivery') {
                 if (widget.cart['shippingAddress'] == null) {
-                  showSnackbar(MyLocalizations.of(context)
-                      .pleaseSelectAddshippingaddressfirst);
+                  widget.cart['shippingAddress'] = addressList[0];
+                  // showSnackbar(MyLocalizations.of(context)
+                  //     .pleaseSelectAddshippingaddressfirst);
                 } else {
                   if (widget.deliveryInfo == null ||
                       widget.deliveryInfo['areaAthority']) {
@@ -1560,7 +1558,8 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                           i++) {
                         if (widget.deliveryInfo['areaCode'][i]['pinCode']
                                 .toString() ==
-                            widget.cart['shippingAddress']['zip'].toString()) {
+                            widget.cart['shippingAddress']['postalCode:']
+                                .toString()) {
                           isPinFound = true;
                         }
                       }
@@ -1572,7 +1571,8 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                       } else {
                         _showAvailablePincodeAlert(
                             widget.cart['restaurant'],
-                            widget.cart['shippingAddress']['zip'].toString(),
+                            widget.cart['shippingAddress']['postalCode']
+                                .toString(),
                             widget.deliveryInfo['areaCode']);
                       }
                     }
@@ -1588,7 +1588,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
               children: <Widget>[
                 Expanded(
                   child: new Container(
-                    height: 70.0,
+                    height: 78.0,
                     color: PRIMARY,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -1628,7 +1628,6 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
             placeOrderLoading = false;
           });
         }
-        print("  csdcsd");
         Navigator.push(
             context,
             MaterialPageRoute(
@@ -1659,6 +1658,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                 cart: widget.cart,
                 locale: widget.locale,
                 localizedValues: widget.localizedValues,
+                paymentMethods: paymentMethods,
               ),
             ));
       } else {

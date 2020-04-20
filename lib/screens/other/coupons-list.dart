@@ -1,13 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import '../../services/constant.dart';
 import '../../styles/styles.dart';
 import '../../services/main-service.dart';
 import 'package:async_loader/async_loader.dart';
 import '../../widgets/no-data.dart';
 import '../../services/sentry-services.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import '../../services/localizations.dart';
 
 SentryError sentryError = new SentryError();
@@ -34,63 +32,54 @@ class _CouponsListState extends State<CouponsList> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        locale: Locale(widget.locale),
-        debugShowCheckedModeBanner: false,
-        localizationsDelegates: [
-          MyLocalizationsDelegate(widget.localizedValues),
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-        ],
-        supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
-        home: Scaffold(
-          backgroundColor: whiteTextb,
-          appBar: AppBar(
-            leading: InkWell(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: Icon(
-                Icons.arrow_back,
-                color: Colors.white,
-              ),
-            ),
-            backgroundColor: PRIMARY,
-            title: new Text(MyLocalizations.of(context).coupon,
-                style: titleBoldWhiteOSS()),
-            centerTitle: true,
+    return Scaffold(
+      backgroundColor: whiteTextb,
+      appBar: AppBar(
+        leading: InkWell(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
           ),
-          body: AsyncLoader(
-            key: _asyncLoaderState,
-            initState: () async => await getCouponsByLocationId(),
-            renderLoad: () => Center(child: CircularProgressIndicator()),
-            renderError: ([error]) {
-              sentryError.reportError(error, null);
-              return NoData(
-                  message: MyLocalizations.of(context).connectionError,
-                  icon: Icons.block);
-            },
-            renderSuccess: ({data}) {
-              if (data is Map<String, dynamic> && data['message'] != null) {
-                return buildEmptyPage(data['message']);
-              } else if (data.length > 0) {
-                return ListView.builder(
-                    physics: ScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: data.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return couponCard(
-                        data[index],
-                      );
-                    });
-              } else {
-                return Container(
-                  child: Text('Invalid response'),
-                );
-              }
-            },
-          ),
-        ));
+        ),
+        backgroundColor: PRIMARY,
+        title: new Text(MyLocalizations.of(context).coupon,
+            style: titleBoldWhiteOSS()),
+        centerTitle: true,
+      ),
+      body: AsyncLoader(
+        key: _asyncLoaderState,
+        initState: () async => await getCouponsByLocationId(),
+        renderLoad: () => Center(child: CircularProgressIndicator()),
+        renderError: ([error]) {
+          sentryError.reportError(error, null);
+          return NoData(
+              message: MyLocalizations.of(context).connectionError,
+              icon: Icons.block);
+        },
+        renderSuccess: ({data}) {
+          if (data is Map<String, dynamic> && data['message'] != null) {
+            return buildEmptyPage(data['message']);
+          } else if (data.length > 0) {
+            return ListView.builder(
+                physics: ScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: data.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return couponCard(
+                    data[index],
+                  );
+                });
+          } else {
+            return Container(
+              child: Text('Invalid response'),
+            );
+          }
+        },
+      ),
+    );
   }
 
   Widget couponCard(Map data) {

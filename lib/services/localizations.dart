@@ -848,6 +848,34 @@ class MyLocalizations {
     return localizedValues[locale.languageCode]['noDeliverycharge'];
   }
 
+  String get flatNumber {
+    return localizedValues[locale.languageCode]['flatNumber'];
+  }
+
+  String get apartmentName {
+    return localizedValues[locale.languageCode]['apartmentName'];
+  }
+
+  String get landmark {
+    return localizedValues[locale.languageCode]['landmark'];
+  }
+
+  String get addressType {
+    return localizedValues[locale.languageCode]['addressType'];
+  }
+
+  String get choosefromphotos {
+    return localizedValues[locale.languageCode]['choosefromphotos'];
+  }
+
+  String get takephoto {
+    return localizedValues[locale.languageCode]['takephoto'];
+  }
+
+  String get removephoto {
+    return localizedValues[locale.languageCode]['removephoto'];
+  }
+
   greetTo(name) {
     return localizedValues[locale.languageCode]['greetTo']
         .replaceAll('{{name}}', name);

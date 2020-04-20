@@ -1,14 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import '../../services/constant.dart';
 import '../../styles/styles.dart';
 import '../other/ratings.dart';
 import '../../services/profile-service.dart';
 import 'package:async_loader/async_loader.dart';
 import '../../widgets/no-data.dart';
 import '../../services/sentry-services.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import '../../services/localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -66,34 +64,25 @@ class _OrderDetailsState extends State<OrderDetails> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        locale: Locale(widget.locale),
-        debugShowCheckedModeBanner: false,
-        localizationsDelegates: [
-          MyLocalizationsDelegate(widget.localizedValues),
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-        ],
-        supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
-        home: Scaffold(
-          appBar: AppBar(
-            leading: InkWell(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: Icon(
-                  Icons.arrow_back,
-                  color: Colors.white,
-                )),
-            backgroundColor: PRIMARY,
-            iconTheme: IconThemeData(color: Colors.white),
-            title: new Text(
-              MyLocalizations.of(context).orderDetails,
-            ),
-            centerTitle: true,
-          ),
-          body: _retriveOrderDetails(),
-        ));
+    return Scaffold(
+      appBar: AppBar(
+        leading: InkWell(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Icon(
+              Icons.arrow_back,
+              color: Colors.white,
+            )),
+        backgroundColor: PRIMARY,
+        iconTheme: IconThemeData(color: Colors.white),
+        title: new Text(
+          MyLocalizations.of(context).orderDetails,
+        ),
+        centerTitle: true,
+      ),
+      body: _retriveOrderDetails(),
+    );
   }
 
   Widget _buildOrderDetailsBody(Map<String, dynamic> order) {

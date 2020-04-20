@@ -12,11 +12,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
 
+String currency = "";
+
 class LocationListSheet extends StatelessWidget {
   final Map<String, dynamic> restaurantInfo, locationInfo;
   final Map<String, Map<String, String>> localizedValues;
   final String locale;
-  String currency = "";
   final GlobalKey<AsyncLoaderState> _asyncLoaderState =
       GlobalKey<AsyncLoaderState>();
 

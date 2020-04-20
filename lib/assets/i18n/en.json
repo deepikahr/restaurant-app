@@ -204,5 +204,12 @@
   "seddoeiusmodtemporincididuntutlaboreetdolormagna": "Sed doeius mod temporinci did untut laboreet do lormagna",
   "pleaseSelectTimefirstforpickup": "Please Select Time first for pickup",
   "pleaseSelectAddshippingaddressfirst": "Please Select / Add shipping address first",
-  "noDeliverycharge": "No Delivery charge"
+  "noDeliverycharge": "No Delivery charge",
+  "flatNumber": "Flat Number",
+  "apartmentName": "Apartment Name",
+  "landmark": "Landmark",
+  "addressType": "Address Type",
+  "choosefromphotos": "Choose from photos",
+  "takephoto": "Take photo",
+  "removephoto": "Remove photo"
 }

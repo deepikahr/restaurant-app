@@ -2,8 +2,6 @@ import 'dart:async';
 import '../../services/localizations.dart';
 import '../../services/counter-service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import '../../services/constant.dart';
 import '../../styles/styles.dart';
 import 'cart.dart';
 import '../../services/common.dart';
@@ -236,162 +234,152 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     }).catchError((onError) {
       sentryError.reportError(onError, null);
     });
-    return MaterialApp(
-        locale: Locale(widget.locale),
-        debugShowCheckedModeBanner: false,
-        localizationsDelegates: [
-          MyLocalizationsDelegate(widget.localizedValues),
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-        ],
-        supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
-        home: Scaffold(
-          appBar: AppBar(
-            backgroundColor: PRIMARY,
-            elevation: 0.0,
-            title: Text(
-              "${widget.product['title'][0].toUpperCase()}${widget.product['title'].substring(1)}",
-              style: titleBoldWhiteOSS(),
-            ),
-            centerTitle: true,
-            leading: InkWell(
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: PRIMARY,
+        elevation: 0.0,
+        title: Text(
+          "${widget.product['title'][0].toUpperCase()}${widget.product['title'].substring(1)}",
+          style: titleBoldWhiteOSS(),
+        ),
+        centerTitle: true,
+        leading: InkWell(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
+        ),
+        actions: <Widget>[
+          GestureDetector(
               onTap: () {
-                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => CartPage(
+                      locale: widget.locale,
+                      localizedValues: widget.localizedValues,
+                    ),
+                  ),
+                );
               },
-              child: Icon(
-                Icons.arrow_back,
-                color: Colors.white,
+              child: Stack(
+                children: <Widget>[
+                  Container(
+                      padding: EdgeInsets.only(top: 20.0, right: 10),
+                      child: Icon(Icons.shopping_cart)),
+                  Positioned(
+                      right: 3,
+                      top: 5,
+                      child: (cartCount == null || cartCount == 0)
+                          ? Text(
+                              '',
+                              style: TextStyle(fontSize: 14.0),
+                            )
+                          : Container(
+                              height: 20,
+                              width: 20,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.black,
+                              ),
+                              child: Text('${cartCount.toString()}',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontFamily: "bold",
+                                      fontSize: 11)),
+                            )),
+                ],
+              )),
+          Padding(padding: EdgeInsets.only(left: 7.0)),
+          // buildLocationIcon(),
+          // Padding(padding: EdgeInsets.only(left: 7.0)),
+        ],
+      ),
+      body: Container(
+        alignment: AlignmentDirectional.topCenter,
+        color: Colors.white,
+        child: SingleChildScrollView(
+          child: ListView(
+            physics: ScrollPhysics(),
+            shrinkWrap: true,
+            children: <Widget>[
+              _buildProductTopImg(
+                widget.product['imageUrl'],
+                widget.product['description'],
               ),
-            ),
-            actions: <Widget>[
-              GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (BuildContext context) => CartPage(
-                          locale: widget.locale,
-                          localizedValues: widget.localizedValues,
-                        ),
+              _buildHeadingBlock(
+                MyLocalizations.of(context).size +
+                    ' & ' +
+                    MyLocalizations.of(context).price,
+                MyLocalizations.of(context).selectSize,
+              ),
+              widget.product['variants'].length > 0
+                  ? _buildSingleSelectionBlock(widget.product['variants'])
+                  : Container(
+                      height: 0.0,
+                      width: 0.0,
+                    ),
+              Padding(
+                padding: EdgeInsets.only(bottom: 5.0),
+                child: widget.product['extraIngredients'].length > 0
+                    ? _buildHeadingBlock(
+                        MyLocalizations.of(context).extra,
+                        MyLocalizations.of(context)
+                            .whichextraingredientswouldyouliketoadd,
+                      )
+                    : Container(
+                        height: 0.0,
+                        width: 0.0,
                       ),
-                    );
-                  },
-                  child: Stack(
-                    children: <Widget>[
-                      Container(
-                          padding: EdgeInsets.only(top: 20.0, right: 10),
-                          child: Icon(Icons.shopping_cart)),
-                      Positioned(
-                          right: 3,
-                          top: 5,
-                          child: (cartCount == null || cartCount == 0)
-                              ? Text(
-                                  '',
-                                  style: TextStyle(fontSize: 14.0),
-                                )
-                              : Container(
-                                  height: 20,
-                                  width: 20,
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.black,
-                                  ),
-                                  child: Text('${cartCount.toString()}',
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontFamily: "bold",
-                                          fontSize: 11)),
-                                )),
-                    ],
-                  )),
-              Padding(padding: EdgeInsets.only(left: 7.0)),
-              // buildLocationIcon(),
-              // Padding(padding: EdgeInsets.only(left: 7.0)),
+              ),
+              widget.product['extraIngredients'] != null
+                  ? _buildMultiSelectionBlock(
+                      widget.product['extraIngredients'])
+                  : Container(),
             ],
           ),
-          body: Container(
-            alignment: AlignmentDirectional.topCenter,
-            color: Colors.white,
-            child: SingleChildScrollView(
-              child: ListView(
-                physics: ScrollPhysics(),
-                shrinkWrap: true,
-                children: <Widget>[
-                  _buildProductTopImg(
-                    widget.product['imageUrl'],
-                    widget.product['description'],
-                  ),
-                  _buildHeadingBlock(
-                    MyLocalizations.of(context).size +
-                        ' & ' +
-                        MyLocalizations.of(context).price,
-                    MyLocalizations.of(context).selectSize,
-                  ),
-                  widget.product['variants'].length > 0
-                      ? _buildSingleSelectionBlock(widget.product['variants'])
-                      : Container(
-                          height: 0.0,
-                          width: 0.0,
-                        ),
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 5.0),
-                    child: widget.product['extraIngredients'].length > 0
-                        ? _buildHeadingBlock(
-                            MyLocalizations.of(context).extra,
-                            MyLocalizations.of(context)
-                                .whichextraingredientswouldyouliketoadd,
-                          )
-                        : Container(
-                            height: 0.0,
-                            width: 0.0,
-                          ),
-                  ),
-                  widget.product['extraIngredients'] != null
-                      ? _buildMultiSelectionBlock(
-                          widget.product['extraIngredients'])
-                      : Container(),
-                ],
-              ),
-            ),
-          ),
-          bottomNavigationBar: Container(
-            height: 110.0,
-            child: Column(
-              children: <Widget>[
-                _buildProductAddCounter(),
-                widget.locationInfo['deliveryInfo'] != null
-                    ? _buildAddToCartButton()
-                    : Padding(
-                        padding: const EdgeInsetsDirectional.only(
-                            start: 20.0, end: 20.0, bottom: 1.0),
-                        child: RawMaterialButton(
-                          padding: EdgeInsetsDirectional.only(
-                              start: 15.0, end: 15.0),
-                          fillColor: PRIMARY,
-                          constraints: const BoxConstraints(minHeight: 44.0),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(50.0),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              new Text(
-                                MyLocalizations.of(context)
-                                    .deliveryisNotAvailable,
-                                style: hintStyleWhiteLightOSB(),
-                              ),
-                            ],
-                          ),
-                          onPressed: null,
-                          splashColor: secondary,
-                        ),
+        ),
+      ),
+      bottomNavigationBar: Container(
+        height: 110.0,
+        child: Column(
+          children: <Widget>[
+            _buildProductAddCounter(),
+            widget.locationInfo['deliveryInfo'] != null
+                ? _buildAddToCartButton()
+                : Padding(
+                    padding: const EdgeInsetsDirectional.only(
+                        start: 20.0, end: 20.0, bottom: 1.0),
+                    child: RawMaterialButton(
+                      padding:
+                          EdgeInsetsDirectional.only(start: 15.0, end: 15.0),
+                      fillColor: PRIMARY,
+                      constraints: const BoxConstraints(minHeight: 44.0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(50.0),
                       ),
-              ],
-            ),
-          ),
-        ));
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          new Text(
+                            MyLocalizations.of(context).deliveryisNotAvailable,
+                            style: hintStyleWhiteLightOSB(),
+                          ),
+                        ],
+                      ),
+                      onPressed: null,
+                      splashColor: secondary,
+                    ),
+                  ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildProductTopImg(String imgUrl, String description) {
@@ -432,10 +420,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
   Widget _buildHeadingBlock(String title, String subtitle) {
     return Padding(
-      padding: EdgeInsets.only(left: 10.0),
+      padding: EdgeInsets.only(left: 10.0, right: 10.0),
       child: Container(
         color: whiteTextb,
-        height: 50.0,
+        height: 58.0,
         child: new Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,

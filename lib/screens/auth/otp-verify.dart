@@ -1,12 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import '../../services/constant.dart';
 import '../../styles/styles.dart';
 import '../../services/auth-service.dart';
 import 'new-password.dart';
 import '../../services/sentry-services.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import '../../services/localizations.dart';
 
 SentryError sentryError = new SentryError();
@@ -84,50 +82,40 @@ class _OtpVerifyState extends State<OtpVerify> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      locale: Locale(widget.locale),
-      debugShowCheckedModeBanner: false,
-      localizationsDelegates: [
-        MyLocalizationsDelegate(widget.localizedValues),
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ],
-      supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
-      home: Scaffold(
-        key: _scaffoldKey,
-        appBar: AppBar(
-          leading: InkWell(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: Icon(
-              Icons.arrow_back,
-              color: Colors.white,
-            ),
+    return Scaffold(
+      key: _scaffoldKey,
+      appBar: AppBar(
+        leading: InkWell(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
           ),
-          title: Text(MyLocalizations.of(context).verifyOtp),
-          centerTitle: true,
-          backgroundColor: PRIMARY,
         ),
-        body: ListView(
-          children: <Widget>[
-            Stack(
-              children: <Widget>[
-                Image(
-                  image: AssetImage("lib/assets/bgImgs/background.png"),
-                  fit: BoxFit.fill,
-                  height: screenHeight(context),
-                  width: screenWidth(context),
-                ),
-                Form(
-                  key: _formKey,
-                  child: _buildOTPField(),
-                ),
-                _buildVerifyOTPButton(),
-              ],
-            ),
-          ],
-        ),
+        title: Text(MyLocalizations.of(context).verifyOtp),
+        centerTitle: true,
+        backgroundColor: PRIMARY,
+      ),
+      body: ListView(
+        children: <Widget>[
+          Stack(
+            children: <Widget>[
+              Image(
+                image: AssetImage("lib/assets/bgImgs/background.png"),
+                fit: BoxFit.fill,
+                height: screenHeight(context),
+                width: screenWidth(context),
+              ),
+              Form(
+                key: _formKey,
+                child: _buildOTPField(),
+              ),
+              _buildVerifyOTPButton(),
+            ],
+          ),
+        ],
       ),
     );
   }

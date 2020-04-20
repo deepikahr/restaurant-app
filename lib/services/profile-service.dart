@@ -121,6 +121,19 @@ class ProfileService {
     return json.decode(response.body);
   }
 
+  static Future<Map<String, dynamic>> deleteAddress(index) async {
+    String token;
+    await Common.getToken().then((onValue) {
+      token = 'bearer ' + onValue;
+    });
+    final response = await client.delete(
+      API_ENDPOINT + 'users/address/$index',
+      headers: {'Content-Type': 'application/json', 'Authorization': token},
+    );
+
+    return json.decode(response.body);
+  }
+
   static Future<Map<String, dynamic>> placeOrder(
       Map<String, dynamic> body) async {
     String token;
