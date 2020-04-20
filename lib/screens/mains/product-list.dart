@@ -2,7 +2,6 @@ import '../../services/counter-service.dart';
 import 'package:flutter/material.dart';
 import 'package:async_loader/async_loader.dart';
 import 'package:intl/intl.dart';
-import '../../services/constant.dart';
 import '../../styles/styles.dart';
 import '../../widgets/location-card.dart';
 import '../../services/main-service.dart';
@@ -10,7 +9,6 @@ import '../../widgets/no-data.dart';
 import 'product-details.dart';
 import 'cart.dart';
 import '../../services/sentry-services.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import '../../services/localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -152,120 +150,110 @@ class _ProductListPageState extends State<ProductListPage> {
         }
       },
     );
-    return MaterialApp(
-      locale: Locale(widget.locale),
-      debugShowCheckedModeBanner: false,
-      localizationsDelegates: [
-        MyLocalizationsDelegate(widget.localizedValues),
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ],
-      supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
-      home: Scaffold(
-        appBar: AppBar(
-          leading: InkWell(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: Icon(Icons.arrow_back, color: Colors.white),
-          ),
-          backgroundColor: PRIMARY,
-          elevation: 0.0,
-          title: Text(
-            widget.restaurantName,
-            style: titleBoldWhiteOSS(),
-          ),
-          centerTitle: true,
-          actions: <Widget>[
-            GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (BuildContext context) => CartPage(
-                        localizedValues: widget.localizedValues,
-                        locale: widget.locale,
-                      ),
-                    ),
-                  );
-                },
-                child: Stack(
-                  children: <Widget>[
-                    Container(
-                        padding: EdgeInsets.only(top: 20.0, right: 10),
-                        child: Icon(Icons.shopping_cart)),
-                    Positioned(
-                        right: 3,
-                        top: 5,
-                        child: (cartCount == null || cartCount == 0)
-                            ? Text(
-                                '',
-                                style: TextStyle(fontSize: 14.0),
-                              )
-                            : Container(
-                                height: 20,
-                                width: 20,
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.black,
-                                ),
-                                child: Text('${cartCount.toString()}',
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontFamily: "bold",
-                                        fontSize: 11)),
-                              )),
-                  ],
-                )),
-            Padding(padding: EdgeInsets.only(left: 7.0)),
-            // buildLocationIcon(),
-            // Padding(padding: EdgeInsets.only(left: 7.0)),
-          ],
-        ),
-        body: SingleChildScrollView(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Stack(
-                  fit: StackFit.passthrough,
-                  children: <Widget>[
-                    _buildBgImg(),
-                    _buildDescription(),
-                    _buildInfoBar(),
-                  ],
-                ),
-                asyncLoader
-              ],
-            ),
-          ),
-        ),
-        bottomNavigationBar: GestureDetector(
+    return Scaffold(
+      appBar: AppBar(
+        leading: InkWell(
           onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (BuildContext context) => CartPage(
-                  locale: widget.locale,
-                  localizedValues: widget.localizedValues,
-                ),
-              ),
-            );
+            Navigator.pop(context);
           },
-          child: Container(
-            height: 50.0,
-            color: PRIMARY,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  MyLocalizations.of(context).goToCart,
-                  style: subTitleWhiteBOldOSB(),
-                ),
-              ],
+          child: Icon(Icons.arrow_back, color: Colors.white),
+        ),
+        backgroundColor: PRIMARY,
+        elevation: 0.0,
+        title: Text(
+          widget.restaurantName,
+          style: titleBoldWhiteOSS(),
+        ),
+        centerTitle: true,
+        actions: <Widget>[
+          GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => CartPage(
+                      localizedValues: widget.localizedValues,
+                      locale: widget.locale,
+                    ),
+                  ),
+                );
+              },
+              child: Stack(
+                children: <Widget>[
+                  Container(
+                      padding: EdgeInsets.only(top: 20.0, right: 10),
+                      child: Icon(Icons.shopping_cart)),
+                  Positioned(
+                      right: 3,
+                      top: 5,
+                      child: (cartCount == null || cartCount == 0)
+                          ? Text(
+                              '',
+                              style: TextStyle(fontSize: 14.0),
+                            )
+                          : Container(
+                              height: 20,
+                              width: 20,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.black,
+                              ),
+                              child: Text('${cartCount.toString()}',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontFamily: "bold",
+                                      fontSize: 11)),
+                            )),
+                ],
+              )),
+          Padding(padding: EdgeInsets.only(left: 7.0)),
+          // buildLocationIcon(),
+          // Padding(padding: EdgeInsets.only(left: 7.0)),
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Stack(
+                fit: StackFit.passthrough,
+                children: <Widget>[
+                  _buildBgImg(),
+                  _buildDescription(),
+                  _buildInfoBar(),
+                ],
+              ),
+              asyncLoader
+            ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (BuildContext context) => CartPage(
+                locale: widget.locale,
+                localizedValues: widget.localizedValues,
+              ),
             ),
+          );
+        },
+        child: Container(
+          height: 50.0,
+          color: PRIMARY,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                MyLocalizations.of(context).goToCart,
+                style: subTitleWhiteBOldOSB(),
+              ),
+            ],
           ),
         ),
       ),

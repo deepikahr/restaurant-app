@@ -204,5 +204,12 @@
   "seddoeiusmodtemporincididuntutlaboreetdolormagna": "塞德·杜伊乌斯（Sed doeiu​​s）mod temporinci做了未做的劳动",
   "pleaseSelectTimefirstforpickup": "请先选择时间取车",
   "pleaseSelectAddshippingaddressfirst": "请先选择/添加送货地址",
-  "noDeliverycharge": "无运费"
+  "noDeliverycharge": "无运费",
+  "flatNumber": "平号",
+  "apartmentName": "公寓名称",
+  "landmark": "里程碑",
+  "addressType": "地址类型",
+  "choosefromphotos": "从照片中选择",
+  "takephoto": "拍照",
+  "removephoto": "删除照片"
 }

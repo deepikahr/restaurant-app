@@ -1,10 +1,9 @@
+import 'package:RestaurantSaas/services/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../services/constant.dart';
 import '../../styles/styles.dart';
 import '../../services/auth-service.dart';
 import 'dart:async';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import '../../services/localizations.dart';
 import 'package:flutter/foundation.dart';
 
@@ -94,63 +93,54 @@ class _RegisterFormState extends State<RegisterForm> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        locale: Locale(widget.locale),
-        debugShowCheckedModeBanner: false,
-        localizationsDelegates: [
-          MyLocalizationsDelegate(widget.localizedValues),
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-        ],
-        supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
-        home: Scaffold(
-          key: _scaffoldKey,
-          appBar: AppBar(
-            leading: InkWell(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: Icon(
-                Icons.arrow_back,
-                color: Colors.white,
-              ),
-            ),
-            title: Text("Register"),
-            centerTitle: true,
-            backgroundColor: PRIMARY,
+    return Scaffold(
+      key: _scaffoldKey,
+      appBar: AppBar(
+        leading: InkWell(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
           ),
-          body: Container(
-            child: Stack(
-              fit: StackFit.expand,
-              children: <Widget>[
-                Image(
-                  image: AssetImage("lib/assets/bgImgs/background.png"),
-                  fit: BoxFit.fill,
-                  height: screenHeight(context),
-                  width: screenWidth(context),
+        ),
+        title: Text(MyLocalizations.of(context).register),
+        centerTitle: true,
+        backgroundColor: PRIMARY,
+      ),
+      body: Container(
+        child: Stack(
+          fit: StackFit.expand,
+          children: <Widget>[
+            Image(
+              image: AssetImage("lib/assets/bgImgs/background.png"),
+              fit: BoxFit.fill,
+              height: screenHeight(context),
+              width: screenWidth(context),
+            ),
+            SingleChildScrollView(
+                child: Form(
+              key: _formKey,
+              child: Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    _buildNameField(),
+                    _buildNumberField(),
+                    _buildEmailField(),
+                    _buildPasswordField(),
+                    _buildTermsAndCondiField(),
+                    _buildRegisterButton(),
+                  ],
                 ),
-                SingleChildScrollView(
-                    child: Form(
-                  key: _formKey,
-                  child: Padding(
-                    padding: const EdgeInsets.all(15.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        _buildNameField(),
-                        _buildNumberField(),
-                        _buildEmailField(),
-                        _buildPasswordField(),
-                        _buildTermsAndCondiField(),
-                        _buildRegisterButton(),
-                      ],
-                    ),
-                  ),
-                ))
-              ],
-            ),
-          ),
-        ));
+              ),
+            ))
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildNameField() {
@@ -381,8 +371,7 @@ class _RegisterFormState extends State<RegisterForm> {
 // import '../../blocs/validators.dart';
 // import '../../services/auth-service.dart';
 // import '../../services/sentry-services.dart';
-// import 'package:flutter_localizations/flutter_localizations.dart';
-
+//
 // import 'package:RestaurantSaas/initialize_i18n.dart' show initializeI18n;
 // import 'package:RestaurantSaas/constant.dart' show languages;
 // import 'package:RestaurantSaas/localizations.dart'

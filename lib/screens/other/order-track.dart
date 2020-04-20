@@ -2,14 +2,12 @@ import 'dart:async';
 
 import 'package:RestaurantSaas/styles/styles.dart' as prefix0;
 import 'package:flutter/material.dart';
-import '../../services/constant.dart';
 import '../../styles/styles.dart';
 import 'package:intl/intl.dart';
 import '../../services/profile-service.dart';
 import 'package:async_loader/async_loader.dart';
 import '../../widgets/no-data.dart';
 import '../../services/sentry-services.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import '../../services/localizations.dart';
 
 SentryError sentryError = new SentryError();
@@ -50,34 +48,25 @@ class OrderTrackState extends State<OrderTrack> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        locale: Locale(widget.locale),
-        debugShowCheckedModeBanner: false,
-        localizationsDelegates: [
-          MyLocalizationsDelegate(widget.localizedValues),
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-        ],
-        supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
-        home: Scaffold(
-          appBar: AppBar(
-            leading: InkWell(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: Icon(
-                Icons.arrow_back,
-                color: Colors.white,
-              ),
-            ),
-            backgroundColor: prefix0.PRIMARY,
-            iconTheme: IconThemeData(color: Colors.white),
-            title: new Text(
-              MyLocalizations.of(context).trackOrder,
-            ),
+    return Scaffold(
+      appBar: AppBar(
+        leading: InkWell(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
           ),
-          body: _retriveOrderTrack(),
-        ));
+        ),
+        backgroundColor: prefix0.PRIMARY,
+        iconTheme: IconThemeData(color: Colors.white),
+        title: new Text(
+          MyLocalizations.of(context).trackOrder,
+        ),
+      ),
+      body: _retriveOrderTrack(),
+    );
   }
 
   Widget _buildOrderTrackBody(Map<String, dynamic> order) {

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../services/constant.dart';
 import '../../styles/styles.dart';
 import 'order-upcoming.dart';
 import 'order-history.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import '../../services/localizations.dart';
 
 class OrdersPage extends StatefulWidget {
@@ -32,69 +30,59 @@ class _OrdersPageState extends State<OrdersPage>
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      locale: Locale(widget.locale),
-      debugShowCheckedModeBanner: false,
-      localizationsDelegates: [
-        MyLocalizationsDelegate(widget.localizedValues),
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ],
-      supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
-      home: Scaffold(
-        appBar: AppBar(
-          leading: InkWell(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: Icon(Icons.arrow_back),
-          ),
-          centerTitle: true,
-          backgroundColor: PRIMARY,
-          elevation: 0.0,
-          title: Text(MyLocalizations.of(context).myOrders),
+    return Scaffold(
+      appBar: AppBar(
+        leading: InkWell(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Icon(Icons.arrow_back),
         ),
-        body: DefaultTabController(
-          length: 2,
-          child: Column(
-            children: <Widget>[
-              Material(
-                color: PRIMARY,
-                child: TabBar(
-                  tabs: [
-                    Tab(
-                      child: Text(
-                        MyLocalizations.of(context).upcoming,
-                        style: subTitleWhiteLightOSR(),
-                      ),
+        centerTitle: true,
+        backgroundColor: PRIMARY,
+        elevation: 0.0,
+        title: Text(MyLocalizations.of(context).myOrders),
+      ),
+      body: DefaultTabController(
+        length: 2,
+        child: Column(
+          children: <Widget>[
+            Material(
+              color: PRIMARY,
+              child: TabBar(
+                tabs: [
+                  Tab(
+                    child: Text(
+                      MyLocalizations.of(context).upcoming,
+                      style: subTitleWhiteLightOSR(),
                     ),
-                    Tab(
-                      child: Text(
-                        MyLocalizations.of(context).history,
-                        style: subTitleWhiteLightOSR(),
-                      ),
+                  ),
+                  Tab(
+                    child: Text(
+                      MyLocalizations.of(context).history,
+                      style: subTitleWhiteLightOSR(),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              Expanded(
-                child: TabBarView(
-                  children: [
-                    OrderUpcoming(
-                      isRatingAllowed: false,
-                      locale: widget.locale,
-                      localizedValues: widget.localizedValues,
-                    ),
-                    OrderHistory(
-                      isRatingAllowed: true,
-                      locale: widget.locale,
-                      localizedValues: widget.localizedValues,
-                    ),
-                  ],
-                ),
+            ),
+            Expanded(
+              child: TabBarView(
+                children: [
+                  OrderUpcoming(
+                    isRatingAllowed: false,
+                    locale: widget.locale,
+                    localizedValues: widget.localizedValues,
+                  ),
+                  OrderHistory(
+                    isRatingAllowed: true,
+                    locale: widget.locale,
+                    localizedValues: widget.localizedValues,
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

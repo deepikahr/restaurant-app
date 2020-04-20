@@ -2,7 +2,6 @@ import 'package:RestaurantSaas/screens/mains/home.dart';
 import 'package:RestaurantSaas/services/initialize_i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:toast/toast.dart';
-import '../../services/constant.dart';
 import '../../styles/styles.dart';
 import '../../services/profile-service.dart';
 import 'package:async_loader/async_loader.dart';
@@ -17,7 +16,6 @@ import 'package:RestaurantSaas/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/cupertino.dart';
 
-import 'package:flutter_localizations/flutter_localizations.dart';
 import '../../services/localizations.dart';
 
 SentryError sentryError = new SentryError();
@@ -33,18 +31,8 @@ class ProfileApp extends StatefulWidget {
 class _ProfileAppState extends State<ProfileApp> {
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
-      locale: Locale(widget.locale),
-      debugShowCheckedModeBanner: false,
-      localizationsDelegates: [
-        MyLocalizationsDelegate(widget.localizedValues),
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ],
-      supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
-      home: Profile(
-          locale: widget.locale, localizedValues: widget.localizedValues),
-    );
+    return new Profile(
+        locale: widget.locale, localizedValues: widget.localizedValues);
   }
 }
 
@@ -319,43 +307,50 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                                         const EdgeInsets.all(
                                                             8.0),
                                                     child: InkWell(
-                                                        onTap: () {
-                                                          Navigator.pop(
-                                                              context);
-                                                          selectGallary();
-                                                        },
-                                                        child: new Text(
-                                                            'Choose from photos')),
+                                                      onTap: () {
+                                                        Navigator.pop(context);
+                                                        selectGallary();
+                                                      },
+                                                      child: new Text(
+                                                          MyLocalizations.of(
+                                                                  context)
+                                                              .choosefromphotos),
+                                                    ),
                                                   ),
                                                   Padding(
                                                     padding:
                                                         const EdgeInsets.all(
                                                             8.0),
                                                     child: InkWell(
-                                                        onTap: () {
-                                                          Navigator.pop(
-                                                              context);
-                                                          selectCamera();
-                                                        },
-                                                        child: new Text(
-                                                            'Take photo')),
+                                                      onTap: () {
+                                                        Navigator.pop(context);
+                                                        selectCamera();
+                                                      },
+                                                      child: new Text(
+                                                          MyLocalizations.of(
+                                                                  context)
+                                                              .takephoto),
+                                                    ),
                                                   ),
                                                   Padding(
                                                     padding:
                                                         const EdgeInsets.all(
                                                             8.0),
-                                                    child: profileData[
-                                                                'logo'] !=
-                                                            null
-                                                        ? InkWell(
-                                                            onTap: () {
-                                                              Navigator.pop(
-                                                                  context);
-                                                              removeProfilePic();
-                                                            },
-                                                            child: new Text(
-                                                                'Remove photo'))
-                                                        : Container(),
+                                                    child:
+                                                        profileData['logo'] !=
+                                                                null
+                                                            ? InkWell(
+                                                                onTap: () {
+                                                                  Navigator.pop(
+                                                                      context);
+                                                                  removeProfilePic();
+                                                                },
+                                                                child: new Text(
+                                                                    MyLocalizations.of(
+                                                                            context)
+                                                                        .removephoto),
+                                                              )
+                                                            : Container(),
                                                   ),
                                                 ],
                                               )
@@ -402,57 +397,60 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                     SharedPreferences prefs =
                                         await SharedPreferences.getInstance();
                                     prefs.setString('selectedLanguage', 'en');
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (BuildContext context) =>
-                                            EntryPage('en', localizedValues),
-                                      ),
-                                    );
+                                    Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (BuildContext context) =>
+                                              EntryPage('en', localizedValues),
+                                        ),
+                                        (Route<dynamic> route) => false);
                                   } else if (newValue == 'Chinese') {
                                     SharedPreferences prefs =
                                         await SharedPreferences.getInstance();
                                     prefs.setString('selectedLanguage', 'zh');
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (BuildContext context) =>
-                                            EntryPage('zh', localizedValues),
-                                      ),
-                                    );
+                                    Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (BuildContext context) =>
+                                              EntryPage('zh', localizedValues),
+                                        ),
+                                        (Route<dynamic> route) => false);
                                   } else if (newValue == 'Kannada') {
                                     SharedPreferences prefs =
                                         await SharedPreferences.getInstance();
                                     prefs.setString('selectedLanguage', 'ka');
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (BuildContext context) =>
-                                            EntryPage('ka', localizedValues),
-                                      ),
-                                    );
+
+                                    Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (BuildContext context) =>
+                                              EntryPage('ka', localizedValues),
+                                        ),
+                                        (Route<dynamic> route) => false);
                                   } else if (newValue == 'Arabic') {
                                     SharedPreferences prefs =
                                         await SharedPreferences.getInstance();
                                     prefs.setString('selectedLanguage', 'ar');
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (BuildContext context) =>
-                                            EntryPage('ar', localizedValues),
-                                      ),
-                                    );
+
+                                    Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (BuildContext context) =>
+                                              EntryPage('ar', localizedValues),
+                                        ),
+                                        (Route<dynamic> route) => false);
                                   } else {
                                     SharedPreferences prefs =
                                         await SharedPreferences.getInstance();
                                     prefs.setString('selectedLanguage', 'fr');
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (BuildContext context) =>
-                                            EntryPage('fr', localizedValues),
-                                      ),
-                                    );
+
+                                    Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (BuildContext context) =>
+                                              EntryPage('fr', localizedValues),
+                                        ),
+                                        (Route<dynamic> route) => false);
                                   }
                                 });
                               },

@@ -1,7 +1,6 @@
 import 'package:RestaurantSaas/screens/mains/cart.dart';
 import '../../services/counter-service.dart';
 import 'package:flutter/material.dart';
-import '../../services/constant.dart';
 import '../../styles/styles.dart';
 import 'home.dart';
 import '../../services/main-service.dart';
@@ -10,7 +9,6 @@ import '../../widgets/no-data.dart';
 import 'location-list-sheet.dart';
 import '../../services/common.dart';
 import '../../services/sentry-services.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import '../../services/localizations.dart';
 
 SentryError sentryError = new SentryError();
@@ -76,83 +74,74 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
     }).catchError((onError) {
       sentryError.reportError(onError, null);
     });
-    return MaterialApp(
-        locale: Locale(widget.locale),
-        debugShowCheckedModeBanner: false,
-        localizationsDelegates: [
-          MyLocalizationsDelegate(widget.localizedValues),
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-        ],
-        supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
-        home: Scaffold(
-          key: scaffoldKey,
-          appBar: AppBar(
-            backgroundColor: PRIMARY,
-            elevation: 0.0,
-            leading: InkWell(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: Icon(
-                Icons.arrow_back,
-                color: Colors.white,
-              ),
-            ),
-            title: Text(
-              widget.title + MyLocalizations.of(context).restaurants,
-              style: titleBoldWhiteOSS(),
-            ),
-            centerTitle: true,
-            actions: <Widget>[
-              GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (BuildContext context) => CartPage(
-                          locale: widget.locale,
-                          localizedValues: widget.localizedValues,
-                        ),
-                      ),
-                    );
-                  },
-                  child: Stack(
-                    children: <Widget>[
-                      Container(
-                          padding: EdgeInsets.only(top: 20.0, right: 10),
-                          child: Icon(Icons.shopping_cart)),
-                      Positioned(
-                          right: 3,
-                          top: 5,
-                          child: (cartCount == null || cartCount == 0)
-                              ? Text(
-                                  '',
-                                  style: TextStyle(fontSize: 14.0),
-                                )
-                              : Container(
-                                  height: 20,
-                                  width: 20,
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.black,
-                                  ),
-                                  child: Text('${cartCount.toString()}',
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontFamily: "bold",
-                                          fontSize: 11)),
-                                )),
-                    ],
-                  )),
-              Padding(padding: EdgeInsets.only(left: 7.0)),
-              // buildLocationIcon(),
-              // Padding(padding: EdgeInsets.only(left: 7.0)),
-            ],
+    return Scaffold(
+      key: scaffoldKey,
+      appBar: AppBar(
+        backgroundColor: PRIMARY,
+        elevation: 0.0,
+        leading: InkWell(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
           ),
-          body: _buildGetRestaurantLoader(),
-        ));
+        ),
+        title: Text(
+          widget.title + MyLocalizations.of(context).restaurants,
+          style: titleBoldWhiteOSS(),
+        ),
+        centerTitle: true,
+        actions: <Widget>[
+          GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => CartPage(
+                      locale: widget.locale,
+                      localizedValues: widget.localizedValues,
+                    ),
+                  ),
+                );
+              },
+              child: Stack(
+                children: <Widget>[
+                  Container(
+                      padding: EdgeInsets.only(top: 20.0, right: 10),
+                      child: Icon(Icons.shopping_cart)),
+                  Positioned(
+                      right: 3,
+                      top: 5,
+                      child: (cartCount == null || cartCount == 0)
+                          ? Text(
+                              '',
+                              style: TextStyle(fontSize: 14.0),
+                            )
+                          : Container(
+                              height: 20,
+                              width: 20,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.black,
+                              ),
+                              child: Text('${cartCount.toString()}',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontFamily: "bold",
+                                      fontSize: 11)),
+                            )),
+                ],
+              )),
+          Padding(padding: EdgeInsets.only(left: 7.0)),
+          // buildLocationIcon(),
+          // Padding(padding: EdgeInsets.only(left: 7.0)),
+        ],
+      ),
+      body: _buildGetRestaurantLoader(),
+    );
   }
 
   Widget _buildGetRestaurantLoader() {

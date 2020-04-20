@@ -1,8 +1,6 @@
 import 'dart:async';
 import '../../services/counter-service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import '../../services/constant.dart';
 import '../../styles/styles.dart';
 import 'confirm-order.dart';
 import '../../services/common.dart';
@@ -110,9 +108,9 @@ class _CartPageState extends State<CartPage> {
     }
 
     // [4] calculate tax
-    // if (widget.taxInfo != null) {
-    //   tax = (subTotal * (widget.taxInfo['taxRate'] / 100));
-    // }
+    if (widget.taxInfo != null) {
+      tax = (subTotal * (widget.taxInfo['taxRate'] / 100));
+    }
 
     // [5] calculate delivery charge
     Map<String, dynamic> deliveryInfo = (widget.locationInfo != null &&
@@ -135,7 +133,7 @@ class _CartPageState extends State<CartPage> {
     }
 
     // [6] calculate grand total
-    grandTotal = subTotal + deliveryCharge; //  + tax
+    grandTotal = subTotal + deliveryCharge + tax;
 
     // [7] create complete order json as Map
     cart = {
@@ -156,8 +154,8 @@ class _CartPageState extends State<CartPage> {
       'restaurantID': products.length > 0 ? products[0]['restaurantID'] : null,
       'status': 'Pending',
       'subTotal': subTotal,
-      "taxInfo": {"taxRate": 0, "taxName": "nil"},
-      // 'taxInfo': widget.taxInfo,
+      // "taxInfo": {"taxRate": 0, "taxName": "nil"},
+      'taxInfo': widget.taxInfo,
       'productDetails': products,
       'note': null,
       'isForDineIn': false,
@@ -208,111 +206,90 @@ class _CartPageState extends State<CartPage> {
         });
       }
     });
-    return MaterialApp(
-        locale: Locale(widget.locale),
-        debugShowCheckedModeBanner: false,
-        localizationsDelegates: [
-          MyLocalizationsDelegate(widget.localizedValues),
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-        ],
-        supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
-        home: Scaffold(
-          backgroundColor: Colors.white,
-          appBar: AppBar(
-            backgroundColor: PRIMARY,
-            elevation: 0.0,
-            title: new Text(
-              MyLocalizations.of(context).cart,
-              style: titleBoldWhiteOSS(),
-            ),
-            leading: InkWell(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: Icon(
-                Icons.arrow_back,
-                color: Colors.white,
-              ),
-            ),
-            centerTitle: true,
-            actions: <Widget>[],
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: PRIMARY,
+        elevation: 0.0,
+        title: new Text(
+          MyLocalizations.of(context).cart,
+          style: titleBoldWhiteOSS(),
+        ),
+        leading: InkWell(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
           ),
-          body: productsLength > 0
-              ? SingleChildScrollView(
-                  child: Stack(
+        ),
+        centerTitle: true,
+        actions: <Widget>[],
+      ),
+      body: productsLength > 0
+          ? SingleChildScrollView(
+              child: Stack(
+                children: <Widget>[
+                  new Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
-                      new Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                          SingleChildScrollView(
-                            child: Container(
-                                height: screenHeight(context) * 0.42,
-                                color: greyc,
-                                padding:
-                                    EdgeInsets.only(top: 10.0, bottom: 20.0),
-                                child: _buildCartItemTile(products)),
-                          ),
-                          Divider(),
-                          _buildApplyCouponLine(),
-                          selectedCoupon != null ? Divider() : Container(),
-                          selectedCoupon != null
-                              ? _buildPriceTagLine(
-                                  'Coupon (' +
-                                      selectedCoupon['couponName'] +
-                                      ' - ' +
-                                      selectedCoupon['offPrecentage']
-                                          .toString() +
-                                      '% off)',
-                                  couponDeduction)
-                              : Container(),
-                          Divider(),
-                          _buildPriceTagLine(
-                              MyLocalizations.of(context).subTotal, subTotal),
-                          Divider(),
-                          widget.taxInfo != null
-                              ? _buildPriceTagLine(
-                                  'Tax ' + widget.taxInfo['taxName'], tax)
-                              : Container(height: 0, width: 0),
-                          widget.taxInfo != null
-                              ? Divider()
-                              : Container(height: 0, width: 0),
-                          _buildPriceTagLine(
-                              MyLocalizations.of(context).deliveryCharges,
-                              deliveryCharge),
-                          Divider(),
-                          _buildPriceTagLine(
-                              MyLocalizations.of(context).grandTotal,
-                              grandTotal),
-                          Divider(),
-                        ],
+                      SingleChildScrollView(
+                        child: Container(
+                            height: screenHeight(context) * 0.42,
+                            color: greyc,
+                            padding: EdgeInsets.only(top: 10.0, bottom: 5.0),
+                            child: _buildCartItemTile(products)),
                       ),
-                      Container(
-                        color: border,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[],
-                        ),
-                      ),
+                      Divider(),
+                      _buildApplyCouponLine(),
+                      selectedCoupon != null ? Divider() : Container(),
+                      selectedCoupon != null
+                          ? _buildPriceTagLine(
+                              'Coupon (' +
+                                  selectedCoupon['couponName'] +
+                                  ' - ' +
+                                  selectedCoupon['offPrecentage'].toString() +
+                                  '% off)',
+                              couponDeduction)
+                          : Container(),
+                      Divider(),
+                      _buildPriceTagLine(
+                          MyLocalizations.of(context).subTotal, subTotal),
+                      Divider(),
+                      widget.taxInfo != null
+                          ? _buildPriceTagLine(widget.taxInfo['taxName'], tax)
+                          : Container(height: 0, width: 0),
+                      widget.taxInfo != null
+                          ? Divider()
+                          : Container(height: 0, width: 0),
+                      _buildPriceTagLine(
+                          MyLocalizations.of(context).deliveryCharges,
+                          deliveryCharge),
+                      Divider(),
+                      _buildPriceTagLine(
+                          MyLocalizations.of(context).grandTotal, grandTotal),
+                      Divider(),
                     ],
                   ),
-                )
-              : Padding(
-                  padding: EdgeInsets.only(top: 50.0),
-                  child: NoData(
-                    message: MyLocalizations.of(context).cartEmpty,
-                    icon: Icons.hourglass_empty,
-                  ),
-                ),
-          bottomNavigationBar: productsLength > 0
-              ? _buildBottomBar()
-              : Container(
-                  height: 0,
-                  width: 0,
-                ),
-        ));
+                ],
+              ),
+            )
+          : Padding(
+              padding: EdgeInsets.only(top: 50.0),
+              child: NoData(
+                message: MyLocalizations.of(context).cartEmpty,
+                icon: Icons.hourglass_empty,
+              ),
+            ),
+      bottomNavigationBar: productsLength > 0
+          ? _buildBottomBar()
+          : Container(
+              height: 0,
+              width: 0,
+            ),
+    );
   }
 
   Widget _buildCartItemTile(List<dynamic> products) {

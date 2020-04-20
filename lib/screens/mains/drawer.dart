@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:RestaurantSaas/screens/mains/home.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../services/constant.dart';
 import '../../styles/styles.dart';
 import '../other/orders.dart';
 import '../other/favorites.dart';
@@ -13,7 +12,6 @@ import '../../screens/mains/cart.dart';
 import '../other/about-us.dart';
 import '../other/profile.dart';
 import '../../services/profile-service.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import '../../services/localizations.dart';
 
 class DrawerPage extends StatefulWidget {
@@ -101,119 +99,111 @@ class _DrawerPageState extends State<DrawerPage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        child: Drawer(
-            child: MaterialApp(
-      locale: Locale(widget.locale),
-      debugShowCheckedModeBanner: false,
-      localizationsDelegates: [
-        MyLocalizationsDelegate(widget.localizedValues),
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ],
-      supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
-      home: Container(
-        child: Drawer(
-          child: Center(
-            child: ListView(
-              children: <Widget>[
-                Stack(
-                  fit: StackFit.passthrough,
-                  children: <Widget>[
-                    _buildMenuBg(),
-                    Column(
-                      children: <Widget>[
-                        _buildMenuProfileLogo(profilePic),
-                        fullname != null
-                            ? Text(fullname.toUpperCase(),
-                                style: TextStyle(color: Colors.white))
-                            : Container(height: 0, width: 0),
-                        _buildMenuTileList(
-                          'lib/assets/icon/spoon.png',
-                          MyLocalizations.of(context).home,
-                          0,
-                          route: HomePage(
-                            locale: widget.locale,
-                            localizedValues: widget.localizedValues,
+      child: Drawer(
+        child: Container(
+          child: Drawer(
+            child: Center(
+              child: ListView(
+                children: <Widget>[
+                  Stack(
+                    fit: StackFit.passthrough,
+                    children: <Widget>[
+                      _buildMenuBg(),
+                      Column(
+                        children: <Widget>[
+                          _buildMenuProfileLogo(profilePic),
+                          fullname != null
+                              ? Text(fullname.toUpperCase(),
+                                  style: TextStyle(color: Colors.white))
+                              : Container(height: 0, width: 0),
+                          _buildMenuTileList(
+                            'lib/assets/icon/spoon.png',
+                            MyLocalizations.of(context).home,
+                            0,
+                            route: HomePage(
+                              locale: widget.locale,
+                              localizedValues: widget.localizedValues,
+                            ),
                           ),
-                        ),
-                        _buildMenuTileList(
-                          'lib/assets/icon/carte.png',
-                          MyLocalizations.of(context).cart,
-                          cartCounter != null ? cartCounter : 0,
-                          route: CartPage(
-                            locale: widget.locale,
-                            localizedValues: widget.localizedValues,
+                          _buildMenuTileList(
+                            'lib/assets/icon/carte.png',
+                            MyLocalizations.of(context).cart,
+                            cartCounter != null ? cartCounter : 0,
+                            route: CartPage(
+                              locale: widget.locale,
+                              localizedValues: widget.localizedValues,
+                            ),
                           ),
-                        ),
-                        isLoggedIn
-                            ? _buildMenuTileList(
-                                'lib/assets/icon/orderHistory.png',
-                                MyLocalizations.of(context).myOrders,
-                                0,
-                                route: OrdersPage(
-                                  locale: widget.locale,
-                                  localizedValues: widget.localizedValues,
-                                ),
-                              )
-                            : Container(height: 0, width: 0),
-                        isLoggedIn
-                            ? _buildMenuTileList(
-                                'lib/assets/icon/favorite.png',
-                                MyLocalizations.of(context).favourites,
-                                0,
-                                route: Favorites(
-                                  locale: widget.locale,
-                                  localizedValues: widget.localizedValues,
-                                ),
-                              )
-                            : Container(height: 0, width: 0),
-                        isLoggedIn
-                            ? _buildMenuTileList(
-                                'lib/assets/icon/settings.png',
-                                MyLocalizations.of(context).profile,
-                                0,
-                                route: ProfileApp(
+                          isLoggedIn
+                              ? _buildMenuTileList(
+                                  'lib/assets/icon/orderHistory.png',
+                                  MyLocalizations.of(context).myOrders,
+                                  0,
+                                  route: OrdersPage(
                                     locale: widget.locale,
-                                    localizedValues: widget.localizedValues),
-                              )
-                            : Container(height: 0, width: 0),
-                        _buildMenuTileList(
-                          'lib/assets/icon/about.png',
-                          MyLocalizations.of(context).aboutUs,
-                          0,
-                          route: AboutUs(
-                            locale: widget.locale,
-                            localizedValues: widget.localizedValues,
+                                    localizedValues: widget.localizedValues,
+                                  ),
+                                )
+                              : Container(height: 0, width: 0),
+                          isLoggedIn
+                              ? _buildMenuTileList(
+                                  'lib/assets/icon/favorite.png',
+                                  MyLocalizations.of(context).favourites,
+                                  0,
+                                  route: Favorites(
+                                    locale: widget.locale,
+                                    localizedValues: widget.localizedValues,
+                                  ),
+                                )
+                              : Container(height: 0, width: 0),
+                          isLoggedIn
+                              ? _buildMenuTileList(
+                                  'lib/assets/icon/settings.png',
+                                  MyLocalizations.of(context).profile,
+                                  0,
+                                  route: ProfileApp(
+                                      locale: widget.locale,
+                                      localizedValues: widget.localizedValues),
+                                )
+                              : Container(height: 0, width: 0),
+                          _buildMenuTileList(
+                            'lib/assets/icon/about.png',
+                            MyLocalizations.of(context).aboutUs,
+                            0,
+                            route: AboutUs(
+                              locale: widget.locale,
+                              localizedValues: widget.localizedValues,
+                            ),
                           ),
-                        ),
-                        !isLoggedIn
-                            ? _buildMenuTileList(
-                                'lib/assets/icon/loginIcon.png',
-                                MyLocalizations.of(context).login,
-                                0,
-                                route: LoginPage(
-                                  locale: widget.locale,
-                                  localizedValues: widget.localizedValues,
-                                ),
-                              )
-                            : Container(height: 0, width: 0),
-                        isLoggedIn
-                            ? _buildMenuTileList(
-                                'lib/assets/icon/loginIcon.png',
-                                MyLocalizations.of(context).logout,
-                                0,
-                                check: false)
-                            : Container(height: 0, width: 0),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
+                          !isLoggedIn
+                              ? _buildMenuTileList(
+                                  'lib/assets/icon/loginIcon.png',
+                                  MyLocalizations.of(context).login,
+                                  0,
+                                  route: LoginPage(
+                                    locale: widget.locale,
+                                    localizedValues: widget.localizedValues,
+                                  ),
+                                )
+                              : Container(height: 0, width: 0),
+                          isLoggedIn
+                              ? _buildMenuTileList(
+                                  'lib/assets/icon/loginIcon.png',
+                                  MyLocalizations.of(context).logout,
+                                  0,
+                                  check: false)
+                              : Container(height: 0, width: 0),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
       ),
-    )));
+    );
   }
 
   Widget _buildMenuBg() {

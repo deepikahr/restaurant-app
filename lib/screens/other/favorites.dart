@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:toast/toast.dart';
-import '../../services/constant.dart';
 import '../../styles/styles.dart';
 import '../../services/profile-service.dart';
 import '../../widgets/no-data.dart';
 import 'package:async_loader/async_loader.dart';
 import '../../screens/mains/product-details.dart';
 import '../../services/sentry-services.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import '../../services/localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -47,47 +45,37 @@ class _FavoritesState extends State<Favorites> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      locale: Locale(widget.locale),
-      debugShowCheckedModeBanner: false,
-      localizationsDelegates: [
-        MyLocalizationsDelegate(widget.localizedValues),
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ],
-      supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
-      home: Scaffold(
-        backgroundColor: whiteTextb,
-        appBar: AppBar(
-          leading: InkWell(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: Icon(Icons.arrow_back),
-          ),
-          backgroundColor: PRIMARY,
-          title: new Text(MyLocalizations.of(context).favourites,
-              style: titleBoldWhiteOSS()),
-          centerTitle: true,
-        ),
-        body: AsyncLoader(
-          key: _asyncLoaderState,
-          initState: () async => await getFavouriteList(),
-          renderLoad: () => Center(child: CircularProgressIndicator()),
-          renderError: ([error]) {
-            sentryError.reportError(error, null);
-            return NoData(
-                message: MyLocalizations.of(context).connectionError,
-                icon: Icons.block);
+    return Scaffold(
+      backgroundColor: whiteTextb,
+      appBar: AppBar(
+        leading: InkWell(
+          onTap: () {
+            Navigator.pop(context);
           },
-          renderSuccess: ({data}) {
-            if (data.length > 0) {
-              return _buildFavTile(data);
-            } else {
-              return buildEmptyPage(context);
-            }
-          },
+          child: Icon(Icons.arrow_back),
         ),
+        backgroundColor: PRIMARY,
+        title: new Text(MyLocalizations.of(context).favourites,
+            style: titleBoldWhiteOSS()),
+        centerTitle: true,
+      ),
+      body: AsyncLoader(
+        key: _asyncLoaderState,
+        initState: () async => await getFavouriteList(),
+        renderLoad: () => Center(child: CircularProgressIndicator()),
+        renderError: ([error]) {
+          sentryError.reportError(error, null);
+          return NoData(
+              message: MyLocalizations.of(context).connectionError,
+              icon: Icons.block);
+        },
+        renderSuccess: ({data}) {
+          if (data.length > 0) {
+            return _buildFavTile(data);
+          } else {
+            return buildEmptyPage(context);
+          }
+        },
       ),
     );
   }

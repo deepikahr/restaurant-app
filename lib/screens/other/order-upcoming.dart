@@ -446,7 +446,7 @@ class OrderUpcomingState extends State<OrderUpcoming>
             // crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Text(
-                "${MyLocalizations.of(context).totalincludingGST}: \$" +
+                "${MyLocalizations.of(context).grandTotal}: \$" +
                     total.toStringAsFixed(2),
                 style: hintStyleSmallDarkBoldOSL(),
               ),

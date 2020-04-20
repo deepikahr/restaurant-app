@@ -1,12 +1,11 @@
 import 'dart:async';
 
+import 'package:RestaurantSaas/services/constant.dart';
 import 'package:flutter/material.dart';
-import '../../services/constant.dart';
 import '../../styles/styles.dart';
 import '../../services/auth-service.dart';
 import 'otp-verify.dart';
 import '../../services/sentry-services.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import '../../services/localizations.dart';
 
 SentryError sentryError = new SentryError();
@@ -84,53 +83,44 @@ class _ResetPasswordState extends State<ResetPassword> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      locale: Locale(widget.locale),
-      debugShowCheckedModeBanner: false,
-      localizationsDelegates: [
-        MyLocalizationsDelegate(widget.localizedValues),
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ],
-      supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
-      home: Scaffold(
-          key: _scaffoldKey,
-          appBar: AppBar(
-            leading: InkWell(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: Icon(
-                Icons.arrow_back,
-                color: Colors.white,
-              ),
-            ),
-            title: Text(
-              MyLocalizations.of(context).resetPassword,
-            ),
-            centerTitle: true,
-            backgroundColor: PRIMARY,
-            elevation: 0.0,
+    return Scaffold(
+      key: _scaffoldKey,
+      appBar: AppBar(
+        leading: InkWell(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
           ),
-          body: new ListView(
+        ),
+        title: Text(
+          MyLocalizations.of(context).resetPassword,
+        ),
+        centerTitle: true,
+        backgroundColor: PRIMARY,
+        elevation: 0.0,
+      ),
+      body: new ListView(
+        children: <Widget>[
+          Stack(
             children: <Widget>[
-              Stack(
-                children: <Widget>[
-                  Image(
-                    image: AssetImage("lib/assets/bgImgs/background.png"),
-                    fit: BoxFit.fill,
-                    height: screenHeight(context),
-                    width: screenWidth(context),
-                  ),
-                  Form(
-                    key: _formKey,
-                    child: _buildEmailField(),
-                  ),
-                  _buildSubmitButton(),
-                ],
+              Image(
+                image: AssetImage("lib/assets/bgImgs/background.png"),
+                fit: BoxFit.fill,
+                height: screenHeight(context),
+                width: screenWidth(context),
               ),
+              Form(
+                key: _formKey,
+                child: _buildEmailField(),
+              ),
+              _buildSubmitButton(),
             ],
-          )),
+          ),
+        ],
+      ),
     );
   }
 

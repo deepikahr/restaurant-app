@@ -1,11 +1,10 @@
+import 'package:RestaurantSaas/main.dart';
 import 'package:flutter/material.dart';
-import '../../services/constant.dart';
 import '../../styles/styles.dart';
 import '../../services/auth-service.dart';
 import '../../services/common.dart';
 import '../mains/home.dart';
 import '../../services/sentry-services.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import '../../services/localizations.dart';
 
 SentryError sentryError = new SentryError();
@@ -36,24 +35,23 @@ class _NewPasswordState extends State<NewPassword> {
       }
       AuthService.createNewPassword({'newPass': newPassword}, widget.otpToken)
           .then((onValue) {
+        print(onValue);
         try {
-          if (onValue['message'] != null) {
+          if (onValue['token'] != null) {
             showSnackbar(onValue['message']);
-            if (onValue['token'] != null) {
-              Common.setToken(onValue['token']).then((onValue) {
-                if (onValue) {
-                  Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                        builder: (BuildContext context) => HomePage(
-                          locale: widget.locale,
-                          localizedValues: widget.localizedValues,
-                        ),
-                      ),
-                      (Route<dynamic> route) => route.isFirst);
-                }
-              });
-            }
+            Future.delayed(const Duration(milliseconds: 3000), () {
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => EntryPage(
+                      widget.locale,
+                      widget.localizedValues,
+                    ),
+                  ),
+                  (Route<dynamic> route) => route.isFirst);
+            });
+          } else {
+            showSnackbar(onValue['message']);
           }
           if (mounted) {
             setState(() {
@@ -85,50 +83,40 @@ class _NewPasswordState extends State<NewPassword> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      locale: Locale(widget.locale),
-      debugShowCheckedModeBanner: false,
-      localizationsDelegates: [
-        MyLocalizationsDelegate(widget.localizedValues),
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ],
-      supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
-      home: Scaffold(
-        key: _scaffoldKey,
-        appBar: AppBar(
-          title: Text(MyLocalizations.of(context).createPassword),
-          centerTitle: true,
-          backgroundColor: PRIMARY,
-          leading: InkWell(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: Icon(
-              Icons.arrow_back,
-              color: Colors.white,
-            ),
+    return Scaffold(
+      key: _scaffoldKey,
+      appBar: AppBar(
+        title: Text(MyLocalizations.of(context).createPassword),
+        centerTitle: true,
+        backgroundColor: PRIMARY,
+        leading: InkWell(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
           ),
         ),
-        body: ListView(
-          children: <Widget>[
-            Stack(
-              children: <Widget>[
-                Image(
-                  image: AssetImage("lib/assets/bgImgs/background.png"),
-                  fit: BoxFit.fill,
-                  height: screenHeight(context),
-                  width: screenWidth(context),
-                ),
-                Form(
-                  key: _formKey,
-                  child: _buildNewPasswordField(),
-                ),
-                _buildSubmitButton(),
-              ],
-            ),
-          ],
-        ),
+      ),
+      body: ListView(
+        children: <Widget>[
+          Stack(
+            children: <Widget>[
+              Image(
+                image: AssetImage("lib/assets/bgImgs/background.png"),
+                fit: BoxFit.fill,
+                height: screenHeight(context),
+                width: screenWidth(context),
+              ),
+              Form(
+                key: _formKey,
+                child: _buildNewPasswordField(),
+              ),
+              _buildSubmitButton(),
+            ],
+          ),
+        ],
       ),
     );
   }
