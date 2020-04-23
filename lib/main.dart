@@ -61,14 +61,32 @@ void tokenCheck() {
   });
 }
 
-void initOneSignal() {
+Future<void> initOneSignal() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  OneSignal.shared
+      .setNotificationReceivedHandler((OSNotification notification) {});
+  OneSignal.shared
+      .setNotificationOpenedHandler((OSNotificationOpenedResult result) {});
   OneSignal.shared.init(ONE_SIGNAL_APP_ID, iOSSettings: {
     OSiOSSettings.autoPrompt: false,
-    OSiOSSettings.inAppLaunchUrl: true
+    OSiOSSettings.inAppLaunchUrl: true,
   });
   OneSignal.shared.setInFocusDisplayType(
     OSNotificationDisplayType.notification,
   );
+
+  OneSignal.shared
+      .promptUserForPushNotificationPermission(fallbackToSettings: true);
+  OneSignal.shared
+      .setInFocusDisplayType(OSNotificationDisplayType.notification);
+  var status = await OneSignal.shared.getPermissionSubscriptionState();
+  String playerId = status.subscriptionStatus.userId;
+  if (playerId == null) {
+    initOneSignal();
+  } else {
+    prefs.setString("playerId", playerId);
+  }
 }
 
 class EntryPage extends StatefulWidget {

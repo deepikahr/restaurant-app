@@ -28,10 +28,25 @@ class Common {
     return prefs.setString('cart', json.encode(cart));
   }
 
+  static Future<bool> setGlobalSettingData(Map<String, dynamic> cart) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setString('globalSetting', json.encode(cart));
+  }
+
   // get cart items from storage
   static Future<Map<String, dynamic>> getCart() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String cartStorage = prefs.getString('cart');
+    try {
+      return json.decode(cartStorage) as Map<String, dynamic>;
+    } catch (err) {
+      return Future(() => null);
+    }
+  }
+
+  static Future<Map<String, dynamic>> getGlobalSettingData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String cartStorage = prefs.getString('globalSetting');
     try {
       return json.decode(cartStorage) as Map<String, dynamic>;
     } catch (err) {

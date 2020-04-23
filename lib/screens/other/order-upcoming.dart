@@ -128,7 +128,8 @@ class OrderUpcomingState extends State<OrderUpcoming>
                     orders[index]['_id'],
                     orders[index]['restaurantID'],
                     orders[index]['location'],
-                    isRatingAllowed),
+                    isRatingAllowed,
+                    currency),
                 _buildBottomPriceLine(
                     double.parse(orders[index]['grandTotal'].toString()),
                     orders[index]['paymentOption'],
@@ -136,8 +137,10 @@ class OrderUpcomingState extends State<OrderUpcoming>
                         ? ""
                         : DateFormat('dd-MMM-yy hh:mm a').format(
                             new DateTime.fromMillisecondsSinceEpoch(
-                                orders[index]['createdAtTime'])),
-                    context)
+                                orders[index]['createdAtTime']),
+                          ),
+                    context,
+                    currency)
               ],
             ),
           );
@@ -278,7 +281,6 @@ class OrderUpcomingState extends State<OrderUpcoming>
                   type + ' : ' + status,
                   style: hintStyleSmallDarkBoldOSL(),
                 ),
-                // Text(time, style: titleBlackLightOSB()),
                 Text(
                   MyLocalizations.of(context).orderID +
                       ": " +
@@ -339,8 +341,13 @@ class OrderUpcomingState extends State<OrderUpcoming>
     );
   }
 
-  static Widget _buildProductList(List<dynamic> products, String orderId,
-      String restaurantId, String locationId, bool isRatingAllowed) {
+  static Widget _buildProductList(
+      List<dynamic> products,
+      String orderId,
+      String restaurantId,
+      String locationId,
+      bool isRatingAllowed,
+      String currency) {
     return ListView.builder(
       itemCount: products.length,
       physics: ScrollPhysics(),
@@ -380,34 +387,14 @@ class OrderUpcomingState extends State<OrderUpcoming>
               isRatingAllowed
                   ? Expanded(
                       flex: 2,
-                      child: (products[index]['RatingInfo'] == null)
-                          ? Container(
-                              child: InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (BuildContext context) => Rating(
-                                        orderId: orderId,
-                                        productId: products[index]['productId'],
-                                        locationId: locationId,
-                                        restaurantId: restaurantId,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                child: new Text(
-                                  MyLocalizations.of(context).rate,
-                                  textAlign: TextAlign.start,
-                                  style: textred(),
-                                ),
-                              ),
-                            )
+                      child: (products[index]['productRating'] == null)
+                          ? Container()
                           : Container(
                               child: Row(
                               children: <Widget>[
                                 Text(
-                                  products[index]['RatingInfo']['rating']
+                                  products[index]['productDetails'][index]
+                                          ['RatingInfo']
                                       .toString(),
                                   style: TextStyle(color: Colors.green),
                                 ),
@@ -423,7 +410,8 @@ class OrderUpcomingState extends State<OrderUpcoming>
               Expanded(
                 flex: 3,
                 child: Text(
-                  '\$' + products[index]['totalPrice'].toStringAsFixed(2),
+                  '$currency' +
+                      products[index]['totalPrice'].toStringAsFixed(2),
                 ),
               )
             ],
@@ -434,7 +422,7 @@ class OrderUpcomingState extends State<OrderUpcoming>
   }
 
   static Widget _buildBottomPriceLine(
-      double total, String paymentMode, String time, context) {
+      double total, String paymentMode, String time, context, String currency) {
     return Container(
       alignment: AlignmentDirectional.centerStart,
       padding: EdgeInsetsDirectional.only(top: 12.0),
@@ -443,10 +431,9 @@ class OrderUpcomingState extends State<OrderUpcoming>
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            // crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Text(
-                "${MyLocalizations.of(context).grandTotal}: \$" +
+                "${MyLocalizations.of(context).grandTotal}: $currency" +
                     total.toStringAsFixed(2),
                 style: hintStyleSmallDarkBoldOSL(),
               ),
@@ -462,7 +449,6 @@ class OrderUpcomingState extends State<OrderUpcoming>
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            // crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Text(MyLocalizations.of(context).chargesIncluding),
               Text(
@@ -476,208 +462,3 @@ class OrderUpcomingState extends State<OrderUpcoming>
     );
   }
 }
-
-//   static Widget _buildImageHead(
-//       String imgUrl, int itemCount, String status, BuildContext context) {
-//     return Stack(
-//       alignment: Alignment.center,
-//       fit: StackFit.passthrough,
-//       children: <Widget>[
-//         Image(
-//           image: imgUrl != null
-//               ? NetworkImage(imgUrl)
-//               : AssetImage("lib/assets/bgImgs/loginbg.png"),
-//           fit: BoxFit.fill,
-//           color: Colors.black54,
-//           colorBlendMode: BlendMode.darken,
-//           height: 85.0,
-//           width: screenWidth(context),
-//         ),
-//         Column(
-//           children: <Widget>[
-//             Text(
-//               itemCount.toString() + ' item',
-//               style: titleLightWhiteOSR(),
-//             ),
-//             Text(
-//               MyLocalizations.of(context).status + ': $status',
-//               style: hintStyleSmallWhiteBoldOSL(),
-//             ),
-//           ],
-//         ),
-//       ],
-//     );
-//   }
-
-//   static Widget _buildOrderInfo(String status, String time, int orderId,
-//       BuildContext context, bool isRatingAllowed, String orderIdUniq, final String locale,
-//       Map<String, Map<String, String>> localizedValues,) {
-//     return Container(
-//       padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-//       child: Row(
-//         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//         crossAxisAlignment: CrossAxisAlignment.center,
-//         children: <Widget>[
-//           Flexible(
-//             flex: 2,
-//             fit: FlexFit.tight,
-//             child: Column(
-//               mainAxisAlignment: MainAxisAlignment.start,
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: <Widget>[
-//                 Icon(
-//                   Icons.check_circle_outline,
-//                   color: PRIMARY,
-//                   size: 24.0,
-//                 ),
-//               ],
-//             ),
-//           ),
-//           Flexible(
-//             flex: 12,
-//             fit: FlexFit.tight,
-//             child: Column(
-//               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: <Widget>[
-//                 Text(
-//                   status,
-//                   style: hintStyleSmallDarkBoldOSL(),
-//                 ),
-//                 // Text(time, style: titleBlackLightOSB()),
-//                 Text(
-//                   "Order ID: " + orderId.toString(),
-//                   style: titleBlackLightOSB(),
-//                 ),
-//               ],
-//             ),
-//           ),
-//           Flexible(
-//             flex: 4,
-//             fit: FlexFit.tight,
-//             child: Column(
-//               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: <Widget>[
-//                 RawMaterialButton(
-//                   shape: RoundedRectangleBorder(
-//                       borderRadius: BorderRadius.all(Radius.circular(15.0))),
-//                   onPressed: () {
-//                     if (isRatingAllowed) {
-//                       Navigator.push(
-//                         context,
-//                         MaterialPageRoute(
-//                           builder: (BuildContext context) =>
-//                               OrderDetails(orderId: orderIdUniq, locale: locale, localizedValues: localizedValues,),
-//                         ),
-//                       );
-//                     } else {
-//                       Navigator.push(
-//                         context,
-//                         MaterialPageRoute(
-//                           builder: (BuildContext context) =>
-//                               OrderTrack(orderId: orderIdUniq, locale: locale, localizedValues: localizedValues, ),
-//                         ),
-//                       );
-//                     }
-//                   },
-//                   fillColor: PRIMARY,
-//                   child: new Text(
-//                     isRatingAllowed ? MyLocalizations.of(context).view :
-//                     MyLocalizations.of(context).track,
-//                     style: hintStylesmallWhiteLightOSL(),
-//                   ),
-//                 ),
-//               ],
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-
-//   static Widget _buildProductList(List<dynamic> products) {
-//     return ListView.builder(
-//       itemCount: products.length,
-//       physics: ScrollPhysics(),
-//       shrinkWrap: true,
-//       itemBuilder: (BuildContext context, int index) {
-//         return Container(
-//           decoration: BoxDecoration(
-//             border: Border(
-//               bottom: BorderSide(color: border, width: 1.0),
-//               top: BorderSide(color: border, width: 1.0),
-//             ),
-//           ),
-//           child: Container(
-//             padding: EdgeInsetsDirectional.only(top: 5.0, bottom: 5.0),
-//             child: Row(
-//               children: <Widget>[
-//                 Expanded(
-//                   flex: 1,
-//                   child: Container(
-//                     padding: EdgeInsets.only(right: 10.0),
-//                     child: Text(
-//                       (index + 1).toString(),
-//                       style: hintStyleSmallDarkBoldOSL(),
-//                     ),
-//                   ),
-//                 ),
-//                 Expanded(
-//                   flex: 10,
-//                   child: Text(
-//                     products[index]['title'],
-//                     style: hintStyleSmallDarkBoldOSL(),
-//                   ),
-//                 ),
-//                 Expanded(
-//                   flex: 3,
-//                   child: Text(
-//                       '\$' + products[index]['totalPrice'].toStringAsFixed(2)),
-//                 )
-//               ],
-//             ),
-//           ),
-//         );
-//       },
-//     );
-//   }
-
-//   static Widget _buildBottomPriceLine(context,
-//       double total, String paymentMode, String time) {
-//     return Container(
-//       alignment: AlignmentDirectional.centerStart,
-//       padding: EdgeInsetsDirectional.only(top: 12.0),
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           Row(
-//             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//             // crossAxisAlignment: CrossAxisAlignment.center,
-//             children: <Widget>[
-//               Text(
-//                 MyLocalizations.of(context).total + ": \$" + total.toStringAsFixed(2),
-//                 style: titleBold(),
-//               ),
-//               Text(
-//               MyLocalizations.of(context).paymentMode + ":" + paymentMode,
-//                 style: hintStyleSmallDarkBoldOSL(),
-//               ),
-//             ],
-//           ),
-//           Row(
-//             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//             // crossAxisAlignment: CrossAxisAlignment.center,
-//             children: <Widget>[
-//               Text(MyLocalizations.of(context).chargesIncluding),
-//               Text(
-//                 time,
-//                 style: hintStyleSmallDarkBoldOSL(),
-//               ),
-//             ],
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }

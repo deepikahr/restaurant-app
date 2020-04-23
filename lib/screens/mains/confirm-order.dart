@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:RestaurantSaas/services/common.dart';
 import 'package:RestaurantSaas/services/constant.dart';
 import 'package:google_map_location_picker/google_map_location_picker.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -41,35 +42,33 @@ class ConfrimOrderPage extends StatefulWidget {
 }
 
 class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
-  int selectedAddressIndex = 0;
-  double remainingLoyaltyPoint = 0.0;
-  double usedLoyaltyPoint = 0.0;
-  bool isLoyaltyApplied = false;
-  bool isDeliveryAvailable = true;
-  double grandTotal = 0.0;
-  double tempGrandTotal = 0.0;
-  bool isFirstTime = true;
-  double deliveryCharge = 0.0;
-  bool isShopOpen = true;
-  bool isAlwaysOpenOrClose = false;
-  bool isAlwaysOpenOrCloseLoading = false;
-  bool showSlot = false;
-  bool showSlotTimimg = false, isAddressget = false;
-  Map<String, dynamic> userInfo, paymentMethods;
-  String openAndCloseTime;
-  List<dynamic> paymentMethodList;
-  var selectedSlot, selectedLocale;
-  DateTime pickupDate, pickupTime;
-  List<dynamic> todayWorkingHoursList;
-  List addressList;
-
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey<AsyncLoaderState> _asyncLoaderState =
       GlobalKey<AsyncLoaderState>();
+  int selectedAddressIndex = 0;
 
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  List<String> languages = ['English', 'French', 'Chinese'];
-  bool placeOrderLoading = false;
+  double remainingLoyaltyPoint = 0.0,
+      usedLoyaltyPoint = 0.0,
+      grandTotal = 0.0,
+      tempGrandTotal = 0.0,
+      deliveryCharge = 0.0;
 
+  bool isLoyaltyApplied = false,
+      isDeliveryAvailable = true,
+      isFirstTime = true,
+      isAlwaysOpenOrClose = false,
+      isAlwaysOpenOrCloseLoading = false,
+      showSlot = false,
+      showSlotTimimg = false,
+      isAddressget = false,
+      placeOrderLoading = false;
+
+  Map<String, dynamic> userInfo;
+  List paymentMethods;
+  String openAndCloseTime;
+  List<dynamic> todayWorkingHoursList, addressList;
+  var selectedSlot;
+  DateTime pickupDate, pickupTime;
   String currency = '';
 
   Future<Map<String, dynamic>> _getUserInfo() async {
@@ -82,20 +81,20 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
     }).catchError((onError) {
       sentryError.reportError(onError, null);
     });
-
-    await MainService.getLoyaltyInfoByRestaurantId(widget.cart['restaurantID'])
-        .then((onValue) {
+    await MainService.getAdminSettings().then((onValue) {
       try {
-        userInfo['loyaltyInfo'] = onValue['adminSet'];
-        paymentMethods = onValue['setting'];
+        userInfo['loyaltyInfo'] = onValue;
+        paymentMethods = onValue['paymentMethod'];
+
         remainingLoyaltyPoint =
             double.parse(userInfo['totalLoyaltyPoints'].toString());
       } catch (error, stackTrace) {
         sentryError.reportError(error, stackTrace);
       }
-    }).catchError((onError) {
-      sentryError.reportError(onError, null);
+    }).catchError((error) {
+      sentryError.reportError(error, null);
     });
+
     await MainService.getRestaurantOpenAndCloseTime(
             widget.cart['location'],
             DateFormat('HH:mm').format(DateTime.now()),
@@ -119,12 +118,18 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
       });
     }
     await ProfileService.getAddressList().then((value) {
-      if (mounted) {
-        setState(() {
-          addressList = value;
-          isAddressget = false;
-        });
+      try {
+        if (mounted) {
+          setState(() {
+            addressList = value;
+            isAddressget = false;
+          });
+        }
+      } catch (error, stackTrace) {
+        sentryError.reportError(error, stackTrace);
       }
+    }).catchError((onError) {
+      sentryError.reportError(onError, null);
     });
   }
 
@@ -135,11 +140,17 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
       });
     }
     await ProfileService.deleteAddress(index).then((value) {
-      if (mounted) {
-        setState(() {
-          _getAddressList();
-        });
+      try {
+        if (mounted) {
+          setState(() {
+            _getAddressList();
+          });
+        }
+      } catch (error, stackTrace) {
+        sentryError.reportError(error, stackTrace);
       }
+    }).catchError((onError) {
+      sentryError.reportError(onError, null);
     });
   }
 
@@ -347,15 +358,6 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
             _buildHeader(),
             new Column(
               children: <Widget>[
-                // _buildBulletTitle(
-                //     1, MyLocalizations.of(context).contactInformation),
-                // _buildContactBlock(userInfo['name'],
-                //     userInfo['contactNumber'].toString(), userInfo),
-                // _buildBulletTitle(2, MyLocalizations.of(context).selectAddress),
-                // _buildOrderTypeBlock(),
-                // _buildAddressList(),
-                // _buildBulletTitle(3, MyLocalizations.of(context).orderDetails),
-                // _buildProductListBlock(userInfo),
                 _buildBulletTitle(
                     1, MyLocalizations.of(context).contactInformation),
                 _buildContactBlock(userInfo['name'],
@@ -489,7 +491,6 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                                   Text(
                                     MyLocalizations.of(context).dineIn,
                                     textAlign: TextAlign.center,
-                                    // style: hintStyleOSBType(),
                                   ),
                                   Padding(
                                     padding: EdgeInsets.only(left: 10),
@@ -769,7 +770,6 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                                                             size: 24.0,
                                                             color: PRIMARY,
                                                           ),
-                                                // backgroundColor: PRIMARY,
                                                 children: [
                                                   widget.cart['pickupTime'] ==
                                                           null
@@ -929,208 +929,6 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                               )
                       ])
                 : Container(),
-//                         Column(
-//                                     children: <Widget>[
-//                                       Text(
-//                                         "Click To Slot " +
-//                                             widget.cart['orderType'] +
-//                                             ' Date and Time',
-//                                         style: titleBlackLightOSB(),
-//                                       ),
-//                                       RaisedButton(
-//                                         onPressed: () {
-//                                           DatePicker.showDatePicker(context,
-//                                               showTitleActions: true,
-//                                               onChanged: (dt) => setState(
-//                                                     () async {
-//                                                       widget.cart[
-//                                                               'pickupDate'] =
-//                                                           DateFormat(
-//                                                                   'dd-MMM-yy')
-//                                                               .format(dt);
-//                                                       getSlotTime( DateFormat(
-//                                                           'dd-MMM-yy')
-//                                                           .format(dt));
-
-//                                                     },
-//                                                   ),
-//                                               onConfirm: (date) {
-
-//                                               },
-//                                               minTime: new DateTime.now()
-//                                                   .add(new Duration(days: 0)),
-//                                               maxTime: new DateTime.now()
-//                                                   .add(new Duration(days: 7)),
-//                                               currentTime: new DateTime.now()
-//                                                   .add(new Duration(days: 0)));
-//                                         },
-//                                         color: PRIMARY,
-//                                         child: new Text(
-//                                           'Select Date',
-//                                           style: TextStyle(
-//                                             fontWeight: FontWeight.w400,
-//                                             fontSize: 12.0,
-//                                             color: Colors.white,
-//                                             fontFamily: 'OpenSansRegular',
-//                                           ),
-//                                         ),
-//                                       ),
-//                                       widget.cart['pickupDate'] != null
-//                                           ? Text(
-//                                               "Date " +
-//                                                   widget.cart['pickupDate'],
-//                                               style: titleBlackLightOSB(),
-//                                             )
-//                                           : Container(),
-//                                       widget.cart['pickupTime'] != null
-//                                           ? Text(
-//                                               "Time " +
-//                                                   widget.cart['pickupTime'],
-//                                               style: titleBlackLightOSB(),
-//                                             )
-//                                           : Container()
-//                                     ],
-//                                   ),
-//                       showSlot?
-//                       isAlwaysOpenOrClose == true?
-
-//                       Center(
-//                                 child: Column(
-//                                 children: <Widget>[
-//                                   Text(
-//                                     "Click To Slot " +
-//                                         widget.cart['orderType'] +
-//                                         'Time',
-//                                     style: titleBlackLightOSB(),
-//                                   ),
-//                                   widget.cart['pickupDate'] != null
-//                                       ? Text(
-//                                           widget.cart['pickupDate'] +
-//                                               ", " +
-//                                               widget.cart['pickupTime'],
-//                                           style: titleBlackLightOSB(),
-//                                         )
-//                                       : Container(),
-//                                   RaisedButton(
-//                                     onPressed: () {
-//                                       DatePicker.showTimePicker(context,
-//                                           showTitleActions: true,
-//                                           onChanged: (dt) => setState(
-//                                                 () {
-//                                                   widget.cart['pickupDate'] =
-//                                                       DateFormat('dd-MMM-yy')
-//                                                           .format(dt);
-//                                                   widget.cart['pickupTime'] =
-//                                                       DateFormat('hh:mm')
-//                                                           .format(dt);
-//                                                 },
-//                                               ),
-//                                           onConfirm: (date) {},
-// //                                          minTime: new DateTime.now()
-// //                                              .add(new Duration(days: 0)),
-// //                                          maxTime: new DateTime.now()
-// //                                              .add(new Duration(days: 7)),
-//                                           currentTime: new DateTime.now()
-//                                               .add(new Duration(days: 0)));
-//                                     },
-//                                     color: PRIMARY,
-//                                     child: new Text(
-//                                       '24/7 open',
-//                                       style: TextStyle(
-//                                         fontWeight: FontWeight.w400,
-//                                         fontSize: 12.0,
-//                                         color: Colors.white,
-//                                         fontFamily: 'OpenSansRegular',
-//                                       ),
-//                                     ),
-//                                   ),
-//                                 ],
-//                               )):ListView.builder(
-//                                     physics: ScrollPhysics(),
-//                                     shrinkWrap: true,
-//                                     padding: EdgeInsets.only(right: 0.0),
-//                                     itemCount: todayWorkingHoursList.length,
-//                                     itemBuilder:
-//                                         (BuildContext context, int index) {
-//                                       return Column(
-//                                         children: [
-//                                           ExpansionTile(
-//                                             children: [
-//                                               ListView.builder(
-//                                                   physics: ScrollPhysics(),
-//                                                   shrinkWrap: true,
-//                                                   scrollDirection:
-//                                                       Axis.vertical,
-//                                                   padding: EdgeInsets.only(
-//                                                       right: 0.0),
-//                                                   itemCount:
-//                                                       todayWorkingHoursList[
-//                                                               index]['slotList']
-//                                                           .length,
-//                                                   itemBuilder:
-//                                                       (BuildContext context,
-//                                                           int indexx) {
-//                                                     return Padding(
-//                                                       padding:
-//                                                           const EdgeInsets.only(
-//                                                               left: 20.0,
-//                                                               right: 20.0),
-//                                                       child: Container(
-//                                                           child: RaisedButton(
-//                                                         onPressed: () {
-//                                                             if (mounted) {
-            // setState(() {
-//                                                             selectedSlot =
-//                                                                 todayWorkingHoursList[
-//                                                                             index]
-//                                                                         [
-//                                                                         'slotList']
-//                                                                     [indexx];
-
-//                                                             widget.cart[
-//                                                                     'pickupDate'] =
-//                                                                 widget.cart[
-//                                                                     'pickupDate'];
-//                                                             widget.cart[
-//                                                                     'pickupTime'] =
-//                                                                 selectedSlot;
-//                                                           });
-//                                                         },
-//                                                         color: PRIMARY,
-//                                                         child: new Text(
-//                                                           "${todayWorkingHoursList[index]['slotList'][indexx]}",
-//                                                           style: TextStyle(
-//                                                             fontWeight:
-//                                                                 FontWeight.w400,
-//                                                             fontSize: 12.0,
-//                                                             color: Colors.white,
-//                                                             fontFamily:
-//                                                                 'OpenSansRegular',
-//                                                           ),
-//                                                         ),
-//                                                       )),
-//                                                     );
-//                                                   })
-//                                             ],
-//                                             title: new Text(
-//                                               "${todayWorkingHoursList[index]['openTime']} ${todayWorkingHoursList[index]['openTimeMeridian']}" +
-//                                                   " -" +
-//                                                   "${todayWorkingHoursList[index]['closingTime']} ${todayWorkingHoursList[index]['closeTimeMeridian']}",
-//                                               style: TextStyle(
-//                                                 fontWeight: FontWeight.w400,
-//                                                 fontSize: 12.0,
-//                                                 color: Colors.black,
-//                                                 fontFamily: 'OpenSansRegular',
-//                                               ),
-//                                             ),
-//                                           ),
-//                                         ],
-//                                       );
-//                                     })
-// //
-//                               : Container(),
-//                       ])
-//                 : Container(),
           ],
         ),
       ),
@@ -1204,13 +1002,14 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                             ],
                           )
                         : Container(
-                            child: Text('Your order amount should be more than \$' +
-                                userInfo['loyaltyInfo']['minOrdLoyalty']
-                                    .toString() +
-                                ' to use loyalty point. You have ' +
-                                userInfo['totalLoyaltyPoints']
-                                    .toStringAsFixed(2) +
-                                ' points on your account! Place orders to get more.'),
+                            child: Text(
+                                'Your order amount should be more than $currency' +
+                                    userInfo['loyaltyInfo']['minOrdLoyalty']
+                                        .toString() +
+                                    ' to use loyalty point. You have ' +
+                                    userInfo['totalLoyaltyPoints']
+                                        .toStringAsFixed(2) +
+                                    ' points on your account! Place orders to get more.'),
                           )
                     : Container(
                         child: Text(
@@ -1264,17 +1063,17 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
-                    ListView.builder(
-                      physics: ScrollPhysics(),
-                      shrinkWrap: true,
-                      padding: EdgeInsets.only(right: 0.0),
-                      itemCount: addressList.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        if (addressList[index]['isSelected'] == null) {
-                          addressList[index]['isSelected'] = false;
-                        }
-                        return addressList[index]['name'] == null
-                            ? RadioListTile(
+                    addressList.length > 0
+                        ? ListView.builder(
+                            physics: ScrollPhysics(),
+                            shrinkWrap: true,
+                            padding: EdgeInsets.only(right: 0.0),
+                            itemCount: addressList.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              if (addressList[index]['isSelected'] == null) {
+                                addressList[index]['isSelected'] = false;
+                              }
+                              return RadioListTile(
                                 groupValue: selectedAddressIndex,
                                 value: index,
                                 selected: addressList[index]['isSelected'],
@@ -1299,7 +1098,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                                       style: subTitleDarkLightOSS(),
                                     ),
                                     new Text(
-                                      addressList[index]['faltNo'],
+                                      addressList[index]['flatNo'],
                                       style: hintStyleSmallTextDarkOSR(),
                                     ),
                                     new Text(
@@ -1327,10 +1126,10 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                                     color: PRIMARY,
                                   ),
                                 ),
-                              )
-                            : Container();
-                      },
-                    ),
+                              );
+                            },
+                          )
+                        : Container(),
                     Divider(),
                     InkWell(
                       onTap: () async {
@@ -1535,46 +1334,43 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
               } else if (widget.cart['orderType'] == 'Delivery') {
                 if (widget.cart['shippingAddress'] == null) {
                   widget.cart['shippingAddress'] = addressList[0];
-                  // showSnackbar(MyLocalizations.of(context)
-                  //     .pleaseSelectAddshippingaddressfirst);
+                }
+                if (widget.deliveryInfo == null ||
+                    widget.deliveryInfo['areaAthority']) {
+                  openAndCloseTime == "Open"
+                      ? _buildBottomBarButton()
+                      : showSnackbar(MyLocalizations.of(context)
+                          .storeisClosedPleaseTryAgainduringouropeninghours);
                 } else {
-                  if (widget.deliveryInfo == null ||
-                      widget.deliveryInfo['areaAthority']) {
+                  if (widget.deliveryInfo['areaCode'] == null ||
+                      widget.deliveryInfo['areaCode'][0] == null) {
                     openAndCloseTime == "Open"
                         ? _buildBottomBarButton()
                         : showSnackbar(MyLocalizations.of(context)
                             .storeisClosedPleaseTryAgainduringouropeninghours);
                   } else {
-                    if (widget.deliveryInfo['areaCode'] == null ||
-                        widget.deliveryInfo['areaCode'][0] == null) {
+                    bool isPinFound = false;
+                    for (int i = 0;
+                        i < widget.deliveryInfo['areaCode'].length;
+                        i++) {
+                      if (widget.deliveryInfo['areaCode'][i]['pinCode']
+                              .toString() ==
+                          widget.cart['shippingAddress']['postalCode']
+                              .toString()) {
+                        isPinFound = true;
+                      }
+                    }
+                    if (isPinFound) {
                       openAndCloseTime == "Open"
                           ? _buildBottomBarButton()
                           : showSnackbar(MyLocalizations.of(context)
                               .storeisClosedPleaseTryAgainduringouropeninghours);
                     } else {
-                      bool isPinFound = false;
-                      for (int i = 0;
-                          i < widget.deliveryInfo['areaCode'].length;
-                          i++) {
-                        if (widget.deliveryInfo['areaCode'][i]['pinCode']
-                                .toString() ==
-                            widget.cart['shippingAddress']['postalCode:']
-                                .toString()) {
-                          isPinFound = true;
-                        }
-                      }
-                      if (isPinFound) {
-                        openAndCloseTime == "Open"
-                            ? _buildBottomBarButton()
-                            : showSnackbar(MyLocalizations.of(context)
-                                .storeisClosedPleaseTryAgainduringouropeninghours);
-                      } else {
-                        _showAvailablePincodeAlert(
-                            widget.cart['restaurant'],
-                            widget.cart['shippingAddress']['postalCode']
-                                .toString(),
-                            widget.deliveryInfo['areaCode']);
-                      }
+                      _showAvailablePincodeAlert(
+                          widget.cart['restaurant'],
+                          widget.cart['shippingAddress']['postalCode']
+                              .toString(),
+                          widget.deliveryInfo['areaCode']);
                     }
                   }
                 }

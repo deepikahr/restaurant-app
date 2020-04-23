@@ -19,6 +19,8 @@ class RegisterForm extends StatefulWidget {
 class _RegisterFormState extends State<RegisterForm> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool isLoading = false, isChecked = false;
+  var selectedLanguage;
   Map<String, dynamic> register = {
     'email': null,
     'password': null,
@@ -26,15 +28,12 @@ class _RegisterFormState extends State<RegisterForm> {
     'role': 'User',
     'contactNumber': null
   };
-  bool isLoading = false;
-  bool isChecked = false;
+
   @override
   void initState() {
     super.initState();
     selectedLanguages();
   }
-
-  var selectedLanguage;
 
   selectedLanguages() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

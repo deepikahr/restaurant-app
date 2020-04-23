@@ -177,11 +177,9 @@ class _AddCardPageState extends State<AddCardPage> {
                               decoration: new InputDecoration(
                                 hintText: MyLocalizations.of(context)
                                     .creditCardNumber,
-                                // hintStyle: greySmallTextHN(),
                                 contentPadding: EdgeInsets.all(12.0),
                                 border: InputBorder.none,
                               ),
-                              // style: darkTextSmallHN(),
                               keyboardType: TextInputType.number,
                               maxLength: 16,
                               validator: (String value) {
@@ -219,17 +217,13 @@ class _AddCardPageState extends State<AddCardPage> {
                               color: Colors.white,
                             ),
                             child: TextFormField(
-                              // initialValue: cardInfo['expiryMonth'],
                               decoration: new InputDecoration(
                                 hintText: MyLocalizations.of(context).mm,
-                                // hintStyle: greySmallTextHN(),
                                 contentPadding: EdgeInsets.all(12.0),
                                 border: InputBorder.none,
                               ),
-                              // style: darkTextSmallHN(),
                               keyboardType: TextInputType.number,
                               maxLength: 2,
-
                               validator: (String value) {
                                 int month = int.parse(value);
                                 if ((value.length != 2) || (month > 12))
@@ -245,7 +239,9 @@ class _AddCardPageState extends State<AddCardPage> {
                             ),
                           ),
                         ),
-                        Padding(padding: EdgeInsets.all(10.0)),
+                        Padding(
+                          padding: EdgeInsets.all(10.0),
+                        ),
                         Expanded(
                           child: Container(
                             margin: EdgeInsets.only(top: 14.0),
@@ -255,10 +251,8 @@ class _AddCardPageState extends State<AddCardPage> {
                               color: Colors.white,
                             ),
                             child: TextFormField(
-                              // initialValue: cardInfo['expiryYear'],
                               decoration: new InputDecoration(
                                 hintText: MyLocalizations.of(context).yyyy,
-                                // hintStyle: greySmallTextHN(),
                                 contentPadding: EdgeInsets.all(12.0),
                                 border: InputBorder.none,
                               ),
@@ -298,12 +292,9 @@ class _AddCardPageState extends State<AddCardPage> {
                             child: TextFormField(
                               decoration: new InputDecoration(
                                 hintText: MyLocalizations.of(context).cvv,
-                                // hintStyle: greySmallTextHN(),
                                 contentPadding: EdgeInsets.all(12.0),
                                 border: InputBorder.none,
                               ),
-                              // style: darkTextSmallHN(),
-                              keyboardType: TextInputType.number,
                               maxLength: 3,
                               validator: (String value) {
                                 if (value.length != 3)
@@ -349,7 +340,9 @@ class _AddCardPageState extends State<AddCardPage> {
                 MyLocalizations.of(context).addCard,
                 style: titleBoldWhiteOSS(),
               ),
-              Padding(padding: EdgeInsets.only(left: 5.0, right: 5.0)),
+              Padding(
+                padding: EdgeInsets.only(left: 5.0, right: 5.0),
+              ),
               isLoading
                   ? Image.asset(
                       'lib/assets/icon/spinner.gif',

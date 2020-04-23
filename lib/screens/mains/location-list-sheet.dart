@@ -141,7 +141,7 @@ class LocationListSheet extends StatelessWidget {
       freeDeliveryText = data[index]['location']['deliveryInfo']['deliveryInfo']
               ['freeDelivery']
           ? MyLocalizations.of(context).freeDeliveryAvailable
-          : 'Free delivery above \$' +
+          : 'Free delivery above $currency' +
               data[index]['location']['deliveryInfo']['deliveryInfo']
                       ['amountEligibility']
                   .toString();

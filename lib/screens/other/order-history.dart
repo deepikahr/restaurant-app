@@ -26,6 +26,7 @@ class _OrderHistoryState extends State<OrderHistory>
   final GlobalKey<AsyncLoaderState> _asyncLoaderState =
       GlobalKey<AsyncLoaderState>();
 
+  String currency = '';
   getDelieveredOrders() async {
     return await ProfileService.getDeliveredOrdersList();
   }
@@ -35,8 +36,6 @@ class _OrderHistoryState extends State<OrderHistory>
     super.initState();
     getGlobalSettingsData();
   }
-
-  String currency = '';
 
   getGlobalSettingsData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -56,7 +55,7 @@ class _OrderHistoryState extends State<OrderHistory>
               icon: Icons.block);
         },
         renderSuccess: ({data}) {
-          if (data.length > 0) {
+          if (data is List) {
             return OrderUpcomingState.buildOrderList(
                 data,
                 widget.isRatingAllowed,

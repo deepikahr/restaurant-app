@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:RestaurantSaas/services/common.dart';
 import 'package:http/http.dart' show Client;
 import 'constant.dart';
 import 'dart:convert';
@@ -77,7 +78,8 @@ class MainService {
   }
 
   static Future<dynamic> getAdminSettings() async {
-    final response = await client.get(API_ENDPOINT + 'adminsettings');
+    final response = await client.get(API_ENDPOINT + 'adminSettings/');
+    Common.setGlobalSettingData(json.decode(response.body));
     return json.decode(response.body);
   }
 }

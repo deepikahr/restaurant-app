@@ -25,10 +25,10 @@ class Rating extends StatefulWidget {
 }
 
 class _RatingState extends State<Rating> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   int _rating = 0;
   String comment;
   bool isLoading = false;
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   void _rateProduct() async {
     if (_formKey.currentState.validate()) {
@@ -75,15 +75,6 @@ class _RatingState extends State<Rating> {
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-        leading: InkWell(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Icon(
-            Icons.arrow_back,
-            color: Colors.white,
-          ),
-        ),
         title: Text(
           MyLocalizations.of(context).rateYourOrder,
         ),

@@ -55,6 +55,7 @@ class HomePageState extends State<HomePage> {
   List advertisementList;
   bool isNewlyArrivedRestaurants = false;
   List newlyArrivedRestaurantsList;
+  Map taxInfo;
   int cartCounter;
 
   @override
@@ -70,9 +71,10 @@ class HomePageState extends State<HomePage> {
   getGlobalSettingsData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await MainService.getAdminSettings().then((onValue) {
+      print(onValue);
       try {
         var adminSettings = onValue;
-
+        taxInfo = onValue['taxInfo'];
         if (adminSettings['currency'] == null) {
           prefs.setString('currency', '\$');
         } else {
@@ -712,27 +714,6 @@ class HomePageState extends State<HomePage> {
     );
   }
 
-  // Widget buildLocationIcon() {
-  //   return GestureDetector(
-  //     onTap: () {
-  //       Navigator.push(
-  //         context,
-  //         MaterialPageRoute(
-  //           builder: (BuildContext context) => LocationPage(),
-  //         ),
-  //       );
-  //     },
-  //     child: Container(
-  //       padding: EdgeInsets.only(right: 10.0),
-  //       child: Image.asset(
-  //         "lib/assets/icon/location.png",
-  //         color: Colors.white,
-  //         width: 15.0,
-  //       ),
-  //     ),
-  //   );
-  // }
-
   Widget _buildOfferSlider(List<dynamic> list) {
     return list.length > 0
         ? Swiper(
@@ -764,8 +745,7 @@ class HomePageState extends State<HomePage> {
                         workingHours:
                             list[index]['locationInfo']['workingHours'] ?? null,
                         locationInfo: list[index]['locationInfo'],
-                        taxInfo: list[index]['locationInfo']['restaurantID']
-                            ['taxInfo'],
+                        taxInfo: taxInfo,
                         locale: widget.locale,
                         localizedValues: widget.localizedValues,
                       ),

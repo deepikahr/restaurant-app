@@ -20,16 +20,6 @@ class AddAddressPage extends StatefulWidget {
 
 class _AddAddressPageState extends State<AddAddressPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  Map<String, dynamic> address = {
-    "location": {"lat": 0, "long": 0},
-    "address": "String",
-    "flatNo": "String",
-    "apartmentName": "String",
-    "landmark": "String",
-    "postalCode": "String",
-    "contactNumber": "String",
-    "addressType": "String"
-  };
   bool isLoading = false;
   List<String> addressType = ['Home', "Work", "Others"];
   int selectedRadio = 0, selectedRadioFirst;
@@ -40,6 +30,17 @@ class _AddAddressPageState extends State<AddAddressPage> {
       });
     }
   }
+
+  Map<String, dynamic> address = {
+    "location": {"lat": 0, "long": 0},
+    "address": null,
+    "flatNo": null,
+    "apartmentName": null,
+    "landmark": null,
+    "postalCode": null,
+    "contactNumber": null,
+    "addressType": null
+  };
 
   _saveAddress() async {
     if (_formKey.currentState.validate()) {
@@ -120,7 +121,9 @@ class _AddAddressPageState extends State<AddAddressPage> {
                           MyLocalizations.of(context).byCreating,
                           style: textOSR(),
                         ),
-                        new Padding(padding: EdgeInsets.only(top: 20.0)),
+                        new Padding(
+                          padding: EdgeInsets.only(top: 20.0),
+                        ),
                         new Row(
                           children: <Widget>[
                             new Text(
@@ -145,7 +148,9 @@ class _AddAddressPageState extends State<AddAddressPage> {
                             )
                           ],
                         ),
-                        new Padding(padding: EdgeInsets.only(top: 20.0)),
+                        new Padding(
+                          padding: EdgeInsets.only(top: 20.0),
+                        ),
                         new Row(
                           children: <Widget>[
                             new Text(
@@ -157,38 +162,48 @@ class _AddAddressPageState extends State<AddAddressPage> {
                         new Row(
                           children: <Widget>[
                             Expanded(
-                                child: new Container(
-                              decoration: BoxDecoration(
+                              child: new Container(
+                                decoration: BoxDecoration(
                                   border: BorderDirectional(
-                                      bottom: BorderSide(color: Colors.grey))),
-                              child: new TextFormField(
-                                decoration: InputDecoration(
-                                    hintText: MyLocalizations.of(context)
-                                            .enterYour +
-                                        "  " +
-                                        MyLocalizations.of(context).flatNumber,
-                                    hintStyle: hintStyleSmallLightOSR(),
-                                    border: InputBorder.none),
-                                style: textOSR(),
-                                validator: (String value) {
-                                  if (value.isEmpty) {
-                                    return MyLocalizations.of(context).please +
-                                        " " +
-                                        MyLocalizations.of(context).enterYour +
-                                        "  " +
-                                        MyLocalizations.of(context).flatNumber;
-                                  } else {
-                                    return null;
-                                  }
-                                },
-                                onSaved: (String value) {
-                                  address['faltNo'] = value;
-                                },
+                                    bottom: BorderSide(color: Colors.grey),
+                                  ),
+                                ),
+                                child: new TextFormField(
+                                  decoration: InputDecoration(
+                                      hintText: MyLocalizations.of(context)
+                                              .enterYour +
+                                          "  " +
+                                          MyLocalizations.of(context)
+                                              .flatNumber,
+                                      hintStyle: hintStyleSmallLightOSR(),
+                                      border: InputBorder.none),
+                                  style: textOSR(),
+                                  validator: (String value) {
+                                    if (value.isEmpty) {
+                                      return MyLocalizations
+                                                  .of(context)
+                                              .please +
+                                          " " +
+                                          MyLocalizations.of(context)
+                                              .enterYour +
+                                          "  " +
+                                          MyLocalizations.of(context)
+                                              .flatNumber;
+                                    } else {
+                                      return null;
+                                    }
+                                  },
+                                  onSaved: (String value) {
+                                    address['flatNo'] = value;
+                                  },
+                                ),
                               ),
-                            ))
+                            )
                           ],
                         ),
-                        new Padding(padding: EdgeInsets.only(top: 20.0)),
+                        new Padding(
+                          padding: EdgeInsets.only(top: 20.0),
+                        ),
                         new Row(
                           children: <Widget>[
                             new Text(
@@ -200,40 +215,48 @@ class _AddAddressPageState extends State<AddAddressPage> {
                         new Row(
                           children: <Widget>[
                             Expanded(
-                                child: new Container(
-                              decoration: BoxDecoration(
+                              child: new Container(
+                                decoration: BoxDecoration(
                                   border: BorderDirectional(
-                                      bottom: BorderSide(color: Colors.grey))),
-                              child: new TextFormField(
-                                decoration: InputDecoration(
-                                    hintText:
-                                        MyLocalizations.of(context).enterYour +
-                                            "  " +
-                                            MyLocalizations.of(context)
-                                                .apartmentName,
-                                    hintStyle: hintStyleSmallLightOSR(),
-                                    border: InputBorder.none),
-                                style: textOSR(),
-                                validator: (String value) {
-                                  if (value.isEmpty) {
-                                    return MyLocalizations.of(context).please +
-                                        " " +
-                                        MyLocalizations.of(context).enterYour +
-                                        "  " +
-                                        MyLocalizations.of(context)
-                                            .apartmentName;
-                                  } else {
-                                    return null;
-                                  }
-                                },
-                                onSaved: (String value) {
-                                  address['apartmentName'] = value;
-                                },
+                                    bottom: BorderSide(color: Colors.grey),
+                                  ),
+                                ),
+                                child: new TextFormField(
+                                  decoration: InputDecoration(
+                                      hintText: MyLocalizations.of(context)
+                                              .enterYour +
+                                          "  " +
+                                          MyLocalizations.of(context)
+                                              .apartmentName,
+                                      hintStyle: hintStyleSmallLightOSR(),
+                                      border: InputBorder.none),
+                                  style: textOSR(),
+                                  validator: (String value) {
+                                    if (value.isEmpty) {
+                                      return MyLocalizations
+                                                  .of(context)
+                                              .please +
+                                          " " +
+                                          MyLocalizations.of(context)
+                                              .enterYour +
+                                          "  " +
+                                          MyLocalizations.of(context)
+                                              .apartmentName;
+                                    } else {
+                                      return null;
+                                    }
+                                  },
+                                  onSaved: (String value) {
+                                    address['apartmentName'] = value;
+                                  },
+                                ),
                               ),
-                            ))
+                            )
                           ],
                         ),
-                        new Padding(padding: EdgeInsets.only(top: 20.0)),
+                        new Padding(
+                          padding: EdgeInsets.only(top: 20.0),
+                        ),
                         new Row(
                           children: <Widget>[
                             new Text(
@@ -245,38 +268,46 @@ class _AddAddressPageState extends State<AddAddressPage> {
                         new Row(
                           children: <Widget>[
                             Expanded(
-                                child: new Container(
-                              decoration: BoxDecoration(
+                              child: new Container(
+                                decoration: BoxDecoration(
                                   border: BorderDirectional(
-                                      bottom: BorderSide(color: Colors.grey))),
-                              child: new TextFormField(
-                                decoration: InputDecoration(
-                                    hintText: MyLocalizations.of(context)
-                                            .enterYour +
-                                        "  " +
-                                        MyLocalizations.of(context).landmark,
-                                    hintStyle: hintStyleSmallLightOSR(),
-                                    border: InputBorder.none),
-                                style: textOSR(),
-                                validator: (String value) {
-                                  if (value.isEmpty) {
-                                    return MyLocalizations.of(context).please +
-                                        " " +
-                                        MyLocalizations.of(context).enterYour +
-                                        "  " +
-                                        MyLocalizations.of(context).landmark;
-                                  } else {
-                                    return null;
-                                  }
-                                },
-                                onSaved: (String value) {
-                                  address['landmark'] = value;
-                                },
+                                    bottom: BorderSide(color: Colors.grey),
+                                  ),
+                                ),
+                                child: new TextFormField(
+                                  decoration: InputDecoration(
+                                      hintText: MyLocalizations.of(context)
+                                              .enterYour +
+                                          "  " +
+                                          MyLocalizations.of(context).landmark,
+                                      hintStyle: hintStyleSmallLightOSR(),
+                                      border: InputBorder.none),
+                                  style: textOSR(),
+                                  validator: (String value) {
+                                    if (value.isEmpty) {
+                                      return MyLocalizations
+                                                  .of(context)
+                                              .please +
+                                          " " +
+                                          MyLocalizations.of(context)
+                                              .enterYour +
+                                          "  " +
+                                          MyLocalizations.of(context).landmark;
+                                    } else {
+                                      return null;
+                                    }
+                                  },
+                                  onSaved: (String value) {
+                                    address['landmark'] = value;
+                                  },
+                                ),
                               ),
-                            ))
+                            )
                           ],
                         ),
-                        new Padding(padding: EdgeInsets.only(top: 20.0)),
+                        new Padding(
+                          padding: EdgeInsets.only(top: 20.0),
+                        ),
                         new Row(
                           children: <Widget>[
                             new Text(
@@ -319,7 +350,9 @@ class _AddAddressPageState extends State<AddAddressPage> {
                             },
                           ),
                         ),
-                        new Padding(padding: EdgeInsets.only(top: 20.0)),
+                        new Padding(
+                          padding: EdgeInsets.only(top: 20.0),
+                        ),
                         new Row(
                           children: <Widget>[
                             new Text(
@@ -373,7 +406,9 @@ class _AddAddressPageState extends State<AddAddressPage> {
                             )
                           ],
                         ),
-                        new Padding(padding: EdgeInsets.only(top: 20.0)),
+                        new Padding(
+                          padding: EdgeInsets.only(top: 20.0),
+                        ),
                         new Row(
                           children: <Widget>[
                             new Text(
@@ -423,8 +458,9 @@ class _AddAddressPageState extends State<AddAddressPage> {
                               width: screenWidth(context),
                               height: 44.0,
                               decoration: BoxDecoration(
-                                  color: PRIMARY,
-                                  borderRadius: BorderRadius.circular(50.0)),
+                                color: PRIMARY,
+                                borderRadius: BorderRadius.circular(50.0),
+                              ),
                               child: Image.asset(
                                 'lib/assets/icon/spinner.gif',
                                 width: 19.0,
@@ -436,11 +472,13 @@ class _AddAddressPageState extends State<AddAddressPage> {
                               width: screenWidth(context),
                               height: 44.0,
                               decoration: BoxDecoration(
-                                  color: PRIMARY,
-                                  borderRadius: BorderRadius.circular(50.0)),
+                                color: PRIMARY,
+                                borderRadius: BorderRadius.circular(50.0),
+                              ),
                               child: new Text(
-                                  MyLocalizations.of(context).addAddress,
-                                  style: subTitleWhiteBOldOSB()),
+                                MyLocalizations.of(context).addAddress,
+                                style: subTitleWhiteBOldOSB(),
+                              ),
                             ),
                     ),
                   ),

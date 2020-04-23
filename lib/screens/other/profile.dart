@@ -46,28 +46,28 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   File file;
+  File _imageFile;
+
   final GlobalKey<AsyncLoaderState> _asyncLoaderState =
       GlobalKey<AsyncLoaderState>();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   Map<String, dynamic> profileData;
-  bool isLoading = false;
-  Image selectedImage;
-  String base64Image;
-  bool isPicUploading = false, isImageUploading = false;
+  bool isLoading = false, isPicUploading = false, isImageUploading = false;
+  var selectedLanguage, selectedLocale;
+  Map<String, Map<String, String>> localizedValues;
 
+  String selectedLanguages;
+
+  List<String> languages = ['English', 'French', 'Chinese', 'Arabic'];
   Future<Map<String, dynamic>> getProfileInfo() async {
     return await ProfileService.getUserInfo();
   }
-
-  Map<String, Map<String, String>> localizedValues;
 
   @override
   void initState() {
     super.initState();
     getData();
   }
-
-  var selectedLanguage, selectedLocale;
 
   getData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -127,11 +127,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
     }
   }
 
-  File _imageFile;
-
   void selectGallary() async {
     var file = await ImagePicker.pickImage(source: ImageSource.gallery);
-    // base64Image = base64Encode(file.readAsBytesSync());
     if (mounted) {
       setState(() {
         _imageFile = file;
@@ -162,7 +159,6 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 
   void selectCamera() async {
     var file = await ImagePicker.pickImage(source: ImageSource.camera);
-    // base64Image = base64Encode(file.readAsBytesSync());
     if (mounted) {
       setState(() {
         _imageFile = file;
@@ -209,19 +205,13 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
             isImageUploading = false;
           });
         }
-      }
-      // }
-      catch (error, stackTrace) {
+      } catch (error, stackTrace) {
         sentryError.reportError(error, stackTrace);
       }
     }).catchError((onError) {
       sentryError.reportError(onError, null);
     });
   }
-
-  String selectedLanguages, selectedLang;
-
-  List<String> languages = ['English', 'French', 'Chinese', 'Arabic'];
 
   @override
   Widget build(BuildContext context) {

@@ -33,7 +33,6 @@ class _NewPasswordState extends State<NewPassword> {
       }
       AuthService.createNewPassword({'newPass': newPassword}, widget.otpToken)
           .then((onValue) {
-        print(onValue);
         try {
           if (onValue['token'] != null) {
             showSnackbar(onValue['message']);

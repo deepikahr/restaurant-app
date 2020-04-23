@@ -1,4 +1,4 @@
-package com.example.restaurantsass;
+package com.ionicfirebaseapp.restaurantsass;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;

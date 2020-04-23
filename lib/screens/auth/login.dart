@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:RestaurantSaas/screens/mains/home.dart';
 import 'package:RestaurantSaas/services/constant.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../styles/styles.dart';
 import '../../services/auth-service.dart';
 import '../../services/common.dart';
@@ -34,10 +35,11 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-//    selectedLanguages();
   }
 
-  login() {
+  login() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
     if (_formKey.currentState.validate()) {
       if (mounted) {
         setState(() {
@@ -45,7 +47,11 @@ class _LoginPageState extends State<LoginPage> {
         });
       }
       _formKey.currentState.save();
-      Map<String, dynamic> body = {'email': email, 'password': password};
+      Map<String, dynamic> body = {
+        'email': email,
+        'password': password,
+        "playerId": prefs.getString("playerId")
+      };
       AuthService.login(body).then((onValue) {
         try {
           if (onValue['message'] != null) {
@@ -57,19 +63,17 @@ class _LoginPageState extends State<LoginPage> {
                 showSnackbar(MyLocalizations.of(context).loginSuccessful);
                 Future.delayed(Duration(milliseconds: 1500), () {
                   if (widget.isDrawe == true) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (BuildContext context) => HomePage(
-                            locale: widget.locale,
-                            localizedValues: widget.localizedValues),
-                      ),
-                    );
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (BuildContext context) => HomePage(
+                              locale: widget.locale,
+                              localizedValues: widget.localizedValues),
+                        ),
+                        (Route<dynamic> route) => route.isFirst);
                   } else {
                     Navigator.of(context).pop(
                       MyLocalizations.of(context).success,
-                      // locale: widget.locale,
-                      // localizedValues: widget.localizedValues,
                     );
                   }
                 });
