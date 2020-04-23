@@ -15,7 +15,6 @@ class ThankYou extends StatefulWidget {
 class _ThankYouState extends State<ThankYou> {
   @override
   void initState() {
-    // selectedLanguages();
     super.initState();
   }
 

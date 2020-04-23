@@ -140,6 +140,7 @@ class ProfileService {
     await Common.getToken().then((onValue) {
       token = 'bearer ' + onValue;
     });
+    print(token);
     final response = await client.post(API_ENDPOINT + 'orders',
         headers: {'Content-Type': 'application/json', 'Authorization': token},
         body: json.encode(body));

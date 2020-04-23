@@ -24,7 +24,7 @@ class _FavoritesState extends State<Favorites> {
       GlobalKey<AsyncLoaderState>();
 
   bool isProcessing = false;
-  String selectedItemId;
+  String selectedItemId, currency = '';
 
   getFavouriteList() async {
     return await ProfileService.getFavouritList();
@@ -35,8 +35,6 @@ class _FavoritesState extends State<Favorites> {
     super.initState();
     getGlobalSettingsData();
   }
-
-  String currency = '';
 
   getGlobalSettingsData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -101,12 +99,11 @@ class _FavoritesState extends State<Favorites> {
               context,
               MaterialPageRoute(
                 builder: (BuildContext context) => ProductDetailsPage(
-                    product: favs[index]['product'],
-                    restaurantName: favs[index]['restaurantID']
-                        ['restaurantName'],
-                    restaurantId: favs[index]['restaurantID']['_id'],
-                    locationInfo: favs[index]['location'],
-                    taxInfo: favs[index]['restaurantID']['taxInfo']),
+                  product: favs[index]['product'],
+                  restaurantName: favs[index]['restaurantID']['restaurantName'],
+                  restaurantId: favs[index]['restaurantID']['_id'],
+                  locationInfo: favs[index]['location'],
+                ),
               ),
             );
           },

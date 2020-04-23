@@ -26,8 +26,7 @@ class DrawerPage extends StatefulWidget {
 
 class _DrawerPageState extends State<DrawerPage> {
   int cartCounter;
-  String profilePic;
-  String fullname;
+  String profilePic, fullname;
   bool isLoggedIn = false;
 
   @override
@@ -215,25 +214,27 @@ class _DrawerPageState extends State<DrawerPage> {
 
   Widget _buildMenuProfileLogo(String imgUrl) {
     return Padding(
-        padding: EdgeInsets.only(top: 30.0, bottom: 20.0),
-        child: imgUrl == null
-            ? Image.asset(
-                'lib/assets/imgs/na.jpg',
-                width: 150.0,
-                height: 50.0,
-              )
-            : Container(
-                padding: EdgeInsets.only(
-                  left: 20.0,
-                  right: 20.0,
+      padding: EdgeInsets.only(top: 30.0, bottom: 20.0),
+      child: imgUrl == null
+          ? Image.asset(
+              'lib/assets/imgs/na.jpg',
+              width: 150.0,
+              height: 50.0,
+            )
+          : Container(
+              padding: EdgeInsets.only(
+                left: 20.0,
+                right: 20.0,
+              ),
+              height: 90.0,
+              width: 130.0,
+              child: new CircleAvatar(
+                backgroundImage: new NetworkImage(
+                  "$imgUrl",
                 ),
-                height: 90.0,
-                width: 130.0,
-                child: new CircleAvatar(
-                  backgroundImage: new NetworkImage(
-                    "$imgUrl",
-                  ),
-                )));
+              ),
+            ),
+    );
   }
 
   Widget _buildMenuTileList(String icon, String name, int count,
@@ -298,7 +299,6 @@ class _DrawerPageState extends State<DrawerPage> {
                     child: Text(
                       count.toString(),
                       textAlign: TextAlign.center,
-                      // style: hintStyleLightOSB(),
                     ),
                   ),
                 )

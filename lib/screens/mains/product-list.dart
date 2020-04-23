@@ -140,7 +140,7 @@ class _ProductListPageState extends State<ProductListPage> {
                   children: <Widget>[
                     _buildCategoryTitle(
                         data['categorydata'][index]['categoryTitle'],
-                        null,
+                        data['categorydata'][index]['categoryImageUrl'],
                         data['categorydata'][index]['product']),
                   ],
                 );
@@ -422,11 +422,11 @@ class _ProductListPageState extends State<ProductListPage> {
   //                 widget.deliveryInfo['freeDelivery'] &&
   //                 widget.deliveryInfo['amountEligibility'] != null)
   //             ? MyLocalizations.of(context).freeDeliveryAbove +
-  //                 ' \$ ${widget.deliveryInfo['amountEligibility'].toString()}'
+  //                 ' $currency ${widget.deliveryInfo['amountEligibility'].toString()}'
   //             : (widget.deliveryInfo != null &&
   //                     !widget.deliveryInfo['freeDelivery'])
   //                 ? MyLocalizations.of(context).deliveryChargesOnly +
-  //                     ' \$ ${widget.deliveryInfo['deliveryCharges'].toString()}'
+  //                     ' $currency ${widget.deliveryInfo['deliveryCharges'].toString()}'
   //                 : MyLocalizations.of(context).freeDeliveryAvailable,
   //         style: hintStyleSmallWhiteLightOSL(),
   //       ),
@@ -469,12 +469,12 @@ class _ProductListPageState extends State<ProductListPage> {
                     widget.deliveryInfo['freeDelivery'] &&
                     widget.deliveryInfo['amountEligibility'] != null)
                 ? MyLocalizations.of(context).freedeliveryabove +
-                    ' \$' +
+                    ' $currency' +
                     widget.deliveryInfo['amountEligibility'].toString()
                 : (widget.deliveryInfo != null &&
                         !widget.deliveryInfo['freeDelivery'])
                     ? MyLocalizations.of(context).deliveryCharges +
-                        ': Only \$' +
+                        ': Only $currency' +
                         widget.deliveryInfo['deliveryCharges'].toString()
                     : MyLocalizations.of(context).freedeliveryavailable,
             style: hintStyleSmallWhiteLightOSL(),
@@ -489,18 +489,23 @@ class _ProductListPageState extends State<ProductListPage> {
     return Column(
       children: [
         ExpansionTile(
-          trailing: Container(
-              height: 70.0,
-              width: 80.0,
-              child: imgUrl != null
-                  ? Image.network(
-                      imgUrl,
-                      fit: BoxFit.fill,
-                    )
-                  : Icon(
-                      Icons.collections_bookmark,
-                      color: Colors.black87,
-                    )),
+          trailing: Padding(
+            padding: const EdgeInsets.all(5.0),
+            child: Container(
+                decoration:
+                    BoxDecoration(border: Border.all(color: primaryLight)),
+                height: 70.0,
+                width: 70.0,
+                child: imgUrl != null
+                    ? Image.network(
+                        imgUrl,
+                        fit: BoxFit.fill,
+                      )
+                    : Icon(
+                        Icons.collections_bookmark,
+                        color: Colors.black87,
+                      )),
+          ),
           children: [
             ListView.builder(
                 physics: ScrollPhysics(),
