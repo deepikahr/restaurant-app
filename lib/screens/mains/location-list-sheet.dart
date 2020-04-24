@@ -125,7 +125,8 @@ class LocationListSheet extends StatelessWidget {
     double rating = double.parse(data[index]['location']['rating'].toString());
     dynamic cuisine = data[index]['location']['cuisine'];
     String deliveryTime, deliveryChargeText, freeDeliveryText;
-    if (data[index]['location']['deliveryInfo'] == null ||
+
+    if (data[index]['location']['deliveryInfo'] == null &&
         data[index]['location']['deliveryInfo']['deliveryInfo'] == null) {
       deliveryTime = deliveryChargeText = freeDeliveryText = null;
     } else {

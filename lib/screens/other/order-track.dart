@@ -168,8 +168,8 @@ class OrderTrackState extends State<OrderTrack> {
                                   height: 10.0,
                                   margin: EdgeInsets.only(left: 9.0, top: 5.0),
                                   decoration: new BoxDecoration(
-                                    border: Border.all(color: Colors.grey),
-                                    color: Colors.grey,
+                                    border: Border.all(color: PRIMARY),
+                                    color: PRIMARY,
                                   ),
                                 ),
                               ],
@@ -193,7 +193,9 @@ class OrderTrackState extends State<OrderTrack> {
                                 new Text(
                                   DateFormat('dd-MMM-yy hh:mm a').format(
                                       new DateTime.fromMillisecondsSinceEpoch(
-                                          order['createdAtTime'] ?? 0)),
+                                          order['userNotification'][index]
+                                                  ['time'] ??
+                                              0)),
                                   style: textOS(),
                                 ),
                               ],

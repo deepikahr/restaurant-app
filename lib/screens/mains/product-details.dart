@@ -392,7 +392,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               ? NetworkImage(imgUrl)
               : AssetImage("lib/assets/headers/menu.png"),
           fit: BoxFit.fill,
-          height: 150.0,
+          height: 200.0,
         ),
         isLoggedIn
             ? Positioned(

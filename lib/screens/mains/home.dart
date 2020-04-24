@@ -230,36 +230,36 @@ class HomePageState extends State<HomePage> {
   }
 
   getNearByRestaurants() async {
-    if (!isNearByRestaurants) {
-      currentLocation = await _location.getLocation();
-      final coordinates =
-          new Coordinates(currentLocation.latitude, currentLocation.longitude);
-      var addresses =
-          await Geocoder.local.findAddressesFromCoordinates(coordinates);
-      var first = addresses.first;
-      addressData = first.addressLine;
-      if (addressData != null && mounted) {
-        setState(() {
-          position = {
-            'lat': currentLocation.latitude,
-            'long': currentLocation.longitude,
-            'name': addressData
-          };
-        });
-        await Common.savePositionInfo(position).then((onValue) {});
-      }
-
-      if (isFirstStart) {
-        await Future.delayed(Duration(milliseconds: 5000), () {});
-        isFirstStart = false;
-      }
-      if (position != null) {
-        return await MainService.getNearByRestaurants(
-            position['lat'], position['long'],
-            count: itemCount);
-      }
-      return first;
+    // if (!isNearByRestaurants) {
+    currentLocation = await _location.getLocation();
+    // final coordinates =
+    //     new Coordinates(currentLocation.latitude, currentLocation.longitude);
+    // var addresses =
+    //     await Geocoder.local.findAddressesFromCoordinates(coordinates);
+    // var first = addresses.first;
+    // addressData = first.addressLine;
+    if (currentLocation != null && mounted) {
+      setState(() {
+        position = {
+          'lat': currentLocation.latitude,
+          'long': currentLocation.longitude,
+          'name': addressData
+        };
+      });
+      await Common.savePositionInfo(position).then((onValue) {});
     }
+
+    if (isFirstStart) {
+      await Future.delayed(Duration(milliseconds: 5000), () {});
+      isFirstStart = false;
+    }
+    if (position != null) {
+      return await MainService.getNearByRestaurants(
+          position['lat'], position['long'],
+          count: itemCount);
+    }
+    // return first;
+    // }
   }
 
   getTopRatedRestaurants() async {
