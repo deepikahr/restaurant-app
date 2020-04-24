@@ -33,7 +33,7 @@ class PaymentMethod extends StatefulWidget {
 }
 
 class _PaymentMethodState extends State<PaymentMethod> {
-  int selectedPaymentIndex = 0, groupValue;
+  int groupValue;
   List cardList, paymentMethodList;
   bool isPaymentMethodLoading = false,
       paymentMethodAvaiilable = true,
@@ -119,81 +119,109 @@ class _PaymentMethodState extends State<PaymentMethod> {
   }
 
   void _orderInfo() {
-    print(widget.cart['paymentOption']);
-
-    if (widget.cart['paymentOption'] == 'CREDIT CARD') {
-      StripePayment.paymentRequestWithCardForm(CardFormPaymentRequest())
-          .then((pm) {
-        setState(() {
-          _paymentMethodId = pm.id;
-
-          widget.cart['createdAtTime'] = DateTime.now().millisecondsSinceEpoch;
-          widget.cart['restaurant'] =
-              widget.cart['productDetails'][0]['restaurant'];
-          widget.cart['restaurantID'] =
-              widget.cart['productDetails'][0]['restaurantID'];
-          widget.cart['paymentMethodId'] = _paymentMethodId;
-          print(widget.cart['paymentMethodId']);
-
-          if (mounted) {
-            setState(() {
-              isPlaceOrderLoading = true;
-            });
-          }
-
-          ProfileService.placeOrder(widget.cart).then((onValue) {
-            print(onValue);
-            if (mounted) {
-              setState(() {
-                isPlaceOrderLoading = false;
-              });
-            }
-            if (onValue['statusCode'] == 200) {
-              Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => ThankYou(
-                        locale: widget.locale,
-                        localizedValues: widget.localizedValues),
-                  ),
-                  (Route<dynamic> route) => route.isFirst);
-            } else {
-              showAlertMessageCardError(onValue['message']);
-            }
-          });
-        });
-      }).catchError((e) {
-        showAlertMessageCardError(e.toString());
-      });
-    } else if (widget.cart['paymentOption'] == 'COD') {
-      widget.cart['createdAtTime'] = DateTime.now().millisecondsSinceEpoch;
-      widget.cart['restaurant'] =
-          widget.cart['productDetails'][0]['restaurant'];
-      widget.cart['restaurantID'] =
-          widget.cart['productDetails'][0]['restaurantID'];
-      widget.cart['paymentMethodId'] = null;
-
-      if (mounted) {
-        setState(() {
-          isPlaceOrderLoading = true;
-        });
-      }
-      ProfileService.placeOrder(widget.cart).then((onValue) {
-        if (mounted) {
-          setState(() {
-            isPlaceOrderLoading = false;
-          });
-        }
-        Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(
-              builder: (BuildContext context) => ThankYou(
-                locale: widget.locale,
-                localizedValues: widget.localizedValues,
+    if (groupValue == null) {
+      showDialog<Null>(
+        context: context,
+        barrierDismissible: false, // user must tap button!
+        builder: (BuildContext context) {
+          return new AlertDialog(
+            content: new SingleChildScrollView(
+              child: new ListBody(
+                children: <Widget>[
+                  new Text("Select Payment Method"),
+                ],
               ),
             ),
-            (Route<dynamic> route) => route.isFirst);
-      });
+            actions: <Widget>[
+              new FlatButton(
+                child: new Text(MyLocalizations.of(context).ok),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      print(widget.cart['paymentOption']);
+
+      if (widget.cart['paymentOption'] == 'STRIPE') {
+        StripePayment.paymentRequestWithCardForm(CardFormPaymentRequest())
+            .then((pm) {
+          setState(() {
+            _paymentMethodId = pm.id;
+
+            widget.cart['createdAtTime'] =
+                DateTime.now().millisecondsSinceEpoch;
+            widget.cart['restaurant'] =
+                widget.cart['productDetails'][0]['restaurant'];
+            widget.cart['restaurantID'] =
+                widget.cart['productDetails'][0]['restaurantID'];
+            widget.cart['paymentMethodId'] = _paymentMethodId;
+            print(widget.cart['paymentMethodId']);
+
+            if (mounted) {
+              setState(() {
+                isPlaceOrderLoading = true;
+              });
+            }
+            print(widget.cart);
+
+            ProfileService.placeOrder(widget.cart).then((onValue) {
+              print(onValue);
+              if (mounted) {
+                setState(() {
+                  isPlaceOrderLoading = false;
+                });
+              }
+              if (onValue['statusCode'] == 200) {
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (BuildContext context) => ThankYou(
+                          locale: widget.locale,
+                          localizedValues: widget.localizedValues),
+                    ),
+                    (Route<dynamic> route) => route.isFirst);
+              } else {
+                showAlertMessageCardError(onValue['message']);
+              }
+            });
+          });
+        }).catchError((e) {
+          showAlertMessageCardError(e.toString());
+        });
+      } else if (widget.cart['paymentOption'] == 'COD') {
+        widget.cart['createdAtTime'] = DateTime.now().millisecondsSinceEpoch;
+        widget.cart['restaurant'] =
+            widget.cart['productDetails'][0]['restaurant'];
+        widget.cart['restaurantID'] =
+            widget.cart['productDetails'][0]['restaurantID'];
+        widget.cart['paymentMethodId'] = null;
+
+        if (mounted) {
+          setState(() {
+            isPlaceOrderLoading = true;
+          });
+        }
+        ProfileService.placeOrder(widget.cart).then((onValue) {
+          if (mounted) {
+            setState(() {
+              isPlaceOrderLoading = false;
+            });
+          }
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (BuildContext context) => ThankYou(
+                  locale: widget.locale,
+                  localizedValues: widget.localizedValues,
+                ),
+              ),
+              (Route<dynamic> route) => route.isFirst);
+        });
+      }
     }
   }
 
@@ -235,12 +263,6 @@ class _PaymentMethodState extends State<PaymentMethod> {
 
   @override
   Widget build(BuildContext context) {
-    if (isFirstTime) {
-      widget.cart['paymentOption'] =
-          paymentMethodList[selectedPaymentIndex]['type'];
-      isFirstTime = false;
-    }
-
     return Scaffold(
       backgroundColor: whiteTextb,
       appBar: AppBar(
@@ -321,12 +343,12 @@ class _PaymentMethodState extends State<PaymentMethod> {
                             color: Colors.white,
                             child: RadioListTile(
                               value: index,
-                              groupValue: selectedPaymentIndex,
+                              groupValue: groupValue,
                               selected: paymentMethodList[index]['isSelected'],
                               onChanged: (int selected) {
                                 if (mounted) {
                                   setState(() {
-                                    selectedPaymentIndex = selected;
+                                    groupValue = selected;
                                     widget.cart['paymentOption'] =
                                         paymentMethodList[index]['type'];
                                   });

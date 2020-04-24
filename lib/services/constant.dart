@@ -8,10 +8,10 @@ const ONE_SIGNAL_APP_ID = '05ac6c51-8416-41ab-8779-b48503bbe125';
 const GOOGLE_API_KEY = "AIzaSyDXxt_aIn5HWQZg3gFYOqcuf8hjUuzmvKg";
 
 //api urls
-// const BASE_URL = 'http://90a43b26.ngrok.io/';
+const BASE_URL = 'http://74a05cc0.ngrok.io/';
 
 // api deploy
-const BASE_URL = 'https://restaurant-sass.herokuapp.com/';
+// const BASE_URL = 'https://restaurant-sass.herokuapp.com/';
 
 // stripe key
 const STRIPE_KEY = "pk_test_RBdAu6jIbEByY3KaBQFbH4N100nMkViv6g";
