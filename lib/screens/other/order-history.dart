@@ -55,7 +55,7 @@ class _OrderHistoryState extends State<OrderHistory>
               icon: Icons.block);
         },
         renderSuccess: ({data}) {
-          if (data is List) {
+          if (data.length > 0) {
             return OrderUpcomingState.buildOrderList(
                 data,
                 widget.isRatingAllowed,

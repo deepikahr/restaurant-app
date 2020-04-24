@@ -1333,6 +1333,9 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                 }
               } else if (widget.cart['orderType'] == 'Delivery') {
                 if (widget.cart['shippingAddress'] == null) {
+                  if (addressList.length == 0) {
+                    showSnackbar(MyLocalizations.of(context).addAddress);
+                  }
                   widget.cart['shippingAddress'] = addressList[0];
                 }
                 if (widget.deliveryInfo == null ||
