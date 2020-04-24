@@ -894,7 +894,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                                                     () {
                                                       widget.cart[
                                                               'pickupTime'] =
-                                                          DateFormat('hh:mm')
+                                                          DateFormat('hh:mm a')
                                                               .format(dt);
                                                     },
                                                   ),

@@ -52,6 +52,7 @@ class _LoginPageState extends State<LoginPage> {
         'password': password,
         "playerId": prefs.getString("playerId")
       };
+
       AuthService.login(body).then((onValue) {
         try {
           if (onValue['message'] != null) {
