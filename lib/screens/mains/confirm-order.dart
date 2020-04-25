@@ -1265,7 +1265,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                 MyLocalizations.of(context).subTotal, widget.cart['subTotal']),
             widget.cart['taxInfo'] != null
                 ? _buildTotalPriceLine(
-                    widget.cart['taxInfo']['taxName'],
+                    "Tax " + widget.cart['taxInfo']['taxName'],
                     (double.parse(
                             widget.cart['taxInfo']['taxRate'].toString()) *
                         widget.cart['subTotal'] /

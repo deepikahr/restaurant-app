@@ -259,7 +259,8 @@ class _CartPageState extends State<CartPage> {
                           MyLocalizations.of(context).subTotal, subTotal),
                       Divider(),
                       widget.taxInfo != null
-                          ? _buildPriceTagLine(widget.taxInfo['taxName'], tax)
+                          ? _buildPriceTagLine(
+                              "Tax " + widget.taxInfo['taxName'], tax)
                           : Container(height: 0, width: 0),
                       widget.taxInfo != null
                           ? Divider()
