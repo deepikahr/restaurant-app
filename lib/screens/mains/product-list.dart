@@ -1,16 +1,17 @@
-import '../../services/counter-service.dart';
-import 'package:flutter/material.dart';
 import 'package:async_loader/async_loader.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:toast/toast.dart';
+
+import '../../services/counter-service.dart';
+import '../../services/localizations.dart';
+import '../../services/main-service.dart';
+import '../../services/sentry-services.dart';
 import '../../styles/styles.dart';
 import '../../widgets/location-card.dart';
-import '../../services/main-service.dart';
 import '../../widgets/no-data.dart';
-import 'product-details.dart';
 import 'cart.dart';
-import '../../services/sentry-services.dart';
-import '../../services/localizations.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
 
@@ -55,6 +56,11 @@ class _ProductListPageState extends State<ProductListPage> {
   bool isopenAndCloseTimeLoading = false;
   int cartCount;
   String openAndCloseTime;
+
+  double price = 0;
+
+  Map<String, dynamic> cartProduct;
+
   getProductList() async {
     return await MainService.getProductsBylocationId(widget.locationId);
   }
@@ -174,6 +180,9 @@ class _ProductListPageState extends State<ProductListPage> {
                     builder: (BuildContext context) => CartPage(
                       localizedValues: widget.localizedValues,
                       locale: widget.locale,
+                      product: cartProduct,
+                      taxInfo: widget.taxInfo,
+                      locationInfo: widget.locationInfo,
                     ),
                   ),
                 );
@@ -231,33 +240,71 @@ class _ProductListPageState extends State<ProductListPage> {
           ),
         ),
       ),
-      bottomNavigationBar: GestureDetector(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (BuildContext context) => CartPage(
-                locale: widget.locale,
-                localizedValues: widget.localizedValues,
-              ),
-            ),
-          );
-        },
-        child: Container(
-          height: 50.0,
-          color: PRIMARY,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                MyLocalizations.of(context).goToCart,
-                style: subTitleWhiteBOldOSB(),
-              ),
-            ],
-          ),
-        ),
-      ),
+//      bottomNavigationBar: GestureDetector(
+//        onTap: () {
+//          Navigator.push(
+//            context,
+//            MaterialPageRoute(
+//              builder: (BuildContext context) => CartPage(
+//                locale: widget.locale,
+//                localizedValues: widget.localizedValues,
+//              ),
+//            ),
+//          );
+//        },
+//        child: Container(
+//          height: 50.0,
+//          color: PRIMARY,
+//          child: Row(
+//            mainAxisAlignment: MainAxisAlignment.center,
+//            children: <Widget>[
+//              Text(
+//                MyLocalizations.of(context).goToCart,
+//                style: subTitleWhiteBOldOSB(),
+//              ),
+//            ],
+//          ),
+//        ),
+//      ),
     );
+  }
+
+  void _calculatePrice(final Map<String, dynamic> product) {
+    price = 0;
+    Map<String, dynamic> variant = product['variants'][0];
+    price = price + variant['price'];
+
+    if (mounted) {
+      setState(() {
+        price = price * 1;
+      });
+    }
+    List<dynamic> extraIngredientsList = List<dynamic>();
+    if (product['extraIngredients'].length > 0 &&
+        product['extraIngredients'][0] != null) {
+      product['extraIngredients'].forEach((item) {
+        if (item != null && item['isSelected'] != null && item['isSelected']) {
+          price = price + item['price'];
+          extraIngredientsList.add(item);
+        }
+      });
+    }
+    cartProduct = {
+      'Discount': variant['Discount'],
+      'MRP': variant['MRP'],
+      'note': null,
+      'Quantity': 1,
+      'price': variant['price'],
+      'extraIngredients': extraIngredientsList,
+      'imageUrl': product['imageUrl'],
+      'productId': product['_id'],
+      'size': variant['size'],
+      'title': product['title'],
+      'restaurant': widget.restaurantName,
+      'restaurantID': widget.restaurantId,
+      'totalPrice': price,
+      'restaurantAddress': widget.address
+    };
   }
 
   Widget _buildBgImg() {
@@ -514,20 +561,26 @@ class _ProductListPageState extends State<ProductListPage> {
                 itemBuilder: (BuildContext context, int index) {
                   return InkWell(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (BuildContext context) => ProductDetailsPage(
-                              locale: widget.locale,
-                              localizedValues: widget.localizedValues,
-                              product: products[index],
-                              restaurantName: widget.restaurantName,
-                              restaurantId: widget.restaurantId,
-                              locationInfo: widget.locationInfo,
-                              taxInfo: widget.taxInfo,
-                              restaurantAddress: widget.address),
-                        ),
-                      );
+                      _calculatePrice(products[index]);
+                      Toast.show('Product added to Cart', context,
+                          duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+
+                      //TODO:commented for testing
+
+//                      Navigator.push(
+//                        context,
+//                        MaterialPageRoute(
+//                          builder: (BuildContext context) => ProductDetailsPage(
+//                              locale: widget.locale,
+//                              localizedValues: widget.localizedValues,
+//                              product: products[index],
+//                              restaurantName: widget.restaurantName,
+//                              restaurantId: widget.restaurantId,
+//                              locationInfo: widget.locationInfo,
+//                              taxInfo: widget.taxInfo,
+//                              restaurantAddress: widget.address),
+//                        ),
+//                      );
                     },
                     child: _buildProductTile(
                         products[index]['imgUrl'],
@@ -556,6 +609,7 @@ class _ProductListPageState extends State<ProductListPage> {
       ],
     );
   }
+
   // Widget _buildCategoryTitle(
   //     String categoryName, String imgUrl, List<dynamic> products) {
   //   return Stack(

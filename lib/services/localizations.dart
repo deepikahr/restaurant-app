@@ -1,10 +1,13 @@
 import 'dart:async' show Future;
+
 import 'package:flutter/foundation.dart' show SynchronousFuture;
 import 'package:flutter/material.dart';
+
 import 'constant.dart';
 
 class MyLocalizations {
   final Map<String, Map<String, String>> localizedValues;
+
   MyLocalizations(this.locale, this.localizedValues);
 
   final Locale locale;
@@ -752,6 +755,10 @@ class MyLocalizations {
 
   String get productRemovedFromFavourite {
     return localizedValues[locale.languageCode]['productRemovedFromFavourite'];
+  }
+
+  String get productAddedtoCart {
+    return localizedValues[locale.languageCode]['productaddedtoCart'];
   }
 
   String get productaddedtoFavourites {
