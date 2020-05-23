@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'package:RestaurantSaas/services/common.dart';
 import 'package:RestaurantSaas/services/constant.dart';
-import 'package:google_map_location_picker/google_map_location_picker.dart';
+import 'package:flutter_map_picker/flutter_map_picker.dart';
+// import 'package:google_map_location_picker/google_map_location_picker.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../services/localizations.dart';
@@ -1133,24 +1133,31 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                     Divider(),
                     InkWell(
                       onTap: () async {
-                        LocationResult result = await showLocationPicker(
+                        PlacePickerResult pickerResult = await Navigator.push(
                           context,
-                          GOOGLE_API_KEY,
-                          initialCenter: LatLng(31.1975844, 29.9598339),
-                          myLocationButtonEnabled: true,
-                          layersButtonEnabled: true,
+                          MaterialPageRoute(
+                            builder: (context) => PlacePickerScreen(
+                              googlePlacesApiKey: GOOGLE_API_KEY,
+                              initialPosition: LatLng(31.1975844, 29.9598339),
+                              mainColor: primaryLight,
+                              mapStrings: MapPickerStrings.english(),
+                              placeAutoCompleteLanguage: widget.locale,
+                            ),
+                          ),
                         );
-
                         await Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (BuildContext context) => AddAddressPage(
                                 localizedValues: widget.localizedValues,
                                 locale: widget.locale,
-                                loactionAddress: result),
+                                loactionAddress: {
+                                  'address': pickerResult.address.toString(),
+                                  'lat': pickerResult.latLng.latitude,
+                                  'long': pickerResult.latLng.longitude
+                                }),
                           ),
                         );
-
                         _getAddressList();
                       },
                       child: Row(

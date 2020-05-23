@@ -5,7 +5,7 @@ const APP_NAME = 'Restaurant Saas';
 const ONE_SIGNAL_APP_ID = '05ac6c51-8416-41ab-8779-b48503bbe125';
 
 // google api key
-const GOOGLE_API_KEY = "AIzaSyDXxt_aIn5HWQZg3gFYOqcuf8hjUuzmvKg";
+const GOOGLE_API_KEY = "AIzaSyBAwPGO0nO-z1aXVgEJg5G_XRAo6RnepSw";
 
 //api urls
 // const BASE_URL = 'http://74a05cc0.ngrok.io/';

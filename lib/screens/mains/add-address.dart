@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_map_location_picker/google_map_location_picker.dart';
+// import 'package:google_map_location_picker/google_map_location_picker.dart';
 import '../../styles/styles.dart';
 import '../../services/profile-service.dart';
 import '../../services/sentry-services.dart';
@@ -10,13 +10,15 @@ SentryError sentryError = new SentryError();
 class AddAddressPage extends StatefulWidget {
   final Map<String, Map<String, String>> localizedValues;
   final String locale;
-  final LocationResult loactionAddress;
+  final Map<String, dynamic> loactionAddress;
   AddAddressPage(
       {Key key, this.locale, this.localizedValues, this.loactionAddress})
       : super(key: key);
   @override
   _AddAddressPageState createState() => _AddAddressPageState();
 }
+
+class LocationResult {}
 
 class _AddAddressPageState extends State<AddAddressPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -49,10 +51,10 @@ class _AddAddressPageState extends State<AddAddressPage> {
           isLoading = true;
         });
       }
-      address['address'] = widget.loactionAddress.address;
+      address['address'] = widget.loactionAddress['address'];
       var location = {
-        "lat": widget.loactionAddress.latLng.latitude,
-        "long": widget.loactionAddress.latLng.longitude
+        "lat": widget.loactionAddress['lat'],
+        "long": widget.loactionAddress['long']
       };
       address['location'] = location;
       address['addressType'] = addressType[
@@ -142,7 +144,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                                   ),
                                 ),
                                 child: new Text(
-                                  widget.loactionAddress.address,
+                                  widget.loactionAddress['address'],
                                 ),
                               ),
                             )
