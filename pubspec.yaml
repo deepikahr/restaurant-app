@@ -23,9 +23,8 @@ dependencies:
   toast: ^0.1.5
   sentry: ^3.0.1
   flutter_datetime_picker: ^1.3.5
-  # google_map_location_picker: ^3.2.1+2
   flutter_map_picker: ^0.1.2
-  stripe_payment: ^1.0.6
+  stripe_payment: ^1.0.7
   flutter_localizations:
     sdk: flutter
 
