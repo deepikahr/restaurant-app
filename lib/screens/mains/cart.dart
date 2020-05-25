@@ -1,15 +1,17 @@
 import 'dart:async';
-import '../../services/counter-service.dart';
+
 import 'package:flutter/material.dart';
-import '../../styles/styles.dart';
-import 'confirm-order.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../services/common.dart';
+import '../../services/counter-service.dart';
+import '../../services/localizations.dart';
+import '../../services/sentry-services.dart';
+import '../../styles/styles.dart';
 import '../../widgets/no-data.dart';
 import '../auth/login.dart';
 import '../other/coupons-list.dart';
-import '../../services/sentry-services.dart';
-import '../../services/localizations.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'confirm-order.dart';
 
 SentryError sentryError = new SentryError();
 
@@ -18,6 +20,7 @@ class CartPage extends StatefulWidget {
   final Map<String, Map<String, String>> localizedValues;
   final String locale;
   final Map<String, dynamic> tableInfo;
+
   CartPage(
       {Key key,
       this.product,
@@ -80,11 +83,17 @@ class _CartPageState extends State<CartPage> {
       cart = onValue;
     });
 
+    await Common.getProducts().then((value) {
+      products = value != null ? value : [];
+      print(products.toString());
+    });
+
     // [2] add new product to cart products list. remove first if already available
-    products = cart != null ? cart['productDetails'] : [];
+//    products = cart != null ? cart['productDetails'] : [];
     if (widget.product != null) {
       int currentIndex;
       for (int i = 0; i < products.length; i++) {
+        print(products.toString());
         if (products[i]['productId'] == widget.product['productId']) {
           if (products[i]['size'] == widget.product['size']) {
             currentIndex = i;
@@ -93,6 +102,7 @@ class _CartPageState extends State<CartPage> {
       }
       if (currentIndex != null) products.removeAt(currentIndex);
       products.add(widget.product);
+      print('after adding products ${products.toString()}');
     }
 
     // [3] calculate sub total
@@ -194,6 +204,7 @@ class _CartPageState extends State<CartPage> {
   }
 
   int cartCount;
+
   @override
   Widget build(BuildContext context) {
     if (widget.taxInfo != null && widget.taxInfo['taxName'] == null) {

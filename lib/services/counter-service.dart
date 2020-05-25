@@ -8,10 +8,10 @@ class CounterService with ChangeNotifier {
   int cartCounter = 0;
 
   getCounter() async {
-    await Common.getCart().then((onValue) {
+    await Common.getProducts().then((onValue) {
       try {
         if (onValue != null) {
-          cartCounter = onValue['productDetails'].length;
+          cartCounter = onValue.length;
         } else {
           cartCounter = 0;
         }

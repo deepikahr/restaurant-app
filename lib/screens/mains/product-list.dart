@@ -1,3 +1,4 @@
+import 'package:RestaurantSaas/screens/mains/product-details.dart';
 import 'package:async_loader/async_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -561,26 +562,26 @@ class _ProductListPageState extends State<ProductListPage> {
                 itemBuilder: (BuildContext context, int index) {
                   return InkWell(
                     onTap: () {
-                      _calculatePrice(products[index]);
-                      Toast.show('Product added to Cart', context,
-                          duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+//                      _calculatePrice(products[index]);
+//                      Toast.show('Product added to Cart', context,
+//                          duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
 
                       //TODO:commented for testing
 
-//                      Navigator.push(
-//                        context,
-//                        MaterialPageRoute(
-//                          builder: (BuildContext context) => ProductDetailsPage(
-//                              locale: widget.locale,
-//                              localizedValues: widget.localizedValues,
-//                              product: products[index],
-//                              restaurantName: widget.restaurantName,
-//                              restaurantId: widget.restaurantId,
-//                              locationInfo: widget.locationInfo,
-//                              taxInfo: widget.taxInfo,
-//                              restaurantAddress: widget.address),
-//                        ),
-//                      );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (BuildContext context) => ProductDetailsPage(
+                              locale: widget.locale,
+                              localizedValues: widget.localizedValues,
+                              product: products[index],
+                              restaurantName: widget.restaurantName,
+                              restaurantId: widget.restaurantId,
+                              locationInfo: widget.locationInfo,
+                              taxInfo: widget.taxInfo,
+                              restaurantAddress: widget.address),
+                        ),
+                      );
                     },
                     child: _buildProductTile(
                         products[index]['imgUrl'],
