@@ -670,6 +670,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
   void _goToCart() async {
     addProduct();
+    //TODO: commented for testing
 //    Navigator.push(
 //      context,
 //      MaterialPageRoute(
@@ -739,6 +740,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         });
       } else {
         tempProducts.add(cartProduct);
+      }
+      try {
         Common.addProduct(tempProducts).then((value) {
           setState(() {
             isAdded = true;
@@ -747,8 +750,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
           print(value.toString());
         });
-      }
-      try {} catch (error, stackTrace) {
+      } catch (error, stackTrace) {
         sentryError.reportError(error, stackTrace);
       }
     }).catchError((onError) {
