@@ -41,6 +41,8 @@ class MainService {
   static Future<dynamic> getLocationsByRestaurantId(String id) async {
     final response =
         await client.get(API_ENDPOINT + 'locations/list/by/restaurant/$id');
+    print('response body ');
+    print(json.decode(response.body));
     return json.decode(response.body);
   }
 

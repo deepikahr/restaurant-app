@@ -64,6 +64,8 @@ class _ProductListPageState extends State<ProductListPage> {
     getRestaurantOpenAndCloseTime();
     super.initState();
     getGlobalSettingsData();
+    print('llllpppppp');
+    print(widget.deliveryInfo);
   }
 
   String currency = '';
