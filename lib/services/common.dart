@@ -16,6 +16,21 @@ class Common {
     return Future(() => prefs.getString('token'));
   }
 
+  static Future<bool> addProduct(List<dynamic> products) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setString('product', json.encode(products));
+  }
+
+  static Future<List<dynamic>> getProducts() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String products = prefs.getString("product");
+    try {
+      return json.decode(products) as List<dynamic>;
+    } catch (err) {
+      return Future(() => null);
+    }
+  }
+
   // remove token from storage
   static Future<bool> removeToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

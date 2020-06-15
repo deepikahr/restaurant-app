@@ -297,6 +297,10 @@ class MyLocalizations {
     return localizedValues[locale.languageCode]['usersReview'];
   }
 
+  String get producthasbeenaddedtocart {
+    return localizedValues[locale.languageCode]['producthasbeenaddedtocart'];
+  }
+
   String get outletsDelivering {
     return localizedValues[locale.languageCode]['outletsDelivering'];
   }
