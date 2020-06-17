@@ -118,7 +118,7 @@ class _LoginPageState extends State<LoginPage> {
         child: Stack(
           fit: StackFit.expand,
           children: <Widget>[
-//            buildLoginPageBg(),
+            buildLoginPageBg(),
             SingleChildScrollView(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

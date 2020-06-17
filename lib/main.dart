@@ -1,22 +1,19 @@
+import 'dart:async';
+
 import 'package:RestaurantSaas/services/auth-service.dart';
 import 'package:RestaurantSaas/services/common.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
-
-import 'services/initialize_i18n.dart';
-import 'services/localizations.dart';
-
-import './styles/styles.dart';
-import './services/constant.dart';
-import 'screens/mains/home.dart';
-
-import './services/sentry-services.dart';
-import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import './services/constant.dart';
+import './services/sentry-services.dart';
+import './styles/styles.dart';
+import 'screens/mains/home.dart';
 import 'services/constant.dart';
+import 'services/initialize_i18n.dart';
+import 'services/localizations.dart';
 
 bool get isInDebugMode {
   bool inDebugMode = false;
@@ -52,7 +49,8 @@ void tokenCheck() {
   Common.getToken().then((tokenVerification) async {
     if (tokenVerification != null) {
       AuthService.verifyTokenOTP(tokenVerification).then((verifyInfo) async {
-        if (verifyInfo['success'] == true) {} else {
+        if (verifyInfo['success'] == true) {
+        } else {
           Common.removeToken().then((removeVerification) async {});
         }
       });
