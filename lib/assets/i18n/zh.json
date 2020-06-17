@@ -211,5 +211,19 @@
   "addressType": "地址类型",
   "choosefromphotos": "从照片中选择",
   "takephoto": "拍照",
-  "removephoto": "删除照片"
+  "removephoto": "删除照片",
+  "tax": "稅",
+  "work": "工作",
+  "others": "其他",
+  "producthasbeenaddedtocart": "產品已添加到購物車",
+  "addToCart": "添加到購物車",
+  "items": "物品",
+  "quantity": "數量",
+  "useLoyaltyPoints": "使用會員積分",
+  "enableTogetlocation": "啟用獲取位置！",
+  "gPSsettings": "使用您的設備位置時出現問題。請檢查您的GPS設置",
+  "selectPaymentMethod": "選擇付款方式",
+  "yourProfileSuccessfullyUpdated": "您的個人資料已成功更新",
+  "yourProfilePictureSuccessfullyUpdated": "您的個人資料照片已成功更新",
+  "pleaseCheckInternetConnection": "請檢查您的互聯網連接"
 }
