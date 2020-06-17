@@ -192,7 +192,7 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
 
     // [5] calculate delivery charge
     Map<String, dynamic> deliveryInfo = (widget.locationInfo != null &&
-        widget.locationInfo['deliveryInfo'] != null)
+            widget.locationInfo['deliveryInfo'] != null)
         ? widget.locationInfo['deliveryInfo']['deliveryInfo']
         : null;
     if (deliveryInfo != null) {
@@ -218,7 +218,7 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
       'deliveryCharge': deliveryCharge,
       'grandTotal': grandTotal,
       'location':
-      widget.locationInfo != null ? widget.locationInfo['_id'] : null,
+          widget.locationInfo != null ? widget.locationInfo['_id'] : null,
       'locationName': widget.locationInfo != null
           ? widget.locationInfo['locationName']
           : null,
@@ -265,7 +265,7 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Text(
-                    "Quantity" + ' :',
+                    '${MyLocalizations.of(context).quantity} +  :',
                     style: titleBold(),
                   ),
                   Container(
@@ -324,27 +324,27 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
             SizedBox(height: 5),
             widget.product['variants'].length > 0
                 ? _buildSingleSelectionBlock(widget.product['variants'],
-                selectedSizeIndex, widget.currency)
+                    selectedSizeIndex, widget.currency)
                 : Container(
-              height: 0.0,
-              width: 0.0,
-            ),
+                    height: 0.0,
+                    width: 0.0,
+                  ),
             Padding(
               padding: EdgeInsets.only(bottom: 5.0),
               child: widget.product['extraIngredients'].length > 0
                   ? _buildHeadingBlock(
-                MyLocalizations.of(context).extra,
-                MyLocalizations.of(context)
-                    .whichextraingredientswouldyouliketoadd,
-              )
+                      MyLocalizations.of(context).extra,
+                      MyLocalizations.of(context)
+                          .whichextraingredientswouldyouliketoadd,
+                    )
                   : Container(
-                height: 0.0,
-                width: 0.0,
-              ),
+                      height: 0.0,
+                      width: 0.0,
+                    ),
             ),
             widget.product['extraIngredients'] != null
                 ? _buildMultiSelectionBlock(
-                widget.product['extraIngredients'], currency)
+                    widget.product['extraIngredients'], currency)
                 : Container(),
           ],
         ),
@@ -385,7 +385,8 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
                                 style: titleLightWhiteOSS(),
                               ),
                               TextSpan(
-                                  text: 'items', style: titleLightWhiteOSS()),
+                                  text: MyLocalizations.of(context).items,
+                                  style: titleLightWhiteOSS()),
                             ],
                           ),
                         ),
@@ -404,7 +405,7 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
                 Padding(
                   padding: const EdgeInsets.only(left: 0.0),
                   child: new Text(
-                    'Add to Cart',
+                    MyLocalizations.of(context).addToCart,
                     style: smallTitleWhiteOSR(),
                   ),
                 ),
@@ -486,16 +487,16 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
               activeColor: PRIMARY,
               title: sizes[index]['size'] != null
                   ? new Text(
-                sizes[index]['size'],
-                style: hintStyleSmallDarkLightOSR(),
-              )
+                      sizes[index]['size'],
+                      style: hintStyleSmallDarkLightOSR(),
+                    )
                   : Text(''),
               secondary: sizes[index]['price'] != null
                   ? new Text(
-                currency + sizes[index]['price'].toStringAsFixed(2),
-                textAlign: TextAlign.end,
-                style: hintStyleTitleBlueOSR(),
-              )
+                      currency + sizes[index]['price'].toStringAsFixed(2),
+                      textAlign: TextAlign.end,
+                      style: hintStyleTitleBlueOSR(),
+                    )
                   : Text(''),
             ),
           );
@@ -515,52 +516,52 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
             extras[index]['isSelected'] = false;
           return extras[index] != null
               ? Container(
-            color: Colors.white,
-            width: screenWidth(context),
-            child: Padding(
-              padding: EdgeInsets.only(left: 10.0),
-              child: Row(
-                children: <Widget>[
-                  Checkbox(
-                    value: extras[index]['isSelected'],
-                    onChanged: (bool value) {
-                      if (mounted) {
-                        setState(() {
-                          extras[index]['isSelected'] =
-                          !extras[index]['isSelected'];
-                        });
-                        calculatePrice(widget.product);
-                      }
-                    },
-                    activeColor: PRIMARY,
+                  color: Colors.white,
+                  width: screenWidth(context),
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 10.0),
+                    child: Row(
+                      children: <Widget>[
+                        Checkbox(
+                          value: extras[index]['isSelected'],
+                          onChanged: (bool value) {
+                            if (mounted) {
+                              setState(() {
+                                extras[index]['isSelected'] =
+                                    !extras[index]['isSelected'];
+                              });
+                              calculatePrice(widget.product);
+                            }
+                          },
+                          activeColor: PRIMARY,
+                        ),
+                        Text(
+                          extras[index]['name'] != null
+                              ? extras[index]['name']
+                              : '',
+                          style: hintStyleSmallDarkLightOSR(),
+                        ),
+                        Expanded(
+                          child: Padding(
+                              padding: const EdgeInsets.only(right: 15.0),
+                              child: new Text(
+                                currency +
+                                    (extras[index]['price']).toStringAsFixed(2),
+                                textAlign: TextAlign.end,
+                                style: hintStyleTitleBlueOSR(),
+                              )),
+                        ),
+                      ],
+                    ),
                   ),
-                  Text(
-                    extras[index]['name'] != null
-                        ? extras[index]['name']
-                        : '',
-                    style: hintStyleSmallDarkLightOSR(),
-                  ),
-                  Expanded(
-                    child: Padding(
-                        padding: const EdgeInsets.only(right: 15.0),
-                        child: new Text(
-                          currency +
-                              (extras[index]['price']).toStringAsFixed(2),
-                          textAlign: TextAlign.end,
-                          style: hintStyleTitleBlueOSR(),
-                        )),
-                  ),
-                ],
-              ),
-            ),
-          )
+                )
               : Container(
-            color: Colors.white,
-            width: screenWidth(context),
-            child: Padding(
-              padding: EdgeInsets.only(left: 10.0),
-            ),
-          );
+                  color: Colors.white,
+                  width: screenWidth(context),
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 10.0),
+                  ),
+                );
         },
       ),
     );

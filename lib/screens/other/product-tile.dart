@@ -123,7 +123,7 @@ class _BuildProductTileState extends State<BuildProductTile> {
                   : Container(
                       decoration: BoxDecoration(
                           color: Colors.grey[300],
-                          borderRadius: BorderRadius.circular(15.0)),
+                          borderRadius: BorderRadius.circular(20.0)),
                       height: 30,
                       width: 100,
                       child: Row(
@@ -151,7 +151,7 @@ class _BuildProductTileState extends State<BuildProductTile> {
                           ),
                           Padding(
                             padding:
-                                const EdgeInsets.only(left: 20.0, right: 20),
+                                const EdgeInsets.only(left: 18.0, right: 18),
                             child: Container(
                                 child: Text(productQuantity.toString())),
                           ),
@@ -163,7 +163,7 @@ class _BuildProductTileState extends State<BuildProductTile> {
                               height: 24,
                               decoration: BoxDecoration(
                                 color: PRIMARY,
-                                borderRadius: BorderRadius.circular(15.0),
+                                borderRadius: BorderRadius.circular(20.0),
                               ),
                               child: InkWell(
                                 onTap: () {

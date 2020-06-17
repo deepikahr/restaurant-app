@@ -113,12 +113,12 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: Colors.transparent,
+      backgroundColor: Color(0XFF303030),
       body: Container(
         child: Stack(
           fit: StackFit.expand,
           children: <Widget>[
-            buildLoginPageBg(),
+//            buildLoginPageBg(),
             SingleChildScrollView(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -150,7 +150,7 @@ class _LoginPageState extends State<LoginPage> {
     return Padding(
       padding: EdgeInsets.only(top: 70.0, bottom: 40.0),
       child: Image(
-        image: AssetImage("lib/assets/logos/logo.png"),
+        image: AssetImage("lib/assets/logos/playstore-icon.png",),
         fit: BoxFit.cover,
         width: 95.0,
       ),

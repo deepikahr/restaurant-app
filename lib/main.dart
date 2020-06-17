@@ -52,8 +52,7 @@ void tokenCheck() {
   Common.getToken().then((tokenVerification) async {
     if (tokenVerification != null) {
       AuthService.verifyTokenOTP(tokenVerification).then((verifyInfo) async {
-        if (verifyInfo['success'] == true) {
-        } else {
+        if (verifyInfo['success'] == true) {} else {
           Common.removeToken().then((removeVerification) async {});
         }
       });
@@ -92,6 +91,7 @@ Future<void> initOneSignal() async {
 class EntryPage extends StatefulWidget {
   final Map<String, Map<String, String>> localizedValues;
   final String locale;
+
   EntryPage(this.locale, this.localizedValues);
 
   @override

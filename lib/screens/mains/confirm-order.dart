@@ -1,24 +1,25 @@
 import 'dart:async';
-import 'package:RestaurantSaas/services/constant.dart';
-import 'package:flutter_map_picker/flutter_map_picker.dart';
-// import 'package:google_map_location_picker/google_map_location_picker.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'dart:core';
 
-import '../../services/localizations.dart';
 import 'package:RestaurantSaas/screens/other/thank-you.dart';
+import 'package:RestaurantSaas/services/constant.dart';
+import 'package:async_loader/async_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:flutter_map_picker/flutter_map_picker.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
+import 'package:location/location.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../services/localizations.dart';
+import '../../services/main-service.dart';
+import '../../services/profile-service.dart';
+import '../../services/sentry-services.dart';
 import '../../styles/styles.dart';
+import '../../widgets/no-data.dart';
 import 'add-address.dart';
 import 'payment-method.dart';
-import 'package:async_loader/async_loader.dart';
-import '../../widgets/no-data.dart';
-import '../../services/profile-service.dart';
-import 'dart:core';
-import '../../services/main-service.dart';
-import 'package:intl/intl.dart';
-import '../../services/sentry-services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
 
@@ -46,6 +47,8 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
   final GlobalKey<AsyncLoaderState> _asyncLoaderState =
       GlobalKey<AsyncLoaderState>();
   int selectedAddressIndex = 0;
+  LocationData currentLocation;
+  Location _location = new Location();
 
   double remainingLoyaltyPoint = 0.0,
       usedLoyaltyPoint = 0.0,
@@ -986,7 +989,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                                 activeColor: PRIMARY,
                               ),
                               Text(
-                                'Use Loyalty Points',
+                                MyLocalizations.of(context).useLoyaltyPoints,
                                 style: hintStyleSmallDarkLightOSR(),
                               ),
                               Expanded(
@@ -1098,20 +1101,11 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                                       style: subTitleDarkLightOSS(),
                                     ),
                                     new Text(
-                                      addressList[index]['flatNo'],
-                                      style: hintStyleSmallTextDarkOSR(),
-                                    ),
-                                    new Text(
                                       addressList[index]['address'],
                                       style: hintStyleSmallTextDarkOSR(),
                                     ),
                                     new Text(
                                       addressList[index]['contactNumber']
-                                          .toString(),
-                                      style: hintStyleSmallTextDarkOSR(),
-                                    ),
-                                    new Text(
-                                      addressList[index]['postalCode']
                                           .toString(),
                                       style: hintStyleSmallTextDarkOSR(),
                                     ),
@@ -1133,32 +1127,57 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                     Divider(),
                     InkWell(
                       onTap: () async {
-                        PlacePickerResult pickerResult = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => PlacePickerScreen(
-                              googlePlacesApiKey: GOOGLE_API_KEY,
-                              initialPosition: LatLng(31.1975844, 29.9598339),
-                              mainColor: primaryLight,
-                              mapStrings: MapPickerStrings.english(),
-                              placeAutoCompleteLanguage: widget.locale,
-                            ),
-                          ),
-                        );
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (BuildContext context) => AddAddressPage(
-                                localizedValues: widget.localizedValues,
-                                locale: widget.locale,
-                                loactionAddress: {
-                                  'address': pickerResult.address.toString(),
-                                  'lat': pickerResult.latLng.latitude,
-                                  'long': pickerResult.latLng.longitude
-                                }),
-                          ),
-                        );
-                        _getAddressList();
+                        currentLocation = await _location.getLocation();
+                        if (currentLocation != null) {
+                          PlacePickerResult pickerResult = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => PlacePickerScreen(
+                                        googlePlacesApiKey: GOOGLE_API_KEY,
+                                        initialPosition: LatLng(
+                                            currentLocation.latitude,
+                                            currentLocation.longitude),
+                                        mainColor: PRIMARY,
+                                        mapStrings: MapPickerStrings.english(
+                                            cancel: MyLocalizations.of(context)
+                                                .cancel,
+                                            selectAddress:
+                                                MyLocalizations.of(context)
+                                                    .selectAddress,
+                                            address: MyLocalizations.of(context)
+                                                .address),
+                                        placeAutoCompleteLanguage:
+                                            widget.locale,
+                                      )));
+                          if (pickerResult != null) {
+                            setState(() {
+                              var result = Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      AddAddressPage(
+                                          localizedValues:
+                                              widget.localizedValues,
+                                          locale: widget.locale,
+                                          loactionAddress: {
+                                        'address':
+                                            pickerResult.address.toString(),
+                                        'lat': pickerResult.latLng.latitude,
+                                        'long': pickerResult.latLng.longitude
+                                      }),
+                                ),
+                              );
+                              result.then((res) {
+                                _getAddressList();
+                                _getUserInfo();
+                              });
+                            });
+                          }
+                        } else {
+                          showError(
+                              MyLocalizations.of(context).enableTogetlocation,
+                              MyLocalizations.of(context).gPSsettings);
+                        }
                       },
                       child: Row(
                         children: <Widget>[
@@ -1549,5 +1568,66 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
       duration: Duration(milliseconds: 3000),
     );
     _scaffoldKey.currentState.showSnackBar(snackBar);
+  }
+
+  showError(error, message) async {
+    showDialog<Null>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          contentPadding: EdgeInsets.only(
+            top: 10.0,
+          ),
+          title: new Text(
+            "$error",
+            textAlign: TextAlign.center,
+          ),
+          content: Container(
+            height: 120.0,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                  child: new Text(
+                    "$message",
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                Column(
+                  children: <Widget>[
+                    Divider(),
+                    IntrinsicHeight(
+                      child: new Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Container(
+                                alignment: Alignment.center,
+                                margin: EdgeInsets.only(bottom: 12.0),
+                                height: 30.0,
+                                decoration: BoxDecoration(),
+                                child: Text(
+                                  MyLocalizations.of(context).ok,
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }

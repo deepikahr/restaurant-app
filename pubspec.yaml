@@ -41,6 +41,7 @@ flutter:
     - lib/assets/i18n/ka.json
     - lib/assets/i18n/ar.json
     - lib/assets/logos/logo.png
+    - lib/assets/logos/playstore-icon.png
     - lib/assets/bgImgs/background.png
     - lib/assets/bgImgs/confirmedbg.png
     - lib/assets/bgImgs/cover.png

@@ -211,5 +211,19 @@
   "addressType": "Type d'adresse",
   "choosefromphotos": "Choisissez parmi les photos",
   "takephoto": "Prendre une photo",
-  "removephoto": "Retirer photo"
+  "removephoto": "Retirer photo",
+  "tax": "IMPÔT",
+  "work": "Travail",
+  "others": "Autres",
+  "producthasbeenaddedtocart": "Le produit a été ajouté au panier",
+  "addToCart": "Ajouter au chariot",
+  "items": "Articles",
+  "quantity": "Quantité",
+  "useLoyaltyPoints": "Utiliser des points de fidélité",
+  "enableTogetlocation": "Activer pour obtenir l'emplacement!",
+  "gPSsettings": "Un problème est survenu lors de l'utilisation de l'emplacement de votre appareil. Veuillez vérifier vos paramètres GPS",
+  "selectPaymentMethod": "Sélectionnez le mode de paiement",
+  "yourProfileSuccessfullyUpdated": "Votre profil a été mis à jour avec succès",
+  "yourProfilePictureSuccessfullyUpdated": "Votre profil Picture a été mis à jour avec succès",
+  "pleaseCheckInternetConnection": "S'il vous plait, vérifiez votre connexion internet!"
 }

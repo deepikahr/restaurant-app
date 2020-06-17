@@ -53,27 +53,6 @@ class _PaymentMethodState extends State<PaymentMethod> {
       sentryError.reportError(onError, null);
     });
     if (widget.cart['paymentOption'] == 'RazorPay') {
-      // // Map<String, String> notesr= {'orderInfo': json.encode(widget.cart)};
-      // Map<String, String> options = {
-      //   'name': widget.cart['restaurant'],
-      //   'currency': 'USD',
-      //   'display_currency': 'USD',
-      //   'image': 'https://www.73lines.com/web/image/12427',
-      //   'description': 'Order Placed from ' + APP_NAME,
-      //   'amount': (100 * widget.cart['grandTotal']).toStringAsFixed(2),
-      //   'email': widget.cart['shippingAddress']['contactNumber'].toString(),
-      //   'contact': widget.cart['shippingAddress']['contactNumber'].toString(),
-      //   'theme': '#FF0000',
-      //   'api_key': 'rzp_test_HjcXUWgYjGPIf9',
-      //   // 'notes': notes.toString()
-      // };
-      // Map<dynamic, dynamic> paymentResponse =
-      //     await Razorpay.showPaymentForm(options);
-      // widget.cart['payment'] = {'paymentStatus': true};
-      // widget.cart['paymentStatus'] = 'Success';
-      // if (paymentResponse['code'] == 1) {
-      //   _orderInfo();
-      // }
     } else {
       _orderInfo();
     }
@@ -128,7 +107,7 @@ class _PaymentMethodState extends State<PaymentMethod> {
             content: new SingleChildScrollView(
               child: new ListBody(
                 children: <Widget>[
-                  new Text("Select Payment Method"),
+                  new Text(MyLocalizations.of(context).selectPaymentMethod),
                 ],
               ),
             ),

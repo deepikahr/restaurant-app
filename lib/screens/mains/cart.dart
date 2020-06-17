@@ -80,12 +80,10 @@ class _CartPageState extends State<CartPage> {
     // [1] retrive cart from storage if available
     Map<String, dynamic> cart = cartItems;
     await Common.getCart().then((onValue) {
-//      print('cart data ${onValue.toString()}');
       cart = onValue;
     });
 
     await Common.getProducts().then((value) {
-//      print('products data ${value.toString()}');
       products = value != null ? value : [];
     });
 
@@ -260,7 +258,10 @@ class _CartPageState extends State<CartPage> {
                 Divider(),
                 widget.taxInfo != null
                     ? _buildPriceTagLine(
-                    "Tax " + widget.taxInfo['taxName'], tax)
+                    MyLocalizations.of(context).tax +
+                        " " +
+                        widget.taxInfo['taxName'],
+                    tax)
                     : Container(height: 0, width: 0),
                 widget.taxInfo != null
                     ? Divider()

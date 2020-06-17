@@ -1,10 +1,13 @@
 import 'dart:async' show Future;
+
 import 'package:flutter/foundation.dart' show SynchronousFuture;
 import 'package:flutter/material.dart';
+
 import 'constant.dart';
 
 class MyLocalizations {
   final Map<String, Map<String, String>> localizedValues;
+
   MyLocalizations(this.locale, this.localizedValues);
 
   final Locale locale;
@@ -19,6 +22,14 @@ class MyLocalizations {
 
   String get home {
     return localizedValues[locale.languageCode]['home'];
+  }
+
+  String get work {
+    return localizedValues[locale.languageCode]['work'];
+  }
+
+  String get others {
+    return localizedValues[locale.languageCode]['others'];
   }
 
   String get cart {
@@ -115,6 +126,20 @@ class MyLocalizations {
 
   String get cancel {
     return localizedValues[locale.languageCode]['cancel'];
+  }
+  String get yourProfileSuccessfullyUpdated {
+    return localizedValues[locale.languageCode]
+    ['yourProfileSuccessfullyUpdated'];
+  }
+
+  String get yourProfilePictureSuccessfullyUpdated {
+    return localizedValues[locale.languageCode]
+    ['yourProfilePictureSuccessfullyUpdated'];
+  }
+
+  String get pleaseCheckInternetConnection {
+    return localizedValues[locale.languageCode]
+    ['pleaseCheckInternetConnection'];
   }
 
   String get save {
@@ -365,6 +390,10 @@ class MyLocalizations {
     return localizedValues[locale.languageCode]['subTotal'];
   }
 
+  String get tax {
+    return localizedValues[locale.languageCode]['tax'];
+  }
+
   String get deliveryCharges {
     return localizedValues[locale.languageCode]['deliveryCharges'];
   }
@@ -553,6 +582,26 @@ class MyLocalizations {
     return localizedValues[locale.languageCode]['item'];
   }
 
+  String get items {
+    return localizedValues[locale.languageCode]['items'];
+  }
+
+  String get quantity {
+    return localizedValues[locale.languageCode]['quantity'];
+  }
+
+  String get enableTogetlocation {
+    return localizedValues[locale.languageCode]['enableTogetlocation'];
+  }
+
+  String get gPSsettings {
+    return localizedValues[locale.languageCode]['gPSsettings'];
+  }
+
+  String get useLoyaltyPoints {
+    return localizedValues[locale.languageCode]['useLoyaltyPoints'];
+  }
+
   String get type {
     return localizedValues[locale.languageCode]['type'];
   }
@@ -618,6 +667,10 @@ class MyLocalizations {
     return localizedValues[locale.languageCode]['addCard'];
   }
 
+  String get addToCart {
+    return localizedValues[locale.languageCode]['addToCart'];
+  }
+
   String get nameonCard {
     return localizedValues[locale.languageCode]['nameonCard'];
   }
@@ -678,6 +731,9 @@ class MyLocalizations {
     return localizedValues[locale.languageCode]['dateandTime'];
   }
 
+  String get selectPaymentMethod {
+    return localizedValues[locale.languageCode]['selectPaymentMethod'];
+  }
   String get time {
     return localizedValues[locale.languageCode]['time'];
   }
