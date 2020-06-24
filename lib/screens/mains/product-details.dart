@@ -309,6 +309,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             children: <Widget>[
               _buildProductTopImg(
                 widget.product['imageUrl'],
+              ),
+              _buildDescription(
                 widget.product['description'],
               ),
               _buildHeadingBlock(
@@ -382,7 +384,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     );
   }
 
-  Widget _buildProductTopImg(String imgUrl, String description) {
+  Widget _buildProductTopImg(String imgUrl) {
     return Stack(
       alignment: AlignmentDirectional.center,
       fit: StackFit.passthrough,
@@ -415,6 +417,27 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               )
             : Container(height: 0, width: 0),
       ],
+    );
+  }
+
+  Widget _buildDescription(String description) {
+    return Padding(
+      padding: EdgeInsets.only(left: 10.0, right: 10.0),
+      child: Container(
+        color: whiteTextb,
+        height: 58.0,
+        child: new Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Padding(padding: EdgeInsets.only(top: 4.0)),
+            Text(
+              description,
+              style: hintStyleSmallTextDarkOSR(),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

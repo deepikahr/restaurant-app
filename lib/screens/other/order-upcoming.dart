@@ -1,4 +1,3 @@
-import 'package:RestaurantSaas/screens/other/ratings.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../styles/styles.dart';
@@ -92,6 +91,28 @@ class OrderUpcomingState extends State<OrderUpcoming>
         itemCount: orders.length,
         padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 13.0),
         itemBuilder: (BuildContext context, int index) {
+          if (orders[index]['status'] == "Accepted") {
+            orders[index]['status'] = MyLocalizations.of(context).accepted;
+          } else if (orders[index]['status'] == "On the way.") {
+            orders[index]['status'] = MyLocalizations.of(context).ontheWay;
+          } else if (orders[index]['status'] == "Delivered") {
+            orders[index]['status'] = MyLocalizations.of(context).delivered;
+          } else if (orders[index]['status'] == "Cancelled") {
+            orders[index]['status'] = MyLocalizations.of(context).cancelled;
+          } else if (orders[index]['status'] == "Pending") {
+            orders[index]['status'] = MyLocalizations.of(context).pending;
+          } else {
+            orders[index]['status'] = orders[index]['status'];
+          }
+          if (orders[index]['orderType'] == "Pickup") {
+            orders[index]['orderType'] = MyLocalizations.of(context).pickUp;
+          } else if (orders[index]['orderType'] == "Dine In") {
+            orders[index]['orderType'] = MyLocalizations.of(context).dineIn;
+          } else if (orders[index]['orderType'] == "Delivery") {
+            orders[index]['orderType'] = MyLocalizations.of(context).dELIVERY;
+          } else {
+            orders[index]['orderType'] = orders[index]['orderType'];
+          }
           return Container(
             width: screenWidth(context),
             margin: EdgeInsetsDirectional.only(top: 8.0),

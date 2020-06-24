@@ -53,27 +53,6 @@ class _PaymentMethodState extends State<PaymentMethod> {
       sentryError.reportError(onError, null);
     });
     if (widget.cart['paymentOption'] == 'RazorPay') {
-      // // Map<String, String> notesr= {'orderInfo': json.encode(widget.cart)};
-      // Map<String, String> options = {
-      //   'name': widget.cart['restaurant'],
-      //   'currency': 'USD',
-      //   'display_currency': 'USD',
-      //   'image': 'https://www.73lines.com/web/image/12427',
-      //   'description': 'Order Placed from ' + APP_NAME,
-      //   'amount': (100 * widget.cart['grandTotal']).toStringAsFixed(2),
-      //   'email': widget.cart['shippingAddress']['contactNumber'].toString(),
-      //   'contact': widget.cart['shippingAddress']['contactNumber'].toString(),
-      //   'theme': '#FF0000',
-      //   'api_key': 'rzp_test_HjcXUWgYjGPIf9',
-      //   // 'notes': notes.toString()
-      // };
-      // Map<dynamic, dynamic> paymentResponse =
-      //     await Razorpay.showPaymentForm(options);
-      // widget.cart['payment'] = {'paymentStatus': true};
-      // widget.cart['paymentStatus'] = 'Success';
-      // if (paymentResponse['code'] == 1) {
-      //   _orderInfo();
-      // }
     } else {
       _orderInfo();
     }
@@ -128,7 +107,7 @@ class _PaymentMethodState extends State<PaymentMethod> {
             content: new SingleChildScrollView(
               child: new ListBody(
                 children: <Widget>[
-                  new Text("Select Payment Method"),
+                  new Text(MyLocalizations.of(context).selectPaymentMethod),
                 ],
               ),
             ),
@@ -144,8 +123,6 @@ class _PaymentMethodState extends State<PaymentMethod> {
         },
       );
     } else {
-      print(widget.cart['paymentOption']);
-
       if (widget.cart['paymentOption'] == 'STRIPE') {
         StripePayment.paymentRequestWithCardForm(CardFormPaymentRequest())
             .then((pm) {
@@ -159,17 +136,14 @@ class _PaymentMethodState extends State<PaymentMethod> {
             widget.cart['restaurantID'] =
                 widget.cart['productDetails'][0]['restaurantID'];
             widget.cart['paymentMethodId'] = _paymentMethodId;
-            print(widget.cart['paymentMethodId']);
 
             if (mounted) {
               setState(() {
                 isPlaceOrderLoading = true;
               });
             }
-            print(widget.cart);
 
             ProfileService.placeOrder(widget.cart).then((onValue) {
-              print(onValue);
               if (mounted) {
                 setState(() {
                   isPlaceOrderLoading = false;
@@ -356,15 +330,20 @@ class _PaymentMethodState extends State<PaymentMethod> {
                               },
                               activeColor: PRIMARY,
                               title: Text(
-                                paymentMethodList[index]['type'],
+                                paymentMethodList[index]['type'] == "COD"
+                                    ? MyLocalizations.of(context).cod
+                                    : paymentMethodList[index]['type'] ==
+                                            "STRIPE"
+                                        ? MyLocalizations.of(context).stripe
+                                        : paymentMethodList[index]['type'],
                                 style: TextStyle(color: PRIMARY),
                               ),
                               secondary:
                                   paymentMethodList[index]['type'] == "COD"
-                                      ? Icon(
-                                          Icons.attach_money,
-                                          color: PRIMARY,
-                                          size: 16.0,
+                                      ? Text(
+                                          currency,
+                                          style: TextStyle(
+                                              fontSize: 16.0, color: PRIMARY),
                                         )
                                       : Icon(
                                           Icons.credit_card,

@@ -1,29 +1,32 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:RestaurantSaas/main.dart';
 import 'package:RestaurantSaas/screens/mains/home.dart';
 import 'package:RestaurantSaas/services/initialize_i18n.dart';
-import 'package:flutter/material.dart';
-import 'package:toast/toast.dart';
-import '../../styles/styles.dart';
-import '../../services/profile-service.dart';
-import 'package:async_loader/async_loader.dart';
-import '../../widgets/no-data.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
-import 'dart:async';
-import 'package:http/http.dart' as http;
 import 'package:async/async.dart';
-import '../../services/sentry-services.dart';
-import 'package:RestaurantSaas/main.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:async_loader/async_loader.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:toast/toast.dart';
 
 import '../../services/localizations.dart';
+import '../../services/profile-service.dart';
+import '../../services/sentry-services.dart';
+import '../../styles/styles.dart';
+import '../../widgets/no-data.dart';
 
 SentryError sentryError = new SentryError();
 
 class ProfileApp extends StatefulWidget {
   final Map<String, Map<String, String>> localizedValues;
   final String locale;
+
   ProfileApp({Key key, this.locale, this.localizedValues}) : super(key: key);
+
   @override
   _ProfileAppState createState() => _ProfileAppState();
 }
@@ -39,7 +42,9 @@ class _ProfileAppState extends State<ProfileApp> {
 class Profile extends StatefulWidget {
   final Map<String, Map<String, String>> localizedValues;
   final String locale;
+
   Profile({Key key, this.locale, this.localizedValues}) : super(key: key);
+
   @override
   _ProfileState createState() => _ProfileState();
 }
@@ -59,6 +64,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   String selectedLanguages;
 
   List<String> languages = ['English', 'French', 'Chinese', 'Arabic'];
+
   Future<Map<String, dynamic>> getProfileInfo() async {
     return await ProfileService.getUserInfo();
   }
@@ -109,7 +115,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
       };
       ProfileService.setUserInfo(profileData['_id'], body).then((onValue) {
         try {
-          Toast.show("Your profile Successfully UPDATED", context,
+          Toast.show(MyLocalizations.of(context).yourProfileSuccessfullyUpdated,
+              context,
               duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
           if (mounted) {
             setState(() {
@@ -150,8 +157,11 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
               isPicUploading = false;
             });
           }
-          Toast.show("Your profile Picture Successfully UPDATED", context,
-              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+          Toast.show(
+              MyLocalizations.of(context).yourProfilePictureSuccessfullyUpdated,
+              context,
+              duration: Toast.LENGTH_LONG,
+              gravity: Toast.BOTTOM);
         }
       });
     }
@@ -181,8 +191,11 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
               isPicUploading = false;
             });
           }
-          Toast.show("Your profile Picture Successfully UPDATED", context,
-              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+          Toast.show(
+              MyLocalizations.of(context).yourProfilePictureSuccessfullyUpdated,
+              context,
+              duration: Toast.LENGTH_LONG,
+              gravity: Toast.BOTTOM);
         }
       });
     }
@@ -222,7 +235,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
         renderError: ([error]) {
           sentryError.reportError(error, null);
           return NoData(
-              message: 'Please check your internet connection!',
+              message:
+                  MyLocalizations.of(context).pleaseCheckInternetConnection,
               icon: Icons.block);
         },
         renderSuccess: ({data}) {
@@ -383,65 +397,20 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                               onChanged: (newValue) async {
                                 await initializeI18n().then((value) async {
                                   localizedValues = value;
+                                  SharedPreferences prefs =
+                                      await SharedPreferences.getInstance();
                                   if (newValue == 'English') {
-                                    SharedPreferences prefs =
-                                        await SharedPreferences.getInstance();
                                     prefs.setString('selectedLanguage', 'en');
-                                    Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              EntryPage('en', localizedValues),
-                                        ),
-                                        (Route<dynamic> route) => false);
                                   } else if (newValue == 'Chinese') {
-                                    SharedPreferences prefs =
-                                        await SharedPreferences.getInstance();
                                     prefs.setString('selectedLanguage', 'zh');
-                                    Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              EntryPage('zh', localizedValues),
-                                        ),
-                                        (Route<dynamic> route) => false);
                                   } else if (newValue == 'Kannada') {
-                                    SharedPreferences prefs =
-                                        await SharedPreferences.getInstance();
                                     prefs.setString('selectedLanguage', 'ka');
-
-                                    Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              EntryPage('ka', localizedValues),
-                                        ),
-                                        (Route<dynamic> route) => false);
                                   } else if (newValue == 'Arabic') {
-                                    SharedPreferences prefs =
-                                        await SharedPreferences.getInstance();
                                     prefs.setString('selectedLanguage', 'ar');
-
-                                    Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              EntryPage('ar', localizedValues),
-                                        ),
-                                        (Route<dynamic> route) => false);
                                   } else {
-                                    SharedPreferences prefs =
-                                        await SharedPreferences.getInstance();
                                     prefs.setString('selectedLanguage', 'fr');
-
-                                    Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              EntryPage('fr', localizedValues),
-                                        ),
-                                        (Route<dynamic> route) => false);
                                   }
+                                  main();
                                 });
                               },
                               items: languages.map((lang) {
