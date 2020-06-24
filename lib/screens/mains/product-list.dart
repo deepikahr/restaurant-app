@@ -54,7 +54,7 @@ class ProductListPage extends StatefulWidget {
 
 class ProductListPageState extends State<ProductListPage> {
   final GlobalKey<AsyncLoaderState> _asyncLoaderState =
-  GlobalKey<AsyncLoaderState>();
+      GlobalKey<AsyncLoaderState>();
   bool isopenAndCloseTimeLoading = false;
   int productQuantity = 1;
   int cartCount;
@@ -93,13 +93,19 @@ class ProductListPageState extends State<ProductListPage> {
       });
     }
     return await MainService.getRestaurantOpenAndCloseTime(
-        widget.locationId,
-        DateFormat('HH:mm').format(DateTime.now()),
-        DateFormat('EEEE').format(DateTime.now()))
+            widget.locationId,
+            DateFormat('HH:mm').format(DateTime.now()),
+            DateFormat('EEEE').format(DateTime.now()))
         .then((verifyOpenAndCloseTime) {
       if (mounted) {
         setState(() {
-          openAndCloseTime = verifyOpenAndCloseTime['message'];
+          if (verifyOpenAndCloseTime['message'] == "Open") {
+            openAndCloseTime = MyLocalizations.of(context).open;
+          } else if (verifyOpenAndCloseTime['message'] == "Close") {
+            openAndCloseTime = MyLocalizations.of(context).closed;
+          } else {
+            openAndCloseTime = verifyOpenAndCloseTime['message'];
+          }
           isopenAndCloseTimeLoading = false;
         });
       }
@@ -203,23 +209,23 @@ class ProductListPageState extends State<ProductListPage> {
                       top: 5,
                       child: (cartCount == null || cartCount == 0)
                           ? Text(
-                        '',
-                        style: TextStyle(fontSize: 14.0),
-                      )
+                              '',
+                              style: TextStyle(fontSize: 14.0),
+                            )
                           : Container(
-                        height: 20,
-                        width: 20,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.black,
-                        ),
-                        child: Text('${cartCount.toString()}',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: "bold",
-                                fontSize: 11)),
-                      )),
+                              height: 20,
+                              width: 20,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.black,
+                              ),
+                              child: Text('${cartCount.toString()}',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontFamily: "bold",
+                                      fontSize: 11)),
+                            )),
                 ],
               )),
           Padding(padding: EdgeInsets.only(left: 7.0)),
@@ -305,7 +311,7 @@ class ProductListPageState extends State<ProductListPage> {
 
   Widget _buildLocatioNameView() {
     return Padding(
-      padding: EdgeInsets.only(top: 60.0),
+      padding: EdgeInsets.only(top: 30.0),
       child: Text(
         widget.locationName,
         style: titleLightWhiteOSS(),
@@ -391,13 +397,13 @@ class ProductListPageState extends State<ProductListPage> {
                       Padding(padding: EdgeInsets.only(left: 5.0)),
                       !isopenAndCloseTimeLoading
                           ? Text(
-                        openAndCloseTime,
-                        style: hintStyleSmallGreenLightOSS(),
-                      )
+                              openAndCloseTime,
+                              style: hintStyleSmallGreenLightOSS(),
+                            )
                           : Text(
-                        "",
-                        style: hintStyleSmallGreenLightOSS(),
-                      ),
+                              "",
+                              style: hintStyleSmallGreenLightOSS(),
+                            ),
                       Padding(padding: EdgeInsets.only(left: 10.0)),
                       InkWell(
                         onTap: () {
@@ -455,17 +461,17 @@ class ProductListPageState extends State<ProductListPage> {
           ),
           title: Text(
             (widget.deliveryInfo != null &&
-                widget.deliveryInfo['freeDelivery'] &&
-                widget.deliveryInfo['amountEligibility'] != null)
+                    widget.deliveryInfo['freeDelivery'] &&
+                    widget.deliveryInfo['amountEligibility'] != null)
                 ? MyLocalizations.of(context).freedeliveryabove +
-                ' $currency' +
-                widget.deliveryInfo['amountEligibility'].toString()
+                    ' $currency' +
+                    widget.deliveryInfo['amountEligibility'].toString()
                 : (widget.deliveryInfo != null &&
-                !widget.deliveryInfo['freeDelivery'])
-                ? MyLocalizations.of(context).deliveryCharges +
-                ': Only $currency' +
-                widget.deliveryInfo['deliveryCharges'].toString()
-                : MyLocalizations.of(context).freedeliveryavailable,
+                        !widget.deliveryInfo['freeDelivery'])
+                    ? MyLocalizations.of(context).deliveryCharges +
+                        ': Only $currency' +
+                        widget.deliveryInfo['deliveryCharges'].toString()
+                    : MyLocalizations.of(context).freedeliveryavailable,
             style: hintStyleSmallWhiteLightOSL(),
           ),
         ),
@@ -482,18 +488,18 @@ class ProductListPageState extends State<ProductListPage> {
             padding: const EdgeInsets.all(5.0),
             child: Container(
                 decoration:
-                BoxDecoration(border: Border.all(color: primaryLight)),
+                    BoxDecoration(border: Border.all(color: primaryLight)),
                 height: 70.0,
                 width: 70.0,
                 child: imgUrl != null
                     ? Image.network(
-                  imgUrl,
-                  fit: BoxFit.fill,
-                )
+                        imgUrl,
+                        fit: BoxFit.fill,
+                      )
                     : Icon(
-                  Icons.collections_bookmark,
-                  color: Colors.black87,
-                )),
+                        Icons.collections_bookmark,
+                        color: Colors.black87,
+                      )),
           ),
           children: [
             ListView.builder(
@@ -526,13 +532,13 @@ class ProductListPageState extends State<ProductListPage> {
           ],
           title: categoryName.length > 25
               ? Text(
-            categoryName.substring(0, 25) + " ...",
-            style: subTitleDarkBoldOSS(),
-          )
+                  categoryName.substring(0, 25) + " ...",
+                  style: subTitleDarkBoldOSS(),
+                )
               : Text(
-            categoryName,
-            style: subTitleDarkBoldOSS(),
-          ),
+                  categoryName,
+                  style: subTitleDarkBoldOSS(),
+                ),
         ),
       ],
     );
@@ -586,18 +592,18 @@ class ProductListPageState extends State<ProductListPage> {
 
       timing['timeSchedule'] != null
           ? timing['timeSchedule'].forEach((schedule) {
-        timeScheduleList.add(Padding(
-            padding: EdgeInsets.only(
-              // left: 20.0,
-            ),
-            child: Text(
-                '${schedule['openTimeIn12Hr']} ${schedule['openTimeMeridian']} - ${schedule['closeTimeIn12Hr']} ${schedule['closeTimeMeridian']}')));
-      })
+              timeScheduleList.add(Padding(
+                  padding: EdgeInsets.only(
+                      // left: 20.0,
+                      ),
+                  child: Text(
+                      '${schedule['openTimeIn12Hr']} ${schedule['openTimeMeridian']} - ${schedule['closeTimeIn12Hr']} ${schedule['closeTimeMeridian']}')));
+            })
           : timeScheduleList.add(Padding(
-          padding: EdgeInsets.only(
-            // left: 20.0,
-          ),
-          child: Text(MyLocalizations.of(context).storeisClosed.trim())));
+              padding: EdgeInsets.only(
+                  // left: 20.0,
+                  ),
+              child: Text(MyLocalizations.of(context).storeisClosed.trim())));
 
       timeTextList.add(Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -646,8 +652,8 @@ class ProductListPageState extends State<ProductListPage> {
           title: Text(MyLocalizations.of(context).openingTime),
           content: SingleChildScrollView(
               child: Column(
-                children: timeTextList,
-              )),
+            children: timeTextList,
+          )),
           actions: <Widget>[
             FlatButton(
               child: Text(MyLocalizations.of(context).ok),

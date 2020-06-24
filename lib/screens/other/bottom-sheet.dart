@@ -112,7 +112,6 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
           Toast.show(
               MyLocalizations.of(context).producthasbeenaddedtocart, context,
               duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-          print(value.toString());
         });
       } else {
         tempProducts.add(cartProduct);
@@ -120,7 +119,6 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
           Toast.show(
               MyLocalizations.of(context).producthasbeenaddedtocart, context,
               duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-          print(value.toString());
         });
       }
     }).catchError((onError) {
@@ -265,7 +263,7 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Text(
-                    '${MyLocalizations.of(context).quantity} +  :',
+                    MyLocalizations.of(context).quantity + ' :',
                     style: titleBold(),
                   ),
                   Container(
@@ -385,7 +383,9 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
                                 style: titleLightWhiteOSS(),
                               ),
                               TextSpan(
-                                  text: MyLocalizations.of(context).items,
+                                  text: quantity == 1
+                                      ? MyLocalizations.of(context).item
+                                      : MyLocalizations.of(context).items,
                                   style: titleLightWhiteOSS()),
                             ],
                           ),
@@ -394,7 +394,7 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
                           height: 1.0,
                         ),
                         new Text(
-                          '${widget.currency} $price',
+                          '${widget.currency} ${price.toStringAsFixed(2)}',
                           style: titleLightWhiteOSS(),
                         ),
                       ],

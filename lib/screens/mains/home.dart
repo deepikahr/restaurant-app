@@ -37,15 +37,15 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   final GlobalKey<AsyncLoaderState> _asyncLoaderStateForAdvertisement =
-  GlobalKey<AsyncLoaderState>();
+      GlobalKey<AsyncLoaderState>();
 
   final GlobalKey<AsyncLoaderState> _asyncLoaderStateForNearByLocations =
-  GlobalKey<AsyncLoaderState>();
+      GlobalKey<AsyncLoaderState>();
   final GlobalKey<AsyncLoaderState> _asyncLoaderStateForTopRatedRestaurants =
-  GlobalKey<AsyncLoaderState>();
+      GlobalKey<AsyncLoaderState>();
   final GlobalKey<AsyncLoaderState>
-  _asyncLoaderStateForNewlyArrivedRestaurants =
-  GlobalKey<AsyncLoaderState>();
+      _asyncLoaderStateForNewlyArrivedRestaurants =
+      GlobalKey<AsyncLoaderState>();
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   VoidCallback showBottomSheetCallback;
   Map<String, dynamic> restaurantInfo;
@@ -162,18 +162,14 @@ class HomePageState extends State<HomePage> {
     // if (!isNearByRestaurants) {
     currentLocation = await _location.getLocation();
     final coordinates =
-    new Coordinates(currentLocation.latitude, currentLocation.longitude);
+        new Coordinates(currentLocation.latitude, currentLocation.longitude);
     var addresses =
-    await Geocoder.local.findAddressesFromCoordinates(coordinates);
+        await Geocoder.local.findAddressesFromCoordinates(coordinates);
     var first = addresses.first;
     addressData = first.addressLine;
     if (currentLocation != null && mounted) {
       setState(() {
-        position = {
-          'lat': currentLocation.latitude,
-          'long': currentLocation.longitude,
-          'name': addressData
-        };
+        position = {'lat': 12.8826165, 'long': 77.5500133, 'name': addressData};
       });
       await Common.savePositionInfo(position).then((onValue) {});
     }
@@ -261,23 +257,23 @@ class HomePageState extends State<HomePage> {
                       top: 6,
                       child: (cartCount == null || cartCount == 0)
                           ? Text(
-                        '',
-                        style: TextStyle(fontSize: 14.0),
-                      )
+                              '',
+                              style: TextStyle(fontSize: 14.0),
+                            )
                           : Container(
-                        height: 20,
-                        width: 20,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.black,
-                        ),
-                        child: Text('${cartCount.toString()}',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: "bold",
-                                fontSize: 11)),
-                      )),
+                              height: 20,
+                              width: 20,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.black,
+                              ),
+                              child: Text('${cartCount.toString()}',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontFamily: "bold",
+                                      fontSize: 11)),
+                            )),
                 ],
               )),
           Padding(padding: EdgeInsets.only(left: 7.0)),
@@ -295,15 +291,15 @@ class HomePageState extends State<HomePage> {
             child: _buildAdvertisementLoader(),
           ),
           (isNearByRestaurants == true ||
-              isTopRatedRestaurants == true ||
-              isAdvertisementList == true ||
-              isNewlyArrivedRestaurants == true)
+                  isTopRatedRestaurants == true ||
+                  isAdvertisementList == true ||
+                  isNewlyArrivedRestaurants == true)
               ? Container()
               : Center(
-              child: Container(
-                  height: 50,
-                  width: 50,
-                  child: CircularProgressIndicator())),
+                  child: Container(
+                      height: 50,
+                      width: 50,
+                      child: CircularProgressIndicator())),
           Container(
             color: Colors.white70,
             margin: EdgeInsets.only(bottom: 5.0),
@@ -314,7 +310,7 @@ class HomePageState extends State<HomePage> {
                 isNearByRestaurants != true
                     ? Container()
                     : _buildGridHeader(
-                    MyLocalizations.of(context).restaurantsNearYou),
+                        MyLocalizations.of(context).restaurantsNearYou),
                 _buildGetNearByLocationLoader(),
                 isNearByRestaurants != true || nearByRestaurentsList == null
                     ? Container()
@@ -332,7 +328,7 @@ class HomePageState extends State<HomePage> {
                 isTopRatedRestaurants != true
                     ? Container()
                     : _buildGridHeader(
-                    MyLocalizations.of(context).topRatedRestaurants),
+                        MyLocalizations.of(context).topRatedRestaurants),
                 _buildTopRatedRestaurantLoader(),
                 isTopRatedRestaurants != true || topRatedRestaurantsList == null
                     ? Container()
@@ -350,13 +346,13 @@ class HomePageState extends State<HomePage> {
                 isNewlyArrivedRestaurants != true
                     ? Container()
                     : _buildGridHeader(
-                    MyLocalizations.of(context).newlyArrivedRestaurants),
+                        MyLocalizations.of(context).newlyArrivedRestaurants),
                 _buildNewlyArrivedRestaurantLoader(),
                 isNewlyArrivedRestaurants != true ||
-                    newlyArrivedRestaurantsList == null
+                        newlyArrivedRestaurantsList == null
                     ? Container()
                     : _buildViewAllButton(
-                    MyLocalizations.of(context).newlyArrived),
+                        MyLocalizations.of(context).newlyArrived),
               ],
             ),
           ),
@@ -420,29 +416,77 @@ class HomePageState extends State<HomePage> {
                         physics: ScrollPhysics(),
                         shrinkWrap: true,
                         gridDelegate:
-                        new SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2),
+                            new SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2),
                         itemCount:
-                        nearByRestaurentsList.length < int.parse(itemCount)
-                            ? nearByRestaurentsList.length
-                            : int.parse(itemCount),
+                            nearByRestaurentsList.length < int.parse(itemCount)
+                                ? nearByRestaurentsList.length
+                                : int.parse(itemCount),
                         padding: const EdgeInsets.all(0.0),
                         itemBuilder: (BuildContext context, int index) {
                           return InkWell(
-                              child: buildRestaurantCard(
+                              child: buildRestaurantCardNear(
                                   nearByRestaurentsList[index],
                                   review,
                                   branches),
-                              onTap: () {
-                                nearByRestaurentsList[index]['list']
-                                ['taxInfo'] = taxInfo;
-                                if (mounted) {
-                                  setState(() {
-                                    restaurantInfo =
-                                    nearByRestaurentsList[index];
-                                  });
-                                  _showBottomSheet();
-                                }
+                              onTap: () async {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        ProductListPage(
+                                      restaurantName:
+                                          nearByRestaurentsList[index]['list']
+                                                  ['restaurantID']
+                                              ['restaurantName'],
+                                      locationName: nearByRestaurentsList[index]
+                                          ['list']['locationName'],
+                                      aboutUs: nearByRestaurentsList[index]
+                                          ['list']['aboutUs'],
+                                      imgUrl: nearByRestaurentsList[index]
+                                                  ['list']['restaurantID'] !=
+                                              null
+                                          ? nearByRestaurentsList[index]['list']
+                                              ['restaurantID']['logo']
+                                          : null,
+                                      address: nearByRestaurentsList[index]
+                                          ['list']['address'],
+                                      locationId: nearByRestaurentsList[index]
+                                          ['list']['_id'],
+                                      restaurantId: nearByRestaurentsList[index]
+                                          ['list']['restaurantID']['_id'],
+                                      cuisine: nearByRestaurentsList[index]
+                                          ['list']['cuisine'],
+                                      deliveryInfo: nearByRestaurentsList[index]
+                                                  ['list']['deliveryInfo'] !=
+                                              null
+                                          ? nearByRestaurentsList[index]['list']
+                                              ['deliveryInfo']['deliveryInfo']
+                                          : null,
+                                      workingHours: nearByRestaurentsList[index]
+                                              ['list']['workingHours'] ??
+                                          null,
+                                      locationInfo: nearByRestaurentsList[index]
+                                          ['list'],
+                                      taxInfo: taxInfo,
+                                      locale: widget.locale,
+                                      localizedValues: widget.localizedValues,
+                                    ),
+                                  ),
+                                );
+                                // await Common.getPositionInfo().then((onValue) {
+                                //   nearByRestaurentsList[index]['list']
+                                //       ['taxInfo'] = taxInfo;
+                                //   nearByRestaurentsList[index]['list']
+                                //       ['position'] = onValue;
+                                //   if (mounted) {
+                                //     setState(() {
+                                //       restaurantInfo =
+                                //           nearByRestaurentsList[index];
+                                //     });
+                                //     _showBottomSheet();
+                                //   }
+                                // });
                               });
                         }),
                     // _buildViewAllButton('Near By'),
@@ -518,7 +562,7 @@ class HomePageState extends State<HomePage> {
         physics: ScrollPhysics(),
         shrinkWrap: true,
         gridDelegate:
-        new SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+            new SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
         itemCount: data.length < int.parse(itemCount)
             ? data.length
             : int.parse(itemCount),
@@ -598,6 +642,7 @@ class HomePageState extends State<HomePage> {
                 title: title,
                 localizedValues: widget.localizedValues,
                 locale: widget.locale,
+                taxInfo: taxInfo,
               ),
             ),
           );
@@ -626,112 +671,112 @@ class HomePageState extends State<HomePage> {
   Widget _buildOfferSlider(List<dynamic> list) {
     return list.length > 0
         ? Swiper(
-      autoplay: true,
-      itemCount: list.length,
-      pagination: new SwiperPagination(),
-      itemBuilder: (BuildContext context, int index) {
-        return InkWell(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (BuildContext context) => ProductListPage(
-                  restaurantName: list[index]['restaurantName'],
-                  locationName: list[index]['locationName'],
-                  aboutUs: list[index]['locationInfo']['aboutUs'],
-                  imgUrl: list[index]['restaurantInfo'] != null
-                      ? list[index]['restaurantInfo']['logo']
-                      : null,
-                  address: list[index]['address'],
-                  locationId: list[index]['locationInfo']['_id'],
-                  restaurantId: list[index]['restaurantID'],
-                  cuisine: list[index]['locationInfo']['cuisine'],
-                  deliveryInfo:
-                  list[index]['locationInfo']['deliveryInfo'] != null
-                      ? list[index]['locationInfo']['deliveryInfo']
-                  ['deliveryInfo']
-                      : null,
-                  workingHours:
-                  list[index]['locationInfo']['workingHours'] ?? null,
-                  locationInfo: list[index]['locationInfo'],
-                  taxInfo: taxInfo,
-                  locale: widget.locale,
-                  localizedValues: widget.localizedValues,
-                ),
-              ),
-            );
-          },
-          child: Stack(
-            children: <Widget>[
-              new Image(
-                image: list[index]['homeUrl'] != null
-                    ? NetworkImage(list[index]['homeUrl'])
-                    : AssetImage('lib/assets/imgs/chicken.png'),
-                fit: BoxFit.cover,
-                width: screenWidth(context),
-                height: 200.0,
-              ),
-              new Positioned(
-                bottom: 0.0,
-                left: 0.0,
-                right: 0.0,
-                child: new Container(
-                  decoration: new BoxDecoration(
-                    gradient: new LinearGradient(
-                      colors: [
-                        Color.fromARGB(200, 0, 0, 0),
-                        Color.fromARGB(0, 0, 0, 0)
-                      ],
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
+            autoplay: true,
+            itemCount: list.length,
+            pagination: new SwiperPagination(),
+            itemBuilder: (BuildContext context, int index) {
+              return InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (BuildContext context) => ProductListPage(
+                        restaurantName: list[index]['restaurantName'],
+                        locationName: list[index]['locationName'],
+                        aboutUs: list[index]['locationInfo']['aboutUs'],
+                        imgUrl: list[index]['restaurantInfo'] != null
+                            ? list[index]['restaurantInfo']['logo']
+                            : null,
+                        address: list[index]['address'],
+                        locationId: list[index]['locationInfo']['_id'],
+                        restaurantId: list[index]['restaurantID'],
+                        cuisine: list[index]['locationInfo']['cuisine'],
+                        deliveryInfo:
+                            list[index]['locationInfo']['deliveryInfo'] != null
+                                ? list[index]['locationInfo']['deliveryInfo']
+                                    ['deliveryInfo']
+                                : null,
+                        workingHours:
+                            list[index]['locationInfo']['workingHours'] ?? null,
+                        locationInfo: list[index]['locationInfo'],
+                        taxInfo: taxInfo,
+                        locale: widget.locale,
+                        localizedValues: widget.localizedValues,
+                      ),
                     ),
-                  ),
-                  padding: EdgeInsets.symmetric(
-                      vertical: 0.0, horizontal: 00.0),
-                  child: new Container(
-                    color: Colors.black26,
-                    height: 200.0,
-                    padding:
-                    new EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0),
-                    alignment: FractionalOffset.centerLeft,
-                    child: new Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        new Text(
-                          list[index]['restaurantName'],
-                          style: hintStyleGreyLightOSL(),
-                        ),
-                        new Padding(
-                          padding: new EdgeInsets.fromLTRB(
-                              0.0, 15.0, 0.0, 15.0),
-                          child: new Text(
-                            list[index]['locationName'],
-                            style: hintStyleSmallYellowLightOSR(),
+                  );
+                },
+                child: Stack(
+                  children: <Widget>[
+                    new Image(
+                      image: list[index]['homeUrl'] != null
+                          ? NetworkImage(list[index]['homeUrl'])
+                          : AssetImage('lib/assets/imgs/chicken.png'),
+                      fit: BoxFit.cover,
+                      width: screenWidth(context),
+                      height: 200.0,
+                    ),
+                    new Positioned(
+                      bottom: 0.0,
+                      left: 0.0,
+                      right: 0.0,
+                      child: new Container(
+                        decoration: new BoxDecoration(
+                          gradient: new LinearGradient(
+                            colors: [
+                              Color.fromARGB(200, 0, 0, 0),
+                              Color.fromARGB(0, 0, 0, 0)
+                            ],
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.topCenter,
                           ),
                         ),
-                        new Text(
-                          list[index]['message'],
-                          style: category(),
+                        padding: EdgeInsets.symmetric(
+                            vertical: 0.0, horizontal: 00.0),
+                        child: new Container(
+                          color: Colors.black26,
+                          height: 200.0,
+                          padding:
+                              new EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0),
+                          alignment: FractionalOffset.centerLeft,
+                          child: new Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              new Text(
+                                list[index]['restaurantName'],
+                                style: hintStyleGreyLightOSL(),
+                              ),
+                              new Padding(
+                                padding: new EdgeInsets.fromLTRB(
+                                    0.0, 15.0, 0.0, 15.0),
+                                child: new Text(
+                                  list[index]['locationName'],
+                                  style: hintStyleSmallYellowLightOSR(),
+                                ),
+                              ),
+                              new Text(
+                                list[index]['message'],
+                                style: category(),
+                              ),
+                            ],
+                          ),
                         ),
-                      ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ),
-            ],
-          ),
-        );
-      },
-    )
+              );
+            },
+          )
         : Container(
-      child: new Image(
-        image: AssetImage('lib/assets/imgs/chicken.png'),
-        fit: BoxFit.cover,
-        width: screenWidth(context),
-        height: 200.0,
-      ),
-    );
+            child: new Image(
+              image: AssetImage('lib/assets/imgs/chicken.png'),
+              fit: BoxFit.cover,
+              width: screenWidth(context),
+              height: 200.0,
+            ),
+          );
   }
 
   static Widget buildRestaurantCard(info, review, branches) {
@@ -740,12 +785,89 @@ class HomePageState extends State<HomePage> {
         children: <Widget>[
           buildCardImg(info), //for later use
           buildCardBottom(
-              info['list']['restaurantName'],
+              info['list']['restaurantName'] == null
+                  ? info['list']['locationName']
+                  : info['list']['restaurantName'],
               double.parse(info['list']['rating'].toString()),
               info['locationCount'],
               info['list']['reviewCount'],
               review,
               branches),
+        ],
+      ),
+    );
+  }
+
+  static Widget buildRestaurantCardNear(info, review, branches) {
+    return Card(
+      child: Column(
+        children: <Widget>[
+          buildCardImgnear(info), //for later use
+          buildCardBottomnear(
+              info['list']['locationName'],
+              double.parse(info['list']['rating'].toString()),
+              info['locationCount'],
+              info['list']['reviewCount'],
+              review,
+              branches),
+        ],
+      ),
+    );
+  }
+
+  static Widget buildCardImgnear(info) {
+    return Container(
+      padding: EdgeInsets.all(0.0),
+      height: 120.0,
+      width: 180.0,
+      decoration: getBgDecoration(info['list']['restaurantID']['logo'] ?? null),
+      child: null, //buildFavIcon(),
+    );
+  }
+
+  static Widget buildCardBottomnear(String restaurantName, double rating,
+      int locationCounter, int reviews, String review, branches) {
+    return Container(
+      padding: EdgeInsets.only(left: 5.0, right: 5.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        restaurantName,
+                        overflow: TextOverflow.ellipsis,
+                        style: titleStyle(),
+                      ),
+                    ),
+                    rating > 0
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: <Widget>[
+                              Text(" " + rating.toStringAsFixed(1),
+                                  style: priceDescription()),
+                              Icon(Icons.star, color: PRIMARY, size: 16.0),
+                            ],
+                          )
+                        : Container(),
+                  ],
+                ),
+                locationCounter != null
+                    ? Text(
+                        locationCounter.toString() + ' $branches',
+                        style: subBoldTitle(),
+                      )
+                    : Container(),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -812,21 +934,21 @@ class HomePageState extends State<HomePage> {
                     ),
                     rating > 0
                         ? Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: <Widget>[
-                        Text(" " + rating.toStringAsFixed(1),
-                            style: priceDescription()),
-                        Icon(Icons.star, color: PRIMARY, size: 16.0),
-                      ],
-                    )
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: <Widget>[
+                              Text(" " + rating.toStringAsFixed(1),
+                                  style: priceDescription()),
+                              Icon(Icons.star, color: PRIMARY, size: 16.0),
+                            ],
+                          )
                         : Container(),
                   ],
                 ),
                 locationCounter != null
                     ? Text(
-                  locationCounter.toString() + ' $branches',
-                  style: subBoldTitle(),
-                )
+                        locationCounter.toString() + ' $branches',
+                        style: subBoldTitle(),
+                      )
                     : Container(),
               ],
             ),
@@ -844,31 +966,31 @@ class HomePageState extends State<HomePage> {
     }
     scaffoldKey.currentState
         .showBottomSheet<void>((BuildContext context) {
-      return Container(
-        decoration: BoxDecoration(
-          border: Border(
-            top: BorderSide(color: PRIMARY, width: 6.0),
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(6.0),
-          child: LocationListSheet(
-            restaurantInfo: restaurantInfo,
-            localizedValues: widget.localizedValues,
-            locale: widget.locale,
-          ),
-        ),
-      );
-    })
+          return Container(
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(color: PRIMARY, width: 6.0),
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(6.0),
+              child: LocationListSheet(
+                restaurantInfo: restaurantInfo,
+                localizedValues: widget.localizedValues,
+                locale: widget.locale,
+              ),
+            ),
+          );
+        })
         .closed
         .whenComplete(() {
-      if (mounted) {
-        if (mounted) {
-          setState(() {
-            showBottomSheetCallback = _showBottomSheet;
-          });
-        }
-      }
-    });
+          if (mounted) {
+            if (mounted) {
+              setState(() {
+                showBottomSheetCallback = _showBottomSheet;
+              });
+            }
+          }
+        });
   }
 }

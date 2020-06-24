@@ -194,7 +194,6 @@ class _BuildProductTileState extends State<BuildProductTile> {
   void _updateProductQuantityFromCart(int productQuantity, bool increase,
       String productId, Map<String, dynamic> newProduct) async {
     await Common.getProducts().then((productsList) {
-      print(productsList.toString());
       products = productsList;
       if (productsList != null) {
         productsList.forEach((element) {

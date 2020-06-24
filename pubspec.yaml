@@ -38,7 +38,6 @@ flutter:
     - lib/assets/i18n/en.json
     - lib/assets/i18n/fr.json
     - lib/assets/i18n/zh.json
-    - lib/assets/i18n/ka.json
     - lib/assets/i18n/ar.json
     - lib/assets/logos/logo.png
     - lib/assets/logos/playstore-icon.png

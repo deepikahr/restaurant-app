@@ -1,14 +1,15 @@
-import 'package:flutter/material.dart';
 import 'package:async_loader/async_loader.dart';
-import '../../styles/styles.dart';
-import '../../services/main-service.dart';
-import '../../widgets/no-data.dart';
-import '../../widgets/location-card.dart';
-import 'product-list.dart';
-import 'location-list.dart';
-import '../../services/sentry-services.dart';
-import '../../services/localizations.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../services/localizations.dart';
+import '../../services/main-service.dart';
+import '../../services/sentry-services.dart';
+import '../../styles/styles.dart';
+import '../../widgets/location-card.dart';
+import '../../widgets/no-data.dart';
+import 'location-list.dart';
+import 'product-list.dart';
 
 SentryError sentryError = new SentryError();
 
@@ -125,8 +126,7 @@ class LocationListSheet extends StatelessWidget {
     double rating = double.parse(data[index]['location']['rating'].toString());
     dynamic cuisine = data[index]['location']['cuisine'];
     String deliveryTime, deliveryChargeText, freeDeliveryText;
-    print('appllllllleeeeeeeeeee');
-    print(data[index]['location']['deliveryInfo']);
+
     if (data[index]['location']['deliveryInfo'] == null &&
         data[index]['location']['deliveryInfo']['deliveryInfo'] == null) {
       deliveryTime = deliveryChargeText = freeDeliveryText = null;
@@ -138,8 +138,7 @@ class LocationListSheet extends StatelessWidget {
               ['deliveryInfo']['freeDelivery']
           ? MyLocalizations.of(context).noDeliverycharge
           : '${MyLocalizations.of(context).deliveryCharges} $currency' +
-              data[index]['location']['deliveryInfo']['deliveryInfo']
-                      ['deliveryCharges']
+              data[index]['deliveryInfo']['deliveryInfo']['deliveryCharges']
                   .toString();
       freeDeliveryText = data[index]['location']['deliveryInfo']['deliveryInfo']
               ['freeDelivery']

@@ -397,65 +397,20 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                               onChanged: (newValue) async {
                                 await initializeI18n().then((value) async {
                                   localizedValues = value;
+                                  SharedPreferences prefs =
+                                      await SharedPreferences.getInstance();
                                   if (newValue == 'English') {
-                                    SharedPreferences prefs =
-                                        await SharedPreferences.getInstance();
                                     prefs.setString('selectedLanguage', 'en');
-                                    Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              EntryPage('en', localizedValues),
-                                        ),
-                                        (Route<dynamic> route) => false);
                                   } else if (newValue == 'Chinese') {
-                                    SharedPreferences prefs =
-                                        await SharedPreferences.getInstance();
                                     prefs.setString('selectedLanguage', 'zh');
-                                    Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              EntryPage('zh', localizedValues),
-                                        ),
-                                        (Route<dynamic> route) => false);
                                   } else if (newValue == 'Kannada') {
-                                    SharedPreferences prefs =
-                                        await SharedPreferences.getInstance();
                                     prefs.setString('selectedLanguage', 'ka');
-
-                                    Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              EntryPage('ka', localizedValues),
-                                        ),
-                                        (Route<dynamic> route) => false);
                                   } else if (newValue == 'Arabic') {
-                                    SharedPreferences prefs =
-                                        await SharedPreferences.getInstance();
                                     prefs.setString('selectedLanguage', 'ar');
-
-                                    Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              EntryPage('ar', localizedValues),
-                                        ),
-                                        (Route<dynamic> route) => false);
                                   } else {
-                                    SharedPreferences prefs =
-                                        await SharedPreferences.getInstance();
                                     prefs.setString('selectedLanguage', 'fr');
-
-                                    Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              EntryPage('fr', localizedValues),
-                                        ),
-                                        (Route<dynamic> route) => false);
                                   }
+                                  main();
                                 });
                               },
                               items: languages.map((lang) {

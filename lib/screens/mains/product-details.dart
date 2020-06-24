@@ -105,10 +105,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
   @override
   void initState() {
-    print(widget.product);
     Common.getToken().then((onValue) {
-      print(onValue);
-      print('I am here 11');
       try {
         if (onValue != null) {
           if (mounted) {

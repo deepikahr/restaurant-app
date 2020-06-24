@@ -123,8 +123,6 @@ class _PaymentMethodState extends State<PaymentMethod> {
         },
       );
     } else {
-      print(widget.cart['paymentOption']);
-
       if (widget.cart['paymentOption'] == 'STRIPE') {
         StripePayment.paymentRequestWithCardForm(CardFormPaymentRequest())
             .then((pm) {
@@ -138,17 +136,14 @@ class _PaymentMethodState extends State<PaymentMethod> {
             widget.cart['restaurantID'] =
                 widget.cart['productDetails'][0]['restaurantID'];
             widget.cart['paymentMethodId'] = _paymentMethodId;
-            print(widget.cart['paymentMethodId']);
 
             if (mounted) {
               setState(() {
                 isPlaceOrderLoading = true;
               });
             }
-            print(widget.cart);
 
             ProfileService.placeOrder(widget.cart).then((onValue) {
-              print(onValue);
               if (mounted) {
                 setState(() {
                   isPlaceOrderLoading = false;
@@ -335,15 +330,20 @@ class _PaymentMethodState extends State<PaymentMethod> {
                               },
                               activeColor: PRIMARY,
                               title: Text(
-                                paymentMethodList[index]['type'],
+                                paymentMethodList[index]['type'] == "COD"
+                                    ? MyLocalizations.of(context).cod
+                                    : paymentMethodList[index]['type'] ==
+                                            "STRIPE"
+                                        ? MyLocalizations.of(context).stripe
+                                        : paymentMethodList[index]['type'],
                                 style: TextStyle(color: PRIMARY),
                               ),
                               secondary:
                                   paymentMethodList[index]['type'] == "COD"
-                                      ? Icon(
-                                          Icons.attach_money,
-                                          color: PRIMARY,
-                                          size: 16.0,
+                                      ? Text(
+                                          currency,
+                                          style: TextStyle(
+                                              fontSize: 16.0, color: PRIMARY),
                                         )
                                       : Icon(
                                           Icons.credit_card,

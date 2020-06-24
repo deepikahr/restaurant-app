@@ -1,25 +1,24 @@
 import 'dart:async';
-import 'dart:core';
-
-import 'package:RestaurantSaas/screens/other/thank-you.dart';
 import 'package:RestaurantSaas/services/constant.dart';
-import 'package:async_loader/async_loader.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_map_picker/flutter_map_picker.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:intl/intl.dart';
 import 'package:location/location.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/localizations.dart';
-import '../../services/main-service.dart';
-import '../../services/profile-service.dart';
-import '../../services/sentry-services.dart';
+import 'package:RestaurantSaas/screens/other/thank-you.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import '../../styles/styles.dart';
-import '../../widgets/no-data.dart';
 import 'add-address.dart';
 import 'payment-method.dart';
+import 'package:async_loader/async_loader.dart';
+import '../../widgets/no-data.dart';
+import '../../services/profile-service.dart';
+import 'dart:core';
+import '../../services/main-service.dart';
+import 'package:intl/intl.dart';
+import '../../services/sentry-services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
 
@@ -49,7 +48,6 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
   int selectedAddressIndex = 0;
   LocationData currentLocation;
   Location _location = new Location();
-
   double remainingLoyaltyPoint = 0.0,
       usedLoyaltyPoint = 0.0,
       grandTotal = 0.0,
@@ -654,8 +652,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                             Text(
                               MyLocalizations.of(context).clickToSlot +
                                   " " +
-                                  widget.cart['orderType'] +
-                                  " " +
+                                  MyLocalizations.of(context).pickUp +
                                   MyLocalizations.of(context).dateandTime,
                               style: titleBlackLightOSB(),
                             ),
@@ -885,7 +882,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                                       Text(
                                         MyLocalizations.of(context)
                                                 .clickToSlot +
-                                            widget.cart['orderType'] +
+                                            MyLocalizations.of(context).pickUp +
                                             MyLocalizations.of(context).time,
                                         style: titleBlackLightOSB(),
                                       ),
@@ -1005,31 +1002,100 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                             ],
                           )
                         : Container(
-                            child: Text(
-                                'Your order amount should be more than $currency' +
-                                    userInfo['loyaltyInfo']['minOrdLoyalty']
-                                        .toString() +
-                                    ' to use loyalty point. You have ' +
-                                    userInfo['totalLoyaltyPoints']
-                                        .toStringAsFixed(2) +
-                                    ' points on your account! Place orders to get more.'),
-                          )
-                    : Container(
-                        child: Text(
-                            'You dont have enough loyalty points. Minimum ' +
-                                userInfo['loyaltyInfo']['minLoyaltyPoints']
+                            child: Text(MyLocalizations.of(context)
+                                    .yourorderamountshouldbemorethan +
+                                " $currency" +
+                                userInfo['loyaltyInfo']['minOrdLoyalty']
                                     .toString() +
-                                ' points required to use it, You have only ' +
+                                MyLocalizations.of(context)
+                                    .touseloyaltypointYouhave +
+                                ' ' +
                                 userInfo['totalLoyaltyPoints']
                                     .toStringAsFixed(2) +
-                                ' points on your account! Place orders to get more.'),
+                                MyLocalizations.of(context)
+                                    .pointsonyouraccountPlaceorderstogetmore),
+                          )
+                    : Container(
+                        child: Text(MyLocalizations.of(context)
+                                .youdonthaveenoughloyaltypointsMinimum +
+                            ' ' +
+                            userInfo['loyaltyInfo']['minLoyaltyPoints']
+                                .toString() +
+                            MyLocalizations.of(context)
+                                .pointsrequiredtouseitYouhaveonly +
+                            ' ' +
+                            userInfo['totalLoyaltyPoints'].toStringAsFixed(2) +
+                            MyLocalizations.of(context)
+                                .pointsonyouraccountPlaceorderstogetmore),
                       )
                 : Container(
-                    child: Text('Loyalty is not applicable!'),
+                    child: Text(
+                        MyLocalizations.of(context).loyaltyisnotapplicable),
                   ),
           ],
         ),
       ),
+    );
+  }
+
+  showError(error, message) async {
+    showDialog<Null>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          contentPadding: EdgeInsets.only(
+            top: 10.0,
+          ),
+          title: new Text(
+            "$error",
+            textAlign: TextAlign.center,
+          ),
+          content: Container(
+            height: 120.0,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                  child: new Text(
+                    "$message",
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                Column(
+                  children: <Widget>[
+                    Divider(),
+                    IntrinsicHeight(
+                      child: new Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Container(
+                                alignment: Alignment.center,
+                                margin: EdgeInsets.only(bottom: 12.0),
+                                height: 30.0,
+                                decoration: BoxDecoration(),
+                                child: Text(
+                                  MyLocalizations.of(context).ok,
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -1138,16 +1204,8 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                                             currentLocation.latitude,
                                             currentLocation.longitude),
                                         mainColor: PRIMARY,
-                                        mapStrings: MapPickerStrings.english(
-                                            cancel: MyLocalizations.of(context)
-                                                .cancel,
-                                            selectAddress:
-                                                MyLocalizations.of(context)
-                                                    .selectAddress,
-                                            address: MyLocalizations.of(context)
-                                                .address),
-                                        placeAutoCompleteLanguage:
-                                            widget.locale,
+                                        mapStrings: MapPickerStrings.english(),
+                                        placeAutoCompleteLanguage: 'en',
                                       )));
                           if (pickerResult != null) {
                             setState(() {
@@ -1291,7 +1349,9 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                 MyLocalizations.of(context).subTotal, widget.cart['subTotal']),
             widget.cart['taxInfo'] != null
                 ? _buildTotalPriceLine(
-                    "Tax " + widget.cart['taxInfo']['taxName'],
+                    MyLocalizations.of(context).tax +
+                        " " +
+                        widget.cart['taxInfo']['taxName'],
                     (double.parse(
                             widget.cart['taxInfo']['taxRate'].toString()) *
                         widget.cart['subTotal'] /
@@ -1568,66 +1628,5 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
       duration: Duration(milliseconds: 3000),
     );
     _scaffoldKey.currentState.showSnackBar(snackBar);
-  }
-
-  showError(error, message) async {
-    showDialog<Null>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          contentPadding: EdgeInsets.only(
-            top: 10.0,
-          ),
-          title: new Text(
-            "$error",
-            textAlign: TextAlign.center,
-          ),
-          content: Container(
-            height: 120.0,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 14.0),
-                  child: new Text(
-                    "$message",
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                Column(
-                  children: <Widget>[
-                    Divider(),
-                    IntrinsicHeight(
-                      child: new Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: Container(
-                                alignment: Alignment.center,
-                                margin: EdgeInsets.only(bottom: 12.0),
-                                height: 30.0,
-                                decoration: BoxDecoration(),
-                                child: Text(
-                                  MyLocalizations.of(context).ok,
-                                ),
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
   }
 }
