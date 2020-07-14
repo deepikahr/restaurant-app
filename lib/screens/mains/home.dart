@@ -1,31 +1,34 @@
-import '../../services/counter-service.dart';
+import 'dart:async';
+
 import 'package:RestaurantSaas/services/constant.dart';
+import 'package:async_loader/async_loader.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../../widgets/no-data.dart';
-import 'drawer.dart';
-import 'package:async_loader/async_loader.dart';
-import '../../styles/styles.dart';
-import '../../services/main-service.dart';
-import 'location-list-sheet.dart';
-import 'cart.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
-import 'restaurant-list.dart';
-import '../mains/product-list.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:location/location.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../services/common.dart';
-import 'dart:async';
+import '../../services/counter-service.dart';
+import '../../services/localizations.dart';
+import '../../services/main-service.dart';
 import '../../services/profile-service.dart';
 import '../../services/sentry-services.dart';
-import '../../services/localizations.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../../styles/styles.dart';
+import '../../widgets/no-data.dart';
+import '../mains/product-list.dart';
+import 'cart.dart';
+import 'drawer.dart';
+import 'location-list-sheet.dart';
+import 'restaurant-list.dart';
 
 SentryError sentryError = new SentryError();
 
 class HomePage extends StatefulWidget {
   final Map<String, Map<String, String>> localizedValues;
   final String locale;
+
   HomePage({Key key, this.locale, this.localizedValues}) : super(key: key);
 
   @override
@@ -71,7 +74,6 @@ class HomePageState extends State<HomePage> {
   getGlobalSettingsData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await MainService.getAdminSettings().then((onValue) {
-      print(onValue);
       try {
         var adminSettings = onValue;
         taxInfo = onValue['taxInfo'];
@@ -131,85 +133,12 @@ class HomePageState extends State<HomePage> {
   String barcodeError;
   LocationData currentLocation;
   var addressData;
+
   @override
   void dispose() {
     if (_locationStream != null) _locationStream.cancel();
     super.dispose();
   }
-
-  // getLocationInfoByTableId() async {
-  //   showDialog<void>(
-  //     context: context,
-  //     barrierDismissible: false,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         title:
-  //             Text('Book Table Number: ' + tableInfo['tableNumber'].toString()),
-  //         content: SingleChildScrollView(
-  //           child: ListBody(
-  //             children: <Widget>[Center(child: CircularProgressIndicator())],
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-
-  //   return await MainService.getLocationInfoByTableId(tableInfo['tableId'])
-  //       .then((res) {
-  //     var data = res;
-  //     Navigator.of(context).pop();
-  //     Navigator.push(
-  //       context,
-  //       MaterialPageRoute(
-  //         builder: (BuildContext context) => ProductListPage(
-  //           restaurantName: data['restaurantId']['restaurantName'],
-  //           locationName: data['locationId']['locationName'],
-  //           aboutUs: data['locationId']['aboutUs'],
-  //           imgUrl: data['restaurantId']['logo'],
-  //           address: data['locationId']['address'],
-  //           locationId: data['locationId']['_id'],
-  //           restaurantId: data['restaurantId']['_id'],
-  //           cuisine: data['locationId']['cuisine'],
-  //           deliveryInfo: data['locationId']['deliveryInfo'] != null
-  //               ? data['locationId']['deliveryInfo']['deliveryInfo']
-  //               : null,
-  //           workingHours: data['locationId']['workingHours'] ?? null,
-  //           locationInfo: data['locationId'],
-  //           taxInfo: data['restaurantId']['taxInfo'],
-  //           tableInfo: tableInfo,
-  //         ),
-  //       ),
-  //     );
-  //   });
-  // }
-
-  // Future barcodeScanning() async {
-  //   try {
-  //     String code = await BarcodeScanner.scan();
-  //     // setState(() {
-  //     Map<String, dynamic> barcode = json.decode(code);
-  //     tableInfo = barcode;
-  //     // });
-  //     getLocationInfoByTableId();
-  //     // _showBottomSheetForBarcodeView();
-  //   } on PlatformException catch (e) {
-  //     if (e.code == BarcodeScanner.CameraAccessDenied) {
-  //         if (mounted) {
-  // setState(() {
-  //         barcodeError = 'No camera permission!';
-  //       });
-  //     } else {
-  //         if (mounted) {
-  // setState(() => barcodeError = 'Unknown error: $e');
-  //     }
-  //   } on FormatException {
-  //       if (mounted) {
-  // setState(() => barcodeError = 'Nothing captured.');
-  //   } catch (e) {
-  //       if (mounted) {
-  // setState(() => barcodeError = 'Unknown error: $e');
-  //   }
-  // }
 
   void checkAndValidateToken() {
     Common.getToken().then((onValue) {
@@ -232,19 +161,15 @@ class HomePageState extends State<HomePage> {
   getNearByRestaurants() async {
     // if (!isNearByRestaurants) {
     currentLocation = await _location.getLocation();
-    // final coordinates =
-    //     new Coordinates(currentLocation.latitude, currentLocation.longitude);
-    // var addresses =
-    //     await Geocoder.local.findAddressesFromCoordinates(coordinates);
-    // var first = addresses.first;
-    // addressData = first.addressLine;
+    final coordinates =
+        new Coordinates(currentLocation.latitude, currentLocation.longitude);
+    var addresses =
+        await Geocoder.local.findAddressesFromCoordinates(coordinates);
+    var first = addresses.first;
+    addressData = first.addressLine;
     if (currentLocation != null && mounted) {
       setState(() {
-        position = {
-          'lat': currentLocation.latitude,
-          'long': currentLocation.longitude,
-          'name': addressData
-        };
+        position = {'lat': 12.8826165, 'long': 77.5500133, 'name': addressData};
       });
       await Common.savePositionInfo(position).then((onValue) {});
     }
@@ -360,31 +285,6 @@ class HomePageState extends State<HomePage> {
         shrinkWrap: true,
         physics: ScrollPhysics(),
         children: <Widget>[
-          // Container(
-          //   alignment: AlignmentDirectional.center,
-          //   height: 28.0,
-          //   color: prefix0.PRIMARY.withOpacity(0.7),
-          //   child: Row(
-          //     mainAxisAlignment: MainAxisAlignment.center,
-          //     crossAxisAlignment: CrossAxisAlignment.center,
-          //     children: <Widget>[
-          //       Text(
-          //         MyLocalizations.of(context).hello,
-          //         style: hintStyleWhiteLightOSR(),
-          //       ),
-          //       Text(" "),
-          //       fullname == null
-          //           ? Text(
-          //               MyLocalizations.of(context).greetTo('User'),
-          //               style: hintStyleWhiteLightOSR(),
-          //             )
-          //           : Text(
-          //               MyLocalizations.of(context).greetTo('$fullname'),
-          //               style: hintStyleWhiteLightOSR(),
-          //             ),
-          //     ],
-          //   ),
-          // ),
           Container(
             height: 180.0,
             width: screenWidth(context),
@@ -525,18 +425,68 @@ class HomePageState extends State<HomePage> {
                         padding: const EdgeInsets.all(0.0),
                         itemBuilder: (BuildContext context, int index) {
                           return InkWell(
-                              child: buildRestaurantCard(
+                              child: buildRestaurantCardNear(
                                   nearByRestaurentsList[index],
                                   review,
                                   branches),
-                              onTap: () {
-                                if (mounted) {
-                                  setState(() {
-                                    restaurantInfo =
-                                        nearByRestaurentsList[index];
-                                  });
-                                  _showBottomSheet();
-                                }
+                              onTap: () async {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        ProductListPage(
+                                      restaurantName:
+                                          nearByRestaurentsList[index]['list']
+                                                  ['restaurantID']
+                                              ['restaurantName'],
+                                      locationName: nearByRestaurentsList[index]
+                                          ['list']['locationName'],
+                                      aboutUs: nearByRestaurentsList[index]
+                                          ['list']['aboutUs'],
+                                      imgUrl: nearByRestaurentsList[index]
+                                                  ['list']['restaurantID'] !=
+                                              null
+                                          ? nearByRestaurentsList[index]['list']
+                                              ['restaurantID']['logo']
+                                          : null,
+                                      address: nearByRestaurentsList[index]
+                                          ['list']['address'],
+                                      locationId: nearByRestaurentsList[index]
+                                          ['list']['_id'],
+                                      restaurantId: nearByRestaurentsList[index]
+                                          ['list']['restaurantID']['_id'],
+                                      cuisine: nearByRestaurentsList[index]
+                                          ['list']['cuisine'],
+                                      deliveryInfo: nearByRestaurentsList[index]
+                                                  ['list']['deliveryInfo'] !=
+                                              null
+                                          ? nearByRestaurentsList[index]['list']
+                                              ['deliveryInfo']['deliveryInfo']
+                                          : null,
+                                      workingHours: nearByRestaurentsList[index]
+                                              ['list']['workingHours'] ??
+                                          null,
+                                      locationInfo: nearByRestaurentsList[index]
+                                          ['list'],
+                                      taxInfo: taxInfo,
+                                      locale: widget.locale,
+                                      localizedValues: widget.localizedValues,
+                                    ),
+                                  ),
+                                );
+                                // await Common.getPositionInfo().then((onValue) {
+                                //   nearByRestaurentsList[index]['list']
+                                //       ['taxInfo'] = taxInfo;
+                                //   nearByRestaurentsList[index]['list']
+                                //       ['position'] = onValue;
+                                //   if (mounted) {
+                                //     setState(() {
+                                //       restaurantInfo =
+                                //           nearByRestaurentsList[index];
+                                //     });
+                                //     _showBottomSheet();
+                                //   }
+                                // });
                               });
                         }),
                     // _buildViewAllButton('Near By'),
@@ -575,6 +525,8 @@ class HomePageState extends State<HomePage> {
                         topRatedRestaurantsList[index], review, branches),
                     onTap: () {
                       if (mounted) {
+                        topRatedRestaurantsList[index]['list']['taxInfo'] =
+                            taxInfo;
                         setState(() {
                           restaurantInfo = topRatedRestaurantsList[index];
                         });
@@ -619,6 +571,7 @@ class HomePageState extends State<HomePage> {
           return InkWell(
               child: buildRestaurantCard(data[index], review, branches),
               onTap: () {
+                data[index]['list']['taxInfo'] = taxInfo;
                 if (mounted) {
                   setState(() {
                     restaurantInfo = data[index];
@@ -689,6 +642,7 @@ class HomePageState extends State<HomePage> {
                 title: title,
                 localizedValues: widget.localizedValues,
                 locale: widget.locale,
+                taxInfo: taxInfo,
               ),
             ),
           );
@@ -831,12 +785,89 @@ class HomePageState extends State<HomePage> {
         children: <Widget>[
           buildCardImg(info), //for later use
           buildCardBottom(
-              info['list']['restaurantName'],
+              info['list']['restaurantName'] == null
+                  ? info['list']['locationName']
+                  : info['list']['restaurantName'],
               double.parse(info['list']['rating'].toString()),
               info['locationCount'],
               info['list']['reviewCount'],
               review,
               branches),
+        ],
+      ),
+    );
+  }
+
+  static Widget buildRestaurantCardNear(info, review, branches) {
+    return Card(
+      child: Column(
+        children: <Widget>[
+          buildCardImgnear(info), //for later use
+          buildCardBottomnear(
+              info['list']['locationName'],
+              double.parse(info['list']['rating'].toString()),
+              info['locationCount'],
+              info['list']['reviewCount'],
+              review,
+              branches),
+        ],
+      ),
+    );
+  }
+
+  static Widget buildCardImgnear(info) {
+    return Container(
+      padding: EdgeInsets.all(0.0),
+      height: 120.0,
+      width: 180.0,
+      decoration: getBgDecoration(info['list']['restaurantID']['logo'] ?? null),
+      child: null, //buildFavIcon(),
+    );
+  }
+
+  static Widget buildCardBottomnear(String restaurantName, double rating,
+      int locationCounter, int reviews, String review, branches) {
+    return Container(
+      padding: EdgeInsets.only(left: 5.0, right: 5.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        restaurantName,
+                        overflow: TextOverflow.ellipsis,
+                        style: titleStyle(),
+                      ),
+                    ),
+                    rating > 0
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: <Widget>[
+                              Text(" " + rating.toStringAsFixed(1),
+                                  style: priceDescription()),
+                              Icon(Icons.star, color: PRIMARY, size: 16.0),
+                            ],
+                          )
+                        : Container(),
+                  ],
+                ),
+                locationCounter != null
+                    ? Text(
+                        locationCounter.toString() + ' $branches',
+                        style: subBoldTitle(),
+                      )
+                    : Container(),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -882,44 +913,45 @@ class HomePageState extends State<HomePage> {
   static Widget buildCardBottom(String restaurantName, double rating,
       int locationCounter, int reviews, String review, branches) {
     return Container(
-      padding: EdgeInsets.all(6.0),
+      padding: EdgeInsets.only(left: 5.0, right: 5.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Column(
-            children: <Widget>[
-              Text(
-                restaurantName,
-                style: titleStyle(),
-              ),
-              locationCounter != null
-                  ? Text(
-                      locationCounter.toString() + ' $branches',
-                      style: subBoldTitle(),
-                    )
-                  : Container(),
-            ],
-          ),
-          Flexible(
-            child: rating > 0
-                ? Column(
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          Text(" " + rating.toStringAsFixed(1) + " ",
-                              style: priceDescription()),
-                          Icon(Icons.star, color: PRIMARY, size: 16.0),
-                        ],
-                      ),
-                      Text(
-                        '(' + reviews.toString() + ') ' + review,
-                        style: hintStyleSmallTextDarkOSR(),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        restaurantName,
                         overflow: TextOverflow.ellipsis,
+                        style: titleStyle(),
+                      ),
+                    ),
+                    rating > 0
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: <Widget>[
+                              Text(" " + rating.toStringAsFixed(1),
+                                  style: priceDescription()),
+                              Icon(Icons.star, color: PRIMARY, size: 16.0),
+                            ],
+                          )
+                        : Container(),
+                  ],
+                ),
+                locationCounter != null
+                    ? Text(
+                        locationCounter.toString() + ' $branches',
+                        style: subBoldTitle(),
                       )
-                    ],
-                  )
-                : Text(''),
+                    : Container(),
+              ],
+            ),
           ),
         ],
       ),

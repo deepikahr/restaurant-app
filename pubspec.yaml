@@ -23,8 +23,8 @@ dependencies:
   toast: ^0.1.5
   sentry: ^3.0.1
   flutter_datetime_picker: ^1.3.5
-  google_map_location_picker: ^3.2.1+2
-  stripe_payment: ^1.0.6
+  flutter_map_picker: ^0.1.2
+  stripe_payment: ^1.0.7
   flutter_localizations:
     sdk: flutter
 
@@ -38,9 +38,9 @@ flutter:
     - lib/assets/i18n/en.json
     - lib/assets/i18n/fr.json
     - lib/assets/i18n/zh.json
-    - lib/assets/i18n/ka.json
     - lib/assets/i18n/ar.json
     - lib/assets/logos/logo.png
+    - lib/assets/logos/playstore-icon.png
     - lib/assets/bgImgs/background.png
     - lib/assets/bgImgs/confirmedbg.png
     - lib/assets/bgImgs/cover.png

@@ -1,14 +1,15 @@
-import 'package:flutter/material.dart';
 import 'package:async_loader/async_loader.dart';
-import '../../styles/styles.dart';
-import '../../services/main-service.dart';
-import '../../widgets/no-data.dart';
-import '../../widgets/location-card.dart';
-import 'product-list.dart';
-import 'location-list.dart';
-import '../../services/sentry-services.dart';
-import '../../services/localizations.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../services/localizations.dart';
+import '../../services/main-service.dart';
+import '../../services/sentry-services.dart';
+import '../../styles/styles.dart';
+import '../../widgets/location-card.dart';
+import '../../widgets/no-data.dart';
+import 'location-list.dart';
+import 'product-list.dart';
 
 SentryError sentryError = new SentryError();
 

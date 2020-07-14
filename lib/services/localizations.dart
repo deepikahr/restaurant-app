@@ -24,6 +24,14 @@ class MyLocalizations {
     return localizedValues[locale.languageCode]['home'];
   }
 
+  String get work {
+    return localizedValues[locale.languageCode]['work'];
+  }
+
+  String get others {
+    return localizedValues[locale.languageCode]['others'];
+  }
+
   String get cart {
     return localizedValues[locale.languageCode]['cart'];
   }
@@ -881,6 +889,135 @@ class MyLocalizations {
 
   String get removephoto {
     return localizedValues[locale.languageCode]['removephoto'];
+  }
+
+  String get enableTogetlocation {
+    return localizedValues[locale.languageCode]['enableTogetlocation'];
+  }
+
+  String get gPSsettings {
+    return localizedValues[locale.languageCode]['gPSsettings'];
+  }
+
+  String get producthasbeenaddedtocart {
+    return localizedValues[locale.languageCode]['producthasbeenaddedtocart'];
+  }
+
+  String get addYourRestaurant {
+    return localizedValues[locale.languageCode]['addYourRestaurant'];
+  }
+
+  String get selectPaymentMethod {
+    return localizedValues[locale.languageCode]['selectPaymentMethod'];
+  }
+
+  String get addToCart {
+    return localizedValues[locale.languageCode]['addToCart'];
+  }
+
+  String get accepted {
+    return localizedValues[locale.languageCode]['accepted'];
+  }
+
+  String get ontheWay {
+    return localizedValues[locale.languageCode]['ontheWay'];
+  }
+
+  String get delivered {
+    return localizedValues[locale.languageCode]['delivered'];
+  }
+
+  String get cancelled {
+    return localizedValues[locale.languageCode]['cancelled'];
+  }
+
+  String get pending {
+    return localizedValues[locale.languageCode]['pending'];
+  }
+
+  String get yourProfileSuccessfullyUpdated {
+    return localizedValues[locale.languageCode]
+        ['yourProfileSuccessfullyUpdated'];
+  }
+
+  String get yourProfilePictureSuccessfullyUpdated {
+    return localizedValues[locale.languageCode]
+        ['yourProfilePictureSuccessfullyUpdated'];
+  }
+
+  String get pleaseCheckInternetConnection {
+    return localizedValues[locale.languageCode]
+        ['pleaseCheckInternetConnection'];
+  }
+
+  String get tax {
+    return localizedValues[locale.languageCode]['tax'];
+  }
+
+  String get useLoyaltyPoints {
+    return localizedValues[locale.languageCode]['useLoyaltyPoints'];
+  }
+
+  String get yourorderamountshouldbemorethan {
+    return localizedValues[locale.languageCode]
+        ['yourorderamountshouldbemorethan'];
+  }
+
+  String get touseloyaltypointYouhave {
+    return localizedValues[locale.languageCode]['touseloyaltypointYouhave'];
+  }
+
+  String get pointsonyouraccountPlaceorderstogetmore {
+    return localizedValues[locale.languageCode]
+        ['pointsonyouraccountPlaceorderstogetmore'];
+  }
+
+  String get youdonthaveenoughloyaltypointsMinimum {
+    return localizedValues[locale.languageCode]
+        ['youdonthaveenoughloyaltypointsMinimum'];
+  }
+
+  String get pointsrequiredtouseitYouhaveonly {
+    return localizedValues[locale.languageCode]
+        ['pointsrequiredtouseitYouhaveonly'];
+  }
+
+  String get loyaltyisnotapplicable {
+    return localizedValues[locale.languageCode]['loyaltyisnotapplicable'];
+  }
+
+  String get quantity {
+    return localizedValues[locale.languageCode]['quantity'];
+  }
+
+  String get orderAcceptedbyvendor {
+    return localizedValues[locale.languageCode]['orderAcceptedbyvendor'];
+  }
+
+  String get yourorderisontheway {
+    return localizedValues[locale.languageCode]['yourorderisontheway'];
+  }
+
+  String get yourorderhasbeendeliveredshareyourexperiencewithus {
+    return localizedValues[locale.languageCode]
+        ['yourorderhasbeendeliveredshareyourexperiencewithus'];
+  }
+
+  String get yourorderiscancelledsorryforinconvenience {
+    return localizedValues[locale.languageCode]
+        ['Yourorderiscancelledsorryforinconvenience'];
+  }
+
+  String get items {
+    return localizedValues[locale.languageCode]['items'];
+  }
+
+  String get homePage {
+    return localizedValues[locale.languageCode]['homePage'];
+  }
+
+  String get stripe {
+    return localizedValues[locale.languageCode]['stripe'];
   }
 
   greetTo(name) {

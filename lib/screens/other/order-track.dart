@@ -70,6 +70,21 @@ class OrderTrackState extends State<OrderTrack> {
   }
 
   Widget _buildOrderTrackBody(Map<String, dynamic> order) {
+    String status;
+    if (order['status'] == "Accepted") {
+      status = MyLocalizations.of(context).accepted;
+    } else if (order['status'] == "On the way.") {
+      status = MyLocalizations.of(context).ontheWay;
+    } else if (order['status'] == "Delivered") {
+      status = MyLocalizations.of(context).delivered;
+    } else if (order['status'] == "Cancelled") {
+      status = MyLocalizations.of(context).cancelled;
+    } else if (order['status'] == "Pending") {
+      status = MyLocalizations.of(context).pending;
+    } else {
+      status = order['status'];
+    }
+
     return SingleChildScrollView(
       child: new Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,10 +123,12 @@ class OrderTrackState extends State<OrderTrack> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
-                          new Padding(padding: EdgeInsets.only(top: 0.0)),
-                          new Text(
-                            MyLocalizations.of(context).orderProgress + '...',
-                            style: textOSl(),
+                          new Padding(
+                            padding: EdgeInsets.only(left: 6.0, right: 6.0),
+                            child: new Text(
+                              MyLocalizations.of(context).orderProgress + '...',
+                              style: textOSl(),
+                            ),
                           ),
                         ],
                       ),
@@ -123,9 +140,7 @@ class OrderTrackState extends State<OrderTrack> {
                             ': ' +
                             order['orderID'].toString()),
                         new Text(
-                          MyLocalizations.of(context).status +
-                              ': ' +
-                              order['status'],
+                          MyLocalizations.of(context).status + ': ' + status,
                           style: TextStyle(color: Colors.green),
                         ),
                       ],
@@ -140,6 +155,29 @@ class OrderTrackState extends State<OrderTrack> {
               shrinkWrap: true,
               itemCount: order['userNotification'].length,
               itemBuilder: (BuildContext context, int index) {
+                String status;
+                if (order['userNotification'][index]['status'] == "Pending") {
+                  status = MyLocalizations.of(context).pending;
+                } else if (order['userNotification'][index]['status'] ==
+                    "Order Accepted by vendor.") {
+                  status = MyLocalizations.of(context).orderAcceptedbyvendor;
+                } else if (order['userNotification'][index]['status'] ==
+                    "Your order is on the way.") {
+                  status = MyLocalizations.of(context).yourorderisontheway;
+                } else if (order['userNotification'][index]['status'] ==
+                    "Your order has been delivered,Share your experience with us.") {
+                  order['userNotification'][index]['status'] =
+                      MyLocalizations.of(context)
+                          .yourorderhasbeendeliveredshareyourexperiencewithus;
+                } else if (order['userNotification'][index]['status'] ==
+                    "Your order is cancelled,sorry for inconvenience.") {
+                  order['userNotification'][index]['status'] =
+                      MyLocalizations.of(context)
+                          .yourorderiscancelledsorryforinconvenience;
+                } else {
+                  status = order['userNotification'][index]['status'];
+                }
+
                 return new Padding(
                   padding: EdgeInsets.all(10.0),
                   child: new Column(
@@ -166,7 +204,8 @@ class OrderTrackState extends State<OrderTrack> {
                                 new Container(
                                   width: 3.0,
                                   height: 10.0,
-                                  margin: EdgeInsets.only(left: 9.0, top: 5.0),
+                                  margin: EdgeInsets.only(
+                                      left: 9.0, top: 5.0, right: 9.0),
                                   decoration: new BoxDecoration(
                                     border: Border.all(color: PRIMARY),
                                     color: PRIMARY,
@@ -183,10 +222,7 @@ class OrderTrackState extends State<OrderTrack> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: <Widget>[
                                 new Text(
-                                  (index + 1).toString() +
-                                      '. ' +
-                                      order['userNotification'][index]
-                                          ['status'],
+                                  (index + 1).toString() + '. ' + status,
                                   style: textOSl(),
                                 ),
                                 // new Padding(padding: EdgeInsets.only(top: 5.0)),

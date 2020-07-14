@@ -117,7 +117,7 @@ class _DrawerPageState extends State<DrawerPage> {
                               : Container(height: 0, width: 0),
                           _buildMenuTileList(
                             'lib/assets/icon/spoon.png',
-                            MyLocalizations.of(context).home,
+                            MyLocalizations.of(context).homePage,
                             0,
                             route: HomePage(
                               locale: widget.locale,
@@ -144,17 +144,17 @@ class _DrawerPageState extends State<DrawerPage> {
                                   ),
                                 )
                               : Container(height: 0, width: 0),
-                          isLoggedIn
-                              ? _buildMenuTileList(
-                                  'lib/assets/icon/favorite.png',
-                                  MyLocalizations.of(context).favourites,
-                                  0,
-                                  route: Favorites(
-                                    locale: widget.locale,
-                                    localizedValues: widget.localizedValues,
-                                  ),
-                                )
-                              : Container(height: 0, width: 0),
+                          // isLoggedIn
+                          //     ? _buildMenuTileList(
+                          //         'lib/assets/icon/favorite.png',
+                          //         MyLocalizations.of(context).favourites,
+                          //         0,
+                          //         route: Favorites(
+                          //           locale: widget.locale,
+                          //           localizedValues: widget.localizedValues,
+                          //         ),
+                          //       )
+                          //     : Container(height: 0, width: 0),
                           isLoggedIn
                               ? _buildMenuTileList(
                                   'lib/assets/icon/settings.png',

@@ -88,6 +88,15 @@ class _OrderDetailsState extends State<OrderDetails> {
     if (order['tableNumber'] != null) {
       tableNumber = ' for Table number : ' + order['tableNumber'].toString();
     }
+    if (order['orderType'] == "Pickup") {
+      order['orderType'] = MyLocalizations.of(context).pickUp;
+    } else if (order['orderType'] == "Dine In") {
+      order['orderType'] = MyLocalizations.of(context).dineIn;
+    } else if (order['orderType'] == "Delivery") {
+      order['orderType'] = MyLocalizations.of(context).dELIVERY;
+    } else {
+      order['orderType'] = order['orderType'];
+    }
     return SingleChildScrollView(
       child: new Column(
         crossAxisAlignment: CrossAxisAlignment.start,

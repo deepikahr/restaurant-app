@@ -1,13 +1,16 @@
 import 'package:RestaurantSaas/screens/mains/home.dart';
 import 'package:flutter/material.dart';
-import '../../styles/styles.dart';
+
 import '../../services/common.dart';
 import '../../services/localizations.dart';
+import '../../styles/styles.dart';
 
 class ThankYou extends StatefulWidget {
   final Map<String, Map<String, String>> localizedValues;
   final String locale;
+
   ThankYou({Key key, this.localizedValues, this.locale}) : super(key: key);
+
   @override
   _ThankYouState createState() => _ThankYouState();
 }
@@ -19,6 +22,7 @@ class _ThankYouState extends State<ThankYou> {
   }
 
   Widget build(BuildContext context) {
+    Common.addProduct([]);
     Common.removeCart();
     return Scaffold(
       body: Container(

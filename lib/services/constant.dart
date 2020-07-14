@@ -5,16 +5,16 @@ const APP_NAME = 'Restaurant Saas';
 const ONE_SIGNAL_APP_ID = '05ac6c51-8416-41ab-8779-b48503bbe125';
 
 // google api key
-const GOOGLE_API_KEY = "AIzaSyDXxt_aIn5HWQZg3gFYOqcuf8hjUuzmvKg";
+const GOOGLE_API_KEY = "AIzaSyBAwPGO0nO-z1aXVgEJg5G_XRAo6RnepSw";
 
 //api urls
-// const BASE_URL = 'http://74a05cc0.ngrok.io/';
+// const BASE_URL = 'https://c263c67dacb1.ngrok.io/';
 
 // api deploy testing
-// const BASE_URL = 'http://162.243.171.81:8000/';
+const BASE_URL = 'http://162.243.171.81:8000/';
 
 // api deploy production
-const BASE_URL = 'http://162.243.171.81:7000/';
+// const BASE_URL = 'http://162.243.171.81:7000/';
 
 // api deploy heroku
 // const BASE_URL = 'https://restaurant-sass.herokuapp.com/';
