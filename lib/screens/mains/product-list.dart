@@ -1,5 +1,4 @@
-import 'package:RestaurantSaas/screens/other/product-tile.dart';
-import 'package:RestaurantSaas/services/common.dart';
+import 'package:RestaurantSaas/screens/mains/product-details.dart';
 import 'package:async_loader/async_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -30,43 +29,38 @@ class ProductListPage extends StatefulWidget {
   final Map<String, Map<String, String>> localizedValues;
   final String locale;
 
-  ProductListPage({
-    Key key,
-    this.restaurantName,
-    this.locationName,
-    this.aboutUs,
-    this.imgUrl,
-    this.address,
-    this.locationId,
-    this.restaurantId,
-    this.cuisine,
-    this.deliveryInfo,
-    this.workingHours,
-    this.locationInfo,
-    this.taxInfo,
-    this.locale,
-    this.localizedValues,
-  }) : super(key: key);
+  ProductListPage(
+      {Key key,
+      this.restaurantName,
+      this.locationName,
+      this.aboutUs,
+      this.imgUrl,
+      this.address,
+      this.locationId,
+      this.restaurantId,
+      this.cuisine,
+      this.deliveryInfo,
+      this.workingHours,
+      this.locationInfo,
+      this.taxInfo,
+      this.locale,
+      this.localizedValues})
+      : super(key: key);
 
   @override
-  ProductListPageState createState() => ProductListPageState();
+  _ProductListPageState createState() => _ProductListPageState();
 }
 
-class ProductListPageState extends State<ProductListPage> {
+class _ProductListPageState extends State<ProductListPage> {
   final GlobalKey<AsyncLoaderState> _asyncLoaderState =
       GlobalKey<AsyncLoaderState>();
   bool isopenAndCloseTimeLoading = false;
-  int productQuantity = 1;
   int cartCount;
   String openAndCloseTime;
-  bool isProductAdded = false;
+
   double price = 0;
 
   Map<String, dynamic> cartProduct;
-
-  List<dynamic> tempProducts = [];
-
-  int quantity = 1;
 
   getProductList() async {
     return await MainService.getProductsBylocationId(widget.locationId);
@@ -99,13 +93,7 @@ class ProductListPageState extends State<ProductListPage> {
         .then((verifyOpenAndCloseTime) {
       if (mounted) {
         setState(() {
-          if (verifyOpenAndCloseTime['message'] == "Open") {
-            openAndCloseTime = MyLocalizations.of(context).open;
-          } else if (verifyOpenAndCloseTime['message'] == "Close") {
-            openAndCloseTime = MyLocalizations.of(context).closed;
-          } else {
-            openAndCloseTime = verifyOpenAndCloseTime['message'];
-          }
+          openAndCloseTime = verifyOpenAndCloseTime['message'];
           isopenAndCloseTimeLoading = false;
         });
       }
@@ -193,6 +181,7 @@ class ProductListPageState extends State<ProductListPage> {
                     builder: (BuildContext context) => CartPage(
                       localizedValues: widget.localizedValues,
                       locale: widget.locale,
+                      product: cartProduct,
                       taxInfo: widget.taxInfo,
                       locationInfo: widget.locationInfo,
                     ),
@@ -252,34 +241,71 @@ class ProductListPageState extends State<ProductListPage> {
           ),
         ),
       ),
+//      bottomNavigationBar: GestureDetector(
+//        onTap: () {
+//          Navigator.push(
+//            context,
+//            MaterialPageRoute(
+//              builder: (BuildContext context) => CartPage(
+//                locale: widget.locale,
+//                localizedValues: widget.localizedValues,
+//              ),
+//            ),
+//          );
+//        },
+//        child: Container(
+//          height: 50.0,
+//          color: PRIMARY,
+//          child: Row(
+//            mainAxisAlignment: MainAxisAlignment.center,
+//            children: <Widget>[
+//              Text(
+//                MyLocalizations.of(context).goToCart,
+//                style: subTitleWhiteBOldOSB(),
+//              ),
+//            ],
+//          ),
+//        ),
+//      ),
     );
   }
 
-  void addProduct() async {
-    await Common.getProducts().then((productsList) {
-      if (productsList != null) {
-        tempProducts = productsList;
-        tempProducts.add(cartProduct);
-        for (int i = 0; i < tempProducts.length; i++) {}
-        Common.addProduct(tempProducts).then((value) {
-          Toast.show(
-              MyLocalizations.of(context).producthasbeenaddedtocart, context,
-              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-        });
-      } else {
-        tempProducts.add(cartProduct);
-        Common.addProduct(tempProducts).then((value) {
-          Toast.show(
-              MyLocalizations.of(context).producthasbeenaddedtocart, context,
-              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-        });
-      }
-      try {} catch (error, stackTrace) {
-        sentryError.reportError(error, stackTrace);
-      }
-    }).catchError((onError) {
-      sentryError.reportError(onError, null);
-    });
+  void _calculatePrice(final Map<String, dynamic> product) {
+    price = 0;
+    Map<String, dynamic> variant = product['variants'][0];
+    price = price + variant['price'];
+
+    if (mounted) {
+      setState(() {
+        price = price * 1;
+      });
+    }
+    List<dynamic> extraIngredientsList = List<dynamic>();
+    if (product['extraIngredients'].length > 0 &&
+        product['extraIngredients'][0] != null) {
+      product['extraIngredients'].forEach((item) {
+        if (item != null && item['isSelected'] != null && item['isSelected']) {
+          price = price + item['price'];
+          extraIngredientsList.add(item);
+        }
+      });
+    }
+    cartProduct = {
+      'Discount': variant['Discount'],
+      'MRP': variant['MRP'],
+      'note': null,
+      'Quantity': 1,
+      'price': variant['price'],
+      'extraIngredients': extraIngredientsList,
+      'imageUrl': product['imageUrl'],
+      'productId': product['_id'],
+      'size': variant['size'],
+      'title': product['title'],
+      'restaurant': widget.restaurantName,
+      'restaurantID': widget.restaurantId,
+      'totalPrice': price,
+      'restaurantAddress': widget.address
+    };
   }
 
   Widget _buildBgImg() {
@@ -311,7 +337,7 @@ class ProductListPageState extends State<ProductListPage> {
 
   Widget _buildLocatioNameView() {
     return Padding(
-      padding: EdgeInsets.only(top: 30.0),
+      padding: EdgeInsets.only(top: 60.0),
       child: Text(
         widget.locationName,
         style: titleLightWhiteOSS(),
@@ -321,9 +347,7 @@ class ProductListPageState extends State<ProductListPage> {
 
   Widget _buildAboutUsView() {
     return Text(
-      widget.aboutUs.length > 100
-          ? widget.aboutUs.substring(0, 100)
-          : widget.aboutUs,
+      widget.aboutUs,
       style: hintStyleSmallTextWhiteOSL(),
     );
   }
@@ -432,6 +456,35 @@ class ProductListPageState extends State<ProductListPage> {
     );
   }
 
+  // Widget _buildInfoBar() {
+  //   return Container(
+  //     margin: EdgeInsetsDirectional.only(top: 220.0),
+  //     color: PRIMARY,
+  //     child: ListTile(
+  //       leading: Image(
+  //         image: AssetImage('lib/assets/icon/qmark.png'),
+  //         height: 18.0,
+  //       ),
+  //       title: Text(
+  //         (widget.deliveryInfo != null &&
+  //                 widget.deliveryInfo['freeDelivery'] &&
+  //                 widget.deliveryInfo['amountEligibility'] != null)
+  //             ? MyLocalizations.of(context).freeDeliveryAbove +
+  //                 ' $currency ${widget.deliveryInfo['amountEligibility'].toString()}'
+  //             : (widget.deliveryInfo != null &&
+  //                     !widget.deliveryInfo['freeDelivery'])
+  //                 ? MyLocalizations.of(context).deliveryChargesOnly +
+  //                     ' $currency ${widget.deliveryInfo['deliveryCharges'].toString()}'
+  //                 : MyLocalizations.of(context).freeDeliveryAvailable,
+  //         style: hintStyleSmallWhiteLightOSL(),
+  //       ),
+  //       // trailing: Icon(
+  //       //   Icons.chevron_right,
+  //       //   color: Colors.white,
+  //       // ),
+  //     ),
+  //   );
+  // }
   Widget _buildInfoBar() {
     if (widget.deliveryInfo != null &&
         widget.deliveryInfo['isDeliveryAvailable'] != null &&
@@ -507,26 +560,40 @@ class ProductListPageState extends State<ProductListPage> {
                 shrinkWrap: true,
                 itemCount: products.length,
                 itemBuilder: (BuildContext context, int index) {
-                  return BuildProductTile(
-                    locationInfo: widget.locationInfo,
-                    taxInfo: widget.taxInfo,
-                    restaurantId: widget.restaurantId,
-                    restaurantName: widget.restaurantName,
-                    address: widget.address,
-                    localizedValues: widget.localizedValues,
-                    locale: widget.locale,
-                    imgUrl: products[index]['imgUrl'],
-                    mrp: double.parse(
-                        products[index]['variants'][0]['MRP'].toString()),
-                    price: double.parse(
-                        products[index]['variants'][0]['price'].toString()),
-                    product: products[index],
-                    currency: currency,
-                    topPadding: index == 0 ? 42.0 : 0,
-                    off: double.parse(
-                        products[index]['variants'][0]['Discount'].toString()),
-                    productName: products[index]['title'],
-                    info: products[index]['description'],
+                  return InkWell(
+                    onTap: () {
+//                      _calculatePrice(products[index]);
+//                      Toast.show('Product added to Cart', context,
+//                          duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+
+                      //TODO:commented for testing
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (BuildContext context) => ProductDetailsPage(
+                              locale: widget.locale,
+                              localizedValues: widget.localizedValues,
+                              product: products[index],
+                              restaurantName: widget.restaurantName,
+                              restaurantId: widget.restaurantId,
+                              locationInfo: widget.locationInfo,
+                              taxInfo: widget.taxInfo,
+                              restaurantAddress: widget.address),
+                        ),
+                      );
+                    },
+                    child: _buildProductTile(
+                        products[index]['imgUrl'],
+                        products[index]['title'],
+                        double.parse(
+                            products[index]['variants'][0]['MRP'].toString()),
+                        double.parse(products[index]['variants'][0]['Discount']
+                            .toString()),
+                        double.parse(
+                            products[index]['variants'][0]['price'].toString()),
+                        products[index]['description'],
+                        index == 0 ? 42.0 : 0),
                   );
                 }),
           ],
@@ -540,6 +607,157 @@ class ProductListPageState extends State<ProductListPage> {
                   style: subTitleDarkBoldOSS(),
                 ),
         ),
+      ],
+    );
+  }
+
+  // Widget _buildCategoryTitle(
+  //     String categoryName, String imgUrl, List<dynamic> products) {
+  //   return Stack(
+  //     fit: StackFit.passthrough,
+  //     children: <Widget>[
+  //       Image(
+  //         image: imgUrl != null
+  //             ? NetworkImage(imgUrl)
+  //             : AssetImage("lib/assets/headers/menu.png"),
+  //         fit: BoxFit.fill,
+  //         height: 42.0,
+  //       ),
+  //       Container(
+  //         padding: EdgeInsetsDirectional.only(top: 8.0, start: 14.0),
+  //         alignment: AlignmentDirectional.centerStart,
+  //         child: Text(
+  //           "${categoryName[0].toUpperCase()}${categoryName.substring(1)}",
+  //           style: titleWhiteBoldOSB(),
+  //         ),
+  //       ),
+  //       ListView.builder(
+  //           physics: ScrollPhysics(),
+  //           shrinkWrap: true,
+  //           itemCount: products.length,
+  //           itemBuilder: (BuildContext context, int index) {
+  //             return InkWell(
+  //               onTap: () {
+  //                 Navigator.push(
+  //                   context,
+  //                   MaterialPageRoute(
+  //                     builder: (BuildContext context) => ProductDetailsPage(
+  //                         localizedValues: widget.localizedValues,
+  //                         locale: widget.locale,
+  //                         product: products[index],
+  //                         restaurantName: widget.restaurantName,
+  //                         restaurantId: widget.restaurantId,
+  //                         locationInfo: widget.locationInfo,
+  //                         taxInfo: widget.taxInfo),
+  //                   ),
+  //                 );
+  //               },
+  //               child: _buildProductTile(
+  //                   products[index]['imgUrl'],
+  //                   products[index]['title'],
+  //                   double.parse(
+  //                       products[index]['variants'][0]['MRP'].toString()),
+  //                   double.parse(
+  //                       products[index]['variants'][0]['Discount'].toString()),
+  //                   double.parse(
+  //                       products[index]['variants'][0]['price'].toString()),
+  //                   products[index]['description'],
+  //                   index == 0 ? 42.0 : 0),
+  //             );
+  //           }),
+  //     ],
+  //   );
+  // }
+
+  Widget _buildProductTile(String imgUrl, String productName, double mrp,
+      double off, double price, String info, double topPadding) {
+    return Column(
+      children: <Widget>[
+        ListTile(
+          contentPadding: EdgeInsets.only(left: 10.0, right: 10.0, bottom: 0.0),
+          title: _buildProductTileTitle(
+              imgUrl, productName, mrp, off, price, info),
+          subtitle: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Container(
+                  height: 20.0,
+                  child: Row(
+                    children: <Widget>[
+                      Text(
+                        info,
+                        style: hintStyleGreyLightOSR(),
+                      ),
+                    ],
+                  )),
+              off > 0
+                  ? Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            border: Border.all(color: Color(0xFFFF0000)),
+                            borderRadius: BorderRadius.circular(5.0)),
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                              left: 15.0, top: 2.0, bottom: 2.0, right: 15.0),
+                          child: Text(
+                            off.toStringAsFixed(1) + '% off',
+                            style: hintStyleRedOSS(),
+                          ),
+                        ),
+                      ),
+                    )
+                  : Text(''),
+            ],
+          ),
+          trailing: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                '$currency' + price.toStringAsFixed(2),
+                style: subTitleDarkBoldOSS(),
+              ),
+              Container(
+                padding: EdgeInsetsDirectional.only(top: 18.0),
+                child: Image.asset(
+                  'lib/assets/icon/addbtn.png',
+                  width: 16.0,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Divider(),
+      ],
+    );
+  }
+
+  Widget _buildProductTileTitle(String imgUrl, String productName, double mrp,
+      double off, double price, String info) {
+    return Row(
+      children: <Widget>[
+        Text(
+          productName.length > 21
+              ? "${productName[0].toUpperCase()}${productName.substring(1, 21) + '...'}"
+              : "${productName[0].toUpperCase()}${productName.substring(1)}",
+          style: subTitleDarkBoldOSS(),
+        ),
+        Padding(padding: EdgeInsets.all(5.0)),
+        off > 0
+            ? Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5.0), color: PRIMARY),
+                child: Padding(
+                  padding: EdgeInsets.only(left: 5.0, right: 5.0),
+                  child: Text(
+                    '$currency ' + mrp.toStringAsFixed(2),
+                    style: hintStyleSmallWhiteLightOSSStrike(),
+                  ),
+                ),
+              )
+            : Text(''),
       ],
     );
   }

@@ -1,14 +1,16 @@
 import 'dart:async';
-import '../../services/localizations.dart';
-import '../../services/counter-service.dart';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:toast/toast.dart';
+
+import '../../services/common.dart';
+import '../../services/counter-service.dart';
+import '../../services/localizations.dart';
+import '../../services/profile-service.dart';
+import '../../services/sentry-services.dart';
 import '../../styles/styles.dart';
 import 'cart.dart';
-import '../../services/common.dart';
-import '../../services/profile-service.dart';
-import 'package:toast/toast.dart';
-import '../../services/sentry-services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
 
@@ -40,11 +42,14 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   int quantity = 1, cartCount;
   double price = 0;
   Map<String, dynamic> cartProduct;
+  List<dynamic> tempProducts = [];
   bool isLoading = true;
   bool isFavourite = false;
+  bool isAdded = false;
   String favouriteId;
   bool isLoggedIn = false;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   void _changeProductQuantity(bool increase) {
     if (increase) {
       if (mounted) {
@@ -261,6 +266,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     builder: (BuildContext context) => CartPage(
                       locale: widget.locale,
                       localizedValues: widget.localizedValues,
+                      taxInfo: widget.taxInfo,
+                      locationInfo: widget.locationInfo,
                     ),
                   ),
                 );
@@ -648,8 +655,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            new Text(
-              MyLocalizations.of(context).goToCart,
+            Text(
+              isAdded ? 'Added to cart' : 'Add to cart',
               style: hintStyleWhiteLightOSB(),
             ),
             new Text(
@@ -684,19 +691,21 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     });
   }
 
-  void _goToCart() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (BuildContext context) => CartPage(
-          localizedValues: widget.localizedValues,
-          locale: widget.locale,
-          product: cartProduct,
-          taxInfo: widget.taxInfo,
-          locationInfo: widget.locationInfo,
-        ),
-      ),
-    );
+  void _goToCart() async {
+    addProduct();
+    //TODO: commented for testing
+//    Navigator.push(
+//      context,
+//      MaterialPageRoute(
+//        builder: (BuildContext context) => CartPage(
+//          localizedValues: widget.localizedValues,
+//          locale: widget.locale,
+//          product: cartProduct,
+//          taxInfo: widget.taxInfo,
+//          locationInfo: widget.locationInfo,
+//        ),
+//      ),
+//    );
   }
 
   Future<void> _showClearCartAlert() async {
@@ -734,5 +743,41 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         );
       },
     );
+  }
+
+  void addProduct() async {
+    await Common.getProducts().then((productsList) {
+      if (productsList != null) {
+        tempProducts = productsList;
+        tempProducts.add(cartProduct);
+        for (int i = 0; i < tempProducts.length; i++) {
+          print(tempProducts[i]['size'].toString());
+        }
+        Common.addProduct(tempProducts).then((value) {
+          setState(() {
+            isAdded = true;
+          });
+          Toast.show('product has been added to cart', context,
+              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+          print(value.toString());
+        });
+      } else {
+        tempProducts.add(cartProduct);
+      }
+      try {
+        Common.addProduct(tempProducts).then((value) {
+          setState(() {
+            isAdded = true;
+          });
+          Toast.show('product has been added to cart', context,
+              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+          print(value.toString());
+        });
+      } catch (error, stackTrace) {
+        sentryError.reportError(error, stackTrace);
+      }
+    }).catchError((onError) {
+      sentryError.reportError(onError, null);
+    });
   }
 }

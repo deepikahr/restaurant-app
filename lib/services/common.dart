@@ -1,20 +1,10 @@
 import 'dart:async';
-
-import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
-class Common {
-  // save token on storage
-  static Future<bool> setToken(String token) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.setString('token', token);
-  }
+import 'package:shared_preferences/shared_preferences.dart';
 
-  // get token from storage
-  static Future<String> getToken() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return Future(() => prefs.getString('token'));
-  }
+class Common {
+  List<dynamic> products = List();
 
   static Future<bool> addProduct(List<dynamic> products) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -29,6 +19,18 @@ class Common {
     } catch (err) {
       return Future(() => null);
     }
+  }
+
+  // save token on storage
+  static Future<bool> setToken(String token) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setString('token', token);
+  }
+
+  // get token from storage
+  static Future<String> getToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return Future(() => prefs.getString('token'));
   }
 
   // remove token from storage
@@ -72,6 +74,7 @@ class Common {
   // remove cart items from storage
   static Future<bool> removeCart() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove('product');
     return prefs.remove('cart');
   }
 
