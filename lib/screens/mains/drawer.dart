@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../styles/styles.dart';
 import '../other/orders.dart';
-import '../other/favorites.dart';
 import '../../services/common.dart';
 import '../../screens/auth/login.dart';
 import '../../screens/mains/cart.dart';
@@ -16,7 +15,7 @@ import '../../services/localizations.dart';
 
 class DrawerPage extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
-  final Map<String, Map<String, String>> localizedValues;
+  final Map localizedValues;
   final String locale;
   DrawerPage({Key key, this.scaffoldKey, this.locale, this.localizedValues})
       : super(key: key);
@@ -117,7 +116,8 @@ class _DrawerPageState extends State<DrawerPage> {
                               : Container(height: 0, width: 0),
                           _buildMenuTileList(
                             'lib/assets/icon/spoon.png',
-                            MyLocalizations.of(context).homePage,
+                            MyLocalizations.of(context)
+                                .getLocalizations("HOME"),
                             0,
                             route: HomePage(
                               locale: widget.locale,
@@ -126,7 +126,8 @@ class _DrawerPageState extends State<DrawerPage> {
                           ),
                           _buildMenuTileList(
                             'lib/assets/icon/carte.png',
-                            MyLocalizations.of(context).cart,
+                            MyLocalizations.of(context)
+                                .getLocalizations("CART"),
                             cartCounter != null ? cartCounter : 0,
                             route: CartPage(
                               locale: widget.locale,
@@ -136,7 +137,8 @@ class _DrawerPageState extends State<DrawerPage> {
                           isLoggedIn
                               ? _buildMenuTileList(
                                   'lib/assets/icon/orderHistory.png',
-                                  MyLocalizations.of(context).myOrders,
+                                  MyLocalizations.of(context)
+                                      .getLocalizations("MY_ORDERS"),
                                   0,
                                   route: OrdersPage(
                                     locale: widget.locale,
@@ -158,7 +160,8 @@ class _DrawerPageState extends State<DrawerPage> {
                           isLoggedIn
                               ? _buildMenuTileList(
                                   'lib/assets/icon/settings.png',
-                                  MyLocalizations.of(context).profile,
+                                  MyLocalizations.of(context)
+                                      .getLocalizations("PROFILE"),
                                   0,
                                   route: ProfileApp(
                                       locale: widget.locale,
@@ -167,7 +170,8 @@ class _DrawerPageState extends State<DrawerPage> {
                               : Container(height: 0, width: 0),
                           _buildMenuTileList(
                             'lib/assets/icon/about.png',
-                            MyLocalizations.of(context).aboutUs,
+                            MyLocalizations.of(context)
+                                .getLocalizations("ABOUT_US"),
                             0,
                             route: AboutUs(
                               locale: widget.locale,
@@ -177,7 +181,8 @@ class _DrawerPageState extends State<DrawerPage> {
                           !isLoggedIn
                               ? _buildMenuTileList(
                                   'lib/assets/icon/loginIcon.png',
-                                  MyLocalizations.of(context).login,
+                                  MyLocalizations.of(context)
+                                      .getLocalizations("LOGIN"),
                                   0,
                                   route: LoginPage(
                                     locale: widget.locale,
@@ -188,7 +193,8 @@ class _DrawerPageState extends State<DrawerPage> {
                           isLoggedIn
                               ? _buildMenuTileList(
                                   'lib/assets/icon/loginIcon.png',
-                                  MyLocalizations.of(context).logout,
+                                  MyLocalizations.of(context)
+                                      .getLocalizations("LOGOUT"),
                                   0,
                                   check: false)
                               : Container(height: 0, width: 0),
@@ -258,9 +264,9 @@ class _DrawerPageState extends State<DrawerPage> {
             }
             Common.removeToken().then((onValue) {
               Common.removeCart().then((onValue) {
-                showSnackbar(
-                    MyLocalizations.of(context).logoutSuccessfully + '!');
-                //
+                showSnackbar(MyLocalizations.of(context)
+                        .getLocalizations("LOGOUT_SUCCESSFULLY") +
+                    '!');
                 Navigator.pop(context);
                 if (mounted) {
                   setState(() {

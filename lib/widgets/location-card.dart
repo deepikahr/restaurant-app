@@ -158,6 +158,6 @@ class LocationCard extends StatelessWidget {
     if (cuisine.length > 2)
       return cuisine.substring(0, cuisine.length - 2).toUpperCase();
     else
-      return MyLocalizations.of(context).noCuisines;
+      return MyLocalizations.of(context).getLocalizations("NO_CUISINES");
   }
 }

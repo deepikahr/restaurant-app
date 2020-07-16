@@ -12,7 +12,7 @@ SentryError sentryError = new SentryError();
 
 class ResetPassword extends StatefulWidget {
   final String locale;
-  final Map<String, Map<String, String>> localizedValues;
+  final Map localizedValues;
 
   ResetPassword({Key key, this.locale, this.localizedValues}) : super(key: key);
   @override
@@ -96,7 +96,7 @@ class _ResetPasswordState extends State<ResetPassword> {
           ),
         ),
         title: Text(
-          MyLocalizations.of(context).resetPassword,
+          MyLocalizations.of(context).getLocalizations("RESET_PASSWORD"),
         ),
         centerTitle: true,
         backgroundColor: PRIMARY,
@@ -138,7 +138,8 @@ class _ResetPasswordState extends State<ResetPassword> {
             padding: EdgeInsetsDirectional.only(top: 30.0, bottom: 30.0),
             child: Center(
                 child: Text(
-              MyLocalizations.of(context).resetPasswordOtp,
+              MyLocalizations.of(context)
+                  .getLocalizations("RESET_PASSWORD_VAI_OTP"),
               textAlign: TextAlign.center,
               style: subTitleWhiteLightOSR(),
             )),
@@ -158,7 +159,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                       if (value.isEmpty ||
                           !RegExp(EMAIL_PATTERN).hasMatch(value)) {
                         return MyLocalizations.of(context)
-                            .pleaseEnterValidEmail;
+                            .getLocalizations("ENTER_VALID_EMAIL_ID");
                       } else
                         return null;
                     },
@@ -166,7 +167,8 @@ class _ResetPasswordState extends State<ResetPassword> {
                       email = value;
                     },
                     decoration: new InputDecoration(
-                      labelText: MyLocalizations.of(context).emailId,
+                      labelText: MyLocalizations.of(context)
+                          .getLocalizations("EMAIL_ID"),
                       hintStyle: hintStyleGreyLightOSR(),
                       contentPadding: EdgeInsets.all(12.0),
                       border: InputBorder.none,
@@ -188,7 +190,8 @@ class _ResetPasswordState extends State<ResetPassword> {
           new Padding(
             padding: EdgeInsets.only(top: 20.0),
             child: new Text(
-              MyLocalizations.of(context).resetMessage,
+              MyLocalizations.of(context)
+                  .getLocalizations("RESET_PASSWORD_MSG"),
               textAlign: TextAlign.center,
               style: subTitleWhiteLightOSR(),
             ),
@@ -213,7 +216,8 @@ class _ResetPasswordState extends State<ResetPassword> {
                   decoration:
                       BoxDecoration(border: Border.all(color: Colors.white70)),
                   child: Text(
-                    MyLocalizations.of(context).resetPassword,
+                    MyLocalizations.of(context)
+                        .getLocalizations("RESET_PASSWORD"),
                     style: subTitleWhiteShadeLightOSR(),
                   ),
                 )

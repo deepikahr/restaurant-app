@@ -26,7 +26,7 @@ import 'restaurant-list.dart';
 SentryError sentryError = new SentryError();
 
 class HomePage extends StatefulWidget {
-  final Map<String, Map<String, String>> localizedValues;
+  final Map localizedValues;
   final String locale;
 
   HomePage({Key key, this.locale, this.localizedValues}) : super(key: key);
@@ -208,8 +208,8 @@ class HomePageState extends State<HomePage> {
   String review, branches;
 
   Widget build(BuildContext context) {
-    review = MyLocalizations.of(context).reviews;
-    branches = MyLocalizations.of(context).branches;
+    review = MyLocalizations.of(context).getLocalizations("REVIEW");
+    branches = MyLocalizations.of(context).getLocalizations("BRANCHES");
     CounterService().getCounter().then((res) {
       try {
         if (mounted) {
@@ -309,12 +309,13 @@ class HomePageState extends State<HomePage> {
               children: <Widget>[
                 isNearByRestaurants != true
                     ? Container()
-                    : _buildGridHeader(
-                        MyLocalizations.of(context).restaurantsNearYou),
+                    : _buildGridHeader(MyLocalizations.of(context)
+                        .getLocalizations("NEAR_YOU_RESTO")),
                 _buildGetNearByLocationLoader(),
                 isNearByRestaurants != true || nearByRestaurentsList == null
                     ? Container()
-                    : _buildViewAllButton(MyLocalizations.of(context).nearBy),
+                    : _buildViewAllButton(MyLocalizations.of(context)
+                        .getLocalizations("NEAR_BY")),
               ],
             ),
           ),
@@ -327,12 +328,13 @@ class HomePageState extends State<HomePage> {
               children: <Widget>[
                 isTopRatedRestaurants != true
                     ? Container()
-                    : _buildGridHeader(
-                        MyLocalizations.of(context).topRatedRestaurants),
+                    : _buildGridHeader(MyLocalizations.of(context)
+                        .getLocalizations("TOP_RATED_RESTO")),
                 _buildTopRatedRestaurantLoader(),
                 isTopRatedRestaurants != true || topRatedRestaurantsList == null
                     ? Container()
-                    : _buildViewAllButton(MyLocalizations.of(context).topRated),
+                    : _buildViewAllButton(MyLocalizations.of(context)
+                        .getLocalizations("TOP_RATED")),
               ],
             ),
           ),
@@ -345,14 +347,14 @@ class HomePageState extends State<HomePage> {
               children: <Widget>[
                 isNewlyArrivedRestaurants != true
                     ? Container()
-                    : _buildGridHeader(
-                        MyLocalizations.of(context).newlyArrivedRestaurants),
+                    : _buildGridHeader(MyLocalizations.of(context)
+                        .getLocalizations("NEWLY_ARRIVED_RESTO")),
                 _buildNewlyArrivedRestaurantLoader(),
                 isNewlyArrivedRestaurants != true ||
                         newlyArrivedRestaurantsList == null
                     ? Container()
-                    : _buildViewAllButton(
-                        MyLocalizations.of(context).newlyArrived),
+                    : _buildViewAllButton(MyLocalizations.of(context)
+                        .getLocalizations("NEWLY_ARRIVED")),
               ],
             ),
           ),
@@ -394,7 +396,8 @@ class HomePageState extends State<HomePage> {
         renderError: ([error]) {
           sentryError.reportError(error, null);
           return NoData(
-              message: MyLocalizations.of(context).connectionError,
+              message:
+                  MyLocalizations.of(context).getLocalizations("ERROR_MSG"),
               icon: Icons.block);
         },
         renderSuccess: ({data}) {
@@ -502,7 +505,8 @@ class HomePageState extends State<HomePage> {
         renderError: ([error]) {
           sentryError.reportError(error, null);
           return NoData(
-              message: MyLocalizations.of(context).connectionError,
+              message:
+                  MyLocalizations.of(context).getLocalizations("ERROR_MSG"),
               icon: Icons.block);
         },
         renderSuccess: ({data}) {
@@ -545,7 +549,8 @@ class HomePageState extends State<HomePage> {
         renderError: ([error]) {
           sentryError.reportError(error, null);
           return NoData(
-              message: MyLocalizations.of(context).connectionError,
+              message:
+                  MyLocalizations.of(context).getLocalizations("ERROR_MSG"),
               icon: Icons.block);
         },
         renderSuccess: ({data}) {
@@ -653,7 +658,7 @@ class HomePageState extends State<HomePage> {
             Padding(
               padding: const EdgeInsets.only(right: 8.0),
               child: Text(
-                MyLocalizations.of(context).viewAll,
+                MyLocalizations.of(context).getLocalizations("VIEW_ALL"),
                 style: hintStylePrimaryLightOSR(),
               ),
             ),

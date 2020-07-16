@@ -14,7 +14,7 @@ class BottonSheetClassDryClean extends StatefulWidget {
   final int productQuantity;
   final double dealPercentage;
   final String currency, locale;
-  final Map<String, Map<String, String>> localizedValues;
+  final Map localizedValues;
   final String restaurantName, restaurantId, restaurantAddress;
   final Map<String, dynamic> product;
 
@@ -110,15 +110,21 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
         tempProducts.add(cartProduct);
         Common.addProduct(tempProducts).then((value) {
           Toast.show(
-              MyLocalizations.of(context).producthasbeenaddedtocart, context,
-              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+              MyLocalizations.of(context)
+                  .getLocalizations("PRODUCT_ADD_TO_CART"),
+              context,
+              duration: Toast.LENGTH_LONG,
+              gravity: Toast.BOTTOM);
         });
       } else {
         tempProducts.add(cartProduct);
         Common.addProduct(tempProducts).then((value) {
           Toast.show(
-              MyLocalizations.of(context).producthasbeenaddedtocart, context,
-              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+              MyLocalizations.of(context)
+                  .getLocalizations("PRODUCT_ADD_TO_CART"),
+              context,
+              duration: Toast.LENGTH_LONG,
+              gravity: Toast.BOTTOM);
         });
       }
     }).catchError((onError) {
@@ -263,7 +269,8 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Text(
-                    MyLocalizations.of(context).quantity + ' :',
+                    MyLocalizations.of(context)
+                        .getLocalizations("QUANTITY", true),
                     style: titleBold(),
                   ),
                   Container(
@@ -331,9 +338,9 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
               padding: EdgeInsets.only(bottom: 5.0),
               child: widget.product['extraIngredients'].length > 0
                   ? _buildHeadingBlock(
-                      MyLocalizations.of(context).extra,
+                      MyLocalizations.of(context).getLocalizations("EXTRA"),
                       MyLocalizations.of(context)
-                          .whichextraingredientswouldyouliketoadd,
+                          .getLocalizations("WHICH_EXTAING_MSG"),
                     )
                   : Container(
                       height: 0.0,
@@ -384,8 +391,10 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
                               ),
                               TextSpan(
                                   text: quantity == 1
-                                      ? MyLocalizations.of(context).item
-                                      : MyLocalizations.of(context).items,
+                                      ? MyLocalizations.of(context)
+                                          .getLocalizations("ITEM")
+                                      : MyLocalizations.of(context)
+                                          .getLocalizations("ITEMS"),
                                   style: titleLightWhiteOSS()),
                             ],
                           ),
@@ -405,7 +414,7 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
                 Padding(
                   padding: const EdgeInsets.only(left: 0.0),
                   child: new Text(
-                    MyLocalizations.of(context).addToCart,
+                    MyLocalizations.of(context).getLocalizations("ADD_TO_CART"),
                     style: smallTitleWhiteOSR(),
                   ),
                 ),

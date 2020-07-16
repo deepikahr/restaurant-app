@@ -23,9 +23,9 @@ bool get isInDebugMode {
 
 SentryError sentryError = new SentryError();
 
-main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Map<String, Map<String, String>> localizedValues = await initializeI18n();
+  Map localizedValues = await initializeI18n();
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String locale = prefs.getString('selectedLanguage') ?? 'en';
   FlutterError.onError = (FlutterErrorDetails details) async {
@@ -40,6 +40,7 @@ main() async {
 
   runZoned<Future<Null>>(() async {
     runApp(new EntryPage(locale, localizedValues));
+    // ignore: deprecated_member_use
   }, onError: (error, stackTrace) async {
     await sentryError.reportError(error, stackTrace);
   });
@@ -87,7 +88,7 @@ Future<void> initOneSignal() async {
 }
 
 class EntryPage extends StatefulWidget {
-  final Map<String, Map<String, String>> localizedValues;
+  final Map localizedValues;
   final String locale;
 
   EntryPage(this.locale, this.localizedValues);
@@ -102,11 +103,11 @@ class _EntryPageState extends State<EntryPage> {
     return MaterialApp(
       locale: Locale(widget.locale),
       localizationsDelegates: [
-        MyLocalizationsDelegate(widget.localizedValues),
+        MyLocalizationsDelegate(widget.localizedValues, [widget.locale]),
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
       ],
-      supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
+      supportedLocales: [Locale(widget.locale)],
       debugShowCheckedModeBanner: false,
       title: APP_NAME,
       theme: ThemeData(

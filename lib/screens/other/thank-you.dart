@@ -6,7 +6,7 @@ import '../../services/localizations.dart';
 import '../../styles/styles.dart';
 
 class ThankYou extends StatefulWidget {
-  final Map<String, Map<String, String>> localizedValues;
+  final Map localizedValues;
   final String locale;
 
   ThankYou({Key key, this.localizedValues, this.locale}) : super(key: key);
@@ -43,15 +43,17 @@ class _ThankYouState extends State<ThankYou> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   Text(
-                    MyLocalizations.of(context).thankYou,
+                    MyLocalizations.of(context).getLocalizations("THANK_YOU"),
                     style: titleWhiteOSR(),
                   ),
                   Text(
-                    MyLocalizations.of(context).orderPlaced,
+                    MyLocalizations.of(context)
+                        .getLocalizations("ORDER_PLACED"),
                     style: subTitleWhiteShadeLightOSR(),
                   ),
                   Text(
-                    MyLocalizations.of(context).thankYouMessage,
+                    MyLocalizations.of(context)
+                        .getLocalizations("THANK_YOU_MSG"),
                     style: hintStyleGreyLightOSRDescription(),
                     textAlign: TextAlign.center,
                   ),
@@ -74,7 +76,8 @@ class _ThankYouState extends State<ThankYou> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
                           Text(
-                            MyLocalizations.of(context).backTo,
+                            MyLocalizations.of(context)
+                                .getLocalizations("BACK_TO"),
                             style: hintStylePrimaryLightOSR(),
                           ),
                           Icon(

@@ -11,7 +11,7 @@ SentryError sentryError = new SentryError();
 class LocationListPage extends StatefulWidget {
   final Map<String, dynamic> restaurantInfo;
   final List<dynamic> locations;
-  final Map<String, Map<String, String>> localizedValues;
+  final Map localizedValues;
   final String locale;
 
   LocationListPage(

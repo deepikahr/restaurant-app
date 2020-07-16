@@ -15,9 +15,10 @@ import 'confirm-order.dart';
 
 SentryError sentryError = new SentryError();
 
+// ignore: must_be_immutable
 class CartPage extends StatefulWidget {
   Map<String, dynamic> product, taxInfo, locationInfo;
-  final Map<String, Map<String, String>> localizedValues;
+  final Map localizedValues;
   final String locale;
   final Map<String, dynamic> tableInfo;
 
@@ -85,27 +86,8 @@ class _CartPageState extends State<CartPage> {
 
     await Common.getProducts().then((value) {
       products = value != null ? value : [];
-      print(products.toString());
     });
 
-    // [2] add new product to cart products list. remove first if already available
-//    products = cart != null ? cart['productDetails'] : [];
-    if (widget.product != null) {
-      int currentIndex;
-      for (int i = 0; i < products.length; i++) {
-        print(products.toString());
-        if (products[i]['productId'] == widget.product['productId']) {
-          if (products[i]['size'] == widget.product['size']) {
-            currentIndex = i;
-          }
-        }
-      }
-      if (currentIndex != null) products.removeAt(currentIndex);
-      products.add(widget.product);
-      print('after adding products ${products.toString()}');
-    }
-
-    // [3] calculate sub total
     subTotal = 0.0;
     for (int i = 0; i < products.length; i++) {
       subTotal = subTotal + products[i]['totalPrice'];
@@ -146,35 +128,41 @@ class _CartPageState extends State<CartPage> {
     grandTotal = subTotal + deliveryCharge + tax;
 
     // [7] create complete order json as Map
-    cart = {
-      'deliveryCharge': deliveryCharge,
-      'grandTotal': grandTotal,
-      'location':
-          widget.locationInfo != null ? widget.locationInfo['_id'] : null,
-      'locationName': widget.locationInfo != null
-          ? widget.locationInfo['locationName']
-          : null,
-      'orderType': 'Delivery',
-      'payableAmount': grandTotal,
-      'paymentOption': 'COD',
-      'position': null,
-      'loyalty': null,
-      'shippingAddress': null,
-      'restaurant': products.length > 0 ? products[0]['restaurant'] : null,
-      'restaurantID': products.length > 0 ? products[0]['restaurantID'] : null,
-      'status': 'Pending',
-      'subTotal': subTotal,
-      // "taxInfo": {"taxRate": 0, "taxName": "nil"},
-      'taxInfo': widget.taxInfo,
-      'productDetails': products,
-      'note': null,
-      'isForDineIn': false,
-      'pickupDate': null,
-      'pickupTime': null,
-      'coupon': selectedCoupon == null
-          ? {'couponApplied': false}
-          : {'couponApplied': true, 'couponName': selectedCoupon['couponName']}
-    };
+    if (products.length != 0) {
+      cart = {
+        'deliveryCharge': deliveryCharge,
+        'grandTotal': grandTotal,
+        'location':
+            widget.locationInfo != null ? widget.locationInfo['_id'] : null,
+        'locationName': widget.locationInfo != null
+            ? widget.locationInfo['locationName']
+            : null,
+        'orderType': 'Delivery',
+        'payableAmount': grandTotal,
+        'paymentOption': 'COD',
+        'position': null,
+        'loyalty': null,
+        'shippingAddress': null,
+        'restaurant': products.length > 0 ? products[0]['restaurant'] : null,
+        'restaurantID':
+            products.length > 0 ? products[0]['restaurantID'] : null,
+        'status': 'Pending',
+        'subTotal': subTotal,
+        // "taxInfo": {"taxRate": 0, "taxName": "nil"},
+        'taxInfo': widget.taxInfo,
+        'productDetails': products,
+        'note': null,
+        'isForDineIn': false,
+        'pickupDate': null,
+        'pickupTime': null,
+        'coupon': selectedCoupon == null
+            ? {'couponApplied': false}
+            : {
+                'couponApplied': true,
+                'couponName': selectedCoupon['couponName']
+              }
+      };
+    }
 
     // [8] set cart state and save to storage
     if (widget.locationInfo != null) {
@@ -217,13 +205,14 @@ class _CartPageState extends State<CartPage> {
         });
       }
     });
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: PRIMARY,
         elevation: 0.0,
         title: new Text(
-          MyLocalizations.of(context).cart,
+          MyLocalizations.of(context).getLocalizations("CART"),
           style: titleBoldWhiteOSS(),
         ),
         leading: InkWell(
@@ -267,7 +256,9 @@ class _CartPageState extends State<CartPage> {
                           : Container(),
                       Divider(),
                       _buildPriceTagLine(
-                          MyLocalizations.of(context).subTotal, subTotal),
+                          MyLocalizations.of(context)
+                              .getLocalizations("SUB_TOTAL"),
+                          subTotal),
                       Divider(),
                       widget.taxInfo != null
                           ? _buildPriceTagLine(
@@ -277,11 +268,13 @@ class _CartPageState extends State<CartPage> {
                           ? Divider()
                           : Container(height: 0, width: 0),
                       _buildPriceTagLine(
-                          MyLocalizations.of(context).deliveryCharges,
+                          MyLocalizations.of(context)
+                              .getLocalizations("DELIVERY_CHARGES"),
                           deliveryCharge),
                       Divider(),
                       _buildPriceTagLine(
-                          MyLocalizations.of(context).grandTotal, grandTotal),
+                          MyLocalizations.of(context).getLocalizations("TOTAL"),
+                          grandTotal),
                       Divider(),
                     ],
                   ),
@@ -291,7 +284,8 @@ class _CartPageState extends State<CartPage> {
           : Padding(
               padding: EdgeInsets.only(top: 50.0),
               child: NoData(
-                message: MyLocalizations.of(context).cartEmpty,
+                message:
+                    MyLocalizations.of(context).getLocalizations("CART_EMPTY"),
                 icon: Icons.hourglass_empty,
               ),
             ),
@@ -357,14 +351,18 @@ class _CartPageState extends State<CartPage> {
                             size: 20.0,
                           ),
                           onPressed: () async {
-                            products.removeAt(index);
-                            CounterService().calculateCounter();
-                            widget.product = null;
-                            if (products.length == 0) {
-                              cartItems = null;
+                            if (products.length == 1) {
+                              Common.addProduct(null);
+                              CounterService().calculateCounter();
+                              Common.setCart(null);
+                              setState(() {});
+                              _calculateCart();
+                            } else {
+                              products.removeAt(index);
+                              Common.addProduct(products);
+                              CounterService().calculateCounter();
+                              _calculateCart();
                             }
-                            await Common.setCart(cartItems);
-                            _calculateCart();
                           },
                         ),
                       ],
@@ -471,13 +469,13 @@ class _CartPageState extends State<CartPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             new Text(
-              MyLocalizations.of(context).completeOrder,
+              MyLocalizations.of(context).getLocalizations("COMPLETE_ORDER"),
               style: subTitleWhiteLightOSR(),
             ),
             new Padding(padding: EdgeInsets.only(top: 5.0)),
             new Text(
               // //delivery charge deducted because of above line are commented to disable delivery charge in this page
-              MyLocalizations.of(context).total +
+              MyLocalizations.of(context).getLocalizations("TOTAL") +
                   ': $currency' +
                   (grandTotal - deliveryCharge).toStringAsFixed(2),
               style: titleWhiteBoldOSB(),
@@ -533,7 +531,7 @@ class _CartPageState extends State<CartPage> {
             _showAddNoteAlert(index);
           },
           child: Text(
-            MyLocalizations.of(context).addNote,
+            MyLocalizations.of(context).getLocalizations("ADD_NOTE"),
             style: titleBlackLightOSBCoupon(),
           ),
         ),
@@ -568,7 +566,7 @@ class _CartPageState extends State<CartPage> {
         InkWell(
           onTap: _goToCoupons,
           child: Text(
-            MyLocalizations.of(context).applyCoupon,
+            MyLocalizations.of(context).getLocalizations("APPLY_COUPON"),
             style: titleBlackLightOSBCoupon(),
           ),
         ),
@@ -600,7 +598,8 @@ class _CartPageState extends State<CartPage> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(MyLocalizations.of(context).cookNote),
+          title:
+              Text(MyLocalizations.of(context).getLocalizations("COOK_NOTE")),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
@@ -611,7 +610,8 @@ class _CartPageState extends State<CartPage> {
                     initialValue: cartItems['productDetails'][index]['note'],
                     validator: (String value) {
                       if (value.isEmpty) {
-                        return MyLocalizations.of(context).pleaseEnter;
+                        return MyLocalizations.of(context)
+                            .getLocalizations("PLEASE_ENTER");
                       } else
                         return null;
                     },
@@ -624,7 +624,8 @@ class _CartPageState extends State<CartPage> {
                       }
                     },
                     decoration: InputDecoration(
-                      labelText: MyLocalizations.of(context).note,
+                      labelText:
+                          MyLocalizations.of(context).getLocalizations("NOTE"),
                       labelStyle: hintStyleGreyLightOSR(),
                       contentPadding: EdgeInsets.all(10),
                       // border: InputBorder.,
@@ -637,13 +638,14 @@ class _CartPageState extends State<CartPage> {
           ),
           actions: <Widget>[
             FlatButton(
-              child: Text(MyLocalizations.of(context).cancel),
+              child:
+                  Text(MyLocalizations.of(context).getLocalizations("CANCEL")),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             FlatButton(
-              child: Text(MyLocalizations.of(context).add),
+              child: Text(MyLocalizations.of(context).getLocalizations("ADD")),
               onPressed: () {
                 if (_formKey.currentState.validate()) {
                   _formKey.currentState.save();
