@@ -8,7 +8,7 @@ SentryError sentryError = new SentryError();
 
 class Rating extends StatefulWidget {
   final String productId, orderId, locationId, restaurantId;
-  final Map<String, Map<String, String>> localizedValues;
+  final Map localizedValues;
   final String locale;
   Rating(
       {Key key,
@@ -76,7 +76,7 @@ class _RatingState extends State<Rating> {
     return new Scaffold(
       appBar: new AppBar(
         title: Text(
-          MyLocalizations.of(context).rateYourOrder,
+          MyLocalizations.of(context).getLocalizations("RATE_YOUR_ORDER"),
         ),
         backgroundColor: PRIMARY,
         iconTheme: new IconThemeData(color: Colors.white),
@@ -119,14 +119,14 @@ class _RatingState extends State<Rating> {
                       ),
                     ),
                     new Text(
-                      MyLocalizations.of(context).wereGlad,
+                      MyLocalizations.of(context).getLocalizations("WERE_GLAD"),
                       style: hintStyleLightOSL(),
                       textAlign: TextAlign.center,
                     ),
                     Padding(
                       padding: new EdgeInsets.only(top: 15.0, bottom: 20.0),
                       child: new Text(
-                        MyLocalizations.of(context).rateIt,
+                        MyLocalizations.of(context).getLocalizations("RATE_IT"),
                         style: hintStyleLightOSL(),
                         textAlign: TextAlign.center,
                       ),
@@ -185,8 +185,8 @@ class _RatingState extends State<Rating> {
                         child: new TextFormField(
                           decoration: new InputDecoration(
                             hintStyle: hintStyleLightOSL(),
-                            hintText:
-                                MyLocalizations.of(context).feedbackImportant,
+                            hintText: MyLocalizations.of(context)
+                                .getLocalizations("FEEDBACK_IMP"),
                           ),
                           style: hintStyleSmallWhiteBoldOSL(),
                           maxLines: 5,
@@ -244,7 +244,8 @@ class _RatingState extends State<Rating> {
                                     height: 20.0,
                                   ),
                                   Text(
-                                    MyLocalizations.of(context).submit,
+                                    MyLocalizations.of(context)
+                                        .getLocalizations("SUBMIT"),
                                     style: hintStyleGreyLightOSL(),
                                   ),
                                 ],

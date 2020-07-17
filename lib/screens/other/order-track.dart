@@ -14,7 +14,7 @@ SentryError sentryError = new SentryError();
 
 class OrderTrack extends StatefulWidget {
   final String orderId;
-  final Map<String, Map<String, String>> localizedValues;
+  final Map localizedValues;
   final String locale;
   OrderTrack({Key key, this.orderId, this.locale, this.localizedValues})
       : super(key: key);
@@ -38,7 +38,8 @@ class OrderTrackState extends State<OrderTrack> {
         renderError: ([error]) {
           sentryError.reportError(error, null);
           return NoData(
-              message: MyLocalizations.of(context).connectionError,
+              message:
+                  MyLocalizations.of(context).getLocalizations("ERROR_MSG"),
               icon: Icons.block);
         },
         renderSuccess: ({data}) {
@@ -62,7 +63,7 @@ class OrderTrackState extends State<OrderTrack> {
         backgroundColor: prefix0.PRIMARY,
         iconTheme: IconThemeData(color: Colors.white),
         title: new Text(
-          MyLocalizations.of(context).trackOrder,
+          MyLocalizations.of(context).getLocalizations("TRACK_ORDER"),
         ),
       ),
       body: _retriveOrderTrack(),
@@ -72,15 +73,15 @@ class OrderTrackState extends State<OrderTrack> {
   Widget _buildOrderTrackBody(Map<String, dynamic> order) {
     String status;
     if (order['status'] == "Accepted") {
-      status = MyLocalizations.of(context).accepted;
+      status = MyLocalizations.of(context).getLocalizations("ACCEPTED");
     } else if (order['status'] == "On the way.") {
-      status = MyLocalizations.of(context).ontheWay;
+      status = MyLocalizations.of(context).getLocalizations("ON_THE_WAY");
     } else if (order['status'] == "Delivered") {
-      status = MyLocalizations.of(context).delivered;
+      status = MyLocalizations.of(context).getLocalizations("DELIVERED");
     } else if (order['status'] == "Cancelled") {
-      status = MyLocalizations.of(context).cancelled;
+      status = MyLocalizations.of(context).getLocalizations("CANCELLED");
     } else if (order['status'] == "Pending") {
-      status = MyLocalizations.of(context).pending;
+      status = MyLocalizations.of(context).getLocalizations("PENDING");
     } else {
       status = order['status'];
     }
@@ -126,7 +127,9 @@ class OrderTrackState extends State<OrderTrack> {
                           new Padding(
                             padding: EdgeInsets.only(left: 6.0, right: 6.0),
                             child: new Text(
-                              MyLocalizations.of(context).orderProgress + '...',
+                              MyLocalizations.of(context)
+                                      .getLocalizations("ORDER_PROGRSS") +
+                                  '...',
                               style: textOSl(),
                             ),
                           ),
@@ -136,11 +139,13 @@ class OrderTrackState extends State<OrderTrack> {
                     new Padding(padding: EdgeInsets.all(5.0)),
                     Column(
                       children: <Widget>[
-                        new Text(MyLocalizations.of(context).orderID +
-                            ': ' +
+                        new Text(MyLocalizations.of(context)
+                                .getLocalizations("ORDER_ID", true) +
                             order['orderID'].toString()),
                         new Text(
-                          MyLocalizations.of(context).status + ': ' + status,
+                          MyLocalizations.of(context)
+                                  .getLocalizations("STATUS", true) +
+                              status,
                           style: TextStyle(color: Colors.green),
                         ),
                       ],
@@ -157,23 +162,26 @@ class OrderTrackState extends State<OrderTrack> {
               itemBuilder: (BuildContext context, int index) {
                 String status;
                 if (order['userNotification'][index]['status'] == "Pending") {
-                  status = MyLocalizations.of(context).pending;
+                  status =
+                      MyLocalizations.of(context).getLocalizations("PENDING");
                 } else if (order['userNotification'][index]['status'] ==
                     "Order Accepted by vendor.") {
-                  status = MyLocalizations.of(context).orderAcceptedbyvendor;
+                  status = MyLocalizations.of(context)
+                      .getLocalizations("ORDER_ACCEPTED");
                 } else if (order['userNotification'][index]['status'] ==
                     "Your order is on the way.") {
-                  status = MyLocalizations.of(context).yourorderisontheway;
+                  status = MyLocalizations.of(context)
+                      .getLocalizations("ORDER_ON_THE_WAY");
                 } else if (order['userNotification'][index]['status'] ==
                     "Your order has been delivered,Share your experience with us.") {
                   order['userNotification'][index]['status'] =
                       MyLocalizations.of(context)
-                          .yourorderhasbeendeliveredshareyourexperiencewithus;
+                          .getLocalizations("ORDER_DELIVERD_MSG");
                 } else if (order['userNotification'][index]['status'] ==
                     "Your order is cancelled,sorry for inconvenience.") {
                   order['userNotification'][index]['status'] =
                       MyLocalizations.of(context)
-                          .yourorderiscancelledsorryforinconvenience;
+                          .getLocalizations("ORDER_CANCELLED_MSG");
                 } else {
                   status = order['userNotification'][index]['status'];
                 }
@@ -247,36 +255,5 @@ class OrderTrackState extends State<OrderTrack> {
         ],
       ),
     );
-  }
-
-  static String readTimestamp(int timestamp, context) {
-    var now = new DateTime.now();
-    var format = new DateFormat('hh:mma dd/MM/yyyy');
-    var date = new DateTime.fromMillisecondsSinceEpoch(timestamp);
-    var diff = now.difference(date);
-    String time = '';
-    if (diff.inSeconds <= 0 ||
-        diff.inSeconds > 0 && diff.inMinutes == 0 ||
-        diff.inMinutes > 0 && diff.inHours == 0 ||
-        diff.inHours > 0 && diff.inDays == 0) {
-      time = format.format(date);
-    } else if (diff.inDays > 0 && diff.inDays < 7) {
-      if (diff.inDays == 1) {
-        time =
-            diff.inDays.toString() + ' ${MyLocalizations.of(context).dayAgo}';
-      } else {
-        time =
-            diff.inDays.toString() + ' ${MyLocalizations.of(context).daysAgo}';
-      }
-    } else {
-      if (diff.inDays == 7) {
-        time = (diff.inDays / 7).floor().toString() +
-            ' ${MyLocalizations.of(context).weekAgo}';
-      } else {
-        time = (diff.inDays / 7).floor().toString() +
-            ' ${MyLocalizations.of(context).weeksAgo}';
-      }
-    }
-    return time;
   }
 }

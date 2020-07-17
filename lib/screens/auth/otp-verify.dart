@@ -12,7 +12,7 @@ SentryError sentryError = new SentryError();
 class OtpVerify extends StatefulWidget {
   final String otpToken;
   final String locale;
-  final Map<String, Map<String, String>> localizedValues;
+  final Map localizedValues;
   OtpVerify({Key key, this.otpToken, this.locale, this.localizedValues})
       : super(key: key);
   @override
@@ -94,7 +94,7 @@ class _OtpVerifyState extends State<OtpVerify> {
             color: Colors.white,
           ),
         ),
-        title: Text(MyLocalizations.of(context).verifyOtp),
+        title: Text(MyLocalizations.of(context).getLocalizations("VERIFY_OTP")),
         centerTitle: true,
         backgroundColor: PRIMARY,
       ),
@@ -137,7 +137,7 @@ class _OtpVerifyState extends State<OtpVerify> {
             ),
             child: Center(
                 child: Text(
-              MyLocalizations.of(context).verifyOtp + '!',
+              MyLocalizations.of(context).getLocalizations("VERIFY_OTP") + '!',
               textAlign: TextAlign.center,
               style: subTitleWhiteLightOSR(),
             )),
@@ -153,15 +153,17 @@ class _OtpVerifyState extends State<OtpVerify> {
                   flex: 9,
                   child: TextFormField(
                     decoration: new InputDecoration(
-                      labelText: MyLocalizations.of(context).otp,
+                      labelText:
+                          MyLocalizations.of(context).getLocalizations("OTP"),
                       hintStyle: hintStyleGreyLightOSR(),
                       contentPadding: EdgeInsets.all(12.0),
                       border: InputBorder.none,
                     ),
                     keyboardType: TextInputType.number,
                     validator: (String value) {
-                      if (value.isEmpty || value.length < 6) {
-                        return MyLocalizations.of(context).otpErrorMessage;
+                      if (value.isEmpty || value.length < 5) {
+                        return MyLocalizations.of(context)
+                            .getLocalizations("OTP_ERROR_MSG");
                       } else
                         return null;
                     },
@@ -181,7 +183,7 @@ class _OtpVerifyState extends State<OtpVerify> {
           new Padding(
             padding: EdgeInsets.only(top: 20.0),
             child: new Text(
-              MyLocalizations.of(context).otpMessage,
+              MyLocalizations.of(context).getLocalizations("OTP_MSG"),
               textAlign: TextAlign.center,
               style: subTitleWhiteLightOSR(),
             ),
@@ -206,7 +208,7 @@ class _OtpVerifyState extends State<OtpVerify> {
                   decoration:
                       BoxDecoration(border: Border.all(color: Colors.white70)),
                   child: Text(
-                    MyLocalizations.of(context).verifyOtp,
+                    MyLocalizations.of(context).getLocalizations("VERIFY_OTP"),
                     style: subTitleWhiteShadeLightOSR(),
                   ),
                 )

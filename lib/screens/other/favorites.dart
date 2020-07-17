@@ -12,7 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 SentryError sentryError = new SentryError();
 
 class Favorites extends StatefulWidget {
-  final Map<String, Map<String, String>> localizedValues;
+  final Map localizedValues;
   final String locale;
   Favorites({Key key, this.locale, this.localizedValues}) : super(key: key);
   @override
@@ -53,7 +53,7 @@ class _FavoritesState extends State<Favorites> {
           child: Icon(Icons.arrow_back),
         ),
         backgroundColor: PRIMARY,
-        title: new Text(MyLocalizations.of(context).favourites,
+        title: new Text(MyLocalizations.of(context).getLocalizations("APPLY"),
             style: titleBoldWhiteOSS()),
         centerTitle: true,
       ),
@@ -64,7 +64,8 @@ class _FavoritesState extends State<Favorites> {
         renderError: ([error]) {
           sentryError.reportError(error, null);
           return NoData(
-              message: MyLocalizations.of(context).connectionError,
+              message:
+                  MyLocalizations.of(context).getLocalizations("ERROR_MSG"),
               icon: Icons.block);
         },
         renderSuccess: ({data}) {
@@ -81,7 +82,9 @@ class _FavoritesState extends State<Favorites> {
   static Widget buildEmptyPage(context) {
     return Padding(
       padding: EdgeInsets.only(top: 40.0),
-      child: NoData(message: MyLocalizations.of(context).favoritesListEmpty),
+      child: NoData(
+          message:
+              MyLocalizations.of(context).getLocalizations("FAV_LITS_EMPTY")),
     );
   }
 
@@ -184,7 +187,8 @@ class _FavoritesState extends State<Favorites> {
                                         try {
                                           Toast.show(
                                               MyLocalizations.of(context)
-                                                  .removedFavoriteItem,
+                                                  .getLocalizations(
+                                                      "PRODUCT_REMOVED_MSG"),
                                               context,
                                               duration: Toast.LENGTH_LONG,
                                               gravity: Toast.BOTTOM);

@@ -29,7 +29,7 @@ class NoData extends StatelessWidget {
 
   Widget _buildText(message, context) {
     return Text(
-      message ?? MyLocalizations.of(context).noResource,
+      message ?? MyLocalizations.of(context).getLocalizations("NO_RESOURCE"),
       style: TextStyle(
         fontSize: 18.0,
         color: Colors.grey[500],

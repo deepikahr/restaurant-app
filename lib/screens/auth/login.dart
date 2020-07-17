@@ -17,7 +17,7 @@ SentryError sentryError = new SentryError();
 class LoginPage extends StatefulWidget {
   final isDrawe;
   final String locale;
-  final Map<String, Map<String, String>> localizedValues;
+  final Map localizedValues;
 
   LoginPage({Key key, this.isDrawe, this.locale, this.localizedValues})
       : super(key: key);
@@ -61,7 +61,8 @@ class _LoginPageState extends State<LoginPage> {
           if (onValue['token'] != null) {
             Common.setToken(onValue['token']).then((saved) {
               if (saved) {
-                showSnackbar(MyLocalizations.of(context).loginSuccessful);
+                showSnackbar(MyLocalizations.of(context)
+                    .getLocalizations("LOGIN_SUCCESSFUL"));
                 Future.delayed(Duration(milliseconds: 1500), () {
                   if (widget.isDrawe == true) {
                     Navigator.pushAndRemoveUntil(
@@ -74,7 +75,7 @@ class _LoginPageState extends State<LoginPage> {
                         (Route<dynamic> route) => route.isFirst);
                   } else {
                     Navigator.of(context).pop(
-                      MyLocalizations.of(context).success,
+                      MyLocalizations.of(context).getLocalizations("SUCCESS"),
                     );
                   }
                 });
@@ -150,7 +151,9 @@ class _LoginPageState extends State<LoginPage> {
     return Padding(
       padding: EdgeInsets.only(top: 70.0, bottom: 40.0),
       child: Image(
-        image: AssetImage("lib/assets/logos/playstore-icon.png",),
+        image: AssetImage(
+          "lib/assets/logos/playstore-icon.png",
+        ),
         fit: BoxFit.cover,
         width: 95.0,
       ),
@@ -175,7 +178,8 @@ class _LoginPageState extends State<LoginPage> {
               Padding(
                 padding: EdgeInsetsDirectional.only(top: 40.0, bottom: 20.0),
                 child: Text(
-                  MyLocalizations.of(context).dontHaveAccountYet,
+                  MyLocalizations.of(context)
+                      .getLocalizations("DONT_HAVE_ACCOUNT"),
                   style: subTitleWhiteLightOSR(),
                 ),
               ),
@@ -195,7 +199,8 @@ class _LoginPageState extends State<LoginPage> {
         keyboardType: TextInputType.emailAddress,
         validator: (String value) {
           if (value.isEmpty || !RegExp(EMAIL_PATTERN).hasMatch(value)) {
-            return MyLocalizations.of(context).pleaseEnterValidEmail;
+            return MyLocalizations.of(context)
+                .getLocalizations("ENTER_VALID_EMAIL_ID");
           } else
             return null;
         },
@@ -203,7 +208,7 @@ class _LoginPageState extends State<LoginPage> {
           email = value;
         },
         decoration: InputDecoration(
-          labelText: MyLocalizations.of(context).yourEmail,
+          labelText: MyLocalizations.of(context).getLocalizations("EMAIL_ID"),
           labelStyle: hintStyleGreyLightOSR(),
           contentPadding: EdgeInsets.all(10),
           border: InputBorder.none,
@@ -222,7 +227,8 @@ class _LoginPageState extends State<LoginPage> {
         keyboardType: TextInputType.text,
         validator: (String value) {
           if (value.isEmpty || value.length < 6) {
-            return MyLocalizations.of(context).pleaseEnterValidPassword;
+            return MyLocalizations.of(context)
+                .getLocalizations("PLEASE_ENTER_VALID_PASSWORD");
           } else
             return null;
         },
@@ -230,7 +236,7 @@ class _LoginPageState extends State<LoginPage> {
           password = value;
         },
         decoration: InputDecoration(
-          labelText: MyLocalizations.of(context).yourPassword,
+          labelText: MyLocalizations.of(context).getLocalizations("PASSWORD"),
           labelStyle: hintStyleGreyLightOSR(),
           contentPadding: EdgeInsets.only(
             left: 15.0,
@@ -268,7 +274,7 @@ class _LoginPageState extends State<LoginPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              MyLocalizations.of(context).loginToYourAccount,
+              MyLocalizations.of(context).getLocalizations("LOGIN"),
               style: subTitleWhiteLightOSR(),
             ),
             Padding(padding: EdgeInsets.only(left: 5.0, right: 5.0)),
@@ -301,7 +307,8 @@ class _LoginPageState extends State<LoginPage> {
             );
           },
           child: Text(
-            MyLocalizations.of(context).forgotPassword,
+            MyLocalizations.of(context).getLocalizations("FORGET_PASSWORD") +
+                "?",
             style: hintStyleLightOSB(),
           )),
     );
@@ -315,7 +322,7 @@ class _LoginPageState extends State<LoginPage> {
         width: screenWidth(context),
         decoration: BoxDecoration(border: Border.all(color: Colors.white70)),
         child: Text(
-          MyLocalizations.of(context).signInNow,
+          MyLocalizations.of(context).getLocalizations("SIGN_IN_NOW"),
           style: subTitleWhiteShadeLightOSR(),
         ),
       ),

@@ -17,7 +17,7 @@ SentryError sentryError = new SentryError();
 class ProductDetailsPage extends StatefulWidget {
   final Map<String, dynamic> product, locationInfo, taxInfo, tableInfo;
   final String restaurantName, restaurantId, restaurantAddress;
-  final Map<String, Map<String, String>> localizedValues;
+  final Map localizedValues;
   final String locale;
 
   ProductDetailsPage(
@@ -183,8 +183,11 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       ProfileService.removeFavouritById(favouriteId).then((onValue) {
         try {
           Toast.show(
-              MyLocalizations.of(context).productRemovedFromFavourite, context,
-              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+              MyLocalizations.of(context)
+                  .getLocalizations("PRODUCT_REMOVED_MSG"),
+              context,
+              duration: Toast.LENGTH_LONG,
+              gravity: Toast.BOTTOM);
           if (onValue != null) {
             if (mounted) {
               setState(() {
@@ -206,8 +209,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           .then((onValue) {
         try {
           Toast.show(
-              MyLocalizations.of(context).productaddedtoFavourites, context,
-              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+              MyLocalizations.of(context).getLocalizations("PRODUCT_ADDED_MSG"),
+              context,
+              duration: Toast.LENGTH_LONG,
+              gravity: Toast.BOTTOM);
           if (mounted) {
             setState(() {
               favouriteId = onValue['_id'];
@@ -321,10 +326,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 widget.product['description'],
               ),
               _buildHeadingBlock(
-                MyLocalizations.of(context).size +
-                    ' & ' +
-                    MyLocalizations.of(context).price,
-                MyLocalizations.of(context).selectSize,
+                MyLocalizations.of(context).getLocalizations("SIZE_PRICE"),
+                MyLocalizations.of(context).getLocalizations("SELECT_SIZE"),
               ),
               widget.product['variants'].length > 0
                   ? _buildSingleSelectionBlock(widget.product['variants'])
@@ -336,9 +339,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 padding: EdgeInsets.only(bottom: 5.0),
                 child: widget.product['extraIngredients'].length > 0
                     ? _buildHeadingBlock(
-                        MyLocalizations.of(context).extra,
+                        MyLocalizations.of(context).getLocalizations("EXTRA"),
                         MyLocalizations.of(context)
-                            .whichextraingredientswouldyouliketoadd,
+                            .getLocalizations("WHICH_EXTAING_MSG"),
                       )
                     : Container(
                         height: 0.0,
@@ -376,7 +379,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
                           new Text(
-                            MyLocalizations.of(context).deliveryisNotAvailable,
+                            MyLocalizations.of(context)
+                                .getLocalizations("DELIVERY_NOT_AVAILABLE_NOW"),
                             style: hintStyleWhiteLightOSB(),
                           ),
                         ],
@@ -693,7 +697,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
   void _goToCart() async {
     addProduct();
-    //TODO: commented for testing
 //    Navigator.push(
 //      context,
 //      MaterialPageRoute(
@@ -714,19 +717,20 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(MyLocalizations.of(context).clearcart + '?'),
+          title: Text(
+              MyLocalizations.of(context).getLocalizations("CLEAR_CART") + '?'),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
                 Text(MyLocalizations.of(context)
-                        .youhavesomeitemsalreadyinyourcartfromotherlocationremovetoaddthis +
+                        .getLocalizations("CLEAR_CART_MSG") +
                     '!'),
               ],
             ),
           ),
           actions: <Widget>[
             FlatButton(
-              child: Text(MyLocalizations.of(context).yes),
+              child: Text(MyLocalizations.of(context).getLocalizations("YES")),
               onPressed: () {
                 Navigator.of(context).pop();
                 Common.removeCart();
@@ -734,7 +738,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               },
             ),
             FlatButton(
-              child: Text(MyLocalizations.of(context).no),
+              child: Text(MyLocalizations.of(context).getLocalizations("NO")),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -750,16 +754,17 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       if (productsList != null) {
         tempProducts = productsList;
         tempProducts.add(cartProduct);
-        for (int i = 0; i < tempProducts.length; i++) {
-          print(tempProducts[i]['size'].toString());
-        }
+        for (int i = 0; i < tempProducts.length; i++) {}
         Common.addProduct(tempProducts).then((value) {
           setState(() {
             isAdded = true;
           });
-          Toast.show('product has been added to cart', context,
-              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-          print(value.toString());
+          Toast.show(
+              MyLocalizations.of(context)
+                  .getLocalizations("PRODUCT_ADD_TO_CART"),
+              context,
+              duration: Toast.LENGTH_LONG,
+              gravity: Toast.BOTTOM);
         });
       } else {
         tempProducts.add(cartProduct);
@@ -769,9 +774,12 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           setState(() {
             isAdded = true;
           });
-          Toast.show('product has been added to cart', context,
-              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-          print(value.toString());
+          Toast.show(
+              MyLocalizations.of(context)
+                  .getLocalizations("PRODUCT_ADD_TO_CART"),
+              context,
+              duration: Toast.LENGTH_LONG,
+              gravity: Toast.BOTTOM);
         });
       } catch (error, stackTrace) {
         sentryError.reportError(error, stackTrace);

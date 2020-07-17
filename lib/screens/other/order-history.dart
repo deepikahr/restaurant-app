@@ -11,7 +11,7 @@ SentryError sentryError = new SentryError();
 
 class OrderHistory extends StatefulWidget {
   final bool isRatingAllowed;
-  final Map<String, Map<String, String>> localizedValues;
+  final Map localizedValues;
   final String locale;
 
   OrderHistory(
@@ -51,7 +51,8 @@ class _OrderHistoryState extends State<OrderHistory>
         renderError: ([error]) {
           sentryError.reportError(error, null);
           return NoData(
-              message: MyLocalizations.of(context).connectionError,
+              message:
+                  MyLocalizations.of(context).getLocalizations("ERROR_MSG"),
               icon: Icons.block);
         },
         renderSuccess: ({data}) {

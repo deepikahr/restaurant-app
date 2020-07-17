@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:RestaurantSaas/services/constant.dart';
 import 'package:RestaurantSaas/widgets/no-data.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +15,7 @@ SentryError sentryError = new SentryError();
 class PaymentMethod extends StatefulWidget {
   final Map<String, dynamic> cart;
   final paymentMethods;
-  final Map<String, Map<String, String>> localizedValues;
+  final Map localizedValues;
   final String locale;
 
   PaymentMethod(
@@ -107,13 +105,15 @@ class _PaymentMethodState extends State<PaymentMethod> {
             content: new SingleChildScrollView(
               child: new ListBody(
                 children: <Widget>[
-                  new Text(MyLocalizations.of(context).selectPaymentMethod),
+                  new Text(MyLocalizations.of(context)
+                      .getLocalizations("CHOOSE_PAYMENT_METHOD")),
                 ],
               ),
             ),
             actions: <Widget>[
               new FlatButton(
-                child: new Text(MyLocalizations.of(context).ok),
+                child: new Text(
+                    MyLocalizations.of(context).getLocalizations("OK")),
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -214,7 +214,8 @@ class _PaymentMethodState extends State<PaymentMethod> {
             ),
             actions: <Widget>[
               new FlatButton(
-                child: new Text('OK'),
+                child: new Text(
+                    MyLocalizations.of(context).getLocalizations("OK")),
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -251,7 +252,7 @@ class _PaymentMethodState extends State<PaymentMethod> {
               color: Colors.white,
             )),
         title: new Text(
-          MyLocalizations.of(context).paymentMethod,
+          MyLocalizations.of(context).getLocalizations("PAYMENT_METHOD"),
           style: titleBoldWhiteOSS(),
         ),
         centerTitle: true,
@@ -281,13 +282,15 @@ class _PaymentMethodState extends State<PaymentMethod> {
                             children: <Widget>[
                               new Padding(padding: EdgeInsets.only(top: 10.0)),
                               new Text(
-                                MyLocalizations.of(context).placeOrderNow,
+                                MyLocalizations.of(context)
+                                    .getLocalizations("PLACE_ORDER_NOW"),
                                 style: subTitleWhiteLightOSR(),
                               ),
                               new Padding(padding: EdgeInsets.only(top: 5.0)),
                               new Text(
-                                MyLocalizations.of(context).total +
-                                    ': $currency ${widget.cart['grandTotal'].toStringAsFixed(2)}',
+                                MyLocalizations.of(context)
+                                        .getLocalizations("TOTAL", true) +
+                                    ' $currency ${widget.cart['grandTotal'].toStringAsFixed(2)}',
                                 style: titleWhiteBoldOSB(),
                               ),
                             ],
@@ -331,10 +334,12 @@ class _PaymentMethodState extends State<PaymentMethod> {
                               activeColor: PRIMARY,
                               title: Text(
                                 paymentMethodList[index]['type'] == "COD"
-                                    ? MyLocalizations.of(context).cod
+                                    ? MyLocalizations.of(context)
+                                        .getLocalizations("CASH_ON_DELIVERY")
                                     : paymentMethodList[index]['type'] ==
                                             "STRIPE"
-                                        ? MyLocalizations.of(context).stripe
+                                        ? MyLocalizations.of(context)
+                                            .getLocalizations("PAY_BY_CARD")
                                         : paymentMethodList[index]['type'],
                                 style: TextStyle(color: PRIMARY),
                               ),
@@ -361,7 +366,8 @@ class _PaymentMethodState extends State<PaymentMethod> {
         : Container(
             padding: EdgeInsets.all(60),
             child: NoData(
-              message: MyLocalizations.of(context).noPaymentMethods,
+              message: MyLocalizations.of(context)
+                  .getLocalizations("NO_PAYMENT_METHOD"),
               icon: Icons.hourglass_empty,
             ),
           );

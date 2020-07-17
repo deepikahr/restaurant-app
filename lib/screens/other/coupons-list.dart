@@ -12,7 +12,7 @@ SentryError sentryError = new SentryError();
 
 class CouponsList extends StatefulWidget {
   final String locationId;
-  final Map<String, Map<String, String>> localizedValues;
+  final Map localizedValues;
   final String locale;
 
   CouponsList({Key key, this.locationId, this.locale, this.localizedValues})
@@ -45,7 +45,7 @@ class _CouponsListState extends State<CouponsList> {
           ),
         ),
         backgroundColor: PRIMARY,
-        title: new Text(MyLocalizations.of(context).coupon,
+        title: new Text(MyLocalizations.of(context).getLocalizations("COUPON"),
             style: titleBoldWhiteOSS()),
         centerTitle: true,
       ),
@@ -56,7 +56,8 @@ class _CouponsListState extends State<CouponsList> {
         renderError: ([error]) {
           sentryError.reportError(error, null);
           return NoData(
-              message: MyLocalizations.of(context).connectionError,
+              message:
+                  MyLocalizations.of(context).getLocalizations("ERROR_MSG"),
               icon: Icons.block);
         },
         renderSuccess: ({data}) {
@@ -74,7 +75,8 @@ class _CouponsListState extends State<CouponsList> {
                 });
           } else {
             return Container(
-              child: Text('Invalid response'),
+              child: Text(
+                  MyLocalizations.of(context).getLocalizations("ERROR_MSG")),
             );
           }
         },
@@ -139,7 +141,10 @@ class _CouponsListState extends State<CouponsList> {
               flex: 10,
               child: Row(
                 children: <Widget>[
-                  Text(coupon['offPrecentage'].toString() + '% off',
+                  Text(
+                      coupon['offPrecentage'].toString() +
+                          '% ' +
+                          MyLocalizations.of(context).getLocalizations("OFF"),
                       style: TextStyle(color: Colors.green)),
                 ],
               ),
@@ -150,7 +155,8 @@ class _CouponsListState extends State<CouponsList> {
                 onTap: () {
                   Navigator.pop(context, coupon);
                 },
-                child: Text(MyLocalizations.of(context).apply,
+                child: Text(
+                    MyLocalizations.of(context).getLocalizations("APPLY"),
                     style: TextStyle(color: Colors.amber)),
               ),
             ),

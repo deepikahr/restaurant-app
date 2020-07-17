@@ -64,7 +64,10 @@ class CouponCard extends StatelessWidget {
               flex: 10,
               child: Row(
                 children: <Widget>[
-                  Text(coupon['offPrecentage'].toString() + '% off',
+                  Text(
+                      coupon['offPrecentage'].toString() +
+                          '% ' +
+                          MyLocalizations.of(context).getLocalizations("OFF"),
                       style: TextStyle(color: Colors.green)),
                 ],
               ),
@@ -75,7 +78,8 @@ class CouponCard extends StatelessWidget {
                 onTap: () {
                   Navigator.pop(context, coupon);
                 },
-                child: Text(MyLocalizations.of(context).apply,
+                child: Text(
+                    MyLocalizations.of(context).getLocalizations("APPLY"),
                     style: TextStyle(color: Colors.amber)),
               ),
             ),

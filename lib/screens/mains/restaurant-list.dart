@@ -16,7 +16,7 @@ SentryError sentryError = new SentryError();
 
 class RestaurantListPage extends StatefulWidget {
   final String title;
-  final Map<String, Map<String, String>> localizedValues;
+  final Map localizedValues;
   final String locale;
   final Map taxInfo;
 
@@ -37,9 +37,11 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   getRestaurantsList() async {
-    if (widget.title == MyLocalizations.of(context).topRated) {
+    if (widget.title ==
+        MyLocalizations.of(context).getLocalizations("TOP_RATED")) {
       return await MainService.getTopRatedRestaurants();
-    } else if (widget.title == MyLocalizations.of(context).newlyArrived) {
+    } else if (widget.title ==
+        MyLocalizations.of(context).getLocalizations("NEWLY_ARRIVED")) {
       return await MainService.getNewlyArrivedRestaurants();
     } else {
       List<dynamic> restaurants;
@@ -92,7 +94,8 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
           ),
         ),
         title: Text(
-          widget.title + MyLocalizations.of(context).restaurants,
+          widget.title +
+              MyLocalizations.of(context).getLocalizations("RESTAURANTS"),
           style: titleBoldWhiteOSS(),
         ),
         centerTitle: true,
@@ -155,7 +158,8 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
         renderError: ([error]) {
           sentryError.reportError(error, null);
           return NoData(
-              message: MyLocalizations.of(context).connectionError,
+              message:
+                  MyLocalizations.of(context).getLocalizations("ERROR_MSG"),
               icon: Icons.block);
         },
         renderSuccess: ({data}) {
@@ -167,12 +171,15 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
               itemCount: data.length,
               padding: const EdgeInsets.all(0.0),
               itemBuilder: (BuildContext context, int index) {
-                return widget.title == MyLocalizations.of(context).nearBy
+                return widget.title ==
+                        MyLocalizations.of(context).getLocalizations("NEAR_BY")
                     ? InkWell(
                         child: HomePageState.buildRestaurantCardNear(
                             data[index],
-                            MyLocalizations.of(context).reviews,
-                            MyLocalizations.of(context).branches),
+                            MyLocalizations.of(context)
+                                .getLocalizations("REVIEW"),
+                            MyLocalizations.of(context)
+                                .getLocalizations("BRANCHES")),
                         onTap: () async {
                           Navigator.push(
                             context,
@@ -212,8 +219,10 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
                     : InkWell(
                         child: HomePageState.buildRestaurantCard(
                             data[index],
-                            MyLocalizations.of(context).reviews,
-                            MyLocalizations.of(context).branches),
+                            MyLocalizations.of(context)
+                                .getLocalizations("REVIEW"),
+                            MyLocalizations.of(context)
+                                .getLocalizations("BRANCHES")),
                         onTap: () async {
                           data[index]['list']['taxInfo'] = widget.taxInfo;
                           if (mounted) {

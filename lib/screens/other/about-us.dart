@@ -1,9 +1,10 @@
+import 'package:RestaurantSaas/services/constant.dart';
 import 'package:flutter/material.dart';
 import '../../styles/styles.dart';
 import '../../services/localizations.dart';
 
 class AboutUs extends StatefulWidget {
-  final Map<String, Map<String, String>> localizedValues;
+  final Map localizedValues;
   final String locale;
   AboutUs({Key key, this.locale, this.localizedValues}) : super(key: key);
   @override
@@ -18,7 +19,7 @@ class _AboutUsState extends State<AboutUs> {
         backgroundColor: PRIMARY,
         elevation: 0.0,
         centerTitle: true,
-        title: Text(MyLocalizations.of(context).aboutUs),
+        title: Text(MyLocalizations.of(context).getLocalizations("ABOUT_US")),
         leading: InkWell(
           onTap: () {
             Navigator.pop(context);
@@ -38,25 +39,26 @@ class _AboutUsState extends State<AboutUs> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   new Text(
-                    MyLocalizations.of(context).restaurantSass,
+                    APP_NAME,
                     style: titleBoldOSL(),
                   ),
                   new Padding(
                     padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
                     child: new Text(
-                      MyLocalizations.of(context).shortDescription,
+                      MyLocalizations.of(context)
+                          .getLocalizations("SHORT_DISCRIPTION"),
                       style: textOSL(),
                     ),
                   ),
                   new Text(
-                    'Grilled Chicken Lorem ipsum dolor sit amet, consectetur adipiscing elit,'
-                    ' sed do eiusmod tempor incididunt ut labore et dolore magna ',
+                    MyLocalizations.of(context).getLocalizations("DISCRIPTION"),
                     style: textOS(),
                   ),
                   new Padding(
                     padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
                     child: new Text(
-                      MyLocalizations.of(context).mobileNumber,
+                      MyLocalizations.of(context)
+                          .getLocalizations("CONTACT_NUMBER"),
                       style: textOSL(),
                     ),
                   ),
@@ -67,7 +69,7 @@ class _AboutUsState extends State<AboutUs> {
                   new Padding(
                     padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
                     child: new Text(
-                      MyLocalizations.of(context).emailId,
+                      MyLocalizations.of(context).getLocalizations("EMAIL_ID"),
                       style: textOSL(),
                     ),
                   ),
@@ -78,7 +80,7 @@ class _AboutUsState extends State<AboutUs> {
                   new Padding(
                     padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
                     child: new Text(
-                      MyLocalizations.of(context).address,
+                      MyLocalizations.of(context).getLocalizations("ADDRESS"),
                       style: textOSL(),
                     ),
                   ),

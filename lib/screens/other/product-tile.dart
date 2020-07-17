@@ -17,7 +17,7 @@ class BuildProductTile extends StatefulWidget {
       restaurantId;
   final Map<String, dynamic> product;
   final double mrp, off, price, topPadding;
-  final Map<String, Map<String, String>> localizedValues;
+  final Map localizedValues;
   final String locale;
 
   const BuildProductTile({
@@ -369,19 +369,20 @@ class _BuildProductTileState extends State<BuildProductTile> {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(MyLocalizations.of(context).clearcart + '?'),
+          title: Text(
+              MyLocalizations.of(context).getLocalizations("CLEAR_CART") + '?'),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
                 Text(MyLocalizations.of(context)
-                        .youhavesomeitemsalreadyinyourcartfromotherlocationremovetoaddthis +
+                        .getLocalizations("CLEAR_CART_MSG") +
                     '!'),
               ],
             ),
           ),
           actions: <Widget>[
             FlatButton(
-              child: Text(MyLocalizations.of(context).yes),
+              child: Text(MyLocalizations.of(context).getLocalizations("YES")),
               onPressed: () {
                 Navigator.of(context).pop();
                 Common.removeCart();
@@ -389,7 +390,7 @@ class _BuildProductTileState extends State<BuildProductTile> {
               },
             ),
             FlatButton(
-              child: Text(MyLocalizations.of(context).no),
+              child: Text(MyLocalizations.of(context).getLocalizations("NO")),
               onPressed: () {
                 Navigator.of(context).pop();
               },
