@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:RestaurantSaas/services/constant.dart';
 import 'package:flutter_map_picker/flutter_map_picker.dart';
-// import 'package:google_map_location_picker/google_map_location_picker.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
 
 import '../../services/localizations.dart';
 import 'package:RestaurantSaas/screens/other/thank-you.dart';
@@ -24,7 +24,7 @@ SentryError sentryError = new SentryError();
 
 class ConfrimOrderPage extends StatefulWidget {
   final Map<String, dynamic> cart, deliveryInfo, tableInfo;
-  final Map<String, Map<String, String>> localizedValues;
+  final Map localizedValues;
   final String locale, currency;
 
   ConfrimOrderPage(
@@ -46,7 +46,8 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
   final GlobalKey<AsyncLoaderState> _asyncLoaderState =
       GlobalKey<AsyncLoaderState>();
   int selectedAddressIndex = 0;
-
+  LocationData currentLocation;
+  Location _location = new Location();
   double remainingLoyaltyPoint = 0.0,
       usedLoyaltyPoint = 0.0,
       grandTotal = 0.0,
@@ -304,7 +305,8 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
         renderError: ([error]) {
           sentryError.reportError(error, null);
           return NoData(
-              message: MyLocalizations.of(context).connectionError,
+              message:
+                  MyLocalizations.of(context).getLocalizations("ERROR_MSG"),
               icon: Icons.block);
         },
         renderSuccess: ({data}) {
@@ -327,7 +329,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
         backgroundColor: PRIMARY,
         elevation: 0.0,
         title: new Text(
-          MyLocalizations.of(context).reviewOrder,
+          MyLocalizations.of(context).getLocalizations("REVIEW_ORDER"),
           style: titleBoldWhiteOSS(),
         ),
         centerTitle: true,
@@ -359,11 +361,15 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
             new Column(
               children: <Widget>[
                 _buildBulletTitle(
-                    1, MyLocalizations.of(context).contactInformation),
+                    1,
+                    MyLocalizations.of(context)
+                        .getLocalizations("CONTACT_INFORMATION")),
                 _buildContactBlock(userInfo['name'],
                     userInfo['contactNumber'].toString(), userInfo),
                 _buildBulletTitle(
-                    2, MyLocalizations.of(context).selectOrderType),
+                    2,
+                    MyLocalizations.of(context)
+                        .getLocalizations("SELECT_ORDER_TYPE")),
                 widget.tableInfo == null
                     ? _buildOrderTypeBlock()
                     : _buildDineInTypeBlock(),
@@ -372,11 +378,15 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                     : _buildBulletTitle(
                         3,
                         isPickup
-                            ? MyLocalizations.of(context).restaurantAddress
-                            : MyLocalizations.of(context).selectAddress),
+                            ? MyLocalizations.of(context)
+                                .getLocalizations("RESTAURANT_ADDRESS")
+                            : MyLocalizations.of(context)
+                                .getLocalizations("SELECT_ADDRESS")),
                 isDineIn ? Container() : _buildAddressList(isPickup),
                 _buildBulletTitle(
-                    isDineIn ? 3 : 4, MyLocalizations.of(context).orderDetails),
+                    isDineIn ? 3 : 4,
+                    MyLocalizations.of(context)
+                        .getLocalizations("ORDER_DETAILS")),
                 _buildProductListBlock(userInfo),
               ],
             ),
@@ -399,7 +409,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               new Text(
-                MyLocalizations.of(context).date,
+                MyLocalizations.of(context).getLocalizations("DATE"),
                 style: hintStyleSmallWhiteLightOSL(),
               ),
               new Text(
@@ -413,7 +423,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               new Text(
-                MyLocalizations.of(context).totalOrder,
+                MyLocalizations.of(context).getLocalizations("TOTAL"),
                 style: hintStyleSmallWhiteLightOSL(),
               ),
               new Text(
@@ -489,7 +499,8 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                               Row(
                                 children: [
                                   Text(
-                                    MyLocalizations.of(context).dineIn,
+                                    MyLocalizations.of(context)
+                                        .getLocalizations("DINE_IN"),
                                     textAlign: TextAlign.center,
                                   ),
                                   Padding(
@@ -559,7 +570,8 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                                 Row(
                                   children: [
                                     Text(
-                                      MyLocalizations.of(context).pickUp,
+                                      MyLocalizations.of(context)
+                                          .getLocalizations("PICKUP"),
                                       textAlign: TextAlign.center,
                                       // style: hintStyleOSBType(),
                                     ),
@@ -610,7 +622,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                                         children: [
                                           Text(
                                             MyLocalizations.of(context)
-                                                .dELIVERY,
+                                                .getLocalizations("DELIVERY"),
                                             textAlign: TextAlign.center,
                                             // style: hintStyleOSBType(),
                                           ),
@@ -649,25 +661,22 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                             child: Column(
                           children: <Widget>[
                             Text(
-                              MyLocalizations.of(context).clickToSlot +
-                                  " " +
-                                  widget.cart['orderType'] +
-                                  " " +
-                                  MyLocalizations.of(context).dateandTime,
+                              MyLocalizations.of(context)
+                                  .getLocalizations("CLICK_SLOT"),
                               style: titleBlackLightOSB(),
                             ),
                             widget.cart['pickupDate'] != null
                                 ? Text(
-                                    MyLocalizations.of(context).date +
-                                        ": " +
+                                    MyLocalizations.of(context)
+                                            .getLocalizations("DATE", true) +
                                         widget.cart['pickupDate'],
                                     style: titleBlackLightOSB(),
                                   )
                                 : Container(),
                             widget.cart['pickupTime'] != null
                                 ? Text(
-                                    MyLocalizations.of(context).time +
-                                        ": " +
+                                    MyLocalizations.of(context)
+                                            .getLocalizations("TIME", true) +
                                         widget.cart['pickupTime'],
                                     style: titleBlackLightOSB(),
                                   )
@@ -723,7 +732,8 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                               },
                               color: PRIMARY,
                               child: new Text(
-                                MyLocalizations.of(context).selectDate,
+                                MyLocalizations.of(context)
+                                    .getLocalizations("SELECT_DATE"),
                                 style: TextStyle(
                                   fontWeight: FontWeight.w400,
                                   fontSize: 12.0,
@@ -871,7 +881,8 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                                     : Container(
                                         child: Center(
                                           child: Text(
-                                            MyLocalizations.of(context).closed,
+                                            MyLocalizations.of(context)
+                                                .getLocalizations("CLOSED"),
                                             style: titleBlackLightOSB(),
                                           ),
                                         ),
@@ -881,9 +892,8 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                                     children: <Widget>[
                                       Text(
                                         MyLocalizations.of(context)
-                                                .clickToSlot +
-                                            widget.cart['orderType'] +
-                                            MyLocalizations.of(context).time,
+                                            .getLocalizations(
+                                                "CLICK_SLOT_TIME"),
                                         style: titleBlackLightOSB(),
                                       ),
                                       RaisedButton(
@@ -905,7 +915,8 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                                         color: PRIMARY,
                                         child: new Text(
                                           "24/7 " +
-                                              MyLocalizations.of(context).open,
+                                              MyLocalizations.of(context)
+                                                  .getLocalizations("OPEN"),
                                           style: TextStyle(
                                             fontWeight: FontWeight.w400,
                                             fontSize: 12.0,
@@ -949,7 +960,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             new Text(
-              MyLocalizations.of(context).fullName,
+              MyLocalizations.of(context).getLocalizations("FULLNAME", true),
               style: hintStyleOSB(),
             ),
             new Text(
@@ -958,7 +969,8 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
             ),
             new Divider(),
             new Text(
-              MyLocalizations.of(context).mobileNumber,
+              MyLocalizations.of(context)
+                  .getLocalizations("CONTACT_NUMBER", true),
               style: hintStyleOSB(),
             ),
             new Text(
@@ -986,7 +998,8 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                                 activeColor: PRIMARY,
                               ),
                               Text(
-                                'Use Loyalty Points',
+                                MyLocalizations.of(context)
+                                    .getLocalizations("USE_LOYALTY_POINTS"),
                                 style: hintStyleSmallDarkLightOSR(),
                               ),
                               Expanded(
@@ -1002,31 +1015,101 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                             ],
                           )
                         : Container(
-                            child: Text(
-                                'Your order amount should be more than $currency' +
-                                    userInfo['loyaltyInfo']['minOrdLoyalty']
-                                        .toString() +
-                                    ' to use loyalty point. You have ' +
-                                    userInfo['totalLoyaltyPoints']
-                                        .toStringAsFixed(2) +
-                                    ' points on your account! Place orders to get more.'),
-                          )
-                    : Container(
-                        child: Text(
-                            'You dont have enough loyalty points. Minimum ' +
-                                userInfo['loyaltyInfo']['minLoyaltyPoints']
+                            child: Text(MyLocalizations.of(context)
+                                    .getLocalizations("YOUR_AMOUNT") +
+                                " $currency" +
+                                userInfo['loyaltyInfo']['minOrdLoyalty']
                                     .toString() +
-                                ' points required to use it, You have only ' +
+                                MyLocalizations.of(context)
+                                    .getLocalizations("YOU_HAVE_POINTS") +
+                                ' ' +
                                 userInfo['totalLoyaltyPoints']
                                     .toStringAsFixed(2) +
-                                ' points on your account! Place orders to get more.'),
+                                MyLocalizations.of(context)
+                                    .getLocalizations("MORE_POINTS")),
+                          )
+                    : Container(
+                        child: Text(MyLocalizations.of(context)
+                                .getLocalizations("MINIMUM_AMOUNT") +
+                            ' ' +
+                            userInfo['loyaltyInfo']['minLoyaltyPoints']
+                                .toString() +
+                            MyLocalizations.of(context)
+                                .getLocalizations("POINT_REQUIRED") +
+                            ' ' +
+                            userInfo['totalLoyaltyPoints'].toStringAsFixed(2) +
+                            MyLocalizations.of(context)
+                                .getLocalizations("MORE_POINTS")),
                       )
                 : Container(
-                    child: Text('Loyalty is not applicable!'),
+                    child: Text(MyLocalizations.of(context)
+                        .getLocalizations("NOT_APPLICALBLE")),
                   ),
           ],
         ),
       ),
+    );
+  }
+
+  showError(error, message) async {
+    showDialog<Null>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          contentPadding: EdgeInsets.only(
+            top: 10.0,
+          ),
+          title: new Text(
+            "$error",
+            textAlign: TextAlign.center,
+          ),
+          content: Container(
+            height: 120.0,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                  child: new Text(
+                    "$message",
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                Column(
+                  children: <Widget>[
+                    Divider(),
+                    IntrinsicHeight(
+                      child: new Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Container(
+                                alignment: Alignment.center,
+                                margin: EdgeInsets.only(bottom: 12.0),
+                                height: 30.0,
+                                decoration: BoxDecoration(),
+                                child: Text(
+                                  MyLocalizations.of(context)
+                                      .getLocalizations("OK"),
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -1098,20 +1181,11 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                                       style: subTitleDarkLightOSS(),
                                     ),
                                     new Text(
-                                      addressList[index]['flatNo'],
-                                      style: hintStyleSmallTextDarkOSR(),
-                                    ),
-                                    new Text(
                                       addressList[index]['address'],
                                       style: hintStyleSmallTextDarkOSR(),
                                     ),
                                     new Text(
                                       addressList[index]['contactNumber']
-                                          .toString(),
-                                      style: hintStyleSmallTextDarkOSR(),
-                                    ),
-                                    new Text(
-                                      addressList[index]['postalCode']
                                           .toString(),
                                       style: hintStyleSmallTextDarkOSR(),
                                     ),
@@ -1133,32 +1207,46 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                     Divider(),
                     InkWell(
                       onTap: () async {
-                        PlacePickerResult pickerResult = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => PlacePickerScreen(
-                              googlePlacesApiKey: GOOGLE_API_KEY,
-                              initialPosition: LatLng(31.1975844, 29.9598339),
-                              mainColor: primaryLight,
-                              mapStrings: MapPickerStrings.english(),
-                              placeAutoCompleteLanguage: widget.locale,
-                            ),
-                          ),
-                        );
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (BuildContext context) => AddAddressPage(
-                                localizedValues: widget.localizedValues,
-                                locale: widget.locale,
-                                loactionAddress: {
-                                  'address': pickerResult.address.toString(),
-                                  'lat': pickerResult.latLng.latitude,
-                                  'long': pickerResult.latLng.longitude
-                                }),
-                          ),
-                        );
-                        _getAddressList();
+                        currentLocation = await _location.getLocation();
+                        if (currentLocation != null) {
+                          PlacePickerResult pickerResult = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => PlacePickerScreen(
+                                        googlePlacesApiKey: GOOGLE_API_KEY,
+                                        initialPosition: LatLng(
+                                            currentLocation.latitude,
+                                            currentLocation.longitude),
+                                        mainColor: PRIMARY,
+                                        mapStrings: MapPickerStrings.english(),
+                                        placeAutoCompleteLanguage: 'en',
+                                      )));
+                          if (pickerResult != null) {
+                            setState(() {
+                              var result = Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      AddAddressPage(
+                                          localizedValues:
+                                              widget.localizedValues,
+                                          locale: widget.locale,
+                                          loactionAddress: pickerResult),
+                                ),
+                              );
+                              result.then((res) {
+                                _getAddressList();
+                                _getUserInfo();
+                              });
+                            });
+                          }
+                        } else {
+                          showError(
+                              MyLocalizations.of(context)
+                                  .getLocalizations("ENABLE_LOCATION_MSG"),
+                              MyLocalizations.of(context)
+                                  .getLocalizations("GPS_SETTING"));
+                        }
                       },
                       child: Row(
                         children: <Widget>[
@@ -1170,7 +1258,8 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                           Padding(
                             padding: const EdgeInsets.only(left: 8.0),
                             child: Text(
-                              MyLocalizations.of(context).addAddress,
+                              MyLocalizations.of(context)
+                                  .getLocalizations("ADD_NEW_ADDRESS"),
                               style: textPrimaryOSR(),
                             ),
                           )
@@ -1243,8 +1332,9 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                       ],
                     ),
                     products[index]['note'] != null
-                        ? Text(MyLocalizations.of(context).note +
-                            ': ${products[index]['note']}')
+                        ? Text(MyLocalizations.of(context)
+                                .getLocalizations("NOTE", true) +
+                            ' ${products[index]['note']}')
                         : Container(),
                     Divider(),
                   ],
@@ -1261,7 +1351,8 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                 Padding(
                   padding: const EdgeInsets.only(left: 8.0),
                   child: Text(
-                    MyLocalizations.of(context).orderSummary,
+                    MyLocalizations.of(context)
+                        .getLocalizations("ORDER_SUMMARY"),
                     style: textPrimaryOSR(),
                   ),
                 )
@@ -1269,21 +1360,26 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
             ),
             Divider(),
             _buildTotalPriceLine(
-                MyLocalizations.of(context).subTotal, widget.cart['subTotal']),
+                MyLocalizations.of(context).getLocalizations("SUB_TOTAL"),
+                widget.cart['subTotal']),
             widget.cart['taxInfo'] != null
                 ? _buildTotalPriceLine(
-                    "Tax " + widget.cart['taxInfo']['taxName'],
+                    MyLocalizations.of(context).getLocalizations("TAX") +
+                        " " +
+                        widget.cart['taxInfo']['taxName'],
                     (double.parse(
                             widget.cart['taxInfo']['taxRate'].toString()) *
                         widget.cart['subTotal'] /
                         100))
                 : Container(height: 0, width: 0),
             _buildTotalPriceLine(
-                MyLocalizations.of(context).deliveryCharges,
+                MyLocalizations.of(context)
+                    .getLocalizations("DELIVERY_CHARGES"),
                 widget.cart['deliveryCharge'] == 'Free'
                     ? '0.0'
                     : double.parse(widget.cart['deliveryCharge'].toString())),
-            _buildTotalPriceLine(MyLocalizations.of(context).grandTotal,
+            _buildTotalPriceLine(
+                MyLocalizations.of(context).getLocalizations("TOTAL"),
                 double.parse(widget.cart['grandTotal'].toString())),
             // _buildTotalPriceLine('Used Loyalty Point', usedLoyaltyPoint),
           ],
@@ -1331,17 +1427,18 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                   _buildBottomBarButton();
                 } else if (widget.cart['pickupDate'] == null) {
                   showSnackbar(MyLocalizations.of(context)
-                      .pleaseSelectDatefirstforpickup);
+                      .getLocalizations("SELECT_DATE_FIRST_FOR_PICKUP"));
                 } else if (widget.cart['pickupTime'] == null) {
                   showSnackbar(MyLocalizations.of(context)
-                      .pleaseSelectTimefirstforpickup);
+                      .getLocalizations("SELECT_TIME_FIRST_FOR_PICKUP"));
                 } else {
                   showSnackbar('Please Select Date and Time first for pickup');
                 }
               } else if (widget.cart['orderType'] == 'Delivery') {
                 if (widget.cart['shippingAddress'] == null) {
                   if (addressList.length == 0) {
-                    showSnackbar(MyLocalizations.of(context).addAddress);
+                    showSnackbar(MyLocalizations.of(context)
+                        .getLocalizations("ADD_NEW_ADDRESS"));
                   }
                   widget.cart['shippingAddress'] = addressList[0];
                 }
@@ -1350,14 +1447,14 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                   openAndCloseTime == "Open"
                       ? _buildBottomBarButton()
                       : showSnackbar(MyLocalizations.of(context)
-                          .storeisClosedPleaseTryAgainduringouropeninghours);
+                          .getLocalizations("STORE_CLOSE"));
                 } else {
                   if (widget.deliveryInfo['areaCode'] == null ||
                       widget.deliveryInfo['areaCode'][0] == null) {
                     openAndCloseTime == "Open"
                         ? _buildBottomBarButton()
                         : showSnackbar(MyLocalizations.of(context)
-                            .storeisClosedPleaseTryAgainduringouropeninghours);
+                            .getLocalizations("STORE_CLOSE"));
                   } else {
                     bool isPinFound = false;
                     for (int i = 0;
@@ -1374,7 +1471,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                       openAndCloseTime == "Open"
                           ? _buildBottomBarButton()
                           : showSnackbar(MyLocalizations.of(context)
-                              .storeisClosedPleaseTryAgainduringouropeninghours);
+                              .getLocalizations("STORE_CLOSE"));
                     } else {
                       _showAvailablePincodeAlert(
                           widget.cart['restaurant'],
@@ -1385,9 +1482,9 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                   }
                 }
               } else {
-                showSnackbar(MyLocalizations.of(context)
-                        .somethingwentwrongpleaserestarttheapp +
-                    '.');
+                showSnackbar(
+                    MyLocalizations.of(context).getLocalizations("ERROR_MSG") +
+                        '.');
               }
             },
             child: new Row(
@@ -1401,12 +1498,14 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                       children: <Widget>[
                         new Padding(padding: EdgeInsets.only(top: 10.0)),
                         new Text(
-                          MyLocalizations.of(context).placeOrderNow,
+                          MyLocalizations.of(context)
+                              .getLocalizations("PLACE_ORDER_NOW"),
                           style: subTitleWhiteLightOSR(),
                         ),
                         new Padding(padding: EdgeInsets.only(top: 5.0)),
                         new Text(
-                          MyLocalizations.of(context).total +
+                          MyLocalizations.of(context)
+                                  .getLocalizations("TOTAL") +
                               ': ${widget.currency ?? currency} ${widget.cart['grandTotal'].toStringAsFixed(2)}',
                           style: titleWhiteBoldOSB(),
                         ),
@@ -1506,15 +1605,17 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(MyLocalizations.of(context).deliveryNotAvailable),
+          title: Text(MyLocalizations.of(context)
+              .getLocalizations("DELIVERY_NOT_AVAILABLE")),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
                 Text(restaurant +
-                    MyLocalizations.of(context).notDeliverToThisPostcode +
+                    MyLocalizations.of(context)
+                        .getLocalizations("POST_CODE_MSG") +
                     zip +
-                    MyLocalizations.of(context).deliverToThisPostcode +
-                    ' :'),
+                    MyLocalizations.of(context)
+                        .getLocalizations("CURRENT_POSTEL_CODE", true)),
                 Divider(),
                 SingleChildScrollView(
                   child: ListView.builder(
@@ -1532,7 +1633,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
           ),
           actions: <Widget>[
             FlatButton(
-              child: Text(MyLocalizations.of(context).ok),
+              child: Text(MyLocalizations.of(context).getLocalizations("OK")),
               onPressed: () {
                 Navigator.of(context).pop();
               },

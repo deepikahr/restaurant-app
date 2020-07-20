@@ -1,9 +1,26 @@
 import 'dart:async';
-
-import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 class Common {
+  List<dynamic> products = List();
+
+  static Future<bool> addProduct(List<dynamic> products) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setString('product', json.encode(products));
+  }
+
+  static Future<List<dynamic>> getProducts() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String products = prefs.getString("product");
+    try {
+      return json.decode(products) as List<dynamic>;
+    } catch (err) {
+      return Future(() => null);
+    }
+  }
+
   // save token on storage
   static Future<bool> setToken(String token) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -57,6 +74,7 @@ class Common {
   // remove cart items from storage
   static Future<bool> removeCart() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove('product');
     return prefs.remove('cart');
   }
 

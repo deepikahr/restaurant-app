@@ -1,22 +1,19 @@
+import 'dart:async';
+
 import 'package:RestaurantSaas/services/auth-service.dart';
 import 'package:RestaurantSaas/services/common.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
-
-import 'services/initialize_i18n.dart';
-import 'services/localizations.dart';
-
-import './styles/styles.dart';
-import './services/constant.dart';
-import 'screens/mains/home.dart';
-
-import './services/sentry-services.dart';
-import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import './services/constant.dart';
+import './services/sentry-services.dart';
+import './styles/styles.dart';
+import 'screens/mains/home.dart';
 import 'services/constant.dart';
+import 'services/initialize_i18n.dart';
+import 'services/localizations.dart';
 
 bool get isInDebugMode {
   bool inDebugMode = false;
@@ -26,9 +23,9 @@ bool get isInDebugMode {
 
 SentryError sentryError = new SentryError();
 
-main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Map<String, Map<String, String>> localizedValues = await initializeI18n();
+  Map localizedValues = await initializeI18n();
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String locale = prefs.getString('selectedLanguage') ?? 'en';
   FlutterError.onError = (FlutterErrorDetails details) async {
@@ -43,6 +40,7 @@ main() async {
 
   runZoned<Future<Null>>(() async {
     runApp(new EntryPage(locale, localizedValues));
+    // ignore: deprecated_member_use
   }, onError: (error, stackTrace) async {
     await sentryError.reportError(error, stackTrace);
   });
@@ -90,8 +88,9 @@ Future<void> initOneSignal() async {
 }
 
 class EntryPage extends StatefulWidget {
-  final Map<String, Map<String, String>> localizedValues;
+  final Map localizedValues;
   final String locale;
+
   EntryPage(this.locale, this.localizedValues);
 
   @override
@@ -104,11 +103,11 @@ class _EntryPageState extends State<EntryPage> {
     return MaterialApp(
       locale: Locale(widget.locale),
       localizationsDelegates: [
-        MyLocalizationsDelegate(widget.localizedValues),
+        MyLocalizationsDelegate(widget.localizedValues, [widget.locale]),
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
       ],
-      supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
+      supportedLocales: [Locale(widget.locale)],
       debugShowCheckedModeBanner: false,
       title: APP_NAME,
       theme: ThemeData(

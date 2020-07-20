@@ -1,4 +1,5 @@
 import 'package:RestaurantSaas/screens/mains/cart.dart';
+import 'package:RestaurantSaas/screens/mains/product-list.dart';
 import '../../services/counter-service.dart';
 import 'package:flutter/material.dart';
 import '../../styles/styles.dart';
@@ -15,10 +16,12 @@ SentryError sentryError = new SentryError();
 
 class RestaurantListPage extends StatefulWidget {
   final String title;
-  final Map<String, Map<String, String>> localizedValues;
+  final Map localizedValues;
   final String locale;
+  final Map taxInfo;
 
-  RestaurantListPage({Key key, this.title, this.locale, this.localizedValues})
+  RestaurantListPage(
+      {Key key, this.title, this.locale, this.localizedValues, this.taxInfo})
       : super(key: key);
 
   @override
@@ -34,9 +37,11 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   getRestaurantsList() async {
-    if (widget.title == MyLocalizations.of(context).topRated) {
+    if (widget.title ==
+        MyLocalizations.of(context).getLocalizations("TOP_RATED")) {
       return await MainService.getTopRatedRestaurants();
-    } else if (widget.title == MyLocalizations.of(context).newlyArrived) {
+    } else if (widget.title ==
+        MyLocalizations.of(context).getLocalizations("NEWLY_ARRIVED")) {
       return await MainService.getNewlyArrivedRestaurants();
     } else {
       List<dynamic> restaurants;
@@ -89,7 +94,8 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
           ),
         ),
         title: Text(
-          widget.title + MyLocalizations.of(context).restaurants,
+          widget.title +
+              MyLocalizations.of(context).getLocalizations("RESTAURANTS"),
           style: titleBoldWhiteOSS(),
         ),
         centerTitle: true,
@@ -152,7 +158,8 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
         renderError: ([error]) {
           sentryError.reportError(error, null);
           return NoData(
-              message: MyLocalizations.of(context).connectionError,
+              message:
+                  MyLocalizations.of(context).getLocalizations("ERROR_MSG"),
               icon: Icons.block);
         },
         renderSuccess: ({data}) {
@@ -164,19 +171,67 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
               itemCount: data.length,
               padding: const EdgeInsets.all(0.0),
               itemBuilder: (BuildContext context, int index) {
-                return InkWell(
-                    child: HomePageState.buildRestaurantCard(
-                        data[index],
-                        MyLocalizations.of(context).reviews,
-                        MyLocalizations.of(context).branches),
-                    onTap: () {
-                      if (mounted) {
-                        setState(() {
-                          restaurantInfo = data[index];
+                return widget.title ==
+                        MyLocalizations.of(context).getLocalizations("NEAR_BY")
+                    ? InkWell(
+                        child: HomePageState.buildRestaurantCardNear(
+                            data[index],
+                            MyLocalizations.of(context)
+                                .getLocalizations("REVIEW"),
+                            MyLocalizations.of(context)
+                                .getLocalizations("BRANCHES")),
+                        onTap: () async {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (BuildContext context) =>
+                                  ProductListPage(
+                                restaurantName: data[index]['list']
+                                    ['restaurantID']['restaurantName'],
+                                locationName: data[index]['list']
+                                    ['locationName'],
+                                aboutUs: data[index]['list']['aboutUs'],
+                                imgUrl:
+                                    data[index]['list']['restaurantID'] != null
+                                        ? data[index]['list']['restaurantID']
+                                            ['logo']
+                                        : null,
+                                address: data[index]['list']['address'],
+                                locationId: data[index]['list']['_id'],
+                                restaurantId: data[index]['list']
+                                    ['restaurantID']['_id'],
+                                cuisine: data[index]['list']['cuisine'],
+                                deliveryInfo:
+                                    data[index]['list']['deliveryInfo'] != null
+                                        ? data[index]['list']['deliveryInfo']
+                                            ['deliveryInfo']
+                                        : null,
+                                workingHours:
+                                    data[index]['list']['workingHours'] ?? null,
+                                locationInfo: data[index]['list'],
+                                taxInfo: widget.taxInfo,
+                                locale: widget.locale,
+                                localizedValues: widget.localizedValues,
+                              ),
+                            ),
+                          );
+                        })
+                    : InkWell(
+                        child: HomePageState.buildRestaurantCard(
+                            data[index],
+                            MyLocalizations.of(context)
+                                .getLocalizations("REVIEW"),
+                            MyLocalizations.of(context)
+                                .getLocalizations("BRANCHES")),
+                        onTap: () async {
+                          data[index]['list']['taxInfo'] = widget.taxInfo;
+                          if (mounted) {
+                            setState(() {
+                              restaurantInfo = data[index];
+                            });
+                            _showBottomSheet();
+                          }
                         });
-                        _showBottomSheet();
-                      }
-                    });
               });
         });
   }
@@ -199,6 +254,8 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
               padding: const EdgeInsets.all(6.0),
               child: LocationListSheet(
                 restaurantInfo: restaurantInfo,
+                localizedValues: widget.localizedValues,
+                locale: widget.locale,
               ),
             ),
           );

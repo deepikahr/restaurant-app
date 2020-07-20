@@ -1,29 +1,32 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:RestaurantSaas/main.dart';
 import 'package:RestaurantSaas/screens/mains/home.dart';
 import 'package:RestaurantSaas/services/initialize_i18n.dart';
-import 'package:flutter/material.dart';
-import 'package:toast/toast.dart';
-import '../../styles/styles.dart';
-import '../../services/profile-service.dart';
-import 'package:async_loader/async_loader.dart';
-import '../../widgets/no-data.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
-import 'dart:async';
-import 'package:http/http.dart' as http;
 import 'package:async/async.dart';
-import '../../services/sentry-services.dart';
-import 'package:RestaurantSaas/main.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:async_loader/async_loader.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:toast/toast.dart';
 
 import '../../services/localizations.dart';
+import '../../services/profile-service.dart';
+import '../../services/sentry-services.dart';
+import '../../styles/styles.dart';
+import '../../widgets/no-data.dart';
 
 SentryError sentryError = new SentryError();
 
 class ProfileApp extends StatefulWidget {
-  final Map<String, Map<String, String>> localizedValues;
+  final Map localizedValues;
   final String locale;
+
   ProfileApp({Key key, this.locale, this.localizedValues}) : super(key: key);
+
   @override
   _ProfileAppState createState() => _ProfileAppState();
 }
@@ -37,9 +40,11 @@ class _ProfileAppState extends State<ProfileApp> {
 }
 
 class Profile extends StatefulWidget {
-  final Map<String, Map<String, String>> localizedValues;
+  final Map localizedValues;
   final String locale;
+
   Profile({Key key, this.locale, this.localizedValues}) : super(key: key);
+
   @override
   _ProfileState createState() => _ProfileState();
 }
@@ -54,11 +59,12 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   Map<String, dynamic> profileData;
   bool isLoading = false, isPicUploading = false, isImageUploading = false;
   var selectedLanguage, selectedLocale;
-  Map<String, Map<String, String>> localizedValues;
+  Map localizedValues;
 
   String selectedLanguages;
 
   List<String> languages = ['English', 'French', 'Chinese', 'Arabic'];
+
   Future<Map<String, dynamic>> getProfileInfo() async {
     return await ProfileService.getUserInfo();
   }
@@ -109,8 +115,12 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
       };
       ProfileService.setUserInfo(profileData['_id'], body).then((onValue) {
         try {
-          Toast.show("Your profile Successfully UPDATED", context,
-              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+          Toast.show(
+              MyLocalizations.of(context)
+                  .getLocalizations("PROFILE_SAVE_INFO_MSG"),
+              context,
+              duration: Toast.LENGTH_LONG,
+              gravity: Toast.BOTTOM);
           if (mounted) {
             setState(() {
               isLoading = false;
@@ -128,6 +138,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   }
 
   void selectGallary() async {
+    // ignore: deprecated_member_use
     var file = await ImagePicker.pickImage(source: ImageSource.gallery);
     if (mounted) {
       setState(() {
@@ -139,6 +150,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
         }
         if (_imageFile != null) {
           var stream = new http.ByteStream(
+              // ignore: deprecated_member_use
               DelegatingStream.typed(_imageFile.openRead()));
           ProfileService.uploadProfileImage(
             _imageFile,
@@ -150,14 +162,19 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
               isPicUploading = false;
             });
           }
-          Toast.show("Your profile Picture Successfully UPDATED", context,
-              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+          Toast.show(
+              MyLocalizations.of(context)
+                  .getLocalizations("PROFILE_UPLOAD_MSG"),
+              context,
+              duration: Toast.LENGTH_LONG,
+              gravity: Toast.BOTTOM);
         }
       });
     }
   }
 
   void selectCamera() async {
+    // ignore: deprecated_member_use
     var file = await ImagePicker.pickImage(source: ImageSource.camera);
     if (mounted) {
       setState(() {
@@ -169,6 +186,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
         }
         if (_imageFile != null) {
           var stream = new http.ByteStream(
+              // ignore: deprecated_member_use
               DelegatingStream.typed(_imageFile.openRead()));
           ProfileService.uploadProfileImage(
             _imageFile,
@@ -181,8 +199,12 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
               isPicUploading = false;
             });
           }
-          Toast.show("Your profile Picture Successfully UPDATED", context,
-              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+          Toast.show(
+              MyLocalizations.of(context)
+                  .getLocalizations("PROFILE_UPLOAD_MSG"),
+              context,
+              duration: Toast.LENGTH_LONG,
+              gravity: Toast.BOTTOM);
         }
       });
     }
@@ -222,7 +244,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
         renderError: ([error]) {
           sentryError.reportError(error, null);
           return NoData(
-              message: 'Please check your internet connection!',
+              message:
+                  MyLocalizations.of(context).getLocalizations("ERROR_MSG"),
               icon: Icons.block);
         },
         renderSuccess: ({data}) {
@@ -282,7 +305,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                     builder: (BuildContext context) {
                                       return new AlertDialog(
                                         title: new Text(
-                                            MyLocalizations.of(context).alert),
+                                            MyLocalizations.of(context)
+                                                .getLocalizations("SELECT")),
                                         content: new SingleChildScrollView(
                                           child: new ListBody(
                                             children: <Widget>[
@@ -304,7 +328,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                                       child: new Text(
                                                           MyLocalizations.of(
                                                                   context)
-                                                              .choosefromphotos),
+                                                              .getLocalizations(
+                                                                  "CHOOSE_FROM_PHOTOS")),
                                                     ),
                                                   ),
                                                   Padding(
@@ -319,7 +344,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                                       child: new Text(
                                                           MyLocalizations.of(
                                                                   context)
-                                                              .takephoto),
+                                                              .getLocalizations(
+                                                                  "TAKE_PHOTO")),
                                                     ),
                                                   ),
                                                   Padding(
@@ -335,10 +361,10 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                                                       context);
                                                                   removeProfilePic();
                                                                 },
-                                                                child: new Text(
-                                                                    MyLocalizations.of(
-                                                                            context)
-                                                                        .removephoto),
+                                                                child: new Text(MyLocalizations.of(
+                                                                        context)
+                                                                    .getLocalizations(
+                                                                        "REMOVE_PHOTO")),
                                                               )
                                                             : Container(),
                                                   ),
@@ -349,9 +375,9 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                         ),
                                         actions: <Widget>[
                                           new FlatButton(
-                                            child: new Text(
-                                                MyLocalizations.of(context)
-                                                    .cancel),
+                                            child: new Text(MyLocalizations.of(
+                                                    context)
+                                                .getLocalizations("CANCEL")),
                                             onPressed: () {
                                               Navigator.pop(context);
                                             },
@@ -360,7 +386,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                       );
                                     });
                               },
-                              tooltip: 'Photo',
+                              tooltip: MyLocalizations.of(context)
+                                  .getLocalizations("PHOTO"),
                               child: new Icon(Icons.edit),
                             ),
                           ),
@@ -372,8 +399,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           border: Border.all(color: Colors.grey, width: 1.0),
                         ),
                         child: ListTile(
-                          title:
-                              Text(MyLocalizations.of(context).selectLanguages),
+                          title: Text(MyLocalizations.of(context)
+                              .getLocalizations("SELECT_LANGUAGE")),
                           trailing: DropdownButtonHideUnderline(
                             child: DropdownButton(
                               hint: Text(selectedLocale == null
@@ -383,65 +410,20 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                               onChanged: (newValue) async {
                                 await initializeI18n().then((value) async {
                                   localizedValues = value;
+                                  SharedPreferences prefs =
+                                      await SharedPreferences.getInstance();
                                   if (newValue == 'English') {
-                                    SharedPreferences prefs =
-                                        await SharedPreferences.getInstance();
                                     prefs.setString('selectedLanguage', 'en');
-                                    Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              EntryPage('en', localizedValues),
-                                        ),
-                                        (Route<dynamic> route) => false);
                                   } else if (newValue == 'Chinese') {
-                                    SharedPreferences prefs =
-                                        await SharedPreferences.getInstance();
                                     prefs.setString('selectedLanguage', 'zh');
-                                    Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              EntryPage('zh', localizedValues),
-                                        ),
-                                        (Route<dynamic> route) => false);
                                   } else if (newValue == 'Kannada') {
-                                    SharedPreferences prefs =
-                                        await SharedPreferences.getInstance();
                                     prefs.setString('selectedLanguage', 'ka');
-
-                                    Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              EntryPage('ka', localizedValues),
-                                        ),
-                                        (Route<dynamic> route) => false);
                                   } else if (newValue == 'Arabic') {
-                                    SharedPreferences prefs =
-                                        await SharedPreferences.getInstance();
                                     prefs.setString('selectedLanguage', 'ar');
-
-                                    Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              EntryPage('ar', localizedValues),
-                                        ),
-                                        (Route<dynamic> route) => false);
                                   } else {
-                                    SharedPreferences prefs =
-                                        await SharedPreferences.getInstance();
                                     prefs.setString('selectedLanguage', 'fr');
-
-                                    Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              EntryPage('fr', localizedValues),
-                                        ),
-                                        (Route<dynamic> route) => false);
                                   }
+                                  main();
                                 });
                               },
                               items: languages.map((lang) {
@@ -465,7 +447,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           },
                           initialValue: data['name'],
                           decoration: new InputDecoration(
-                            labelText: MyLocalizations.of(context).fullName,
+                            labelText: MyLocalizations.of(context)
+                                .getLocalizations("FULLNAME"),
                             hintStyle: textOS(),
                             contentPadding: EdgeInsets.all(10.0),
                             border: InputBorder.none,
@@ -484,15 +467,16 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                             data['contactNumber'] = value;
                           },
                           validator: (String value) {
-                            if (value.isEmpty || value.length < 9) {
+                            if (value.isEmpty) {
                               return MyLocalizations.of(context)
-                                  .pleaseEnterValidMobileNumber;
+                                  .getLocalizations("ENTER_CONTACT_NUMBER");
                             } else
                               return null;
                           },
                           initialValue: data['contactNumber'].toString(),
                           decoration: new InputDecoration(
-                            labelText: MyLocalizations.of(context).mobileNumber,
+                            labelText: MyLocalizations.of(context)
+                                .getLocalizations("CONTACT_NUMBER"),
                             hintStyle: textOS(),
                             counterText: "",
                             contentPadding: EdgeInsets.all(10.0),
@@ -501,107 +485,6 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           keyboardType: TextInputType.number,
                         ),
                       ),
-                      Container(
-                        margin: EdgeInsets.only(top: 10.0),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey, width: 1.0),
-                        ),
-                        child: TextFormField(
-                          onSaved: (value) {
-                            data['locationName'] = value;
-                          },
-                          initialValue: data['locationName'],
-                          decoration: new InputDecoration(
-                            labelText: MyLocalizations.of(context).subUrban,
-                            hintStyle: textOS(),
-                            contentPadding: EdgeInsets.all(10.0),
-                            border: InputBorder.none,
-                          ),
-                          keyboardType: TextInputType.text,
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 10.0),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey, width: 1.0),
-                        ),
-                        child: TextFormField(
-                          onSaved: (value) {
-                            data['state'] = value;
-                          },
-                          initialValue: data['state'],
-                          decoration: new InputDecoration(
-                            labelText: MyLocalizations.of(context).state,
-                            hintStyle: textOS(),
-                            contentPadding: EdgeInsets.all(10.0),
-                            border: InputBorder.none,
-                          ),
-                          keyboardType: TextInputType.text,
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 10.0),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey, width: 1.0),
-                        ),
-                        child: TextFormField(
-                          onSaved: (value) {
-                            data['country'] = value;
-                          },
-                          initialValue: data['country'],
-                          decoration: new InputDecoration(
-                            labelText: MyLocalizations.of(context).country,
-                            hintStyle: textOS(),
-                            contentPadding: EdgeInsets.all(10.0),
-                            border: InputBorder.none,
-                          ),
-                          keyboardType: TextInputType.text,
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 10.0),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey, width: 1.0),
-                        ),
-                        child: TextFormField(
-                          maxLength: 6,
-                          onSaved: (value) {
-                            data['zip'] = value;
-                          },
-                          initialValue:
-                              data['zip'] != null ? data['zip'].toString() : '',
-                          decoration: new InputDecoration(
-                            labelText: MyLocalizations.of(context).postalCode,
-                            hintStyle: textOS(),
-                            counterText: "",
-                            contentPadding: EdgeInsets.all(10.0),
-                            border: InputBorder.none,
-                          ),
-                          keyboardType: TextInputType.number,
-                        ),
-                      ),
-                      Container(
-                          margin: EdgeInsets.only(top: 10.0),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey, width: 1.0),
-                          ),
-                          child: new Padding(
-                            padding: EdgeInsets.only(left: 10.0),
-                            child: new TextFormField(
-                              onSaved: (value) {
-                                data['address'] = value;
-                              },
-                              initialValue: data['address'],
-                              decoration: new InputDecoration(
-                                  labelText:
-                                      MyLocalizations.of(context).address,
-                                  hintStyle: textOS(),
-                                  fillColor: Colors.black,
-                                  border: InputBorder.none),
-                              keyboardType: TextInputType.multiline,
-                              maxLines: 3,
-                            ),
-                          )),
                     ],
                   ),
                 ),
@@ -613,7 +496,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: PRIMARY,
-        title: Text(MyLocalizations.of(context).profile),
+        title: Text(MyLocalizations.of(context).getLocalizations("PROFILE")),
         centerTitle: true,
         leading: InkWell(
           onTap: () {
@@ -651,7 +534,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
               height: 40.0,
               child: FlatButton(
                 child: Text(
-                  MyLocalizations.of(context).cancel,
+                  MyLocalizations.of(context).getLocalizations("CANCEL"),
                 ),
                 onPressed: () {
                   Navigator.of(context).pop();
@@ -672,7 +555,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                     )
                   : FlatButton(
                       child: Text(
-                        MyLocalizations.of(context).save,
+                        MyLocalizations.of(context).getLocalizations("SUBMIT"),
                         style: TextStyle(color: Colors.white),
                       ),
                       onPressed: () {

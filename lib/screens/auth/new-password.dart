@@ -10,7 +10,7 @@ SentryError sentryError = new SentryError();
 class NewPassword extends StatefulWidget {
   final String otpToken;
   final String locale;
-  final Map<String, Map<String, String>> localizedValues;
+  final Map localizedValues;
   NewPassword({Key key, this.otpToken, this.locale, this.localizedValues})
       : super(key: key);
   @override
@@ -83,7 +83,8 @@ class _NewPasswordState extends State<NewPassword> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text(MyLocalizations.of(context).createPassword),
+        title: Text(
+            MyLocalizations.of(context).getLocalizations("CREATE_PASSWORD")),
         centerTitle: true,
         backgroundColor: PRIMARY,
         leading: InkWell(
@@ -132,7 +133,9 @@ class _NewPasswordState extends State<NewPassword> {
             padding: EdgeInsetsDirectional.only(top: 30.0, bottom: 30.0),
             child: Center(
               child: Text(
-                MyLocalizations.of(context).createPassword + '!',
+                MyLocalizations.of(context)
+                        .getLocalizations("CREATE_PASSWORD") +
+                    '!',
                 textAlign: TextAlign.center,
                 style: subTitleWhiteLightOSR(),
               ),
@@ -149,7 +152,8 @@ class _NewPasswordState extends State<NewPassword> {
                   flex: 9,
                   child: TextFormField(
                     decoration: new InputDecoration(
-                      labelText: MyLocalizations.of(context).password,
+                      labelText: MyLocalizations.of(context)
+                          .getLocalizations("PASSWORD"),
                       hintStyle: hintStyleGreyLightOSR(),
                       contentPadding: EdgeInsets.all(12.0),
                       border: InputBorder.none,
@@ -158,7 +162,7 @@ class _NewPasswordState extends State<NewPassword> {
                     validator: (String value) {
                       if (value.isEmpty || value.length < 6) {
                         return MyLocalizations.of(context)
-                            .pleaseEnterValidPassword;
+                            .getLocalizations("PLEASE_ENTER_VALID_PASSWORD");
                       } else
                         return null;
                     },
@@ -178,7 +182,8 @@ class _NewPasswordState extends State<NewPassword> {
           new Padding(
             padding: EdgeInsets.only(top: 20.0),
             child: new Text(
-              MyLocalizations.of(context).createPasswordMessage,
+              MyLocalizations.of(context)
+                  .getLocalizations("CREATE_PASSWORD_MSG"),
               textAlign: TextAlign.center,
               style: subTitleWhiteLightOSR(),
             ),
@@ -203,7 +208,8 @@ class _NewPasswordState extends State<NewPassword> {
                   decoration:
                       BoxDecoration(border: Border.all(color: Colors.white70)),
                   child: Text(
-                    MyLocalizations.of(context).createPassword,
+                    MyLocalizations.of(context)
+                        .getLocalizations("CREATE_PASSWORD"),
                     style: subTitleWhiteShadeLightOSR(),
                   ),
                 )

@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
-import '../../styles/styles.dart';
-import 'order-upcoming.dart';
-import 'order-history.dart';
+
 import '../../services/localizations.dart';
+import '../../styles/styles.dart';
+import 'order-history.dart';
+import 'order-upcoming.dart';
 
 class OrdersPage extends StatefulWidget {
-  final Map<String, Map<String, String>> localizedValues;
+  final Map localizedValues;
   final String locale;
+
   OrdersPage({Key key, this.locale, this.localizedValues}) : super(key: key);
+
   @override
   _OrdersPageState createState() => _OrdersPageState();
 }
@@ -41,7 +44,7 @@ class _OrdersPageState extends State<OrdersPage>
         centerTitle: true,
         backgroundColor: PRIMARY,
         elevation: 0.0,
-        title: Text(MyLocalizations.of(context).myOrders),
+        title: Text(MyLocalizations.of(context).getLocalizations("MY_ORDERS")),
       ),
       body: DefaultTabController(
         length: 2,
@@ -53,13 +56,13 @@ class _OrdersPageState extends State<OrdersPage>
                 tabs: [
                   Tab(
                     child: Text(
-                      MyLocalizations.of(context).upcoming,
+                      MyLocalizations.of(context).getLocalizations("UP_COMING"),
                       style: subTitleWhiteLightOSR(),
                     ),
                   ),
                   Tab(
                     child: Text(
-                      MyLocalizations.of(context).history,
+                      MyLocalizations.of(context).getLocalizations("HISTORY"),
                       style: subTitleWhiteLightOSR(),
                     ),
                   ),

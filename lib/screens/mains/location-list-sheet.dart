@@ -1,14 +1,15 @@
-import 'package:flutter/material.dart';
 import 'package:async_loader/async_loader.dart';
-import '../../styles/styles.dart';
-import '../../services/main-service.dart';
-import '../../widgets/no-data.dart';
-import '../../widgets/location-card.dart';
-import 'product-list.dart';
-import 'location-list.dart';
-import '../../services/sentry-services.dart';
-import '../../services/localizations.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../services/localizations.dart';
+import '../../services/main-service.dart';
+import '../../services/sentry-services.dart';
+import '../../styles/styles.dart';
+import '../../widgets/location-card.dart';
+import '../../widgets/no-data.dart';
+import 'location-list.dart';
+import 'product-list.dart';
 
 SentryError sentryError = new SentryError();
 
@@ -16,7 +17,7 @@ String currency = "";
 
 class LocationListSheet extends StatelessWidget {
   final Map<String, dynamic> restaurantInfo, locationInfo;
-  final Map<String, Map<String, String>> localizedValues;
+  final Map localizedValues;
   final String locale;
   final GlobalKey<AsyncLoaderState> _asyncLoaderState =
       GlobalKey<AsyncLoaderState>();
@@ -47,7 +48,8 @@ class LocationListSheet extends StatelessWidget {
           sentryError.reportError(error, null);
           return new Center(
             child: NoData(
-                message: MyLocalizations.of(context).connectionError,
+                message:
+                    MyLocalizations.of(context).getLocalizations("ERROR_MSG"),
                 icon: Icons.block),
           );
         },
@@ -81,7 +83,7 @@ class LocationListSheet extends StatelessWidget {
       List<dynamic> data,
       Map<String, dynamic> restaurantInfo,
       bool isLimited,
-      Map<String, Map<String, String>> localizedValues,
+      Map localizedValues,
       String locale,
       String currency) {
     if (data.length > 0) {
@@ -108,7 +110,9 @@ class LocationListSheet extends StatelessWidget {
           });
     } else {
       return NoData(
-          message: MyLocalizations.of(context).noLocationsFound, icon: null);
+          message: MyLocalizations.of(context)
+              .getLocalizations("NO_LOCATIONS_FOUND"),
+          icon: null);
     }
   }
 
@@ -118,7 +122,7 @@ class LocationListSheet extends StatelessWidget {
       BuildContext context,
       Map<String, dynamic> restaurantInfo,
       Map<String, dynamic> locationInfo,
-      Map<String, Map<String, String>> localizedValues,
+      Map localizedValues,
       final String locale,
       String currency) {
     String locationName = data[index]['location']['locationName'];
@@ -135,13 +139,14 @@ class LocationListSheet extends StatelessWidget {
           ' M';
       deliveryChargeText = data[index]['location']['deliveryInfo']
               ['deliveryInfo']['freeDelivery']
-          ? MyLocalizations.of(context).noDeliverycharge
-          : '${MyLocalizations.of(context).deliveryCharges} $currency' +
+          ? MyLocalizations.of(context).getLocalizations("NO_DELIVERY_CHARGES")
+          : '${MyLocalizations.of(context).getLocalizations("DELIVERY_CHARGES")} $currency' +
               data[index]['deliveryInfo']['deliveryInfo']['deliveryCharges']
                   .toString();
       freeDeliveryText = data[index]['location']['deliveryInfo']['deliveryInfo']
               ['freeDelivery']
-          ? MyLocalizations.of(context).freeDeliveryAvailable
+          ? MyLocalizations.of(context)
+              .getLocalizations("FREE_DELIVERY_AVAILABLE")
           : 'Free delivery above $currency' +
               data[index]['location']['deliveryInfo']['deliveryInfo']
                       ['amountEligibility']
@@ -212,7 +217,8 @@ class LocationListSheet extends StatelessWidget {
                     ? Text(
                         reviewCount.toString() +
                             " " +
-                            MyLocalizations.of(context).usersReview,
+                            MyLocalizations.of(context)
+                                .getLocalizations("USER_REVIEW"),
                         textAlign: TextAlign.left,
                       )
                     : Text(''),
@@ -231,7 +237,8 @@ class LocationListSheet extends StatelessWidget {
             child: Text(
               locationCount.toString() +
                   " " +
-                  MyLocalizations.of(context).outletsDelivering,
+                  MyLocalizations.of(context)
+                      .getLocalizations("OUTLETS_DELIVERING"),
               style: subBoldTitle(),
               textAlign: TextAlign.left,
             ),
@@ -243,7 +250,7 @@ class LocationListSheet extends StatelessWidget {
     BuildContext context,
     Map<String, dynamic> restaurantInfo,
     List<dynamic> locations,
-    Map<String, Map<String, String>> localizedValues,
+    Map localizedValues,
     final String locale,
   ) {
     return Padding(
@@ -272,7 +279,7 @@ class LocationListSheet extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Icon(Icons.add, size: 20.0),
-              Text(MyLocalizations.of(context).viewAll),
+              Text(MyLocalizations.of(context).getLocalizations("VIEW_ALL")),
             ],
           ),
         ),
