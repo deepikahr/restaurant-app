@@ -11,10 +11,10 @@ const GOOGLE_API_KEY = "AIzaSyBAwPGO0nO-z1aXVgEJg5G_XRAo6RnepSw";
 // const BASE_URL = 'https://c263c67dacb1.ngrok.io/';
 
 // api deploy testing
-const BASE_URL = 'http://162.243.171.81:8000/';
+// const BASE_URL = 'http://162.243.171.81:8000/';
 
 // api deploy production
-// const BASE_URL = 'http://162.243.171.81:7000/';
+const BASE_URL = 'http://162.243.171.81:7000/';
 
 // api deploy heroku
 // const BASE_URL = 'https://restaurant-sass.herokuapp.com/';
