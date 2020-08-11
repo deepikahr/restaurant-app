@@ -61,7 +61,7 @@ workflows:
     environment:
       flutter: stable
       xcode: latest
-      cocoapods: deafult
+      cocoapods: default
     cache:
       cache_paths: []
     triggering:
