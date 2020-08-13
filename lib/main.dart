@@ -41,6 +41,7 @@ void main() async {
   oneSignalTimer = Timer.periodic(Duration(seconds: 4), (timer) {
     initOneSignal();
   });
+  initOneSignal();
   runZoned<Future<Null>>(() async {
     runApp(new EntryPage(locale, localizedValues));
     // ignore: deprecated_member_use
