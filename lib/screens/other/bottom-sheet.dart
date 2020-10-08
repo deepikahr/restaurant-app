@@ -1,37 +1,42 @@
-import 'package:RestaurantSaas/screens/mains/location-list-sheet.dart';
 import 'package:RestaurantSaas/services/common.dart';
 import 'package:RestaurantSaas/services/localizations.dart';
 import 'package:RestaurantSaas/services/sentry-services.dart';
+import 'package:RestaurantSaas/services/utils.dart';
 import 'package:RestaurantSaas/styles/styles.dart';
 import 'package:flutter/material.dart';
+import 'package:getwidget/components/button/gf_button.dart';
 import 'package:toast/toast.dart';
+
+import 'flavours-list.dart';
 
 SentryError sentryError = new SentryError();
 
 class BottonSheetClassDryClean extends StatefulWidget {
-  final Map<String, dynamic> locationInfo, taxInfo;
+  final Map<String, dynamic> locationInfo;
   final List variantsList;
-  final int productQuantity;
-  final double dealPercentage;
-  final String currency, locale;
-  final Map localizedValues;
+  final int deliveryCharge, minimumOrderAmount;
+  final String currency, locale, shippingType, locationId;
+  final Map<String, Map<String, String>> localizedValues;
   final String restaurantName, restaurantId, restaurantAddress;
   final Map<String, dynamic> product;
+  final bool isProductFirstDeliverFree;
 
   BottonSheetClassDryClean({
     Key key,
     this.variantsList,
     this.product,
     this.currency,
-    this.productQuantity,
-    this.dealPercentage,
     this.locale,
     this.localizedValues,
     this.restaurantName,
     this.restaurantId,
     this.restaurantAddress,
     this.locationInfo,
-    this.taxInfo,
+    this.deliveryCharge,
+    this.minimumOrderAmount,
+    this.shippingType,
+    this.isProductFirstDeliverFree,
+    this.locationId,
   }) : super(key: key);
 
   @override
@@ -50,24 +55,21 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
   String variantUnit, variantId;
   int variantStock;
   var variantPrice;
+  List<dynamic> flavoursList = [];
   List<dynamic> tempProducts = [];
 
   double price = 0;
 
   @override
   void initState() {
-    if (widget.productQuantity == null) {
-      quantity = widget.productQuantity;
-    } else {
-      quantity = 1;
-    }
     calculatePrice(widget.product);
     super.initState();
   }
 
-  void calculatePrice(final Map<String, dynamic> product) {
+  void calculatePrice(final Map<String, dynamic> product) async {
     price = 0;
-    Map<String, dynamic> variant = product['variants'][0];
+    Map<String, dynamic> variant =
+        widget.product['variants'][selectedSizeIndex];
     price = price + variant['price'];
 
     if (mounted) {
@@ -94,6 +96,7 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
       'extraIngredients': extraIngredientsList,
       'imageUrl': product['imageUrl'],
       'productId': product['_id'],
+      'random': generateRandomString(15),
       'size': variant['size'],
       'title': product['title'],
       'restaurant': widget.restaurantName,
@@ -104,51 +107,34 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
   }
 
   void addProduct() async {
+    calculatePrice(widget.product);
     await Common.getProducts().then((productsList) {
       if (productsList != null) {
         tempProducts = productsList;
         tempProducts.add(cartProduct);
         Common.addProduct(tempProducts).then((value) {
           Toast.show(
-              MyLocalizations.of(context)
-                  .getLocalizations("PRODUCT_ADD_TO_CART"),
-              context,
-              duration: Toast.LENGTH_LONG,
-              gravity: Toast.BOTTOM);
+              MyLocalizations.of(context).producthasbeenaddedtocart, context,
+              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         });
       } else {
         tempProducts.add(cartProduct);
+        if (widget.shippingType != null) {
+          Common.setDeliveryCharge({
+            "shippingType": widget.shippingType,
+            "deliveryCharge": widget.deliveryCharge,
+            "minimumOrderAmount": widget.minimumOrderAmount
+          });
+        }
         Common.addProduct(tempProducts).then((value) {
           Toast.show(
-              MyLocalizations.of(context)
-                  .getLocalizations("PRODUCT_ADD_TO_CART"),
-              context,
-              duration: Toast.LENGTH_LONG,
-              gravity: Toast.BOTTOM);
+              MyLocalizations.of(context).producthasbeenaddedtocart, context,
+              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         });
       }
     }).catchError((onError) {
       sentryError.reportError(onError, null);
     });
-  }
-
-  void _changeProductQuantity(bool increase) {
-    if (increase) {
-      if (mounted) {
-        setState(() {
-          quantity++;
-        });
-      }
-    } else {
-      if (quantity > 1) {
-        if (mounted) {
-          setState(() {
-            quantity--;
-          });
-        }
-      }
-    }
-    calculatePrice(widget.product);
   }
 
   void _calculateCart() async {
@@ -157,16 +143,6 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
     double couponDeduction = 0.0;
     double tax = 0.0;
     List<dynamic> products;
-
-    // [0] other options when opening cart from menu
-
-    if (widget.taxInfo != null) {
-      Map<String, dynamic> cartInfo = {
-        'taxInfo': widget.taxInfo,
-        'locationInfo': widget.locationInfo
-      };
-      await Common.setCartInfo(cartInfo).then((onValue) {});
-    }
 
     // [1] retrive cart from storage if available
     Map<String, dynamic> cart;
@@ -189,27 +165,17 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
       subTotal = subTotal - couponDeduction;
     }
 
-    // [4] calculate tax
-    if (widget.taxInfo != null) {
-      tax = (subTotal * (widget.taxInfo['taxRate'] / 100));
-    }
-
     // [5] calculate delivery charge
-    Map<String, dynamic> deliveryInfo = (widget.locationInfo != null &&
-            widget.locationInfo['deliveryInfo'] != null)
-        ? widget.locationInfo['deliveryInfo']['deliveryInfo']
-        : null;
-    if (deliveryInfo != null) {
-      if (!deliveryInfo['freeDelivery']) {
-        if (deliveryInfo['amountEligibility'] <= subTotal) {
-          deliveryCharge = 0.0;
-        } else {
-          deliveryCharge =
-              double.parse(deliveryInfo['deliveryCharges'].toString());
-        }
-      } else {
+    if (widget?.shippingType?.compareTo('free') ?? 0 == 0) {
+      deliveryCharge = 0.0;
+    } else if (widget.shippingType.compareTo('flexible') == 0) {
+      if (subTotal > widget.minimumOrderAmount) {
         deliveryCharge = 0.0;
+      } else {
+        deliveryCharge = widget.deliveryCharge.toDouble();
       }
+    } else if (widget.shippingType.compareTo('fixed') == 0) {
+      deliveryCharge = widget.deliveryCharge.toDouble();
     } else {
       deliveryCharge = 0.0;
     }
@@ -219,6 +185,8 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
 
     // [7] create complete order json as Map
     cart = {
+      'locationId': widget.locationId,
+      'firstDeliveryFree': widget.isProductFirstDeliverFree,
       'deliveryCharge': deliveryCharge,
       'grandTotal': grandTotal,
       'location':
@@ -230,14 +198,11 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
       'payableAmount': grandTotal,
       'paymentOption': 'COD',
       'position': null,
-      'loyalty': null,
       'shippingAddress': null,
       'restaurant': products.length > 0 ? products[0]['restaurant'] : null,
       'restaurantID': products.length > 0 ? products[0]['restaurantID'] : null,
       'status': 'Pending',
       'subTotal': subTotal,
-      // "taxInfo": {"taxRate": 0, "taxName": "nil"},
-      'taxInfo': widget.taxInfo,
       'productDetails': products,
       'note': null,
       'isForDineIn': false,
@@ -256,80 +221,21 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
 
   @override
   Widget build(BuildContext context) {
+    Common.getFlavours().then((value) {
+      if (mounted) {
+        setState(() {
+          flavoursList = value ?? [];
+        });
+      }
+    });
     return Scaffold(
       key: _scaffoldKey,
       body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(
-                  top: 15.0, bottom: 8.0, left: 20.0, right: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text(
-                    MyLocalizations.of(context)
-                        .getLocalizations("QUANTITY", true),
-                    style: titleBold(),
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        borderRadius: BorderRadius.circular(30.0)),
-                    height: 34,
-                    child: Row(
-                      children: <Widget>[
-                        Container(
-                          width: 32,
-                          height: 32,
-                          decoration: BoxDecoration(
-                            color: Colors.black,
-                            borderRadius: BorderRadius.circular(20.0),
-                          ),
-                          child: InkWell(
-                            onTap: () {
-                              _changeProductQuantity(false);
-                            },
-                            child: Icon(
-                              Icons.remove,
-                              color: primaryLight,
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 20.0, right: 20),
-                          child: Container(child: Text(quantity.toString())),
-                        ),
-                        Text(''),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 0.0),
-                          child: Container(
-                            width: 32,
-                            height: 32,
-                            decoration: BoxDecoration(
-                              color: PRIMARY,
-                              borderRadius: BorderRadius.circular(20.0),
-                            ),
-                            child: InkWell(
-                              onTap: () {
-                                _changeProductQuantity(true);
-                              },
-                              child: Icon(Icons.add),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 5),
-            SizedBox(height: 5),
             widget.product['variants'].length > 0
-                ? _buildSingleSelectionBlock(widget.product['variants'],
-                    selectedSizeIndex, widget.currency)
+                ? _buildSingleSelectionBlock(widget.currency)
                 : Container(
                     height: 0.0,
                     width: 0.0,
@@ -338,9 +244,9 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
               padding: EdgeInsets.only(bottom: 5.0),
               child: widget.product['extraIngredients'].length > 0
                   ? _buildHeadingBlock(
-                      MyLocalizations.of(context).getLocalizations("EXTRA"),
+                      MyLocalizations.of(context).extra,
                       MyLocalizations.of(context)
-                          .getLocalizations("WHICH_EXTAING_MSG"),
+                          .whichextraingredientswouldyouliketoadd,
                     )
                   : Container(
                       height: 0.0,
@@ -349,86 +255,105 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
             ),
             widget.product['extraIngredients'] != null
                 ? _buildMultiSelectionBlock(
-                    widget.product['extraIngredients'], currency)
+                    widget.product['extraIngredients'], widget.currency)
                 : Container(),
           ],
         ),
       ),
-      bottomNavigationBar: Container(
-        height: 65.0,
-        width: MediaQuery.of(context).size.width,
-        child: Padding(
-          padding: const EdgeInsetsDirectional.only(
-              start: 10.0, end: 10.0, bottom: 5.0),
-          child: RawMaterialButton(
-            padding: EdgeInsetsDirectional.only(start: .0, end: 15.0),
-            fillColor: PRIMARY,
-            constraints: const BoxConstraints(minHeight: 44.0),
-            shape: RoundedRectangleBorder(
-              borderRadius: new BorderRadius.circular(5.0),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(right: 0.0),
-                  child: Container(
-                    color: Colors.black,
-                    margin: EdgeInsets.only(right: 0),
-                    width: 120,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        SizedBox(
-                          height: 2.0,
-                        ),
-                        RichText(
-                          text: TextSpan(
-                            children: <TextSpan>[
-                              TextSpan(
-                                text: '(${quantity.toString()}) ',
+      bottomNavigationBar: widget.product['isFlavoured']
+          ? Container(
+              height: 65.0,
+              width: MediaQuery.of(context).size.width,
+              child: Padding(
+                  padding: const EdgeInsetsDirectional.only(
+                      start: 10.0, end: 10.0, bottom: 5.0),
+                  child: RawMaterialButton(
+                    padding: EdgeInsetsDirectional.only(start: .0, end: 15.0),
+                    fillColor: PRIMARY,
+                    constraints: const BoxConstraints(minHeight: 44.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(5.0),
+                    ),
+                    child: Text(
+                      MyLocalizations.of(context).addFlavour,
+                      style: smallTitleWhiteOSR(),
+                    ),
+                    onPressed: () => addFlavoursClicked(),
+                  )),
+            )
+          : Container(
+              height: 65.0,
+              width: MediaQuery.of(context).size.width,
+              child: Padding(
+                padding: const EdgeInsetsDirectional.only(
+                    start: 10.0, end: 10.0, bottom: 5.0),
+                child: RawMaterialButton(
+                  padding: EdgeInsetsDirectional.only(start: .0, end: 15.0),
+                  fillColor: PRIMARY,
+                  constraints: const BoxConstraints(minHeight: 44.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(5.0),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(right: 0.0),
+                        child: Container(
+                          color: Colors.black,
+                          margin: EdgeInsets.only(right: 0),
+                          width: 120,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: <Widget>[
+                              SizedBox(
+                                height: 2.0,
+                              ),
+                              RichText(
+                                text: TextSpan(
+                                  children: <TextSpan>[
+                                    TextSpan(
+                                      text: '(${quantity.toString()}) ',
+                                      style: titleLightWhiteOSS(),
+                                    ),
+                                    TextSpan(
+                                        text: quantity == 1
+                                            ? MyLocalizations.of(context).item
+                                            : MyLocalizations.of(context).items,
+                                        style: titleLightWhiteOSS()),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                height: 1.0,
+                              ),
+                              new Text(
+                                '${widget.currency} ${price.toStringAsFixed(2)}',
                                 style: titleLightWhiteOSS(),
                               ),
-                              TextSpan(
-                                  text: quantity == 1
-                                      ? MyLocalizations.of(context)
-                                          .getLocalizations("ITEM")
-                                      : MyLocalizations.of(context)
-                                          .getLocalizations("ITEMS"),
-                                  style: titleLightWhiteOSS()),
                             ],
                           ),
                         ),
-                        SizedBox(
-                          height: 1.0,
+                      ),
+                      addProductTocart ? CircularProgressIndicator() : Text(""),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 0.0),
+                        child: new Text(
+                          MyLocalizations.of(context).addToCart,
+                          style: smallTitleWhiteOSR(),
                         ),
-                        new Text(
-                          '${widget.currency} ${price.toStringAsFixed(2)}',
-                          style: titleLightWhiteOSS(),
-                        ),
-                      ],
-                    ),
+                      ),
+                      Icon(Icons.shopping_cart, color: Colors.white)
+                    ],
                   ),
+                  onPressed: () async {
+                    addProduct();
+                    _calculateCart();
+                    Navigator.of(context).pop();
+                  },
                 ),
-                addProductTocart ? CircularProgressIndicator() : Text(""),
-                Padding(
-                  padding: const EdgeInsets.only(left: 0.0),
-                  child: new Text(
-                    MyLocalizations.of(context).getLocalizations("ADD_TO_CART"),
-                    style: smallTitleWhiteOSR(),
-                  ),
-                ),
-                Icon(Icons.shopping_cart, color: Colors.white)
-              ],
+              ),
             ),
-            onPressed: () async {
-              addProduct();
-              _calculateCart();
-              Navigator.of(context).pop();
-            },
-          ),
-        ),
-      ),
     );
   }
 
@@ -465,44 +390,48 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
     );
   }
 
-  Widget _buildSingleSelectionBlock(
-      List<dynamic> sizes, int selectedSizeIndex, String currency) {
+  Widget _buildSingleSelectionBlock(String currency) {
     return Container(
       color: greyc,
       child: ListView.builder(
         physics: ScrollPhysics(),
         shrinkWrap: true,
         padding: EdgeInsets.only(right: 0.0),
-        itemCount: sizes.length == null ? 0 : sizes.length,
+        itemCount: widget.product['variants'].length == null
+            ? 0
+            : widget.product['variants'].length,
         itemBuilder: (BuildContext context, int index) {
-          if (sizes[index]['isSelected'] == null)
-            sizes[index]['isSelected'] = false;
+          if (widget.product['variants'][index]['isSelected'] == null)
+            widget.product['variants'][index]['isSelected'] = false;
           return Container(
             color: Colors.white,
             width: screenWidth(context),
             child: RadioListTile(
               value: index,
               groupValue: selectedSizeIndex,
-              selected: sizes[index]['isSelected'],
+              selected: widget.product['variants'][index]['isSelected'],
               onChanged: (int selected) {
                 if (mounted) {
                   setState(() {
                     selectedSizeIndex = selected;
-                    sizes[index]['isSelected'] = !sizes[index]['isSelected'];
+                    widget.product['variants'][index]['isSelected'] =
+                        !widget.product['variants'][index]['isSelected'];
                   });
                   calculatePrice(widget.product);
                 }
               },
               activeColor: PRIMARY,
-              title: sizes[index]['size'] != null
+              title: widget.product['variants'][index]['size'] != null
                   ? new Text(
-                      sizes[index]['size'],
+                      widget.product['variants'][index]['size'],
                       style: hintStyleSmallDarkLightOSR(),
                     )
                   : Text(''),
-              secondary: sizes[index]['price'] != null
+              secondary: widget.product['variants'][index]['price'] != null
                   ? new Text(
-                      currency + sizes[index]['price'].toStringAsFixed(2),
+                      currency +
+                          widget.product['variants'][index]['price']
+                              .toStringAsFixed(2),
                       textAlign: TextAlign.end,
                       style: hintStyleTitleBlueOSR(),
                     )
@@ -574,5 +503,25 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
         },
       ),
     );
+  }
+
+  addFlavoursClicked() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (BuildContext context) => FlavourPage(
+                  locationId: widget.locationId,
+                  locationInfo: widget.locationInfo,
+                  product: widget.product,
+                  deliveryCharge: widget.deliveryCharge,
+                  minimumOrderAmount: widget.minimumOrderAmount,
+                  shippingType: widget.shippingType,
+                  isProductFirstDeliverFree: widget.isProductFirstDeliverFree,
+                  cartProduct: cartProduct,
+                  flavourSelectable: widget.product['flavourSelectable'],
+                  flavourData: widget.product['flavour'],
+                  locale: widget.locale,
+                  localizedValues: widget.localizedValues,
+                )));
   }
 }

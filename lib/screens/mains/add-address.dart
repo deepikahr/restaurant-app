@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_map_picker/flutter_map_picker.dart';
 
 import '../../services/localizations.dart';
 import '../../services/profile-service.dart';
@@ -9,9 +8,9 @@ import '../../styles/styles.dart';
 SentryError sentryError = new SentryError();
 
 class AddAddressPage extends StatefulWidget {
-  final Map localizedValues;
+  final Map<String, Map<String, String>> localizedValues;
   final String locale;
-  final PlacePickerResult loactionAddress;
+  final Map<String, dynamic> loactionAddress;
 
   AddAddressPage(
       {Key key, this.locale, this.localizedValues, this.loactionAddress})
@@ -23,15 +22,14 @@ class AddAddressPage extends StatefulWidget {
 
 class _AddAddressPageState extends State<AddAddressPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  TextEditingController addressController = TextEditingController();
   bool isLoading = false;
-  List<String> addressType = ["Home", "Work", "Others"];
-  int selectedAddressType = 0;
+  List<String> addressType;
+  int selectedRadio = 0, selectedRadioFirst;
 
   setSelectedRadio(int val) async {
     if (mounted) {
       setState(() {
-        selectedAddressType = val;
+        selectedRadioFirst = val;
       });
     }
   }
@@ -51,14 +49,14 @@ class _AddAddressPageState extends State<AddAddressPage> {
           isLoading = true;
         });
       }
-
+      address['address'] = widget.loactionAddress['address'];
       var location = {
-        "lat": widget.loactionAddress.latLng.latitude,
-        "long": widget.loactionAddress.latLng.longitude
+        "lat": widget.loactionAddress['lat'],
+        "long": widget.loactionAddress['long']
       };
       address['location'] = location;
-      address['addressType'] = addressType[selectedAddressType];
-      address['address'] = addressController.text;
+      address['addressType'] = addressType[
+          selectedRadioFirst == null ? selectedRadio : selectedRadioFirst];
 
       _formKey.currentState.save();
       ProfileService.addAddress(address).then((onValue) {
@@ -79,19 +77,12 @@ class _AddAddressPageState extends State<AddAddressPage> {
   }
 
   @override
-  void initState() {
-    addressController.text = widget.loactionAddress.address;
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    addressController.clear();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    addressType = [
+      MyLocalizations.of(context).home,
+      MyLocalizations.of(context).work,
+      MyLocalizations.of(context).others
+    ];
     return Scaffold(
       backgroundColor: bgColor,
       appBar: AppBar(
@@ -107,8 +98,8 @@ class _AddAddressPageState extends State<AddAddressPage> {
         backgroundColor: PRIMARY,
         elevation: 0.0,
         title: new Text(
-          MyLocalizations.of(context).getLocalizations("DELIIVER_ADDRESS"),
-          style: titleBoldWhiteOSS(),
+          MyLocalizations.of(context).deliveryAddress,
+          style: textbarlowSemiBoldWhite(),
         ),
         centerTitle: true,
       ),
@@ -128,13 +119,11 @@ class _AddAddressPageState extends State<AddAddressPage> {
                     child: new Column(
                       children: <Widget>[
                         new Text(
-                          MyLocalizations.of(context)
-                              .getLocalizations("WHERE_TO_DELIVER"),
+                          MyLocalizations.of(context).whereToDeliver,
                           style: titleDarkOSS(),
                         ),
                         new Text(
-                          MyLocalizations.of(context)
-                              .getLocalizations("BY_CREATING"),
+                          MyLocalizations.of(context).byCreating,
                           style: textOSR(),
                         ),
                         new Padding(
@@ -143,8 +132,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                         new Row(
                           children: <Widget>[
                             new Text(
-                              MyLocalizations.of(context)
-                                  .getLocalizations("ADDRESS"),
+                              MyLocalizations.of(context).address,
                               style: hintStyleSmallDarkBoldOSR(),
                             ),
                           ],
@@ -158,26 +146,8 @@ class _AddAddressPageState extends State<AddAddressPage> {
                                     bottom: BorderSide(color: Colors.grey),
                                   ),
                                 ),
-                                child: new TextFormField(
-                                  controller: addressController,
-                                  maxLines: 3,
-                                  decoration: InputDecoration(
-                                      hintText: MyLocalizations.of(context)
-                                          .getLocalizations("ADDRESS"),
-                                      hintStyle: hintStyleSmallLightOSR(),
-                                      border: InputBorder.none),
-                                  style: textOSR(),
-                                  validator: (String value) {
-                                    if (value.isEmpty) {
-                                      return MyLocalizations.of(context)
-                                          .getLocalizations("ADDRESS");
-                                    } else {
-                                      return null;
-                                    }
-                                  },
-                                  onSaved: (String value) {
-                                    address['address'] = addressController.text;
-                                  },
+                                child: new Text(
+                                  widget.loactionAddress['address'],
                                 ),
                               ),
                             )
@@ -189,8 +159,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                         new Row(
                           children: <Widget>[
                             new Text(
-                              MyLocalizations.of(context)
-                                  .getLocalizations("LANDMARK"),
+                              MyLocalizations.of(context).landmark,
                               style: hintStyleSmallDarkBoldOSR(),
                             ),
                           ],
@@ -207,14 +176,22 @@ class _AddAddressPageState extends State<AddAddressPage> {
                                 child: new TextFormField(
                                   decoration: InputDecoration(
                                       hintText: MyLocalizations.of(context)
-                                          .getLocalizations("ENTER_LANDMARK"),
+                                              .enterYour +
+                                          "  " +
+                                          MyLocalizations.of(context).landmark,
                                       hintStyle: hintStyleSmallLightOSR(),
                                       border: InputBorder.none),
                                   style: textOSR(),
                                   validator: (String value) {
                                     if (value.isEmpty) {
-                                      return MyLocalizations.of(context)
-                                          .getLocalizations("RIGISTER_NOW");
+                                      return MyLocalizations
+                                                  .of(context)
+                                              .please +
+                                          " " +
+                                          MyLocalizations.of(context)
+                                              .enterYour +
+                                          "  " +
+                                          MyLocalizations.of(context).landmark;
                                     } else {
                                       return null;
                                     }
@@ -233,8 +210,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                         new Row(
                           children: <Widget>[
                             new Text(
-                              MyLocalizations.of(context)
-                                  .getLocalizations("CONTACT_NUMBER"),
+                              MyLocalizations.of(context).mobileNumber,
                               style: hintStyleSmallDarkBoldOSR(),
                             ),
                           ],
@@ -250,15 +226,20 @@ class _AddAddressPageState extends State<AddAddressPage> {
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
                                 hintText: MyLocalizations.of(context)
-                                    .getLocalizations("CONTACT_NUMBER"),
+                                        .enterYour +
+                                    "  " +
+                                    MyLocalizations.of(context).mobileNumber,
                                 counterText: "",
                                 hintStyle: hintStyleSmallLightOSR(),
                                 border: InputBorder.none),
                             style: textOSR(),
                             validator: (String value) {
                               if (value.isEmpty) {
-                                return MyLocalizations.of(context)
-                                    .getLocalizations("ENTER_CONTACT_NUMBER");
+                                return MyLocalizations.of(context).please +
+                                    " " +
+                                    MyLocalizations.of(context).enterYour +
+                                    "  " +
+                                    MyLocalizations.of(context).mobileNumber;
                               } else {
                                 return null;
                               }
@@ -274,8 +255,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                         new Row(
                           children: <Widget>[
                             new Text(
-                              MyLocalizations.of(context)
-                                  .getLocalizations("ADDRESS_TYPE"),
+                              MyLocalizations.of(context).addressType,
                               style: hintStyleSmallDarkBoldOSR(),
                             ),
                           ],
@@ -283,35 +263,25 @@ class _AddAddressPageState extends State<AddAddressPage> {
                         ListView.builder(
                           physics: ScrollPhysics(),
                           shrinkWrap: true,
-                          itemCount: addressType.length,
+                          itemCount: addressType.length == null
+                              ? 0
+                              : addressType.length,
                           itemBuilder: (BuildContext context, int i) {
-                            String addressTypeData;
-                            if (addressType[i] == "Home") {
-                              addressTypeData = MyLocalizations.of(context)
-                                  .getLocalizations("HOME");
-                            } else if (addressType[i] == "Work") {
-                              addressTypeData = MyLocalizations.of(context)
-                                  .getLocalizations("WORK");
-                            } else if (addressType[i] == "Others") {
-                              addressTypeData = MyLocalizations.of(context)
-                                  .getLocalizations("OTHERS");
-                            } else {
-                              addressTypeData = addressType[i];
-                            }
-
                             return Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: <Widget>[
                                 Radio(
                                   value: i,
-                                  groupValue: selectedAddressType,
+                                  groupValue: selectedRadioFirst == null
+                                      ? selectedRadio
+                                      : selectedRadioFirst,
                                   activeColor: PRIMARY,
                                   onChanged: (value) {
                                     setSelectedRadio(value);
                                   },
                                 ),
-                                Text(addressTypeData),
+                                Text('${addressType[i]}'),
                               ],
                             );
                           },
@@ -349,8 +319,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                                 borderRadius: BorderRadius.circular(50.0),
                               ),
                               child: new Text(
-                                MyLocalizations.of(context)
-                                    .getLocalizations("SUBMIT"),
+                                MyLocalizations.of(context).addAddress,
                                 style: subTitleWhiteBOldOSB(),
                               ),
                             ),

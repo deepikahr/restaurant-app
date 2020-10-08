@@ -1,30 +1,31 @@
 import 'dart:async';
-import 'package:RestaurantSaas/services/constant.dart';
-import 'package:flutter_map_picker/flutter_map_picker.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:location/location.dart';
+import 'dart:core';
 
-import '../../services/localizations.dart';
 import 'package:RestaurantSaas/screens/other/thank-you.dart';
+import 'package:RestaurantSaas/services/constant.dart';
+import 'package:async_loader/async_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:flutter_map_picker/flutter_map_picker.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
+import 'package:location/location.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../services/localizations.dart';
+import '../../services/main-service.dart';
+import '../../services/profile-service.dart';
+import '../../services/sentry-services.dart';
 import '../../styles/styles.dart';
+import '../../widgets/no-data.dart';
 import 'add-address.dart';
 import 'payment-method.dart';
-import 'package:async_loader/async_loader.dart';
-import '../../widgets/no-data.dart';
-import '../../services/profile-service.dart';
-import 'dart:core';
-import '../../services/main-service.dart';
-import 'package:intl/intl.dart';
-import '../../services/sentry-services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
 
 class ConfrimOrderPage extends StatefulWidget {
   final Map<String, dynamic> cart, deliveryInfo, tableInfo;
-  final Map localizedValues;
+  final Map<String, Map<String, String>> localizedValues;
   final String locale, currency;
 
   ConfrimOrderPage(
@@ -48,14 +49,10 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
   int selectedAddressIndex = 0;
   LocationData currentLocation;
   Location _location = new Location();
-  double remainingLoyaltyPoint = 0.0,
-      usedLoyaltyPoint = 0.0,
-      grandTotal = 0.0,
-      tempGrandTotal = 0.0,
-      deliveryCharge = 0.0;
+  double grandTotal = 0.0, tempGrandTotal = 0.0;
+  int deliveryCharge = 0;
 
-  bool isLoyaltyApplied = false,
-      isDeliveryAvailable = true,
+  bool isDeliveryAvailable = true,
       isFirstTime = true,
       isAlwaysOpenOrClose = false,
       isAlwaysOpenOrCloseLoading = false,
@@ -72,6 +69,12 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
   DateTime pickupDate, pickupTime;
   String currency = '';
 
+  int tempDeliveryCharge;
+
+  int dc;
+
+  double gt;
+
   Future<Map<String, dynamic>> _getUserInfo() async {
     await ProfileService.getUserInfo().then((onValue) {
       try {
@@ -84,11 +87,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
     });
     await MainService.getAdminSettings().then((onValue) {
       try {
-        userInfo['loyaltyInfo'] = onValue;
         paymentMethods = onValue['paymentMethod'];
-
-        remainingLoyaltyPoint =
-            double.parse(userInfo['totalLoyaltyPoints'].toString());
       } catch (error, stackTrace) {
         sentryError.reportError(error, stackTrace);
       }
@@ -97,12 +96,19 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
     });
 
     await MainService.getRestaurantOpenAndCloseTime(
-            widget.cart['location'],
+            widget.cart['locationId'],
             DateFormat('HH:mm').format(DateTime.now()),
             DateFormat('EEEE').format(DateTime.now()))
         .then((verifyOpenAndCloseTime) {
+//      print('getRestaurantOpenAndCloseTime $verifyOpenAndCloseTime');
       try {
-        openAndCloseTime = verifyOpenAndCloseTime['message'];
+        setState(() {
+          openAndCloseTime = verifyOpenAndCloseTime['res_code'] == 200
+              ? 'OPEN'
+              : verifyOpenAndCloseTime['res_code'] == 400
+                  ? 'CLOSE'
+                  : verifyOpenAndCloseTime['message'];
+        });
       } catch (error, stackTrace) {
         sentryError.reportError(error, stackTrace);
       }
@@ -182,8 +188,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
         setState(() {
           tempGrandTotal = widget.cart['grandTotal'];
           grandTotal = tempGrandTotal;
-          deliveryCharge =
-              double.parse(widget.cart['deliveryCharge'].toString());
+          deliveryCharge = widget.cart['deliveryCharge'];
           isFirstTime = false;
         });
       }
@@ -210,41 +215,9 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
     }
   }
 
-  void _calculateLoyaltyInfo() {
-    grandTotal = tempGrandTotal;
-    double points = 0.0;
-    if (isLoyaltyApplied) {
-      if (userInfo['totalLoyaltyPoints'] >= grandTotal) {
-        points = userInfo['totalLoyaltyPoints'] - grandTotal;
-        grandTotal = 0.0;
-      } else {
-        grandTotal = grandTotal - userInfo['totalLoyaltyPoints'];
-        points = 0.0;
-      }
-      if (mounted) {
-        setState(() {
-          usedLoyaltyPoint =
-              double.parse(userInfo['totalLoyaltyPoints'].toString()) - points;
-          remainingLoyaltyPoint = points;
-          grandTotal = grandTotal;
-        });
-      }
-    } else {
-      if (mounted) {
-        setState(() {
-          usedLoyaltyPoint = 0.0;
-          remainingLoyaltyPoint =
-              double.parse(userInfo['totalLoyaltyPoints'].toString());
-          grandTotal = grandTotal;
-        });
-      }
-    }
-    _calculateFinalAmount();
-  }
-
   getSlotTime(dt, todayDay, time) async {
     await MainService.getTodayAndOtherDaysWorkingTimimgs(
-            widget.cart['location'], dt, time, todayDay)
+            widget.cart['locationId'], dt, time, todayDay)
         .then((onValue) {
       if (mounted) {
         setState(() {
@@ -285,6 +258,8 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
 
   @override
   void initState() {
+    dc = widget.cart['deliveryCharge'];
+    gt = widget.cart['grandTotal'];
     getGlobalSettingsData();
     _getAddressList();
     super.initState();
@@ -305,8 +280,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
         renderError: ([error]) {
           sentryError.reportError(error, null);
           return NoData(
-              message:
-                  MyLocalizations.of(context).getLocalizations("ERROR_MSG"),
+              message: MyLocalizations.of(context).connectionError,
               icon: Icons.block);
         },
         renderSuccess: ({data}) {
@@ -319,7 +293,9 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
       appBar: AppBar(
         leading: InkWell(
           onTap: () {
-            Navigator.pop(context);
+            widget.cart['deliveryCharge'] = dc;
+            widget.cart['grandTotal'] = gt;
+            Navigator.of(context).pop();
           },
           child: Icon(
             Icons.arrow_back,
@@ -329,8 +305,8 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
         backgroundColor: PRIMARY,
         elevation: 0.0,
         title: new Text(
-          MyLocalizations.of(context).getLocalizations("REVIEW_ORDER"),
-          style: titleBoldWhiteOSS(),
+          MyLocalizations.of(context).reviewOrder,
+          style: textbarlowSemiBoldWhite(),
         ),
         centerTitle: true,
       ),
@@ -361,15 +337,11 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
             new Column(
               children: <Widget>[
                 _buildBulletTitle(
-                    1,
-                    MyLocalizations.of(context)
-                        .getLocalizations("CONTACT_INFORMATION")),
-                _buildContactBlock(userInfo['name'],
+                    1, MyLocalizations.of(context).contactInformation),
+                _buildContactBlock(userInfo['name'] ?? '',
                     userInfo['contactNumber'].toString(), userInfo),
                 _buildBulletTitle(
-                    2,
-                    MyLocalizations.of(context)
-                        .getLocalizations("SELECT_ORDER_TYPE")),
+                    2, MyLocalizations.of(context).selectOrderType),
                 widget.tableInfo == null
                     ? _buildOrderTypeBlock()
                     : _buildDineInTypeBlock(),
@@ -378,15 +350,11 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                     : _buildBulletTitle(
                         3,
                         isPickup
-                            ? MyLocalizations.of(context)
-                                .getLocalizations("RESTAURANT_ADDRESS")
-                            : MyLocalizations.of(context)
-                                .getLocalizations("SELECT_ADDRESS")),
+                            ? MyLocalizations.of(context).restaurantAddress
+                            : MyLocalizations.of(context).selectAddress),
                 isDineIn ? Container() : _buildAddressList(isPickup),
                 _buildBulletTitle(
-                    isDineIn ? 3 : 4,
-                    MyLocalizations.of(context)
-                        .getLocalizations("ORDER_DETAILS")),
+                    isDineIn ? 3 : 4, MyLocalizations.of(context).orderDetails),
                 _buildProductListBlock(userInfo),
               ],
             ),
@@ -409,7 +377,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               new Text(
-                MyLocalizations.of(context).getLocalizations("DATE"),
+                MyLocalizations.of(context).date,
                 style: hintStyleSmallWhiteLightOSL(),
               ),
               new Text(
@@ -423,7 +391,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               new Text(
-                MyLocalizations.of(context).getLocalizations("TOTAL"),
+                MyLocalizations.of(context).totalOrder,
                 style: hintStyleSmallWhiteLightOSL(),
               ),
               new Text(
@@ -499,8 +467,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                               Row(
                                 children: [
                                   Text(
-                                    MyLocalizations.of(context)
-                                        .getLocalizations("DINE_IN"),
+                                    MyLocalizations.of(context).dineIn,
                                     textAlign: TextAlign.center,
                                   ),
                                   Padding(
@@ -570,10 +537,9 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                                 Row(
                                   children: [
                                     Text(
-                                      MyLocalizations.of(context)
-                                          .getLocalizations("PICKUP"),
+                                      MyLocalizations.of(context).pickUp,
                                       textAlign: TextAlign.center,
-                                      // style: hintStyleOSBType(),
+                                      style: TextStyle(color: Colors.white),
                                     ),
                                     Padding(
                                       padding: EdgeInsets.only(left: 10),
@@ -622,9 +588,10 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                                         children: [
                                           Text(
                                             MyLocalizations.of(context)
-                                                .getLocalizations("DELIVERY"),
+                                                .dELIVERY,
                                             textAlign: TextAlign.center,
-                                            // style: hintStyleOSBType(),
+                                            style:
+                                                TextStyle(color: Colors.white),
                                           ),
                                           Padding(
                                             padding: EdgeInsets.only(left: 10),
@@ -661,22 +628,25 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                             child: Column(
                           children: <Widget>[
                             Text(
-                              MyLocalizations.of(context)
-                                  .getLocalizations("CLICK_SLOT"),
+                              MyLocalizations.of(context).clickToSlot +
+                                  " " +
+                                  MyLocalizations.of(context).pickUp +
+                                  " " +
+                                  MyLocalizations.of(context).dateandTime,
                               style: titleBlackLightOSB(),
                             ),
                             widget.cart['pickupDate'] != null
                                 ? Text(
-                                    MyLocalizations.of(context)
-                                            .getLocalizations("DATE", true) +
+                                    MyLocalizations.of(context).date +
+                                        ": " +
                                         widget.cart['pickupDate'],
                                     style: titleBlackLightOSB(),
                                   )
                                 : Container(),
                             widget.cart['pickupTime'] != null
                                 ? Text(
-                                    MyLocalizations.of(context)
-                                            .getLocalizations("TIME", true) +
+                                    MyLocalizations.of(context).time +
+                                        ": " +
                                         widget.cart['pickupTime'],
                                     style: titleBlackLightOSB(),
                                   )
@@ -732,8 +702,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                               },
                               color: PRIMARY,
                               child: new Text(
-                                MyLocalizations.of(context)
-                                    .getLocalizations("SELECT_DATE"),
+                                MyLocalizations.of(context).selectDate,
                                 style: TextStyle(
                                   fontWeight: FontWeight.w400,
                                   fontSize: 12.0,
@@ -832,7 +801,6 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                                                                               });
                                                                               if (todayWorkingHoursList[index]['slotList'][indexx] != "No slot available") {
                                                                                 selectedSlot = todayWorkingHoursList[index]['slotList'][indexx];
-
                                                                                 widget.cart['pickupTime'] = selectedSlot;
                                                                               }
                                                                             }
@@ -881,8 +849,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                                     : Container(
                                         child: Center(
                                           child: Text(
-                                            MyLocalizations.of(context)
-                                                .getLocalizations("CLOSED"),
+                                            MyLocalizations.of(context).closed,
                                             style: titleBlackLightOSB(),
                                           ),
                                         ),
@@ -892,8 +859,9 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                                     children: <Widget>[
                                       Text(
                                         MyLocalizations.of(context)
-                                            .getLocalizations(
-                                                "CLICK_SLOT_TIME"),
+                                                .clickToSlot +
+                                            MyLocalizations.of(context).pickUp +
+                                            MyLocalizations.of(context).time,
                                         style: titleBlackLightOSB(),
                                       ),
                                       RaisedButton(
@@ -915,8 +883,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                                         color: PRIMARY,
                                         child: new Text(
                                           "24/7 " +
-                                              MyLocalizations.of(context)
-                                                  .getLocalizations("OPEN"),
+                                              MyLocalizations.of(context).open,
                                           style: TextStyle(
                                             fontWeight: FontWeight.w400,
                                             fontSize: 12.0,
@@ -960,7 +927,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             new Text(
-              MyLocalizations.of(context).getLocalizations("FULLNAME", true),
+              MyLocalizations.of(context).fullName,
               style: hintStyleOSB(),
             ),
             new Text(
@@ -969,82 +936,13 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
             ),
             new Divider(),
             new Text(
-              MyLocalizations.of(context)
-                  .getLocalizations("CONTACT_NUMBER", true),
+              MyLocalizations.of(context).mobileNumber,
               style: hintStyleOSB(),
             ),
             new Text(
               value,
               style: hintLightOSR(),
             ),
-            Divider(),
-            (userInfo['loyaltyInfo']['message'] == null &&
-                    userInfo['loyaltyInfo']['loyaltyProgram'])
-                ? userInfo['loyaltyInfo']['minLoyaltyPoints'] <
-                        userInfo['totalLoyaltyPoints']
-                    ? userInfo['loyaltyInfo']['minOrdLoyalty'] <= tempGrandTotal
-                        ? Row(
-                            children: <Widget>[
-                              Checkbox(
-                                value: isLoyaltyApplied,
-                                onChanged: (bool value) {
-                                  if (mounted) {
-                                    setState(() {
-                                      isLoyaltyApplied = !isLoyaltyApplied;
-                                    });
-                                    _calculateLoyaltyInfo();
-                                  }
-                                },
-                                activeColor: PRIMARY,
-                              ),
-                              Text(
-                                MyLocalizations.of(context)
-                                    .getLocalizations("USE_LOYALTY_POINTS"),
-                                style: hintStyleSmallDarkLightOSR(),
-                              ),
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(right: 15.0),
-                                  child: new Text(
-                                    remainingLoyaltyPoint.toStringAsFixed(2),
-                                    textAlign: TextAlign.end,
-                                    style: hintStyleTitleBlueOSR(),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          )
-                        : Container(
-                            child: Text(MyLocalizations.of(context)
-                                    .getLocalizations("YOUR_AMOUNT") +
-                                " $currency" +
-                                userInfo['loyaltyInfo']['minOrdLoyalty']
-                                    .toString() +
-                                MyLocalizations.of(context)
-                                    .getLocalizations("YOU_HAVE_POINTS") +
-                                ' ' +
-                                userInfo['totalLoyaltyPoints']
-                                    .toStringAsFixed(2) +
-                                MyLocalizations.of(context)
-                                    .getLocalizations("MORE_POINTS")),
-                          )
-                    : Container(
-                        child: Text(MyLocalizations.of(context)
-                                .getLocalizations("MINIMUM_AMOUNT") +
-                            ' ' +
-                            userInfo['loyaltyInfo']['minLoyaltyPoints']
-                                .toString() +
-                            MyLocalizations.of(context)
-                                .getLocalizations("POINT_REQUIRED") +
-                            ' ' +
-                            userInfo['totalLoyaltyPoints'].toStringAsFixed(2) +
-                            MyLocalizations.of(context)
-                                .getLocalizations("MORE_POINTS")),
-                      )
-                : Container(
-                    child: Text(MyLocalizations.of(context)
-                        .getLocalizations("NOT_APPLICALBLE")),
-                  ),
           ],
         ),
       ),
@@ -1094,8 +992,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                                 height: 30.0,
                                 decoration: BoxDecoration(),
                                 child: Text(
-                                  MyLocalizations.of(context)
-                                      .getLocalizations("OK"),
+                                  MyLocalizations.of(context).ok,
                                 ),
                               ),
                             ),
@@ -1154,7 +1051,11 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                             itemCount: addressList.length,
                             itemBuilder: (BuildContext context, int index) {
                               if (addressList[index]['isSelected'] == null) {
-                                addressList[index]['isSelected'] = false;
+                                if (index == 0) {
+                                  addressList[index]['isSelected'] = true;
+                                } else {
+                                  addressList[index]['isSelected'] = false;
+                                }
                               }
                               return RadioListTile(
                                 groupValue: selectedAddressIndex,
@@ -1231,7 +1132,12 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                                           localizedValues:
                                               widget.localizedValues,
                                           locale: widget.locale,
-                                          loactionAddress: pickerResult),
+                                          loactionAddress: {
+                                        'address':
+                                            pickerResult.address.toString(),
+                                        'lat': pickerResult.latLng.latitude,
+                                        'long': pickerResult.latLng.longitude
+                                      }),
                                 ),
                               );
                               result.then((res) {
@@ -1242,10 +1148,8 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                           }
                         } else {
                           showError(
-                              MyLocalizations.of(context)
-                                  .getLocalizations("ENABLE_LOCATION_MSG"),
-                              MyLocalizations.of(context)
-                                  .getLocalizations("GPS_SETTING"));
+                              MyLocalizations.of(context).enableTogetlocation,
+                              MyLocalizations.of(context).gPSsettings);
                         }
                       },
                       child: Row(
@@ -1258,8 +1162,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                           Padding(
                             padding: const EdgeInsets.only(left: 8.0),
                             child: Text(
-                              MyLocalizations.of(context)
-                                  .getLocalizations("ADD_NEW_ADDRESS"),
+                              MyLocalizations.of(context).addAddress,
                               style: textPrimaryOSR(),
                             ),
                           )
@@ -1331,10 +1234,12 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                         ),
                       ],
                     ),
+                    products[index]['flavour'] != null
+                        ? buildFlavourList(products[index]['flavour'])
+                        : Container(),
                     products[index]['note'] != null
-                        ? Text(MyLocalizations.of(context)
-                                .getLocalizations("NOTE", true) +
-                            ' ${products[index]['note']}')
+                        ? Text(MyLocalizations.of(context).note +
+                            ': ${products[index]['note']}')
                         : Container(),
                     Divider(),
                   ],
@@ -1351,8 +1256,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                 Padding(
                   padding: const EdgeInsets.only(left: 8.0),
                   child: Text(
-                    MyLocalizations.of(context)
-                        .getLocalizations("ORDER_SUMMARY"),
+                    MyLocalizations.of(context).orderSummary,
                     style: textPrimaryOSR(),
                   ),
                 )
@@ -1360,28 +1264,14 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
             ),
             Divider(),
             _buildTotalPriceLine(
-                MyLocalizations.of(context).getLocalizations("SUB_TOTAL"),
-                widget.cart['subTotal']),
-            widget.cart['taxInfo'] != null
-                ? _buildTotalPriceLine(
-                    MyLocalizations.of(context).getLocalizations("TAX") +
-                        " " +
-                        widget.cart['taxInfo']['taxName'],
-                    (double.parse(
-                            widget.cart['taxInfo']['taxRate'].toString()) *
-                        widget.cart['subTotal'] /
-                        100))
-                : Container(height: 0, width: 0),
+                MyLocalizations.of(context).subTotal, widget.cart['subTotal']),
             _buildTotalPriceLine(
-                MyLocalizations.of(context)
-                    .getLocalizations("DELIVERY_CHARGES"),
+                MyLocalizations.of(context).deliveryCharges,
                 widget.cart['deliveryCharge'] == 'Free'
-                    ? '0.0'
+                    ? '0'
                     : double.parse(widget.cart['deliveryCharge'].toString())),
-            _buildTotalPriceLine(
-                MyLocalizations.of(context).getLocalizations("TOTAL"),
+            _buildTotalPriceLine(MyLocalizations.of(context).grandTotal,
                 double.parse(widget.cart['grandTotal'].toString())),
-            // _buildTotalPriceLine('Used Loyalty Point', usedLoyaltyPoint),
           ],
         ),
       ),
@@ -1416,45 +1306,40 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
         : RawMaterialButton(
             onPressed: () {
               if (widget.cart['orderType'] == 'Dine In') {
-                // if (widget.tableInfo == null) {
-                //   showSnackbar('Wrong Table Info please scan barcode again!');
-                // } else {
                 _buildBottomBarButton();
-                // }
               } else if (widget.cart['orderType'] == 'Pickup') {
                 if (widget.cart['pickupDate'] != null &&
                     widget.cart['pickupTime'] != null) {
                   _buildBottomBarButton();
                 } else if (widget.cart['pickupDate'] == null) {
                   showSnackbar(MyLocalizations.of(context)
-                      .getLocalizations("SELECT_DATE_FIRST_FOR_PICKUP"));
+                      .pleaseSelectDatefirstforpickup);
                 } else if (widget.cart['pickupTime'] == null) {
                   showSnackbar(MyLocalizations.of(context)
-                      .getLocalizations("SELECT_TIME_FIRST_FOR_PICKUP"));
+                      .pleaseSelectTimefirstforpickup);
                 } else {
-                  showSnackbar('Please Select Date and Time first for pickup');
+                  showSnackbar(MyLocalizations.of(context).selectDateTime);
                 }
               } else if (widget.cart['orderType'] == 'Delivery') {
                 if (widget.cart['shippingAddress'] == null) {
                   if (addressList.length == 0) {
-                    showSnackbar(MyLocalizations.of(context)
-                        .getLocalizations("ADD_NEW_ADDRESS"));
+                    showSnackbar(MyLocalizations.of(context).addAddress);
                   }
                   widget.cart['shippingAddress'] = addressList[0];
                 }
                 if (widget.deliveryInfo == null ||
                     widget.deliveryInfo['areaAthority']) {
-                  openAndCloseTime == "Open"
+                  openAndCloseTime == "OPEN"
                       ? _buildBottomBarButton()
                       : showSnackbar(MyLocalizations.of(context)
-                          .getLocalizations("STORE_CLOSE"));
+                          .storeisClosedPleaseTryAgainduringouropeninghours);
                 } else {
                   if (widget.deliveryInfo['areaCode'] == null ||
                       widget.deliveryInfo['areaCode'][0] == null) {
-                    openAndCloseTime == "Open"
+                    openAndCloseTime == "OPEN"
                         ? _buildBottomBarButton()
                         : showSnackbar(MyLocalizations.of(context)
-                            .getLocalizations("STORE_CLOSE"));
+                            .storeisClosedPleaseTryAgainduringouropeninghours);
                   } else {
                     bool isPinFound = false;
                     for (int i = 0;
@@ -1468,10 +1353,10 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                       }
                     }
                     if (isPinFound) {
-                      openAndCloseTime == "Open"
+                      openAndCloseTime == "OPEN"
                           ? _buildBottomBarButton()
                           : showSnackbar(MyLocalizations.of(context)
-                              .getLocalizations("STORE_CLOSE"));
+                              .storeisClosedPleaseTryAgainduringouropeninghours);
                     } else {
                       _showAvailablePincodeAlert(
                           widget.cart['restaurant'],
@@ -1482,9 +1367,9 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                   }
                 }
               } else {
-                showSnackbar(
-                    MyLocalizations.of(context).getLocalizations("ERROR_MSG") +
-                        '.');
+                showSnackbar(MyLocalizations.of(context)
+                        .somethingwentwrongpleaserestarttheapp +
+                    '.');
               }
             },
             child: new Row(
@@ -1498,14 +1383,12 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                       children: <Widget>[
                         new Padding(padding: EdgeInsets.only(top: 10.0)),
                         new Text(
-                          MyLocalizations.of(context)
-                              .getLocalizations("PLACE_ORDER_NOW"),
+                          MyLocalizations.of(context).placeOrderNow,
                           style: subTitleWhiteLightOSR(),
                         ),
                         new Padding(padding: EdgeInsets.only(top: 5.0)),
                         new Text(
-                          MyLocalizations.of(context)
-                                  .getLocalizations("TOTAL") +
+                          MyLocalizations.of(context).total +
                               ': ${widget.currency ?? currency} ${widget.cart['grandTotal'].toStringAsFixed(2)}',
                           style: titleWhiteBoldOSB(),
                         ),
@@ -1519,14 +1402,22 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
   }
 
   void _buildBottomBarButton() {
+//    widget.cart['shippingAddress'] = {
+//      'location': {'lat': 12.9546723, 'long': 77.5736175},
+//      'address':
+//          'MDR26, Mandapam, Rapakaputtuga, Sompeta, Andhra Pradesh 532284, India',
+//      'landmark': 'jffnnfn',
+//      'contactNumber': .808848,
+//      'addressType': 'Hogar',
+//      'isSelected': true
+//    };
     if (widget.cart['pickupDate'] != null ||
         widget.cart['pickupStamp'] != null ||
         widget.cart['pickupTime'] != null) {
-      widget.cart['loyalty'] =
-          double.parse(usedLoyaltyPoint.toStringAsFixed(2));
       widget.cart['pickupTime'] = widget.cart['pickupTime'];
       widget.cart['pickupDate'] = widget.cart['pickupDate'];
       widget.cart['shippingAddress'] = null;
+
       if (widget.cart['grandTotal'] != 0) {
         if (mounted) {
           setState(() {
@@ -1547,8 +1438,6 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
         orderInfo();
       }
     } else {
-      widget.cart['loyalty'] =
-          double.parse(usedLoyaltyPoint.toStringAsFixed(2));
       widget.cart['shippingAddress'] = widget.cart['shippingAddress'];
       if (widget.cart['grandTotal'] != 0) {
         if (mounted) {
@@ -1585,7 +1474,9 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
           placeOrderLoading = false;
         });
       }
-      if (onValue != null && onValue['message'] != null) {
+      if (onValue != null &&
+          onValue['message'] != null &&
+          onValue['statusCode'] == 200) {
         Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
@@ -1605,17 +1496,15 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(MyLocalizations.of(context)
-              .getLocalizations("DELIVERY_NOT_AVAILABLE")),
+          title: Text(MyLocalizations.of(context).deliveryNotAvailable),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
                 Text(restaurant +
-                    MyLocalizations.of(context)
-                        .getLocalizations("POST_CODE_MSG") +
+                    MyLocalizations.of(context).notDeliverToThisPostcode +
                     zip +
-                    MyLocalizations.of(context)
-                        .getLocalizations("CURRENT_POSTEL_CODE", true)),
+                    MyLocalizations.of(context).deliverToThisPostcode +
+                    ' :'),
                 Divider(),
                 SingleChildScrollView(
                   child: ListView.builder(
@@ -1633,7 +1522,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
           ),
           actions: <Widget>[
             FlatButton(
-              child: Text(MyLocalizations.of(context).getLocalizations("OK")),
+              child: Text(MyLocalizations.of(context).ok),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -1650,5 +1539,40 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
       duration: Duration(milliseconds: 3000),
     );
     _scaffoldKey.currentState.showSnackBar(snackBar);
+  }
+
+  buildFlavourList(List<dynamic> flavoursList) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: <Widget>[
+        flavoursList.length > 0
+            ? Text(MyLocalizations.of(context).flavours)
+            : Text(''),
+        ListView.builder(
+            physics: ScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: flavoursList.length ?? 0,
+            itemBuilder: (context, index) {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    flavoursList[index]['flavourName'],
+                    style: titleBlackLightOSB(),
+                  ),
+                  Text(
+                    '  X ',
+                    style: titleBlackLightOSB(),
+                  ),
+                  Text(
+                    flavoursList[index]['quantity'].toString(),
+                    style: titleBlackLightOSB(),
+                  ),
+                ],
+              );
+            }),
+      ],
+    );
   }
 }

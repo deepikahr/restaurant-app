@@ -1,25 +1,28 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:RestaurantSaas/services/common.dart';
 import 'package:http/http.dart' show Client;
+
 import 'constant.dart';
-import 'dart:convert';
 
 class MainService {
   static final Client client = Client();
 
   // default get all - users/list/restaurant
-  static Future<dynamic> getTopRatedRestaurants({String count}) async {
+  static Future<dynamic> getTopRatedRestaurants(
+      {String count, double lat, double long}) async {
     if (count == null) count = 'All';
     final response = await client
-        .get(API_ENDPOINT + 'users/list/restaurant/rating/sorting/$count');
+        .get(API_ENDPOINT + 'locations/toprated/all/list/$lat/$long');
     return json.decode(response.body);
   }
 
-  static Future<dynamic> getNewlyArrivedRestaurants({String count}) async {
+  static Future<dynamic> getNewlyArrivedRestaurants(
+      {String count, double lat, double long}) async {
     if (count == null) count = 'All';
     final response = await client
-        .get(API_ENDPOINT + 'users/list/restaurant/createdat/sorting/$count');
+        .get(API_ENDPOINT + 'locations/newlyadded/all/list/$lat/$long');
     return json.decode(response.body);
   }
 
@@ -34,7 +37,6 @@ class MainService {
   static Future<dynamic> getAdvertisementList() async {
     final response =
         await client.get(API_ENDPOINT + 'locations/home/restaurant');
-
     return json.decode(response.body);
   }
 
@@ -46,7 +48,13 @@ class MainService {
 
   static Future<dynamic> getProductsBylocationId(String id) async {
     final response =
-        await client.get(API_ENDPOINT + 'locations/all/category/data/$id');
+    await client.get(API_ENDPOINT + 'locations/all/category/data/$id');
+    return json.decode(response.body);
+  }
+
+  static Future<dynamic> getWorkingHours(String locationId) async {
+    final response =
+    await client.get(API_ENDPOINT + 'locations/get-working/hours/$locationId');
     return json.decode(response.body);
   }
 
@@ -65,7 +73,6 @@ class MainService {
       String id, String time, String day) async {
     final response = await client
         .get(API_ENDPOINT + 'locations/timing/verify/$id/$time/$day');
-
     return json.decode(response.body);
   }
 
@@ -80,6 +87,17 @@ class MainService {
   static Future<dynamic> getAdminSettings() async {
     final response = await client.get(API_ENDPOINT + 'adminSettings/');
     Common.setGlobalSettingData(json.decode(response.body));
+    return json.decode(response.body);
+  }
+
+  static Future<Map<String, dynamic>> getEcoDeliveryInfo(id) async {
+    String token;
+    await Common.getToken().then((onValue) {
+      token = 'bearer ' + onValue;
+    });
+    final response = await client.get(
+        API_ENDPOINT + 'users/res-ecoDelivery/setting/$id',
+        headers: {'Content-Type': 'application/json', 'Authorization': token});
     return json.decode(response.body);
   }
 }

@@ -1,3 +1,4 @@
+import 'package:RestaurantSaas/screens/auth/login.dart';
 import 'package:RestaurantSaas/services/common.dart';
 import 'package:RestaurantSaas/services/localizations.dart';
 import 'package:RestaurantSaas/styles/styles.dart';
@@ -8,17 +9,20 @@ import 'bottom-sheet.dart';
 
 class BuildProductTile extends StatefulWidget {
   final Map<String, dynamic> locationInfo, taxInfo;
+  final bool isProductFirstDeliverFree;
   final String imgUrl,
       productName,
       info,
       currency,
       restaurantName,
       address,
+      shippingType,
       restaurantId;
   final Map<String, dynamic> product;
   final double mrp, off, price, topPadding;
-  final Map localizedValues;
-  final String locale;
+  final Map<String, Map<String, String>> localizedValues;
+  final String locale, locationId;
+  final int deliveryCharge, minimumOrderAmount;
 
   const BuildProductTile({
     Key key,
@@ -38,6 +42,11 @@ class BuildProductTile extends StatefulWidget {
     this.restaurantId,
     this.locationInfo,
     this.taxInfo,
+    this.shippingType,
+    this.deliveryCharge,
+    this.minimumOrderAmount,
+    this.isProductFirstDeliverFree,
+    this.locationId,
   }) : super(key: key);
 
   @override
@@ -70,12 +79,14 @@ class _BuildProductTileState extends State<BuildProductTile> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Container(
-                  height: 20.0,
+                  height: 30.0,
                   child: Row(
                     children: <Widget>[
-                      Text(
-                        widget.info,
-                        style: hintStyleGreyLightOSR(),
+                      Expanded(
+                        child: Text(
+                          widget.info,
+                          style: hintStyleGreyLightOSR(),
+                        ),
                       ),
                     ],
                   )),
@@ -100,91 +111,16 @@ class _BuildProductTileState extends State<BuildProductTile> {
             ],
           ),
           trailing: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Text(
                 '${widget.currency}' + widget.price.toStringAsFixed(2),
                 style: subTitleDarkBoldOSS(),
               ),
-              productQuantity == 0
-                  ? InkWell(
-                      onTap: () {
-                        _checkIfCartIsAvailable();
-                      },
-                      child: Container(
-                        padding: EdgeInsetsDirectional.only(top: 18.0),
-                        child: Image.asset(
-                          'lib/assets/icon/addbtn.png',
-                          width: 16.0,
-                        ),
-                      ),
-                    )
-                  : Container(
-                      decoration: BoxDecoration(
-                          color: Colors.grey[300],
-                          borderRadius: BorderRadius.circular(20.0)),
-                      height: 30,
-                      width: 100,
-                      child: Row(
-                        children: <Widget>[
-                          Container(
-                            width: 24,
-                            height: 24,
-                            decoration: BoxDecoration(
-                              color: Colors.black,
-                              borderRadius: BorderRadius.circular(20.0),
-                            ),
-                            child: InkWell(
-                              onTap: () {
-                                _changeProductQuantity(false);
-                                _calculatePrice(widget.product);
-                                _updateProductQuantityFromCart(productQuantity,
-                                    false, widget.product["_id"], cartProduct);
-                                _calculateCart();
-                              },
-                              child: Icon(
-                                Icons.remove,
-                                color: PRIMARY,
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding:
-                                const EdgeInsets.only(left: 18.0, right: 18),
-                            child: Container(
-                                child: Text(productQuantity.toString())),
-                          ),
-                          Text(''),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 0.0),
-                            child: Container(
-                              width: 24,
-                              height: 24,
-                              decoration: BoxDecoration(
-                                color: PRIMARY,
-                                borderRadius: BorderRadius.circular(20.0),
-                              ),
-                              child: InkWell(
-                                onTap: () {
-                                  _changeProductQuantity(true);
-                                  _calculatePrice(widget.product);
-                                  _updateProductQuantityFromCart(
-                                      productQuantity,
-                                      true,
-                                      widget.product["_id"],
-                                      cartProduct);
-                                  _calculateCart();
-                                },
-                                child: Icon(Icons.add),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
             ],
           ),
+          onTap: () => _checkLoginAndNavigate(),
         ),
         Divider(),
       ],
@@ -207,15 +143,16 @@ class _BuildProductTileState extends State<BuildProductTile> {
               });
             }
             Common.addProduct(productsList).then((value) {});
-            if (productsList.length != 0) {
+            if (productsList.length < 1) {
               Common.setCart(null);
+              Common.addProduct(null);
+            } else {
+              _calculateCart();
             }
           }
         });
       }
-    }).catchError((onError) {
-      sentryError.reportError(onError, null);
-    });
+    }).catchError((onError) {});
   }
 
   void _changeProductQuantity(bool increase) {
@@ -285,7 +222,15 @@ class _BuildProductTileState extends State<BuildProductTile> {
     return quantity;
   }
 
-  void _calculatePrice(final Map<String, dynamic> product) {
+  void _calculatePrice(
+      final Map<String, dynamic> product, productList, flavoursList) async {
+    if (productList != null) {
+      productList.map((e) {
+        if (e['productId'] == product['_id']) {
+          flavoursList = e['flavour'] ?? [];
+        }
+      }).toList();
+    }
     price = 0;
     Map<String, dynamic> variant = product['variants'][0];
     price = price + variant['price'];
@@ -314,6 +259,7 @@ class _BuildProductTileState extends State<BuildProductTile> {
       'extraIngredients': extraIngredientsList,
       'imageUrl': product['imageUrl'],
       'productId': product['_id'],
+      'flavour': flavoursList ?? null,
       'size': variant['size'],
       'title': product['title'],
       'restaurant': widget.restaurantName,
@@ -321,6 +267,27 @@ class _BuildProductTileState extends State<BuildProductTile> {
       'totalPrice': price,
       'restaurantAddress': widget.address
     };
+  }
+
+  void _checkLoginAndNavigate() async {
+    Common.getToken().then((onValue) async {
+      String msg;
+      if (onValue == null) {
+        msg = await Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (BuildContext context) => LoginPage(
+                    locale: widget.locale,
+                    localizedValues: widget.localizedValues,
+                  )),
+        );
+      } else {
+        msg = 'Success';
+      }
+      if (msg == 'Success' && mounted) {
+        _checkIfCartIsAvailable();
+      }
+    });
   }
 
   void _checkIfCartIsAvailable() {
@@ -335,12 +302,8 @@ class _BuildProductTileState extends State<BuildProductTile> {
             _showClearCartAlert();
           }
         }
-      } catch (error, stackTrace) {
-        sentryError.reportError(error, stackTrace);
-      }
-    }).catchError((onError) {
-      sentryError.reportError(onError, null);
-    });
+      } catch (error, stackTrace) {}
+    }).catchError((onError) {});
   }
 
   void _showBottomSheet() {
@@ -348,14 +311,17 @@ class _BuildProductTileState extends State<BuildProductTile> {
         context: context,
         builder: (BuildContext bc) {
           return BottonSheetClassDryClean(
-            taxInfo: widget.taxInfo,
+            locationId: widget.locationId,
+            isProductFirstDeliverFree: widget.isProductFirstDeliverFree,
+            shippingType: widget.shippingType,
+            deliveryCharge: widget.deliveryCharge,
+            minimumOrderAmount: widget.minimumOrderAmount,
             locationInfo: widget.locationInfo,
             restaurantName: widget.restaurantName,
             restaurantId: widget.restaurantId,
             restaurantAddress: widget.address,
             locale: widget.locale,
             localizedValues: widget.localizedValues,
-            productQuantity: productQuantity,
             currency: widget.currency,
             product: widget.product,
             variantsList: widget.product['variants'] ?? '',
@@ -369,20 +335,19 @@ class _BuildProductTileState extends State<BuildProductTile> {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(
-              MyLocalizations.of(context).getLocalizations("CLEAR_CART") + '?'),
+          title: Text(MyLocalizations.of(context).clearcart + '?'),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
                 Text(MyLocalizations.of(context)
-                        .getLocalizations("CLEAR_CART_MSG") +
+                        .youhavesomeitemsalreadyinyourcartfromotherlocationremovetoaddthis +
                     '!'),
               ],
             ),
           ),
           actions: <Widget>[
             FlatButton(
-              child: Text(MyLocalizations.of(context).getLocalizations("YES")),
+              child: Text(MyLocalizations.of(context).yes),
               onPressed: () {
                 Navigator.of(context).pop();
                 Common.removeCart();
@@ -390,7 +355,7 @@ class _BuildProductTileState extends State<BuildProductTile> {
               },
             ),
             FlatButton(
-              child: Text(MyLocalizations.of(context).getLocalizations("NO")),
+              child: Text(MyLocalizations.of(context).no),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -405,7 +370,6 @@ class _BuildProductTileState extends State<BuildProductTile> {
     double deliveryCharge = 0.0, subTotal = 0.0, grandTotal = 0.0;
     Map<String, dynamic> selectedCoupon;
     double couponDeduction = 0.0;
-    double tax = 0.0;
     List<dynamic> products;
 
     // [0] other options when opening cart from menu
@@ -439,77 +403,57 @@ class _BuildProductTileState extends State<BuildProductTile> {
       subTotal = subTotal - couponDeduction;
     }
 
-    // [4] calculate tax
-    if (widget.taxInfo != null) {
-      tax = (subTotal * (widget.taxInfo['taxRate'] / 100));
-    }
-
     // [5] calculate delivery charge
-    Map<String, dynamic> deliveryInfo = (widget.locationInfo != null &&
-            widget.locationInfo['deliveryInfo'] != null)
-        ? widget.locationInfo['deliveryInfo']['deliveryInfo']
-        : null;
-    if (deliveryInfo != null) {
-      if (!deliveryInfo['freeDelivery']) {
-        if (deliveryInfo['amountEligibility'] <= subTotal) {
-          deliveryCharge = 0.0;
-        } else {
-          deliveryCharge =
-              double.parse(deliveryInfo['deliveryCharges'].toString());
-        }
-      } else {
+    if (widget.shippingType.compareTo('free') == 0) {
+      deliveryCharge = 0.0;
+    } else if (widget.shippingType.compareTo('flexible') == 0) {
+      if (subTotal > widget.minimumOrderAmount) {
         deliveryCharge = 0.0;
+      } else {
+        deliveryCharge = widget.deliveryCharge.toDouble();
       }
+    } else if (widget.shippingType.compareTo('fixed') == 0) {
+      deliveryCharge = widget.deliveryCharge.toDouble();
     } else {
       deliveryCharge = 0.0;
     }
 
     // [6] calculate grand total
-    grandTotal = subTotal + deliveryCharge + tax;
+    grandTotal = subTotal + deliveryCharge;
 
     // [7] create complete order json as Map
-    if (products.length != 0)
-      cart = {
-        'deliveryCharge': deliveryCharge,
-        'grandTotal': grandTotal,
-        'location':
-            widget.locationInfo != null ? widget.locationInfo['_id'] : null,
-        'locationName': widget.locationInfo != null
-            ? widget.locationInfo['locationName']
-            : null,
-        'orderType': 'Delivery',
-        'payableAmount': grandTotal,
-        'paymentOption': 'COD',
-        'position': null,
-        'loyalty': null,
-        'shippingAddress': null,
-        'restaurant': products.length > 0 ? products[0]['restaurant'] : null,
-        'restaurantID':
-            products.length > 0 ? products[0]['restaurantID'] : null,
-        'status': 'Pending',
-        'subTotal': subTotal,
-        // "taxInfo": {"taxRate": 0, "taxName": "nil"},
-        'taxInfo': widget.taxInfo,
-        'productDetails': products,
-        'note': null,
-        'isForDineIn': false,
-        'pickupDate': null,
-        'pickupTime': null,
-        'coupon': selectedCoupon == null
-            ? {'couponApplied': false}
-            : {
-                'couponApplied': true,
-                'couponName': selectedCoupon['couponName']
-              }
-      };
+    cart = {
+      'locationId': widget.locationId,
+      'deliveryCharge': deliveryCharge,
+      'grandTotal': grandTotal,
+      'location':
+          widget.locationInfo != null ? widget.locationInfo['_id'] : null,
+      'locationName': widget.locationInfo != null
+          ? widget.locationInfo['locationName']
+          : null,
+      'orderType': 'Delivery',
+      'firstDeliveryFree': widget.isProductFirstDeliverFree,
+      'payableAmount': grandTotal,
+      'paymentOption': 'COD',
+      'position': null,
+      'shippingAddress': null,
+      'restaurant': products.length > 0 ? products[0]['restaurant'] : null,
+      'restaurantID': products.length > 0 ? products[0]['restaurantID'] : null,
+      'status': 'Pending',
+      'subTotal': subTotal,
+      'productDetails': products,
+      'note': null,
+      'isForDineIn': false,
+      'pickupDate': null,
+      'pickupTime': null,
+      'coupon': selectedCoupon == null
+          ? {'couponApplied': false}
+          : {'couponApplied': true, 'couponName': selectedCoupon['couponName']}
+    };
 
     // [8] set cart state and save to storage
     if (widget.locationInfo != null) {
-      if (products.length != 0) {
-        await Common.setCart(cart);
-      } else {
-        await Common.setCart(null);
-      }
+      await Common.setCart(cart);
     }
   }
 }

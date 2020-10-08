@@ -1,13 +1,12 @@
-import 'package:http/http.dart' show Client;
-
-import 'constant.dart';
-import 'dart:convert';
-import 'common.dart';
-
 import 'dart:async';
-import 'package:http/http.dart' as http;
+import 'dart:convert';
 
+import 'package:http/http.dart' show Client;
+import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
+
+import 'common.dart';
+import 'constant.dart';
 import 'sentry-services.dart';
 
 SentryError sentryError = new SentryError();
