@@ -1,24 +1,26 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
-import '../../styles/styles.dart';
-import '../other/ratings.dart';
-import '../../services/profile-service.dart';
 import 'package:async_loader/async_loader.dart';
-import '../../widgets/no-data.dart';
-import '../../services/sentry-services.dart';
-import '../../services/localizations.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../services/localizations.dart';
+import '../../services/profile-service.dart';
+import '../../services/sentry-services.dart';
+import '../../styles/styles.dart';
+import '../../widgets/no-data.dart';
+import '../other/ratings.dart';
 
 SentryError sentryError = new SentryError();
 
 class OrderDetails extends StatefulWidget {
   final String orderId;
-  final Map localizedValues;
+  final Map<String, Map<String, String>> localizedValues;
   final String locale;
 
   OrderDetails({Key key, this.orderId, this.localizedValues, this.locale})
       : super(key: key);
+
   @override
   _OrderDetailsState createState() => _OrderDetailsState();
 }
@@ -40,7 +42,7 @@ class _OrderDetailsState extends State<OrderDetails> {
         renderError: ([error]) {
           sentryError.reportError(error, null);
           return NoData(
-            message: MyLocalizations.of(context).getLocalizations("ERROR_MSG"),
+            message: MyLocalizations.of(context).connectionError,
             icon: Icons.block,
           );
         },
@@ -75,7 +77,8 @@ class _OrderDetailsState extends State<OrderDetails> {
         backgroundColor: PRIMARY,
         iconTheme: IconThemeData(color: Colors.white),
         title: new Text(
-          MyLocalizations.of(context).getLocalizations("ORDER_DETAILS"),
+          MyLocalizations.of(context).orderDetails,
+          style: textbarlowSemiBoldWhite(),
         ),
         centerTitle: true,
       ),
@@ -84,19 +87,18 @@ class _OrderDetailsState extends State<OrderDetails> {
   }
 
   Widget _buildOrderDetailsBody(Map<String, dynamic> order) {
-    String tableNumber = '', orderType;
-
+    String tableNumber = '';
     if (order['tableNumber'] != null) {
       tableNumber = ' for Table number : ' + order['tableNumber'].toString();
     }
     if (order['orderType'] == "Pickup") {
-      orderType = MyLocalizations.of(context).getLocalizations("PICKUP");
+      order['orderType'] = MyLocalizations.of(context).pickUp;
     } else if (order['orderType'] == "Dine In") {
-      orderType = MyLocalizations.of(context).getLocalizations("DINE_IN");
+      order['orderType'] = MyLocalizations.of(context).dineIn;
     } else if (order['orderType'] == "Delivery") {
-      orderType = MyLocalizations.of(context).getLocalizations("DELIVERY");
+      order['orderType'] = MyLocalizations.of(context).dELIVERY;
     } else {
-      orderType = order['orderType'];
+      order['orderType'] = order['orderType'];
     }
     return SingleChildScrollView(
       child: new Column(
@@ -148,41 +150,37 @@ class _OrderDetailsState extends State<OrderDetails> {
                                     children: <Widget>[
                                       new Text(
                                         MyLocalizations.of(context)
-                                            .getLocalizations(
-                                                "DELIVERY_ADDRESS"),
+                                            .deliveryAddress,
                                         style: textOSl(),
                                       ),
                                       new Padding(
                                           padding: EdgeInsets.only(top: 20.0)),
                                       new Text(
-                                        MyLocalizations.of(context)
-                                                .getLocalizations(
-                                                    "ADDRESS_TYPE", true) +
-                                            order['shippingAddress']
-                                                ['addressType'],
+                                        MyLocalizations.of(context).flatNumber +
+                                            ': ' +
+                                            order['shippingAddress']['flatNo'],
                                         style: textOS(),
                                       ),
                                       new Text(
-                                        MyLocalizations.of(context)
-                                                .getLocalizations(
-                                                    "ADDRESS", true) +
+                                        MyLocalizations.of(context).address +
+                                            ': ' +
                                             order['shippingAddress']['address'],
                                         style: textOS(),
                                       ),
                                       new Text(
                                         MyLocalizations.of(context)
-                                                .getLocalizations(
-                                                    "LANDMARK", true) +
+                                                .mobileNumber +
+                                            ': ' +
                                             order['shippingAddress']
-                                                ['landmark'],
+                                                ['contactNumber'],
                                         style: textOS(),
                                       ),
                                       new Text(
-                                        MyLocalizations.of(context)
-                                                .getLocalizations(
-                                                    "CONTACT_NUMBER", true) +
+                                        MyLocalizations.of(context).postalCode +
+                                            ': ' +
                                             order['shippingAddress']
-                                                ['contactNumber'],
+                                                    ['postalCode']
+                                                .toString(),
                                         style: textOS(),
                                       ),
                                     ],
@@ -227,14 +225,13 @@ class _OrderDetailsState extends State<OrderDetails> {
                           children: <Widget>[
                             new Padding(padding: EdgeInsets.only(top: 0.0)),
                             new Text(
-                              MyLocalizations.of(context)
-                                  .getLocalizations("THANKU_FOR_ORDERING"),
+                              'Thanks for ordering',
                               style: textOSl(),
                             ),
                             Text(
-                              MyLocalizations.of(context)
-                                      .getLocalizations("ORDER_TYPE", true) +
-                                  orderType +
+                              MyLocalizations.of(context).orderType +
+                                  ' : ' +
+                                  order['orderType'] +
                                   tableNumber,
                               style: textOSl(),
                             ),
@@ -245,12 +242,13 @@ class _OrderDetailsState extends State<OrderDetails> {
                 new Padding(
                   padding: EdgeInsets.only(left: 35.0, top: 3.0, bottom: 10.0),
                   child: new Text(
-                    MyLocalizations.of(context)
-                            .getLocalizations("RESTAURANT", true) +
+                    MyLocalizations.of(context).restaurant +
+                        ': ' +
+                        // order['restaurant'].toString() +
                         order['productDetails'][0]['restaurant'] +
                         ', ' +
-                        MyLocalizations.of(context)
-                            .getLocalizations("ORDER_ID", true) +
+                        MyLocalizations.of(context).orderID +
+                        ' :' +
                         order['orderID'].toString(),
                     style: textOSl(),
                   ),
@@ -299,8 +297,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                                       );
                                     },
                                     child: new Text(
-                                      MyLocalizations.of(context)
-                                          .getLocalizations("RATE"),
+                                      MyLocalizations.of(context).rate,
                                       textAlign: TextAlign.start,
                                       style: textred(),
                                     ),
@@ -347,7 +344,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                   children: <Widget>[
                     Expanded(
                         child: new Text(
-                      MyLocalizations.of(context).getLocalizations("SUB_TOTAL"),
+                      MyLocalizations.of(context).subTotal,
                       style: textOS(),
                     )),
                     Expanded(
@@ -363,8 +360,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                   children: <Widget>[
                     Expanded(
                         child: new Text(
-                      MyLocalizations.of(context)
-                          .getLocalizations("DELIVERY_CHARGES"),
+                      MyLocalizations.of(context).deliveryCharges,
                       style: textOS(),
                     )),
                     Expanded(
@@ -380,7 +376,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                   children: <Widget>[
                     Expanded(
                         child: new Text(
-                      MyLocalizations.of(context).getLocalizations("TOTAL"),
+                      MyLocalizations.of(context).grandTotal,
                       style: textOSl(),
                     )),
                     Expanded(

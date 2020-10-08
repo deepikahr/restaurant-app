@@ -1,20 +1,22 @@
-import 'package:flutter/material.dart';
-import 'package:toast/toast.dart';
-import '../../styles/styles.dart';
-import '../../services/profile-service.dart';
-import '../../widgets/no-data.dart';
 import 'package:async_loader/async_loader.dart';
-import '../../screens/mains/product-details.dart';
-import '../../services/sentry-services.dart';
-import '../../services/localizations.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:toast/toast.dart';
+
+import '../../services/localizations.dart';
+import '../../services/profile-service.dart';
+import '../../services/sentry-services.dart';
+import '../../styles/styles.dart';
+import '../../widgets/no-data.dart';
 
 SentryError sentryError = new SentryError();
 
 class Favorites extends StatefulWidget {
-  final Map localizedValues;
+  final Map<String, Map<String, String>> localizedValues;
   final String locale;
+
   Favorites({Key key, this.locale, this.localizedValues}) : super(key: key);
+
   @override
   _FavoritesState createState() => _FavoritesState();
 }
@@ -53,8 +55,10 @@ class _FavoritesState extends State<Favorites> {
           child: Icon(Icons.arrow_back),
         ),
         backgroundColor: PRIMARY,
-        title: new Text(MyLocalizations.of(context).getLocalizations("APPLY"),
-            style: titleBoldWhiteOSS()),
+        title: new Text(
+          MyLocalizations.of(context).favourites,
+          style: textbarlowSemiBoldWhite(),
+        ),
         centerTitle: true,
       ),
       body: AsyncLoader(
@@ -64,8 +68,7 @@ class _FavoritesState extends State<Favorites> {
         renderError: ([error]) {
           sentryError.reportError(error, null);
           return NoData(
-              message:
-                  MyLocalizations.of(context).getLocalizations("ERROR_MSG"),
+              message: MyLocalizations.of(context).connectionError,
               icon: Icons.block);
         },
         renderSuccess: ({data}) {
@@ -82,9 +85,7 @@ class _FavoritesState extends State<Favorites> {
   static Widget buildEmptyPage(context) {
     return Padding(
       padding: EdgeInsets.only(top: 40.0),
-      child: NoData(
-          message:
-              MyLocalizations.of(context).getLocalizations("FAV_LITS_EMPTY")),
+      child: NoData(message: MyLocalizations.of(context).favoritesListEmpty),
     );
   }
 
@@ -97,18 +98,18 @@ class _FavoritesState extends State<Favorites> {
       itemBuilder: (BuildContext context, int index) {
         return InkWell(
           onTap: () {
-            Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (BuildContext context) => ProductDetailsPage(
-                  product: favs[index]['product'],
-                  restaurantName: favs[index]['restaurantID']['restaurantName'],
-                  restaurantId: favs[index]['restaurantID']['_id'],
-                  locationInfo: favs[index]['location'],
-                ),
-              ),
-            );
+            // Navigator.pop(context);
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //     builder: (BuildContext context) => ProductDetailsPage(
+            //       product: favs[index]['product'],
+            //       restaurantName: favs[index]['restaurantID']['restaurantName'],
+            //       restaurantId: favs[index]['restaurantID']['_id'],
+            //       locationInfo: favs[index]['location'],
+            //     ),
+            //   ),
+            // );
           },
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -187,8 +188,7 @@ class _FavoritesState extends State<Favorites> {
                                         try {
                                           Toast.show(
                                               MyLocalizations.of(context)
-                                                  .getLocalizations(
-                                                      "PRODUCT_REMOVED_MSG"),
+                                                  .removedFavoriteItem,
                                               context,
                                               duration: Toast.LENGTH_LONG,
                                               gravity: Toast.BOTTOM);

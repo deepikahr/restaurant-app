@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../services/localizations.dart';
 
 class NoData extends StatelessWidget {
@@ -29,7 +30,7 @@ class NoData extends StatelessWidget {
 
   Widget _buildText(message, context) {
     return Text(
-      message ?? MyLocalizations.of(context).getLocalizations("NO_RESOURCE"),
+      message ?? MyLocalizations.of(context).noResource,
       style: TextStyle(
         fontSize: 18.0,
         color: Colors.grey[500],

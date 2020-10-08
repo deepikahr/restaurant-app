@@ -1,5 +1,9 @@
 import 'dart:async';
 
+import 'package:RestaurantSaas/screens/other/bottom-sheet1.dart';
+import 'package:RestaurantSaas/services/main-service.dart';
+import 'package:RestaurantSaas/services/profile-service.dart';
+import 'package:RestaurantSaas/services/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -15,12 +19,12 @@ import 'confirm-order.dart';
 
 SentryError sentryError = new SentryError();
 
-// ignore: must_be_immutable
 class CartPage extends StatefulWidget {
   Map<String, dynamic> product, taxInfo, locationInfo;
-  final Map localizedValues;
+  final Map<String, Map<String, String>> localizedValues;
   final String locale;
   final Map<String, dynamic> tableInfo;
+  final Function listener;
 
   CartPage(
       {Key key,
@@ -29,31 +33,34 @@ class CartPage extends StatefulWidget {
       this.locationInfo,
       this.tableInfo,
       this.locale,
-      this.localizedValues})
+      this.localizedValues,
+      this.listener})
       : super(key: key);
 
   @override
-  _CartPageState createState() => _CartPageState();
+  CartPageState createState() => CartPageState();
 }
 
-class _CartPageState extends State<CartPage> {
+class CartPageState extends State<CartPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   double deliveryCharge = 0.0, subTotal = 0.0, grandTotal = 0.0;
   double tax = 0.0;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  int deliveryCharge1, minimumOrderAmount;
   List<dynamic> products;
   Map<String, dynamic> cartItems = {};
   int productsLength = 0;
   Map<String, dynamic> selectedCoupon;
   double couponDeduction = 0.0;
-  String currency = '';
+  String currency = '', shippingType;
+
+  bool isLoading = true;
 
   @override
   void initState() {
-    _calculateCart();
-
+    calculateCart();
     getGlobalSettingsData();
     super.initState();
-    // selectedLanguage();
   }
 
   getGlobalSettingsData() async {
@@ -61,7 +68,90 @@ class _CartPageState extends State<CartPage> {
     currency = prefs.getString('currency');
   }
 
-  void _calculateCart() async {
+  showFlavourOptionDialog(title, product) async {
+    print(product.toString());
+    showDialog<Null>(
+      context: context,
+      barrierDismissible: true, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          contentPadding: EdgeInsets.only(
+            top: 10.0,
+          ),
+          title: new Text(
+            "$title",
+            textAlign: TextAlign.center,
+          ),
+          content: Container(
+            height: 120.0,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Column(
+                  children: <Widget>[
+                    Divider(),
+                    IntrinsicHeight(
+                      child: new Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).pop();
+                                calculatePrice(product, true,
+                                    addFlavours: true);
+                              },
+                              child: Container(
+                                alignment: Alignment.center,
+                                margin: EdgeInsets.only(bottom: 12.0),
+                                height: 30.0,
+                                decoration: BoxDecoration(),
+                                child: Text(
+                                  MyLocalizations.of(context)
+                                      .same
+                                      .toUpperCase(),
+                                  style: textPrimaryOSR(),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).pop();
+                                _showBottomSheet(product);
+                              },
+                              child: Container(
+                                alignment: Alignment.center,
+                                margin: EdgeInsets.only(bottom: 12.0),
+                                height: 30.0,
+                                decoration: BoxDecoration(),
+                                child: Text(
+                                  MyLocalizations.of(context)
+                                      .different
+                                      .toUpperCase(),
+                                  style: textPrimaryOSR(),
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void calculateCart() async {
+    setState(() {
+      isLoading = true;
+    });
     // [0] other options when opening cart from menu
     if (widget.taxInfo == null) {
       await Common.getCartInfo().then((onValue) {
@@ -82,10 +172,23 @@ class _CartPageState extends State<CartPage> {
     Map<String, dynamic> cart = cartItems;
     await Common.getCart().then((onValue) {
       cart = onValue;
+      print(cart.toString());
+    }).catchError((onError) {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     });
 
     await Common.getProducts().then((value) {
       products = value != null ? value : [];
+    }).catchError((error) {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     });
 
     subTotal = 0.0;
@@ -99,56 +202,85 @@ class _CartPageState extends State<CartPage> {
       subTotal = subTotal - couponDeduction;
     }
 
-    // [4] calculate tax
-    if (widget.taxInfo != null) {
-      tax = (subTotal * (widget.taxInfo['taxRate'] / 100));
-    }
-
     // [5] calculate delivery charge
-    Map<String, dynamic> deliveryInfo = (widget.locationInfo != null &&
-            widget.locationInfo['deliveryInfo'] != null)
-        ? widget.locationInfo['deliveryInfo']['deliveryInfo']
-        : null;
-    if (deliveryInfo != null) {
-      if (!deliveryInfo['freeDelivery']) {
-        if (deliveryInfo['amountEligibility'] <= subTotal) {
-          deliveryCharge = 0.0;
+    await ProfileService.getUserInfo().then((value) async {
+      await MainService.getProductsBylocationId(cart['locationId'])
+          .then((locationId) async {
+        if (value['newUser'] &&
+            locationId['restaurant']['restaurantID']['firstDeliveryFree']) {
+          deliveryCharge = 0;
+          grandTotal = subTotal + deliveryCharge;
         } else {
-          deliveryCharge =
-              double.parse(deliveryInfo['deliveryCharges'].toString());
+          await Common.getDeliveryCharge().then((value) {
+            shippingType = value['shippingType'];
+            deliveryCharge1 = value['deliveryCharge'];
+            minimumOrderAmount = value['minimumOrderAmount'];
+            if (value['shippingType'].compareTo('free') == 0) {
+              deliveryCharge = 0.0;
+              grandTotal = subTotal + deliveryCharge;
+            } else if (value['shippingType'].compareTo('flexible') == 0) {
+              if (subTotal > value['minimumOrderAmount']) {
+                deliveryCharge = 0.0;
+                grandTotal = subTotal + deliveryCharge + tax;
+              } else {
+                deliveryCharge = value['deliveryCharge'].toDouble();
+                grandTotal = subTotal + deliveryCharge + tax;
+              }
+            } else if (value['shippingType'].compareTo('fixed') == 0) {
+              deliveryCharge = value['deliveryCharge'].toDouble();
+              grandTotal = subTotal + deliveryCharge + tax;
+            } else {
+              deliveryCharge = 0.0;
+              grandTotal = subTotal + deliveryCharge + tax;
+            }
+          });
         }
-      } else {
-        deliveryCharge = 0.0;
-      }
-    } else {
-      deliveryCharge = 0.0;
-    }
+      });
+    }).catchError((value) {
+      Common.getDeliveryCharge().then((value) {
+        if (value['shippingType'].compareTo('free') == 0) {
+          deliveryCharge = 0.0;
+          grandTotal = subTotal + deliveryCharge + tax;
+        } else if (value['shippingType'].compareTo('flexible') == 0) {
+          if (subTotal > value['minimumOrderAmount']) {
+            deliveryCharge = 0.0;
+            grandTotal = subTotal + deliveryCharge + tax;
+          } else {
+            deliveryCharge = value['deliveryCharge'].toDouble();
+            grandTotal = subTotal + deliveryCharge + tax;
+          }
+        } else if (value['shippingType'].compareTo('fixed') == 0) {
+          deliveryCharge = value['deliveryCharge'].toDouble();
+          grandTotal = subTotal + deliveryCharge + tax;
+        } else {
+          deliveryCharge = 0.0;
+          grandTotal = subTotal + deliveryCharge + tax;
+        }
+      });
+    });
 
     // [6] calculate grand total
-    grandTotal = subTotal + deliveryCharge + tax;
+    grandTotal = subTotal + deliveryCharge;
 
     // [7] create complete order json as Map
     if (products.length != 0) {
       cart = {
-        'deliveryCharge': deliveryCharge,
+        'locationId': cart != null ? cart['locationId'] : null,
+        'deliveryCharge': deliveryCharge.toInt(),
         'grandTotal': grandTotal,
-        'location':
-            widget.locationInfo != null ? widget.locationInfo['_id'] : null,
-        'locationName': widget.locationInfo != null
-            ? widget.locationInfo['locationName']
-            : null,
+        'location': cart['locationId'],
+        'locationName': cart['locationName'],
         'orderType': 'Delivery',
         'payableAmount': grandTotal,
         'paymentOption': 'COD',
         'position': null,
-        'loyalty': null,
         'shippingAddress': null,
-        'restaurant': products.length > 0 ? products[0]['restaurant'] : null,
+        'restaurantName':
+            products.length > 0 ? products[0]['restaurant'] : null,
         'restaurantID':
             products.length > 0 ? products[0]['restaurantID'] : null,
         'status': 'Pending',
         'subTotal': subTotal,
-        // "taxInfo": {"taxRate": 0, "taxName": "nil"},
         'taxInfo': widget.taxInfo,
         'productDetails': products,
         'note': null,
@@ -165,14 +297,25 @@ class _CartPageState extends State<CartPage> {
     }
 
     // [8] set cart state and save to storage
-    if (widget.locationInfo != null) {
+    if (products != null) {
       await Common.setCart(cart);
       if (mounted) {
         setState(() {
+          isLoading = false;
           cartItems = cart;
           productsLength = products.length;
         });
       }
+    } else {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+    if (products.toString() == [].toString()) {
+      Common.setCart(null);
+      Common.addProduct(null);
     }
   }
 
@@ -188,7 +331,7 @@ class _CartPageState extends State<CartPage> {
       ),
     );
 
-    _calculateCart();
+    calculateCart();
   }
 
   int cartCount;
@@ -205,15 +348,15 @@ class _CartPageState extends State<CartPage> {
         });
       }
     });
-
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: PRIMARY,
         elevation: 0.0,
         title: new Text(
-          MyLocalizations.of(context).getLocalizations("CART"),
-          style: titleBoldWhiteOSS(),
+          MyLocalizations.of(context).cart,
+          style: textbarlowSemiBoldWhite(),
         ),
         leading: InkWell(
           onTap: () {
@@ -227,68 +370,61 @@ class _CartPageState extends State<CartPage> {
         centerTitle: true,
         actions: <Widget>[],
       ),
-      body: productsLength > 0
-          ? SingleChildScrollView(
-              child: Stack(
-                children: <Widget>[
-                  new Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.start,
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : productsLength > 0
+              ? SingleChildScrollView(
+                  child: Stack(
                     children: <Widget>[
-                      SingleChildScrollView(
-                        child: Container(
-                            height: screenHeight(context) * 0.42,
-                            color: greyc,
-                            padding: EdgeInsets.only(top: 10.0, bottom: 5.0),
-                            child: _buildCartItemTile(products)),
+                      new Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          SingleChildScrollView(
+                            child: Container(
+                                height: screenHeight(context) * 0.42,
+                                color: greyc,
+                                padding:
+                                    EdgeInsets.only(top: 10.0, bottom: 5.0),
+                                child: _buildCartItemTile(products)),
+                          ),
+                          Divider(),
+                          _buildApplyCouponLine(),
+                          selectedCoupon != null ? Divider() : Container(),
+                          selectedCoupon != null
+                              ? _buildPriceTagLine(
+                                  'Coupon (' +
+                                      selectedCoupon['couponName'] +
+                                      ' - ' +
+                                      selectedCoupon['offPrecentage']
+                                          .toString() +
+                                      '% off)',
+                                  couponDeduction)
+                              : Container(),
+                          Divider(),
+                          _buildPriceTagLine(
+                              MyLocalizations.of(context).subTotal, subTotal),
+                          Divider(),
+                          _buildPriceTagLine(
+                              MyLocalizations.of(context).deliveryCharges,
+                              deliveryCharge),
+                          Divider(),
+                          _buildPriceTagLine(
+                              MyLocalizations.of(context).grandTotal,
+                              grandTotal),
+                          Divider(),
+                        ],
                       ),
-                      Divider(),
-                      _buildApplyCouponLine(),
-                      selectedCoupon != null ? Divider() : Container(),
-                      selectedCoupon != null
-                          ? _buildPriceTagLine(
-                              'Coupon (' +
-                                  selectedCoupon['couponName'] +
-                                  ' - ' +
-                                  selectedCoupon['offPrecentage'].toString() +
-                                  '% off)',
-                              couponDeduction)
-                          : Container(),
-                      Divider(),
-                      _buildPriceTagLine(
-                          MyLocalizations.of(context)
-                              .getLocalizations("SUB_TOTAL"),
-                          subTotal),
-                      Divider(),
-                      widget.taxInfo != null
-                          ? _buildPriceTagLine(
-                              "Tax " + widget.taxInfo['taxName'], tax)
-                          : Container(height: 0, width: 0),
-                      widget.taxInfo != null
-                          ? Divider()
-                          : Container(height: 0, width: 0),
-                      _buildPriceTagLine(
-                          MyLocalizations.of(context)
-                              .getLocalizations("DELIVERY_CHARGES"),
-                          deliveryCharge),
-                      Divider(),
-                      _buildPriceTagLine(
-                          MyLocalizations.of(context).getLocalizations("TOTAL"),
-                          grandTotal),
-                      Divider(),
                     ],
                   ),
-                ],
-              ),
-            )
-          : Padding(
-              padding: EdgeInsets.only(top: 50.0),
-              child: NoData(
-                message:
-                    MyLocalizations.of(context).getLocalizations("CART_EMPTY"),
-                icon: Icons.hourglass_empty,
-              ),
-            ),
+                )
+              : Padding(
+                  padding: EdgeInsets.only(top: 50.0),
+                  child: NoData(
+                    message: MyLocalizations.of(context).cartEmpty,
+                    icon: Icons.hourglass_empty,
+                  ),
+                ),
       bottomNavigationBar: productsLength > 0
           ? _buildBottomBar()
           : Container(
@@ -344,46 +480,115 @@ class _CartPageState extends State<CartPage> {
                               products[index]['price'].toStringAsFixed(2),
                           style: titleBlackBoldOSB(),
                         ),
-                        IconButton(
-                          icon: Icon(
-                            Icons.delete,
-                            color: PRIMARY,
-                            size: 20.0,
-                          ),
-                          onPressed: () async {
-                            if (products.length == 1) {
-                              Common.addProduct(null);
-                              CounterService().calculateCounter();
-                              Common.setCart(null);
-                              setState(() {});
-                              _calculateCart();
-                            } else {
-                              products.removeAt(index);
-                              Common.addProduct(products);
-                              CounterService().calculateCounter();
-                              _calculateCart();
-                            }
-                          },
+                        Row(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.grey[300],
+                                  borderRadius: BorderRadius.circular(15.0)),
+                              height: 30,
+                              width: 100,
+                              child: Row(
+                                children: <Widget>[
+                                  Container(
+                                    width: 24,
+                                    height: 24,
+                                    decoration: BoxDecoration(
+                                      color: Colors.black,
+                                      borderRadius: BorderRadius.circular(20.0),
+                                    ),
+                                    child: InkWell(
+                                      onTap: () {
+                                        if (products[index]['Quantity'] <= 1) {
+                                          _updateProductQuantityFromCart(
+                                              products[index], products[index]);
+                                        } else {
+                                          products[index]['flavour'] == null
+                                              ? calculatePrice(
+                                                  products[index], false,
+                                                  decrement: true)
+                                              : calculatePrice(
+                                                  products[index], false,
+                                                  removeFlavours: true);
+                                        }
+                                      },
+                                      child: Icon(
+                                        Icons.remove,
+                                        color: PRIMARY,
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 20.0, right: 20),
+                                    child: Container(
+                                        child: Text(products[index]['Quantity']
+                                            .toString())),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 0.0),
+                                    child: Container(
+                                      width: 24,
+                                      height: 24,
+                                      decoration: BoxDecoration(
+                                        color: PRIMARY,
+                                        borderRadius:
+                                            BorderRadius.circular(15.0),
+                                      ),
+                                      child: InkWell(
+                                        onTap: () {
+                                          products[index]['flavour'] == null
+                                              ? calculatePrice(
+                                                  products[index], true)
+                                              : showFlavourOptionDialog(
+                                                  MyLocalizations.of(context)
+                                                      .doYouWantSameOrDifferent,
+                                                  products[index]);
+                                        },
+                                        child: Icon(Icons.add),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                    // products[index]['extraIngredients'].length == 0
-                    //     ? Container()
-                    //     : new Text(
-                    //         'Selected ${products[index]['extraIngredients'].length} Extra Items',
-                    //         overflow: TextOverflow.ellipsis,
-                    //         style: subTitleDarkLightOSS(),
-                    //       ),
                     products[index]['extraIngredients'].length == 0
                         ? Container()
                         : _buildCartExtraItemTile(
                             products[index]['extraIngredients']),
+                    products[index]['flavour'] != null
+                        ? _buildFlavourList(products[index]['flavour'])
+                        : Container(),
+                    SizedBox(height: 10,),
                     _buildAddNoteLine(index),
                     Divider()
                   ],
                 ),
               ),
             ),
+          );
+        });
+  }
+
+  void _showBottomSheet(product) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext bc) {
+          return BottonSheetClassDryClean(
+            shippingType: shippingType,
+            deliveryCharge: deliveryCharge,
+            minimumOrderAmount: minimumOrderAmount,
+            restaurantName: product['restaurant'],
+            restaurantId: product['restaurantID'],
+            restaurantAddress: product['restaurantAddress'],
+            locale: widget.locale,
+            localizedValues: widget.localizedValues,
+            product: product,
+            currency: currency,
           );
         });
   }
@@ -398,38 +603,29 @@ class _CartPageState extends State<CartPage> {
               width: screenWidth(context),
               padding: EdgeInsets.only(left: 50.0),
               child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      flex: 5,
+                    new Text(
+                      extraIngredients[index]['name'].length > 15
+                          ? extraIngredients[index]['name'].substring(0, 15) +
+                              '...'
+                          : extraIngredients[index]['name'],
+                      overflow: TextOverflow.ellipsis,
+                      style: hintStylePrimaryLightOSR(),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 18.0),
                       child: new Text(
-                        extraIngredients[index]['name'].length > 15
-                            ? extraIngredients[index]['name'].substring(0, 15) +
-                                '...'
-                            : extraIngredients[index]['name'],
-                        overflow: TextOverflow.ellipsis,
-                        style: hintStylePrimaryLightOSR(),
+                        'x' + '1',
+                        textAlign: TextAlign.center,
+                        style: hintStylePrimaryOSR(),
                       ),
                     ),
-                    Expanded(
-                      flex: 2,
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 18.0),
-                        child: new Text(
-                          'x' + '1',
-                          textAlign: TextAlign.center,
-                          style: hintStylePrimaryOSR(),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 4,
-                      child: new Text(
-                        '$currency' +
-                            extraIngredients[index]['price'].toStringAsFixed(2),
-                        //  style: darkTextSmallHN(),
-                      ),
+                    new Text(
+                      '$currency' +
+                          extraIngredients[index]['price'].toStringAsFixed(2),
+                      //  style: darkTextSmallHN(),
                     ),
                   ]));
         });
@@ -469,15 +665,14 @@ class _CartPageState extends State<CartPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             new Text(
-              MyLocalizations.of(context).getLocalizations("COMPLETE_ORDER"),
+              MyLocalizations.of(context).completeOrder,
               style: subTitleWhiteLightOSR(),
             ),
             new Padding(padding: EdgeInsets.only(top: 5.0)),
             new Text(
-              // //delivery charge deducted because of above line are commented to disable delivery charge in this page
-              MyLocalizations.of(context).getLocalizations("TOTAL") +
+              MyLocalizations.of(context).total +
                   ': $currency' +
-                  (grandTotal - deliveryCharge).toStringAsFixed(2),
+                  grandTotal.toStringAsFixed(2),
               style: titleWhiteBoldOSB(),
             )
           ],
@@ -487,64 +682,66 @@ class _CartPageState extends State<CartPage> {
   }
 
   void _checkLoginAndNavigate() async {
-    Common.getToken().then((onValue) async {
-      String msg;
-      if (onValue == null) {
-        msg = await Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (BuildContext context) => LoginPage(
-                    locale: widget.locale,
-                    localizedValues: widget.localizedValues,
-                  )),
-        );
-      } else {
-        msg = 'Success';
-      }
-      if (msg == 'Success' && mounted) {
-        var info = (widget.locationInfo != null &&
-                widget.locationInfo['deliveryInfo'] != null)
-            ? widget.locationInfo['deliveryInfo']['deliveryInfo']
-            : null;
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (BuildContext context) => ConfrimOrderPage(
-                locale: widget.locale,
-                localizedValues: widget.localizedValues,
-                cart: cartItems,
-                deliveryInfo: info,
-                currency: currency),
-          ),
-        );
-      }
-    });
+    ProfileService.getUserInfo().then((value) {
+      Common.getToken().then((onValue) async {
+        String msg;
+        if (onValue == null) {
+          msg = await Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext context) => LoginPage(
+                      locale: widget.locale,
+                      localizedValues: widget.localizedValues,
+                    )),
+          );
+        } else {
+          msg = 'Success';
+        }
+        if (msg == 'Success' && mounted) {
+          var info = (widget.locationInfo != null &&
+                  widget.locationInfo['deliveryInfo'] != null)
+              ? widget.locationInfo['deliveryInfo']['deliveryInfo']
+              : null;
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (BuildContext context) => ConfrimOrderPage(
+                  locale: widget.locale,
+                  localizedValues: widget.localizedValues,
+                  cart: cartItems,
+                  deliveryInfo: info,
+                  currency: currency),
+            ),
+          );
+        }
+      });
+    }).catchError((error) {});
   }
 
   Widget _buildAddNoteLine(int index) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
         InkWell(
           onTap: () {
             _showAddNoteAlert(index);
           },
           child: Text(
-            MyLocalizations.of(context).getLocalizations("ADD_NOTE"),
+            MyLocalizations.of(context).addNote,
             style: titleBlackLightOSBCoupon(),
           ),
         ),
         Padding(padding: EdgeInsets.only(left: 10)),
-        cartItems['productDetails'][index]['note'] != null
+        (products[index] != null && products[index]['note'] != null)
             ? InkWell(
                 onTap: () {
                   if (mounted) {
                     setState(() {
-                      cartItems['productDetails'][index]['note'] = null;
-                      Common.setCart(cartItems);
+                      products[index]['note'] = null;
+                      Common.addProduct(products);
                     });
-                    _calculateCart();
+                    calculateCart();
                   }
                 },
                 child: Icon(
@@ -566,7 +763,7 @@ class _CartPageState extends State<CartPage> {
         InkWell(
           onTap: _goToCoupons,
           child: Text(
-            MyLocalizations.of(context).getLocalizations("APPLY_COUPON"),
+            MyLocalizations.of(context).applyCoupon,
             style: titleBlackLightOSBCoupon(),
           ),
         ),
@@ -578,7 +775,7 @@ class _CartPageState extends State<CartPage> {
                     setState(() {
                       selectedCoupon = null;
                     });
-                    _calculateCart();
+                    calculateCart();
                   }
                 },
                 child: Icon(
@@ -598,8 +795,7 @@ class _CartPageState extends State<CartPage> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title:
-              Text(MyLocalizations.of(context).getLocalizations("COOK_NOTE")),
+          title: Text(MyLocalizations.of(context).cookNote),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
@@ -607,25 +803,23 @@ class _CartPageState extends State<CartPage> {
                   key: _formKey,
                   child: TextFormField(
                     keyboardType: TextInputType.text,
-                    initialValue: cartItems['productDetails'][index]['note'],
+                    initialValue: products[index]['note'],
                     validator: (String value) {
                       if (value.isEmpty) {
-                        return MyLocalizations.of(context)
-                            .getLocalizations("PLEASE_ENTER");
+                        return MyLocalizations.of(context).pleaseEnter;
                       } else
                         return null;
                     },
                     onSaved: (String value) {
                       if (mounted) {
                         setState(() {
-                          cartItems['productDetails'][index]['note'] = value;
-                          Common.setCart(cartItems);
+                          products[index]['note'] = value;
+                          Common.addProduct(products);
                         });
                       }
                     },
                     decoration: InputDecoration(
-                      labelText:
-                          MyLocalizations.of(context).getLocalizations("NOTE"),
+                      labelText: MyLocalizations.of(context).note,
                       labelStyle: hintStyleGreyLightOSR(),
                       contentPadding: EdgeInsets.all(10),
                       // border: InputBorder.,
@@ -638,18 +832,17 @@ class _CartPageState extends State<CartPage> {
           ),
           actions: <Widget>[
             FlatButton(
-              child:
-                  Text(MyLocalizations.of(context).getLocalizations("CANCEL")),
+              child: Text(MyLocalizations.of(context).cancel),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             FlatButton(
-              child: Text(MyLocalizations.of(context).getLocalizations("ADD")),
+              child: Text(MyLocalizations.of(context).add),
               onPressed: () {
                 if (_formKey.currentState.validate()) {
                   _formKey.currentState.save();
-                  _calculateCart();
+                  calculateCart();
                   Navigator.of(context).pop();
                 }
               },
@@ -658,5 +851,143 @@ class _CartPageState extends State<CartPage> {
         );
       },
     );
+  }
+
+  _buildFlavourList(List<dynamic> flavoursList) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: <Widget>[
+        flavoursList.length > 0
+            ? Text(MyLocalizations.of(context).flavours)
+            : Text(''),
+        ListView.builder(
+            physics: ScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: flavoursList.length ?? 0,
+            itemBuilder: (context, index) {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    flavoursList[index]['flavourName'],
+                    style: titleBlackLightOSB(),
+                  ),
+                  Text(
+                    '  X ',
+                    style: titleBlackLightOSB(),
+                  ),
+                  Text(
+                    flavoursList[index]['quantity'].toString(),
+                    style: titleBlackLightOSB(),
+                  ),
+                ],
+              );
+            }),
+      ],
+    );
+  }
+
+  void calculatePrice(final Map<String, dynamic> product, bool increase,
+      {addFlavours = false, removeFlavours = false, decrement = false}) async {
+    Map<String, dynamic> cartProduct;
+    int price = 0;
+    int quantity = increase ? product['Quantity'] + 1 : product['Quantity'] - 1;
+    price = product['price'].toInt() * quantity;
+    List<dynamic> extraIngredientsList = List<dynamic>();
+    if (product['extraIngredients'].length > 0 &&
+        product['extraIngredients'][0] != null) {
+      product['extraIngredients'].forEach((item) {
+        if (item != null && item['isSelected'] != null && item['isSelected']) {
+          price = price + item['price'];
+          extraIngredientsList.add(item);
+        }
+      });
+    }
+    cartProduct = {
+      'Discount': product['Discount'],
+      'MRP': product['MRP'],
+      'note': null,
+      'Quantity': quantity,
+      'price': product['price'],
+      'extraIngredients': extraIngredientsList,
+      'imageUrl': product['imageUrl'],
+      'productId': product['productId'],
+      'random': product['random'],
+      'size': product['size'],
+      'title': product['title'],
+      'restaurant': product['restaurant'],
+      'restaurantID': product['restaurantID'],
+      'totalPrice': price,
+      'restaurantAddress': product['restaurantAddress']
+    };
+    cartProduct.addAll({'product': product['product']});
+    print(product.toString());
+    _updateProductQuantityFromCart(
+      product,
+      cartProduct,
+      addFlavours: addFlavours,
+      removeFlavours: removeFlavours,
+      isDeleteItem: increase,
+      decrement: decrement,
+    );
+  }
+
+  void _updateProductQuantityFromCart(product, cartProduct,
+      {isDeleteItem = false,
+      addFlavours = false,
+      removeFlavours = false,
+      decrement = false}) async {
+    await Common.getProducts().then((productsList) {
+      products = productsList;
+      if (productsList != null) {
+        productsList.forEach((element) {
+          if (element['productId'].toString() ==
+                  cartProduct['productId'].toString() &&
+              element['random'].toString() ==
+                  cartProduct['random'].toString()) {
+            productsList.remove(element);
+            if (isDeleteItem) {
+              if (addFlavours) {
+                List<dynamic> flavourList = [];
+                product['flavour'].map((flavour) {
+                  Map<String, dynamic> item;
+                  item = {
+                    '_id': flavour['_id'],
+                    'flavourName': flavour['flavourName'],
+                    'tempQuantity': flavour['tempQuantity'],
+                    'quantity': flavour['quantity'] + flavour['tempQuantity']
+                  };
+                  flavourList.add(item);
+                }).toList();
+                cartProduct.addAll({'flavour': flavourList});
+              }
+              productsList.add(cartProduct);
+            }
+            if (!isDeleteItem && removeFlavours) {
+              List<dynamic> flavourList = [];
+              product['flavour'].map((flavour) {
+                Map<String, dynamic> item;
+                item = {
+                  '_id': flavour['_id'],
+                  'flavourName': flavour['flavourName'],
+                  'tempQuantity': flavour['tempQuantity'],
+                  'quantity': flavour['quantity'] - flavour['tempQuantity']
+                };
+                flavourList.add(item);
+              }).toList();
+              cartProduct.addAll({'flavour': flavourList});
+              productsList.add(cartProduct);
+            }
+            if (!isDeleteItem && decrement) {
+              productsList.add(cartProduct);
+            }
+            Common.addProduct(productsList).then((value) {
+              calculateCart();
+            });
+          }
+        });
+      }
+    }).catchError((onError) {});
   }
 }
