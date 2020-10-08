@@ -662,7 +662,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           trailing: DropdownButtonHideUnderline(
                             child: DropdownButton(
                               hint: Text(selectedLocale == null
-                                  ? 'Spanish'
+                                  ? 'English'
                                   : selectedLocale),
                               value: selectedLanguages,
                               onChanged: (newValue) async {
