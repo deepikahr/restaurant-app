@@ -62,6 +62,7 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
 
   @override
   void initState() {
+    print(widget.shippingType);
     calculatePrice(widget.product);
     super.initState();
   }
@@ -166,7 +167,7 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
     }
 
     // [5] calculate delivery charge
-    if (widget?.shippingType?.compareTo('free') ?? 0 == 0) {
+    if (widget.shippingType.compareTo('free') == 0) {
       deliveryCharge = 0.0;
     } else if (widget.shippingType.compareTo('flexible') == 0) {
       if (subTotal > widget.minimumOrderAmount) {

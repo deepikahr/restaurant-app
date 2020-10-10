@@ -37,6 +37,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void initState() {
+    mobileNumber = mobileNumber ?? 'user@ionicfirebaseapp.com';
     super.initState();
   }
 
@@ -231,6 +232,7 @@ class _LoginPageState extends State<LoginPage> {
     return Container(
       color: Colors.white,
       child: TextFormField(
+        initialValue: 'user@ionicfirebaseapp.com',
         keyboardType: TextInputType.emailAddress,
         validator: (String value) {
           if (value.isEmpty) {
@@ -258,6 +260,7 @@ class _LoginPageState extends State<LoginPage> {
       margin: EdgeInsets.only(top: 4.0),
       color: Colors.white,
       child: TextFormField(
+        initialValue: '123456',
         keyboardType: TextInputType.text,
         validator: (String value) {
           if (value.isEmpty || value.length < 6) {

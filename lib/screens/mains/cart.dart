@@ -238,23 +238,27 @@ class CartPageState extends State<CartPage> {
       });
     }).catchError((value) {
       Common.getDeliveryCharge().then((value) {
-        if (value['shippingType'].compareTo('free') == 0) {
-          deliveryCharge = 0.0;
-          grandTotal = subTotal + deliveryCharge + tax;
-        } else if (value['shippingType'].compareTo('flexible') == 0) {
-          if (subTotal > value['minimumOrderAmount']) {
+        if (value != null) {
+          if (value['shippingType'].compareTo('free') == 0) {
             deliveryCharge = 0.0;
             grandTotal = subTotal + deliveryCharge + tax;
-          } else {
+          } else if (value['shippingType'].compareTo('flexible') == 0) {
+            if (subTotal > value['minimumOrderAmount']) {
+              deliveryCharge = 0.0;
+              grandTotal = subTotal + deliveryCharge + tax;
+            } else {
+              deliveryCharge = value['deliveryCharge'].toDouble();
+              grandTotal = subTotal + deliveryCharge + tax;
+            }
+          } else if (value['shippingType'].compareTo('fixed') == 0) {
             deliveryCharge = value['deliveryCharge'].toDouble();
             grandTotal = subTotal + deliveryCharge + tax;
+          } else {
+            deliveryCharge = 0.0;
+            grandTotal = subTotal + deliveryCharge + tax;
           }
-        } else if (value['shippingType'].compareTo('fixed') == 0) {
-          deliveryCharge = value['deliveryCharge'].toDouble();
-          grandTotal = subTotal + deliveryCharge + tax;
         } else {
           deliveryCharge = 0.0;
-          grandTotal = subTotal + deliveryCharge + tax;
         }
       });
     });
@@ -563,7 +567,9 @@ class CartPageState extends State<CartPage> {
                     products[index]['flavour'] != null
                         ? _buildFlavourList(products[index]['flavour'])
                         : Container(),
-                    SizedBox(height: 10,),
+                    SizedBox(
+                      height: 10,
+                    ),
                     _buildAddNoteLine(index),
                     Divider()
                   ],

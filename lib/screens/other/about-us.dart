@@ -58,7 +58,7 @@ class _AboutUsState extends State<AboutUs> {
                     ),
                   ),
                   new Text(
-                    '90989098000',
+                    '9098909800',
                     style: textOS(),
                   ),
                   new Padding(
