@@ -80,68 +80,67 @@ class CartPageState extends State<CartPage> {
           ),
           title: new Text(
             "$title",
+            style: titleBlackLightOSB(),
             textAlign: TextAlign.center,
           ),
-          content: Container(
-            height: 120.0,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Column(
-                  children: <Widget>[
-                    Divider(),
-                    IntrinsicHeight(
-                      child: new Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).pop();
-                                calculatePrice(product, true,
-                                    addFlavours: true);
-                              },
-                              child: Container(
-                                alignment: Alignment.center,
-                                margin: EdgeInsets.only(bottom: 12.0),
-                                height: 30.0,
-                                decoration: BoxDecoration(),
-                                child: Text(
-                                  MyLocalizations.of(context)
-                                      .same
-                                      .toUpperCase(),
-                                  style: textPrimaryOSR(),
-                                ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Column(
+                children: <Widget>[
+                  Divider(),
+                  IntrinsicHeight(
+                    child: new Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).pop();
+                              calculatePrice(product, true,
+                                  addFlavours: true);
+                            },
+                            child: Container(
+                              alignment: Alignment.center,
+                              margin: EdgeInsets.only(bottom: 12.0),
+                              height: 30.0,
+                              decoration: BoxDecoration(),
+                              child: Text(
+                                MyLocalizations.of(context)
+                                    .same
+                                    .toUpperCase(),
+                                style: textPrimaryOSR(),
                               ),
                             ),
                           ),
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).pop();
-                                _showBottomSheet(product);
-                              },
-                              child: Container(
-                                alignment: Alignment.center,
-                                margin: EdgeInsets.only(bottom: 12.0),
-                                height: 30.0,
-                                decoration: BoxDecoration(),
-                                child: Text(
-                                  MyLocalizations.of(context)
-                                      .different
-                                      .toUpperCase(),
-                                  style: textPrimaryOSR(),
-                                ),
+                        ),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).pop();
+                              _showBottomSheet(product);
+                            },
+                            child: Container(
+                              alignment: Alignment.center,
+                              margin: EdgeInsets.only(bottom: 12.0),
+                              height: 30.0,
+                              decoration: BoxDecoration(),
+                              child: Text(
+                                MyLocalizations.of(context)
+                                    .different
+                                    .toUpperCase(),
+                                style: textPrimaryOSR(),
                               ),
                             ),
-                          )
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ],
-            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ],
           ),
         );
       },

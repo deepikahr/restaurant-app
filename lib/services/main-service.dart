@@ -40,11 +40,11 @@ class MainService {
     return json.decode(response.body);
   }
 
-  static Future<dynamic> getLocationsByRestaurantId(String id) async {
-    final response =
-        await client.get(API_ENDPOINT + 'locations/list/by/restaurant/$id');
-    return json.decode(response.body);
-  }
+//  static Future<dynamic> getLocationsByRestaurantId(String id) async {
+//    final response =
+//        await client.get(API_ENDPOINT + 'locations/list/by/restaurant/$id');
+//    return json.decode(response.body);
+//  }
 
   static Future<dynamic> getProductsBylocationId(String id) async {
     final response =
@@ -64,10 +64,10 @@ class MainService {
     return json.decode(response.body);
   }
 
-  static Future<dynamic> getLoyaltyInfoByRestaurantId(String id) async {
-    final response = await client.get(API_ENDPOINT + 'settings/$id');
-    return json.decode(response.body);
-  }
+//  static Future<dynamic> getLoyaltyInfoByRestaurantId(String id) async {
+//    final response = await client.get(API_ENDPOINT + 'settings/$id');
+//    return json.decode(response.body);
+//  }
 
   static Future<dynamic> getRestaurantOpenAndCloseTime(
       String id, String time, String day) async {
@@ -90,14 +90,14 @@ class MainService {
     return json.decode(response.body);
   }
 
-  static Future<Map<String, dynamic>> getEcoDeliveryInfo(id) async {
-    String token;
-    await Common.getToken().then((onValue) {
-      token = 'bearer ' + onValue;
-    });
-    final response = await client.get(
-        API_ENDPOINT + 'users/res-ecoDelivery/setting/$id',
-        headers: {'Content-Type': 'application/json', 'Authorization': token});
-    return json.decode(response.body);
-  }
+//  static Future<Map<String, dynamic>> getEcoDeliveryInfo(id) async {
+//    String token;
+//    await Common.getToken().then((onValue) {
+//      token = 'bearer ' + onValue;
+//    });
+//    final response = await client.get(
+//        API_ENDPOINT + 'users/res-ecoDelivery/setting/$id',
+//        headers: {'Content-Type': 'application/json', 'Authorization': token});
+//    return json.decode(response.body);
+//  }
 }

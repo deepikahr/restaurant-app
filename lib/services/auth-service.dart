@@ -20,11 +20,11 @@ class AuthService {
     return json.decode(response.body);
   }
 
-  static Future<Map<String, dynamic>> sendOTP(Map<String, dynamic> body) async {
-    final response =
-        await client.post(API_ENDPOINT + 'users/password/otp', body: body);
-    return json.decode(response.body);
-  }
+//  static Future<Map<String, dynamic>> sendOTP(Map<String, dynamic> body) async {
+//    final response =
+//        await client.post(API_ENDPOINT + 'users/password/otp', body: body);
+//    return json.decode(response.body);
+//  }
 
   static Future<Map<String, dynamic>> forgetPassword(
       Map<String, dynamic> body) async {
