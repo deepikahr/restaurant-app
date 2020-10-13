@@ -28,6 +28,7 @@ class AuthService {
 
   static Future<Map<String, dynamic>> forgetPassword(
       Map<String, dynamic> body) async {
+    print(body.toString());
     final response =
         await client.post(API_ENDPOINT + 'users/reset/pass/otp', body: body);
     return json.decode(response.body);
