@@ -9,25 +9,26 @@ class AuthService {
   static final Client client = Client();
 
   static Future<Map<String, dynamic>> login(Map<String, dynamic> body) async {
+    print('login body-------> $body');
     final response = await client.post(BASE_URL + 'auth/local', body: body);
     return json.decode(response.body);
   }
 
   static Future<Map<String, dynamic>> register(
       Map<String, dynamic> body) async {
-    final response =
-    await client.post(API_ENDPOINT + 'users', body: body);
+    final response = await client.post(API_ENDPOINT + 'users', body: body);
     return json.decode(response.body);
   }
 
-  static Future<Map<String, dynamic>> sendOTP(Map<String, dynamic> body) async {
-    final response =
-        await client.post(API_ENDPOINT + 'users/password/otp', body: body);
-    return json.decode(response.body);
-  }
+//  static Future<Map<String, dynamic>> sendOTP(Map<String, dynamic> body) async {
+//    final response =
+//        await client.post(API_ENDPOINT + 'users/password/otp', body: body);
+//    return json.decode(response.body);
+//  }
 
   static Future<Map<String, dynamic>> forgetPassword(
       Map<String, dynamic> body) async {
+    print(body.toString());
     final response =
         await client.post(API_ENDPOINT + 'users/reset/pass/otp', body: body);
     return json.decode(response.body);

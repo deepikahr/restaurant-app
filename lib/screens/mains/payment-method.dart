@@ -236,6 +236,7 @@ class _PaymentMethodState extends State<PaymentMethod> {
 
   @override
   void initState() {
+    print(widget.paymentMethods.toString());
     getPaymentMethod();
     StripePayment.setOptions(StripeOptions(
         publishableKey: STRIPE_KEY,
@@ -320,11 +321,6 @@ class _PaymentMethodState extends State<PaymentMethod> {
                   padding: EdgeInsets.only(right: 0.0),
                   itemCount: paymentMethodList.length,
                   itemBuilder: (BuildContext context, int index) {
-                    if (paymentMethodList[index]['type'] == "COD") {
-                      paymentMethodList[index]['isSelected'] = true;
-                    } else {
-                      paymentMethodList[index]['isSelected'] = false;
-                    }
                     return paymentMethodList[index]['isSelected'] == true
                         ? Container(
                             margin: EdgeInsets.all(8.0),
@@ -337,6 +333,8 @@ class _PaymentMethodState extends State<PaymentMethod> {
                                 if (mounted) {
                                   setState(() {
                                     groupValue = selected;
+                                    widget.cart['paymentOption'] =
+                                        paymentMethodList[index]['type'];
                                   });
                                 }
                               },
@@ -344,7 +342,10 @@ class _PaymentMethodState extends State<PaymentMethod> {
                               title: Text(
                                 paymentMethodList[index]['type'] == "COD"
                                     ? MyLocalizations.of(context).cod
-                                    : paymentMethodList[index]['type'],
+                                    : paymentMethodList[index]['type'] ==
+                                            "STRIPE"
+                                        ? MyLocalizations.of(context).addCard
+                                        : paymentMethodList[index]['type'],
                                 style: TextStyle(color: PRIMARY),
                               ),
                               secondary:

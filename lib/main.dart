@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:RestaurantSaas/screens/mains/current-location.dart';
 import 'package:RestaurantSaas/services/auth-service.dart';
 import 'package:RestaurantSaas/services/common.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
@@ -20,6 +21,8 @@ bool get isInDebugMode {
 }
 
 SentryError sentryError = new SentryError();
+Timer oneSignalTimer;
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,6 +37,9 @@ void main() async {
     }
   };
   tokenCheck();
+  oneSignalTimer = Timer.periodic(Duration(seconds: 4), (timer) {
+    initOneSignal();
+  });
   initOneSignal();
 
   runZoned<Future<Null>>(() async {
@@ -76,11 +82,10 @@ Future<void> initOneSignal() async {
       .setInFocusDisplayType(OSNotificationDisplayType.notification);
   var status = await OneSignal.shared.getPermissionSubscriptionState();
   String playerId = status.subscriptionStatus.userId;
-  print('player Id : $playerId');
-  if (playerId == null) {
-    initOneSignal();
-  } else {
-    prefs.setString("playerId", playerId);
+  if (playerId != null) {
+    await prefs.setString("playerId", playerId);
+    if (oneSignalTimer != null && oneSignalTimer.isActive)
+      oneSignalTimer.cancel();
   }
 }
 
@@ -101,8 +106,10 @@ class _EntryPageState extends State<EntryPage> {
       locale: Locale(widget.locale),
       localizationsDelegates: [
         MyLocalizationsDelegate(widget.localizedValues),
-        GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        DefaultCupertinoLocalizations.delegate
       ],
       supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
       debugShowCheckedModeBanner: false,
