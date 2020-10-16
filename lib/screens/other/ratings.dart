@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
-import '../../styles/styles.dart';
+
+import '../../services/localizations.dart';
 import '../../services/profile-service.dart';
 import '../../services/sentry-services.dart';
-import '../../services/localizations.dart';
+import '../../styles/styles.dart';
 
 SentryError sentryError = new SentryError();
 
 class Rating extends StatefulWidget {
   final String productId, orderId, locationId, restaurantId;
-  final Map localizedValues;
+  final Map<String, Map<String, String>> localizedValues;
   final String locale;
+
   Rating(
       {Key key,
       this.productId,
@@ -76,7 +78,8 @@ class _RatingState extends State<Rating> {
     return new Scaffold(
       appBar: new AppBar(
         title: Text(
-          MyLocalizations.of(context).getLocalizations("RATE_YOUR_ORDER"),
+          MyLocalizations.of(context).rateYourOrder,
+          style: textbarlowSemiBoldWhite(),
         ),
         backgroundColor: PRIMARY,
         iconTheme: new IconThemeData(color: Colors.white),
@@ -119,14 +122,14 @@ class _RatingState extends State<Rating> {
                       ),
                     ),
                     new Text(
-                      MyLocalizations.of(context).getLocalizations("WERE_GLAD"),
+                      MyLocalizations.of(context).wereGlad,
                       style: hintStyleLightOSL(),
                       textAlign: TextAlign.center,
                     ),
                     Padding(
                       padding: new EdgeInsets.only(top: 15.0, bottom: 20.0),
                       child: new Text(
-                        MyLocalizations.of(context).getLocalizations("RATE_IT"),
+                        MyLocalizations.of(context).rateIt,
                         style: hintStyleLightOSL(),
                         textAlign: TextAlign.center,
                       ),
@@ -185,8 +188,8 @@ class _RatingState extends State<Rating> {
                         child: new TextFormField(
                           decoration: new InputDecoration(
                             hintStyle: hintStyleLightOSL(),
-                            hintText: MyLocalizations.of(context)
-                                .getLocalizations("FEEDBACK_IMP"),
+                            hintText:
+                                MyLocalizations.of(context).feedbackImportant,
                           ),
                           style: hintStyleSmallWhiteBoldOSL(),
                           maxLines: 5,
@@ -244,8 +247,7 @@ class _RatingState extends State<Rating> {
                                     height: 20.0,
                                   ),
                                   Text(
-                                    MyLocalizations.of(context)
-                                        .getLocalizations("SUBMIT"),
+                                    MyLocalizations.of(context).submit,
                                     style: hintStyleGreyLightOSL(),
                                   ),
                                 ],

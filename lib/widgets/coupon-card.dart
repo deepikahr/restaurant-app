@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../services/localizations.dart';
 
 class CouponCard extends StatelessWidget {
@@ -64,10 +65,7 @@ class CouponCard extends StatelessWidget {
               flex: 10,
               child: Row(
                 children: <Widget>[
-                  Text(
-                      coupon['offPrecentage'].toString() +
-                          '% ' +
-                          MyLocalizations.of(context).getLocalizations("OFF"),
+                  Text(coupon['offPrecentage'].toString() + '% off',
                       style: TextStyle(color: Colors.green)),
                 ],
               ),
@@ -78,8 +76,7 @@ class CouponCard extends StatelessWidget {
                 onTap: () {
                   Navigator.pop(context, coupon);
                 },
-                child: Text(
-                    MyLocalizations.of(context).getLocalizations("APPLY"),
+                child: Text(MyLocalizations.of(context).apply,
                     style: TextStyle(color: Colors.amber)),
               ),
             ),

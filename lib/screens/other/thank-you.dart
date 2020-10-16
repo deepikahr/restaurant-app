@@ -6,7 +6,7 @@ import '../../services/localizations.dart';
 import '../../styles/styles.dart';
 
 class ThankYou extends StatefulWidget {
-  final Map localizedValues;
+  final Map<String, Map<String, String>> localizedValues;
   final String locale;
 
   ThankYou({Key key, this.localizedValues, this.locale}) : super(key: key);
@@ -22,7 +22,6 @@ class _ThankYouState extends State<ThankYou> {
   }
 
   Widget build(BuildContext context) {
-    Common.addProduct([]);
     Common.removeCart();
     return Scaffold(
       body: Container(
@@ -43,17 +42,15 @@ class _ThankYouState extends State<ThankYou> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   Text(
-                    MyLocalizations.of(context).getLocalizations("THANK_YOU"),
+                    MyLocalizations.of(context).thankYou,
                     style: titleWhiteOSR(),
                   ),
                   Text(
-                    MyLocalizations.of(context)
-                        .getLocalizations("ORDER_PLACED"),
+                    MyLocalizations.of(context).orderPlaced,
                     style: subTitleWhiteShadeLightOSR(),
                   ),
                   Text(
-                    MyLocalizations.of(context)
-                        .getLocalizations("THANK_YOU_MSG"),
+                    MyLocalizations.of(context).thankYouMessage,
                     style: hintStyleGreyLightOSRDescription(),
                     textAlign: TextAlign.center,
                   ),
@@ -76,8 +73,7 @@ class _ThankYouState extends State<ThankYou> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
                           Text(
-                            MyLocalizations.of(context)
-                                .getLocalizations("BACK_TO"),
+                            MyLocalizations.of(context).backTo,
                             style: hintStylePrimaryLightOSR(),
                           ),
                           Icon(

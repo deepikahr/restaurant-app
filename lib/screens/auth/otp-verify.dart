@@ -1,20 +1,38 @@
-import 'dart:async';
-
+import 'package:RestaurantSaas/screens/auth/reset-password.dart';
+import 'package:RestaurantSaas/screens/mains/home.dart';
+import 'package:RestaurantSaas/services/common.dart';
+import 'package:RestaurantSaas/services/localizations.dart';
+import 'package:RestaurantSaas/styles/styles.dart';
 import 'package:flutter/material.dart';
-import '../../styles/styles.dart';
+import 'package:flutter/services.dart';
+
 import '../../services/auth-service.dart';
-import 'new-password.dart';
-import '../../services/sentry-services.dart';
 import '../../services/localizations.dart';
+import '../../services/sentry-services.dart';
+import '../../styles/styles.dart';
 
 SentryError sentryError = new SentryError();
 
 class OtpVerify extends StatefulWidget {
-  final String otpToken;
+  final bool isComingRegister;
+  final String countryCode;
+  final String verificationId;
   final String locale;
-  final Map localizedValues;
-  OtpVerify({Key key, this.otpToken, this.locale, this.localizedValues})
+  final String mobileNumber;
+  final String userToken;
+  final Map<String, Map<String, String>> localizedValues;
+
+  OtpVerify(
+      {Key key,
+      this.countryCode,
+      this.verificationId,
+      this.locale,
+      this.localizedValues,
+      this.mobileNumber,
+      this.userToken,
+      this.isComingRegister})
       : super(key: key);
+
   @override
   _OtpVerifyState createState() => _OtpVerifyState();
 }
@@ -33,23 +51,45 @@ class _OtpVerifyState extends State<OtpVerify> {
           isLoading = true;
         });
       }
-      AuthService.verifyOTP({'otp': otp}, widget.otpToken).then((onValue) {
+
+      Map<String, dynamic> body = {
+        "otp": otp,
+        "verificationId": widget.verificationId,
+        "contactNumber": widget.mobileNumber
+      };
+
+      AuthService.verifyOTP(body).then((onValue) {
         try {
-          if (onValue['message'] != null) {
-            showSnackbar(onValue['message']);
-            if (onValue['token'] != null) {
-              Future.delayed(Duration(milliseconds: 1500), () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => NewPassword(
-                      otpToken: onValue['token'],
-                      locale: widget.locale,
-                      localizedValues: widget.localizedValues,
-                    ),
-                  ),
-                );
-              });
+          if (onValue['response_data']['message'] != null) {
+            showSnackbar(onValue['response_data']['message']);
+            if (onValue['response_code'] == 200) {
+              if (widget.isComingRegister) {
+                if (widget.userToken != null) {
+                  Common.setToken(widget.userToken);
+                }
+                Future.delayed(Duration(milliseconds: 1500), () {
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (BuildContext context) => HomePage(
+                            locale: widget.locale,
+                            localizedValues: widget.localizedValues),
+                      ),
+                      (Route<dynamic> route) => route.isFirst);
+                });
+              } else {
+                Future.delayed(Duration(milliseconds: 1500), () {
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (BuildContext context) => ResetPassword(
+                            token: widget.userToken,
+                            locale: widget.locale,
+                            localizedValues: widget.localizedValues),
+                      ),
+                      (Route<dynamic> route) => route.isFirst);
+                });
+              }
             }
           }
           if (mounted) {
@@ -74,16 +114,25 @@ class _OtpVerifyState extends State<OtpVerify> {
 
   void showSnackbar(message) {
     final snackBar = SnackBar(
-      content: Text(message),
+      content: Text(message.toString()),
       duration: Duration(milliseconds: 3000),
     );
     _scaffoldKey.currentState.showSnackBar(snackBar);
   }
 
   @override
+  void initState() {
+    print(widget.userToken);
+    print(widget.verificationId);
+    print(widget.mobileNumber);
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
+      backgroundColor: Color(0XFF303030),
       appBar: AppBar(
         leading: InkWell(
           onTap: () {
@@ -94,29 +143,18 @@ class _OtpVerifyState extends State<OtpVerify> {
             color: Colors.white,
           ),
         ),
-        title: Text(MyLocalizations.of(context).getLocalizations("VERIFY_OTP")),
+        title: Text(
+          MyLocalizations.of(context).verifyOtp,
+          style: textbarlowSemiBoldWhite(),
+        ),
         centerTitle: true,
         backgroundColor: PRIMARY,
       ),
-      body: ListView(
-        children: <Widget>[
-          Stack(
-            children: <Widget>[
-              Image(
-                image: AssetImage("lib/assets/bgImgs/background.png"),
-                fit: BoxFit.fill,
-                height: screenHeight(context),
-                width: screenWidth(context),
-              ),
-              Form(
-                key: _formKey,
-                child: _buildOTPField(),
-              ),
-              _buildVerifyOTPButton(),
-            ],
-          ),
-        ],
+      body: Form(
+        key: _formKey,
+        child: _buildOTPField(),
       ),
+      bottomNavigationBar: _buildVerifyOTPButton(),
     );
   }
 
@@ -128,16 +166,10 @@ class _OtpVerifyState extends State<OtpVerify> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           Padding(
-            padding: EdgeInsets.only(top: 100),
-          ),
-          Padding(
-            padding: EdgeInsetsDirectional.only(
-              top: 30.0,
-              bottom: 30.0,
-            ),
+            padding: EdgeInsetsDirectional.only(bottom: 30.0),
             child: Center(
                 child: Text(
-              MyLocalizations.of(context).getLocalizations("VERIFY_OTP") + '!',
+              MyLocalizations.of(context).verifyOtp + '!',
               textAlign: TextAlign.center,
               style: subTitleWhiteLightOSR(),
             )),
@@ -153,20 +185,21 @@ class _OtpVerifyState extends State<OtpVerify> {
                   flex: 9,
                   child: TextFormField(
                     decoration: new InputDecoration(
-                      labelText:
-                          MyLocalizations.of(context).getLocalizations("OTP"),
+                      labelText: MyLocalizations.of(context).otp,
                       hintStyle: hintStyleGreyLightOSR(),
                       contentPadding: EdgeInsets.all(12.0),
                       border: InputBorder.none,
                     ),
                     keyboardType: TextInputType.number,
                     validator: (String value) {
-                      if (value.isEmpty || value.length < 5) {
-                        return MyLocalizations.of(context)
-                            .getLocalizations("OTP_ERROR_MSG");
+                      if (value.isEmpty || value.length < 6) {
+                        return MyLocalizations.of(context).otpErrorMessage;
                       } else
                         return null;
                     },
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(6),
+                    ],
                     onSaved: (value) {
                       otp = value;
                     },
@@ -183,49 +216,70 @@ class _OtpVerifyState extends State<OtpVerify> {
           new Padding(
             padding: EdgeInsets.only(top: 20.0),
             child: new Text(
-              MyLocalizations.of(context).getLocalizations("OTP_MSG"),
+              MyLocalizations.of(context).otpMessage,
               textAlign: TextAlign.center,
               style: subTitleWhiteLightOSR(),
             ),
           ),
+          InkWell(
+            onTap: () {
+              AuthService.resendOtp({"contactNumber": widget.mobileNumber})
+                  .then((value) {
+                print(value.toString());
+                if (value['response_data']['message'] != null) {
+                  showSnackbar(value['response_data']['message']);
+                }
+              }).catchError((error) {
+                showSnackbar(error);
+              });
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    'Resend OTP',
+                    style: textbarlowSemiBoldwhite(),
+                  )
+                ],
+              ),
+            ),
+          )
         ],
       ),
     );
   }
 
   Widget _buildVerifyOTPButton() {
-    return Positioned(
-      width: screenWidth(context),
-      top: screenHeight(context) * 0.76,
-      child: Container(
-        padding: const EdgeInsets.all(14.0),
-        child: RawMaterialButton(
-          child: !isLoading
-              ? Container(
-                  alignment: AlignmentDirectional.center,
-                  margin: EdgeInsets.only(left: 5.0, right: 5.0),
-                  height: 56.0,
-                  decoration:
-                      BoxDecoration(border: Border.all(color: Colors.white70)),
-                  child: Text(
-                    MyLocalizations.of(context).getLocalizations("VERIFY_OTP"),
-                    style: subTitleWhiteShadeLightOSR(),
-                  ),
-                )
-              : Container(
-                  alignment: AlignmentDirectional.center,
-                  margin: EdgeInsets.only(left: 5.0, right: 5.0),
-                  height: 56.0,
-                  decoration:
-                      BoxDecoration(border: Border.all(color: Colors.white70)),
-                  child: Image.asset(
-                    'lib/assets/icon/spinner.gif',
-                    width: 40.0,
-                    height: 40.0,
-                  ),
+    return Container(
+      padding: const EdgeInsets.all(14.0),
+      child: RawMaterialButton(
+        child: !isLoading
+            ? Container(
+                alignment: AlignmentDirectional.center,
+                margin: EdgeInsets.only(left: 5.0, right: 5.0),
+                height: 56.0,
+                decoration:
+                    BoxDecoration(border: Border.all(color: Colors.white70)),
+                child: Text(
+                  MyLocalizations.of(context).verifyOtp,
+                  style: subTitleWhiteShadeLightOSR(),
                 ),
-          onPressed: verifyOTP,
-        ),
+              )
+            : Container(
+                alignment: AlignmentDirectional.center,
+                margin: EdgeInsets.only(left: 5.0, right: 5.0),
+                height: 56.0,
+                decoration:
+                    BoxDecoration(border: Border.all(color: Colors.white70)),
+                child: Image.asset(
+                  'lib/assets/icon/spinner.gif',
+                  width: 40.0,
+                  height: 40.0,
+                ),
+              ),
+        onPressed: verifyOTP,
       ),
     );
   }

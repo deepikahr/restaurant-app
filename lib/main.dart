@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:RestaurantSaas/screens/mains/current-location.dart';
 import 'package:RestaurantSaas/services/auth-service.dart';
 import 'package:RestaurantSaas/services/common.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,11 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import './services/constant.dart';
 import './services/sentry-services.dart';
 import './styles/styles.dart';
-import 'screens/mains/home.dart';
 import 'services/constant.dart';
 import 'services/initialize_i18n.dart';
 import 'services/localizations.dart';
@@ -25,9 +23,10 @@ bool get isInDebugMode {
 SentryError sentryError = new SentryError();
 Timer oneSignalTimer;
 
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Map localizedValues = await initializeI18n();
+  Map<String, Map<String, String>> localizedValues = await initializeI18n();
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String locale = prefs.getString('selectedLanguage') ?? 'en';
   FlutterError.onError = (FlutterErrorDetails details) async {
@@ -42,9 +41,9 @@ void main() async {
     initOneSignal();
   });
   initOneSignal();
+
   runZoned<Future<Null>>(() async {
     runApp(new EntryPage(locale, localizedValues));
-    // ignore: deprecated_member_use
   }, onError: (error, stackTrace) async {
     await sentryError.reportError(error, stackTrace);
   });
@@ -65,7 +64,6 @@ void tokenCheck() {
 
 Future<void> initOneSignal() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-
   OneSignal.shared
       .setNotificationReceivedHandler((OSNotification notification) {});
   OneSignal.shared
@@ -92,7 +90,7 @@ Future<void> initOneSignal() async {
 }
 
 class EntryPage extends StatefulWidget {
-  final Map localizedValues;
+  final Map<String, Map<String, String>> localizedValues;
   final String locale;
 
   EntryPage(this.locale, this.localizedValues);
@@ -107,13 +105,13 @@ class _EntryPageState extends State<EntryPage> {
     return MaterialApp(
       locale: Locale(widget.locale),
       localizationsDelegates: [
-        MyLocalizationsDelegate(widget.localizedValues, [widget.locale]),
+        MyLocalizationsDelegate(widget.localizedValues),
         GlobalWidgetsLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
         DefaultCupertinoLocalizations.delegate
       ],
-      supportedLocales: [Locale(widget.locale)],
+      supportedLocales: LANGUAGES.map((language) => Locale(language, '')),
       debugShowCheckedModeBanner: false,
       title: APP_NAME,
       theme: ThemeData(
@@ -121,7 +119,7 @@ class _EntryPageState extends State<EntryPage> {
         primaryColor: PRIMARY,
         accentColor: PRIMARY,
       ),
-      home: HomePage(
+      home: CurrentLocation(
         locale: widget.locale,
         localizedValues: widget.localizedValues,
       ),
