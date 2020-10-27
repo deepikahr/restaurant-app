@@ -1,6 +1,6 @@
 # restaurant_sass user app
 
-Restaurant Sass flutter app by Pietech Solution
+Restaurant Sass flutter user app by Pietech Solution
 
 ## Getting Started
 
