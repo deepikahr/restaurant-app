@@ -1,12 +1,15 @@
 import 'package:RestaurantSaas/services/constant.dart';
 import 'package:flutter/material.dart';
-import '../../styles/styles.dart';
+
 import '../../services/localizations.dart';
+import '../../styles/styles.dart';
 
 class AboutUs extends StatefulWidget {
-  final Map localizedValues;
+  final Map<String, Map<String, String>> localizedValues;
   final String locale;
+
   AboutUs({Key key, this.locale, this.localizedValues}) : super(key: key);
+
   @override
   _AboutUsState createState() => _AboutUsState();
 }
@@ -19,7 +22,10 @@ class _AboutUsState extends State<AboutUs> {
         backgroundColor: PRIMARY,
         elevation: 0.0,
         centerTitle: true,
-        title: Text(MyLocalizations.of(context).getLocalizations("ABOUT_US")),
+        title: Text(
+          MyLocalizations.of(context).aboutUs,
+          style: textbarlowSemiBoldWhite(),
+        ),
         leading: InkWell(
           onTap: () {
             Navigator.pop(context);
@@ -31,7 +37,9 @@ class _AboutUsState extends State<AboutUs> {
         child: new Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            new Image.asset('lib/assets/imgs/chicken.png'),
+            Center(
+                child:
+                    new Image.asset('lib/assets/logos/logo.png', height: 200)),
             new Padding(
               padding: EdgeInsets.only(left: 20.0, right: 20.0, top: 20.0),
               child: new Column(
@@ -45,31 +53,18 @@ class _AboutUsState extends State<AboutUs> {
                   new Padding(
                     padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
                     child: new Text(
-                      MyLocalizations.of(context)
-                          .getLocalizations("SHORT_DISCRIPTION"),
+                      MyLocalizations.of(context).mobileNumber,
                       style: textOSL(),
                     ),
                   ),
                   new Text(
-                    MyLocalizations.of(context).getLocalizations("DISCRIPTION"),
+                    '9098909800',
                     style: textOS(),
                   ),
                   new Padding(
                     padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
                     child: new Text(
-                      MyLocalizations.of(context)
-                          .getLocalizations("CONTACT_NUMBER"),
-                      style: textOSL(),
-                    ),
-                  ),
-                  new Text(
-                    '90989098000',
-                    style: textOS(),
-                  ),
-                  new Padding(
-                    padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                    child: new Text(
-                      MyLocalizations.of(context).getLocalizations("EMAIL_ID"),
+                      MyLocalizations.of(context).emailId,
                       style: textOSL(),
                     ),
                   ),
@@ -80,12 +75,12 @@ class _AboutUsState extends State<AboutUs> {
                   new Padding(
                     padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
                     child: new Text(
-                      MyLocalizations.of(context).getLocalizations("ADDRESS"),
+                      MyLocalizations.of(context).address,
                       style: textOSL(),
                     ),
                   ),
                   new Text(
-                    '1440 , South end , A road , Marenahalli, Bangalore',
+                    'Saudi Arabia Eastern province Saihat',
                     style: textOS(),
                   ),
                 ],

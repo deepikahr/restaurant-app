@@ -17,7 +17,7 @@ SentryError sentryError = new SentryError();
 class ProductDetailsPage extends StatefulWidget {
   final Map<String, dynamic> product, locationInfo, taxInfo, tableInfo;
   final String restaurantName, restaurantId, restaurantAddress;
-  final Map localizedValues;
+  final Map<String, Map<String, String>> localizedValues;
   final String locale;
 
   ProductDetailsPage(
@@ -183,11 +183,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       ProfileService.removeFavouritById(favouriteId).then((onValue) {
         try {
           Toast.show(
-              MyLocalizations.of(context)
-                  .getLocalizations("PRODUCT_REMOVED_MSG"),
-              context,
-              duration: Toast.LENGTH_LONG,
-              gravity: Toast.BOTTOM);
+              MyLocalizations.of(context).productRemovedFromFavourite, context,
+              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
           if (onValue != null) {
             if (mounted) {
               setState(() {
@@ -209,10 +206,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           .then((onValue) {
         try {
           Toast.show(
-              MyLocalizations.of(context).getLocalizations("PRODUCT_ADDED_MSG"),
-              context,
-              duration: Toast.LENGTH_LONG,
-              gravity: Toast.BOTTOM);
+              MyLocalizations.of(context).productaddedtoFavourites, context,
+              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
           if (mounted) {
             setState(() {
               favouriteId = onValue['_id'];
@@ -250,7 +245,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         elevation: 0.0,
         title: Text(
           "${widget.product['title'][0].toUpperCase()}${widget.product['title'].substring(1)}",
-          style: titleBoldWhiteOSS(),
+          style: textbarlowSemiBoldWhite(),
         ),
         centerTitle: true,
         leading: InkWell(
@@ -321,13 +316,13 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             children: <Widget>[
               _buildProductTopImg(
                 widget.product['imageUrl'],
-              ),
-              _buildDescription(
                 widget.product['description'],
               ),
               _buildHeadingBlock(
-                MyLocalizations.of(context).getLocalizations("SIZE_PRICE"),
-                MyLocalizations.of(context).getLocalizations("SELECT_SIZE"),
+                MyLocalizations.of(context).size +
+                    ' & ' +
+                    MyLocalizations.of(context).price,
+                MyLocalizations.of(context).selectSize,
               ),
               widget.product['variants'].length > 0
                   ? _buildSingleSelectionBlock(widget.product['variants'])
@@ -339,9 +334,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 padding: EdgeInsets.only(bottom: 5.0),
                 child: widget.product['extraIngredients'].length > 0
                     ? _buildHeadingBlock(
-                        MyLocalizations.of(context).getLocalizations("EXTRA"),
+                        MyLocalizations.of(context).extra,
                         MyLocalizations.of(context)
-                            .getLocalizations("WHICH_EXTAING_MSG"),
+                            .whichextraingredientswouldyouliketoadd,
                       )
                     : Container(
                         height: 0.0,
@@ -379,8 +374,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
                           new Text(
-                            MyLocalizations.of(context)
-                                .getLocalizations("DELIVERY_NOT_AVAILABLE_NOW"),
+                            MyLocalizations.of(context).deliveryisNotAvailable,
                             style: hintStyleWhiteLightOSB(),
                           ),
                         ],
@@ -395,7 +389,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     );
   }
 
-  Widget _buildProductTopImg(String imgUrl) {
+  Widget _buildProductTopImg(String imgUrl, String description) {
     return Stack(
       alignment: AlignmentDirectional.center,
       fit: StackFit.passthrough,
@@ -428,27 +422,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               )
             : Container(height: 0, width: 0),
       ],
-    );
-  }
-
-  Widget _buildDescription(String description) {
-    return Padding(
-      padding: EdgeInsets.only(left: 10.0, right: 10.0),
-      child: Container(
-        color: whiteTextb,
-        height: 58.0,
-        child: new Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Padding(padding: EdgeInsets.only(top: 4.0)),
-            Text(
-              description,
-              style: hintStyleSmallTextDarkOSR(),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -660,10 +633,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Text(
-              isAdded ? 'Added to cart' : 'Add to cart',
+              isAdded ? 'Added to cart' : MyLocalizations.of(context).addToCart,
               style: hintStyleWhiteLightOSB(),
             ),
-            new Text(
+            Text(
               currency + price.toStringAsFixed(2),
               style: titleLightWhiteOSR(),
             ),
@@ -717,20 +690,19 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(
-              MyLocalizations.of(context).getLocalizations("CLEAR_CART") + '?'),
+          title: Text(MyLocalizations.of(context).clearcart + '?'),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
                 Text(MyLocalizations.of(context)
-                        .getLocalizations("CLEAR_CART_MSG") +
+                        .youhavesomeitemsalreadyinyourcartfromotherlocationremovetoaddthis +
                     '!'),
               ],
             ),
           ),
           actions: <Widget>[
             FlatButton(
-              child: Text(MyLocalizations.of(context).getLocalizations("YES")),
+              child: Text(MyLocalizations.of(context).yes),
               onPressed: () {
                 Navigator.of(context).pop();
                 Common.removeCart();
@@ -738,7 +710,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               },
             ),
             FlatButton(
-              child: Text(MyLocalizations.of(context).getLocalizations("NO")),
+              child: Text(MyLocalizations.of(context).no),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -760,28 +732,21 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             isAdded = true;
           });
           Toast.show(
-              MyLocalizations.of(context)
-                  .getLocalizations("PRODUCT_ADD_TO_CART"),
-              context,
-              duration: Toast.LENGTH_LONG,
-              gravity: Toast.BOTTOM);
+              MyLocalizations.of(context).producthasbeenaddedtocart, context,
+              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         });
       } else {
         tempProducts.add(cartProduct);
-      }
-      try {
         Common.addProduct(tempProducts).then((value) {
           setState(() {
             isAdded = true;
           });
           Toast.show(
-              MyLocalizations.of(context)
-                  .getLocalizations("PRODUCT_ADD_TO_CART"),
-              context,
-              duration: Toast.LENGTH_LONG,
-              gravity: Toast.BOTTOM);
+              MyLocalizations.of(context).producthasbeenaddedtocart, context,
+              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         });
-      } catch (error, stackTrace) {
+      }
+      try {} catch (error, stackTrace) {
         sentryError.reportError(error, stackTrace);
       }
     }).catchError((onError) {

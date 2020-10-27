@@ -1,18 +1,19 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
-import '../../styles/styles.dart';
-import '../../services/main-service.dart';
 import 'package:async_loader/async_loader.dart';
-import '../../widgets/no-data.dart';
-import '../../services/sentry-services.dart';
+import 'package:flutter/material.dart';
+
 import '../../services/localizations.dart';
+import '../../services/main-service.dart';
+import '../../services/sentry-services.dart';
+import '../../styles/styles.dart';
+import '../../widgets/no-data.dart';
 
 SentryError sentryError = new SentryError();
 
 class CouponsList extends StatefulWidget {
   final String locationId;
-  final Map localizedValues;
+  final Map<String, Map<String, String>> localizedValues;
   final String locale;
 
   CouponsList({Key key, this.locationId, this.locale, this.localizedValues})
@@ -45,8 +46,10 @@ class _CouponsListState extends State<CouponsList> {
           ),
         ),
         backgroundColor: PRIMARY,
-        title: new Text(MyLocalizations.of(context).getLocalizations("COUPON"),
-            style: titleBoldWhiteOSS()),
+        title: new Text(
+          MyLocalizations.of(context).coupon,
+          style: textbarlowSemiBoldWhite(),
+        ),
         centerTitle: true,
       ),
       body: AsyncLoader(
@@ -56,8 +59,7 @@ class _CouponsListState extends State<CouponsList> {
         renderError: ([error]) {
           sentryError.reportError(error, null);
           return NoData(
-              message:
-                  MyLocalizations.of(context).getLocalizations("ERROR_MSG"),
+              message: MyLocalizations.of(context).connectionError,
               icon: Icons.block);
         },
         renderSuccess: ({data}) {
@@ -75,8 +77,7 @@ class _CouponsListState extends State<CouponsList> {
                 });
           } else {
             return Container(
-              child: Text(
-                  MyLocalizations.of(context).getLocalizations("ERROR_MSG")),
+              child: Text(MyLocalizations.of(context).invalidResponse),
             );
           }
         },
@@ -141,10 +142,7 @@ class _CouponsListState extends State<CouponsList> {
               flex: 10,
               child: Row(
                 children: <Widget>[
-                  Text(
-                      coupon['offPrecentage'].toString() +
-                          '% ' +
-                          MyLocalizations.of(context).getLocalizations("OFF"),
+                  Text(coupon['offPrecentage'].toString() + '% off',
                       style: TextStyle(color: Colors.green)),
                 ],
               ),
@@ -155,8 +153,7 @@ class _CouponsListState extends State<CouponsList> {
                 onTap: () {
                   Navigator.pop(context, coupon);
                 },
-                child: Text(
-                    MyLocalizations.of(context).getLocalizations("APPLY"),
+                child: Text(MyLocalizations.of(context).apply,
                     style: TextStyle(color: Colors.amber)),
               ),
             ),

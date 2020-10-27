@@ -5,6 +5,7 @@ final primaryLight = const Color(0xFFD489AC);
 final secondary = const Color(0xFF2AA1BF);
 final border = const Color(0xF707070);
 final bgcolor = const Color(0xFF8FD3F4);
+final blacktext = const Color(0xFF272A3F);
 
 final green = const Color(0xFF5ECB56);
 final red = const Color(0xFFff5757);
@@ -54,6 +55,42 @@ TextStyle titleBoldOSL() {
     fontSize: 20.0,
     color: darkTextb,
     fontFamily: 'OpenSansLight',
+  );
+}
+
+TextStyle textbarlowSemiBoldwhite() {
+  return TextStyle(
+    fontSize: 17.0,
+    fontFamily: 'BarlowSemiBold',
+    color: Colors.white,
+    fontWeight: FontWeight.w700,
+  );
+}
+
+TextStyle textbarlowSemiBoldBlack() {
+  return TextStyle(
+    fontSize: 17.0,
+    fontFamily: 'BarlowSemiBold',
+    color: Colors.black,
+    fontWeight: FontWeight.w700,
+  );
+}
+
+TextStyle textbarlowSemiBoldWhite() {
+  return TextStyle(
+    fontSize: 17.0,
+    fontFamily: 'BarlowSemiBold',
+    color: Colors.white,
+    fontWeight: FontWeight.w700,
+  );
+}
+
+TextStyle hintSfsemiboldb() {
+  return TextStyle(
+    fontWeight: FontWeight.w400,
+    fontSize: 16.0,
+    color: blacktext,
+    fontFamily: 'SfUiDSemiBold',
   );
 }
 
@@ -979,5 +1016,64 @@ TextStyle priceDescription() {
     fontWeight: FontWeight.w400,
     fontSize: 15.0,
     color: Colors.black38,
+  );
+}
+
+TextStyle hintSfLightsm() {
+  return TextStyle(
+    fontWeight: FontWeight.w500,
+    fontSize: 13.0,
+    color: Color(0xFF6E7990),
+    fontFamily: 'SfUiDLight',
+  );
+}
+
+TextStyle hintSfLightbig() {
+  return TextStyle(
+    fontWeight: FontWeight.w500,
+    fontSize: 16.0,
+    color: blacktext,
+    fontFamily: 'SfUiDLight',
+  );
+}
+
+final List<Color> gradientColor = [
+  const Color(0xffF0417C),
+  const Color(0xFFFF3636),
+];
+
+TextStyle textsemiblack() {
+  return TextStyle(
+    fontWeight: FontWeight.w400,
+    fontSize: 16.0,
+    color: Colors.black,
+    fontFamily: 'BarlowSemibold',
+  );
+}
+
+TextStyle textsemiboldblack() {
+  return TextStyle(
+    fontWeight: FontWeight.w400,
+    fontSize: 17.0,
+    color: Colors.black,
+    fontFamily: 'BarlowSemibold',
+  );
+}
+
+TextStyle textbarlowRegular() {
+  return TextStyle(
+    fontWeight: FontWeight.w400,
+    fontSize: 10.0,
+    color: Colors.black.withOpacity(0.60),
+    fontFamily: 'BarlowRegular',
+  );
+}
+
+TextStyle textregulargreen() {
+  return TextStyle(
+    fontWeight: FontWeight.w400,
+    fontSize: 16.0,
+    color: PRIMARY,
+    fontFamily: 'BarlowSemibold',
   );
 }
