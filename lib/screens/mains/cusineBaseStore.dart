@@ -131,7 +131,7 @@ class _CuisineBaseStoresState extends State<CuisineBaseStores> {
           restaurantName,
           style: textsemiboldblack(),
         ),
-        subTitle:
+        subtitle:
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(
             locationName ?? '',

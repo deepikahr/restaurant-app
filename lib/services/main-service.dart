@@ -48,13 +48,13 @@ class MainService {
 
   static Future<dynamic> getProductsBylocationId(String id) async {
     final response =
-    await client.get(API_ENDPOINT + 'locations/all/category/data/$id');
+        await client.get(API_ENDPOINT + 'locations/all/category/data/$id');
     return json.decode(response.body);
   }
 
   static Future<dynamic> getWorkingHours(String locationId) async {
-    final response =
-    await client.get(API_ENDPOINT + 'locations/get-working/hours/$locationId');
+    final response = await client
+        .get(API_ENDPOINT + 'locations/get-working/hours/$locationId');
     return json.decode(response.body);
   }
 

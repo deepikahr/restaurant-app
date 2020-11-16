@@ -1,4 +1,3 @@
-import 'package:RestaurantSaas/screens/mains/cart.dart';
 import 'package:RestaurantSaas/services/common.dart';
 import 'package:RestaurantSaas/services/localizations.dart';
 import 'package:RestaurantSaas/styles/styles.dart';
@@ -39,7 +38,6 @@ class _FlavourPageState extends State<FlavourPage> {
   @override
   void initState() {
     cartProduct = widget.cartProduct;
-    print(cartProduct.toString());
     super.initState();
   }
 
@@ -92,7 +90,6 @@ class _FlavourPageState extends State<FlavourPage> {
           onPressed: () async {
             try {
               cartProduct.addAll({'flavour': selectedFlavoursList});
-              print(cartProduct.toString());
               await Common.getProducts().then((productsList) {
                 productsList.add(cartProduct);
                 Common.addProduct(productsList).then((value) {
@@ -114,9 +111,7 @@ class _FlavourPageState extends State<FlavourPage> {
                   });
                 });
               });
-            } catch (error) {
-              print(error.toString());
-            }
+            } catch (error) {}
           },
           child: Container(
             alignment: AlignmentDirectional.center,
@@ -132,74 +127,74 @@ class _FlavourPageState extends State<FlavourPage> {
     );
   }
 
-  void _calculateCart() async {
-    double deliveryCharge = 0.0, subTotal = 0.0, grandTotal = 0.0;
-    List<dynamic> products;
+  // void _calculateCart() async {
+  //   double deliveryCharge = 0.0, subTotal = 0.0, grandTotal = 0.0;
+  //   List<dynamic> products;
 
-    // [1] retrive cart from storage if available
-    Map<String, dynamic> cart;
-    await Common.getCart().then((onValue) {
-      cart = onValue;
-    });
+  //   // [1] retrive cart from storage if available
+  //   Map<String, dynamic> cart;
+  //   await Common.getCart().then((onValue) {
+  //     cart = onValue;
+  //   });
 
-    await Common.getProducts().then((value) => products = value);
+  //   await Common.getProducts().then((value) => products = value);
 
-    subTotal = 0.0;
-    for (int i = 0; i < products.length; i++) {
-      subTotal = subTotal + products[i]['totalPrice'];
-    }
+  //   subTotal = 0.0;
+  //   for (int i = 0; i < products.length; i++) {
+  //     subTotal = subTotal + products[i]['totalPrice'];
+  //   }
 
-    // [5] calculate delivery charge
-    if (widget.shippingType.compareTo('free') == 0) {
-      deliveryCharge = 0.0;
-    } else if (widget.shippingType.compareTo('flexible') == 0) {
-      if (subTotal > widget.minimumOrderAmount) {
-        deliveryCharge = 0.0;
-      } else {
-        deliveryCharge = widget.deliveryCharge.toDouble();
-      }
-    } else if (widget.shippingType.compareTo('fixed') == 0) {
-      deliveryCharge = widget.deliveryCharge.toDouble();
-    } else {
-      deliveryCharge = 0.0;
-    }
+  //   // [5] calculate delivery charge
+  //   if (widget.shippingType.compareTo('free') == 0) {
+  //     deliveryCharge = 0.0;
+  //   } else if (widget.shippingType.compareTo('flexible') == 0) {
+  //     if (subTotal > widget.minimumOrderAmount) {
+  //       deliveryCharge = 0.0;
+  //     } else {
+  //       deliveryCharge = widget.deliveryCharge.toDouble();
+  //     }
+  //   } else if (widget.shippingType.compareTo('fixed') == 0) {
+  //     deliveryCharge = widget.deliveryCharge.toDouble();
+  //   } else {
+  //     deliveryCharge = 0.0;
+  //   }
 
-    // [6] calculate grand total
-    grandTotal = subTotal + deliveryCharge;
+  //   // [6] calculate grand total
+  //   grandTotal = subTotal + deliveryCharge;
 
-    // [7] create complete order json as Map
-    cart = {
-      'locationId': widget.cartProduct['locationId'],
-      'deliveryCharge': deliveryCharge,
-      'grandTotal': grandTotal,
-      'location': widget.cartProduct['locationId'],
-      'locationName': widget.cartProduct['locationId'] != null
-          ? widget.cartProduct['locationName']
-          : null,
-      'orderType': 'Delivery',
-      'payableAmount': grandTotal,
-      'paymentOption': 'COD',
-      'position': null,
-      'shippingAddress': null,
-      'restaurant': products.length > 0 ? products[0]['restaurant'] : null,
-      'restaurantID': products.length > 0 ? products[0]['restaurantID'] : null,
-      'status': 'Pending',
-      'subTotal': subTotal,
-      'productDetails': products,
-      'note': null,
-      'isForDineIn': false,
-      'pickupDate': null,
-      'pickupTime': null,
-      'coupon': {'couponApplied': false}
-    };
-    Common.setDeliveryCharge({
-      "shippingType": widget.shippingType,
-      "deliveryCharge": widget.deliveryCharge,
-      "minimumOrderAmount": widget.minimumOrderAmount
-    });
+  //   // [7] create complete order json as Map
+  //   cart = {
+  //     'locationId': widget.cartProduct['locationId'],
+  //     'deliveryCharge': deliveryCharge,
+  //     'grandTotal': grandTotal,
+  //     'location': widget.cartProduct['locationId'],
+  //     'locationName': widget.cartProduct['locationId'] != null
+  //         ? widget.cartProduct['locationName']
+  //         : null,
+  //     'orderType': 'Delivery',
+  //     'payableAmount': grandTotal,
+  //     'paymentOption': 'COD',
+  //     'position': null,
+  //     'shippingAddress': null,
+  //     'restaurant': products.length > 0 ? products[0]['restaurant'] : null,
+  //     'restaurantID': products.length > 0 ? products[0]['restaurantID'] : null,
+  //     'status': 'Pending',
+  //     'subTotal': subTotal,
+  //     'productDetails': products,
+  //     'note': null,
+  //     'isForDineIn': false,
+  //     'pickupDate': null,
+  //     'pickupTime': null,
+  //     'coupon': {'couponApplied': false}
+  //   };
+  //   Common.setDeliveryCharge({
+  //     "shippingType": widget.shippingType,
+  //     "deliveryCharge": widget.deliveryCharge,
+  //     "minimumOrderAmount": widget.minimumOrderAmount
+  //   });
 
-    await Common.setCart(cart);
-  }
+  //   await Common.setCart(cart);
+  // }
 
   void _changeProductQuantity(
       bool increase, int index, int individualQuantity) {
@@ -302,11 +297,11 @@ class FlavourTile extends StatefulWidget {
 
   const FlavourTile(
       {Key key,
-        this.flavourData,
-        this.changeQuantity,
-        this.index,
-        this.isSelectExtra,
-        this.maxSelect})
+      this.flavourData,
+      this.changeQuantity,
+      this.index,
+      this.isSelectExtra,
+      this.maxSelect})
       : super(key: key);
 
   @override

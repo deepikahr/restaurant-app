@@ -1,12 +1,9 @@
 import 'dart:async';
-
 import 'package:RestaurantSaas/screens/other/bottom-sheet1.dart';
 import 'package:RestaurantSaas/services/main-service.dart';
 import 'package:RestaurantSaas/services/profile-service.dart';
-import 'package:RestaurantSaas/services/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../services/common.dart';
 import '../../services/counter-service.dart';
 import '../../services/localizations.dart';
@@ -19,6 +16,7 @@ import 'confirm-order.dart';
 
 SentryError sentryError = new SentryError();
 
+// ignore: must_be_immutable
 class CartPage extends StatefulWidget {
   Map<String, dynamic> product, taxInfo, locationInfo;
   final Map<String, Map<String, String>> localizedValues;
@@ -69,7 +67,6 @@ class CartPageState extends State<CartPage> {
   }
 
   showFlavourOptionDialog(title, product) async {
-    print(product.toString());
     showDialog<Null>(
       context: context,
       barrierDismissible: true, // user must tap button!
@@ -98,8 +95,7 @@ class CartPageState extends State<CartPage> {
                           child: GestureDetector(
                             onTap: () {
                               Navigator.of(context).pop();
-                              calculatePrice(product, true,
-                                  addFlavours: true);
+                              calculatePrice(product, true, addFlavours: true);
                             },
                             child: Container(
                               alignment: Alignment.center,
@@ -107,9 +103,7 @@ class CartPageState extends State<CartPage> {
                               height: 30.0,
                               decoration: BoxDecoration(),
                               child: Text(
-                                MyLocalizations.of(context)
-                                    .same
-                                    .toUpperCase(),
+                                MyLocalizations.of(context).same.toUpperCase(),
                                 style: textPrimaryOSR(),
                               ),
                             ),
@@ -171,7 +165,6 @@ class CartPageState extends State<CartPage> {
     Map<String, dynamic> cart = cartItems;
     await Common.getCart().then((onValue) {
       cart = onValue;
-      print(cart.toString());
     }).catchError((onError) {
       if (mounted) {
         setState(() {
@@ -927,7 +920,6 @@ class CartPageState extends State<CartPage> {
       'restaurantAddress': product['restaurantAddress']
     };
     cartProduct.addAll({'product': product['product']});
-    print(product.toString());
     _updateProductQuantityFromCart(
       product,
       cartProduct,
