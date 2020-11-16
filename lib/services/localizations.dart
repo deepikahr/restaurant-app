@@ -1176,6 +1176,10 @@ class MyLocalizations {
     return localizedValues[locale.languageCode]['homePage'];
   }
 
+  String get changeLocation {
+    return localizedValues[locale.languageCode]['changeLocation'];
+  }
+
   greetTo(name) {
     return localizedValues[locale.languageCode]['greetTo']
         .replaceAll('{{name}}', name);

@@ -65,7 +65,6 @@ class _RegisterFormState extends State<RegisterForm> {
         }
         _formKey.currentState.save();
         await AuthService.register(register).then((onValue) {
-          print(onValue.toString());
           if (onValue['message'] != null) {
             showSnackbar(onValue['message']);
             Future.delayed(const Duration(milliseconds: 3000), () {

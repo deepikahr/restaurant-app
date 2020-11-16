@@ -122,9 +122,6 @@ class _OtpVerifyState extends State<OtpVerify> {
 
   @override
   void initState() {
-    print(widget.userToken);
-    print(widget.verificationId);
-    print(widget.mobileNumber);
     super.initState();
   }
 
@@ -225,7 +222,6 @@ class _OtpVerifyState extends State<OtpVerify> {
             onTap: () {
               AuthService.resendOtp({"contactNumber": widget.mobileNumber})
                   .then((value) {
-                print(value.toString());
                 if (value['response_data']['message'] != null) {
                   showSnackbar(value['response_data']['message']);
                 }

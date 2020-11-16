@@ -259,16 +259,14 @@ class _DrawerPageState extends State<DrawerPage> {
               });
             }
             Common.removeToken().then((onValue) {
-              Common.removeCart().then((onValue) {
-                showSnackbar(
-                    MyLocalizations.of(context).logoutSuccessfully + '!');
-                Navigator.pop(context);
-                if (mounted) {
-                  setState(() {
-                    isLoggedIn = false;
-                  });
-                }
-              });
+              showSnackbar(
+                  MyLocalizations.of(context).logoutSuccessfully + '!');
+              Navigator.pop(context);
+              if (mounted) {
+                setState(() {
+                  isLoggedIn = false;
+                });
+              }
             });
           }
         }

@@ -42,7 +42,6 @@ class RestaurantSearch extends SearchDelegate<String> {
   Widget buildResults(BuildContext context) {
     return (searchedList?.length ?? 0) > 0
         ? StatefulBuilder(builder: (context, setState) {
-            GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
             return ListView.builder(
                 itemCount: searchedList?.length ?? 0,
                 itemBuilder: (context, index) {

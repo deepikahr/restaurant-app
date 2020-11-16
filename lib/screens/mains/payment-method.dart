@@ -186,7 +186,6 @@ class _PaymentMethodState extends State<PaymentMethod> {
           }
         }).toList();
         ProfileService.placeOrder(widget.cart).then((onValue) {
-          print('order response $onValue');
           if (mounted) {
             setState(() {
               isPlaceOrderLoading = false;
@@ -236,7 +235,6 @@ class _PaymentMethodState extends State<PaymentMethod> {
 
   @override
   void initState() {
-    print(widget.paymentMethods.toString());
     getPaymentMethod();
     StripePayment.setOptions(StripeOptions(
         publishableKey: STRIPE_KEY,

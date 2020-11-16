@@ -1,22 +1,22 @@
 import 'package:RestaurantSaas/screens/mains/home.dart';
 import 'package:RestaurantSaas/services/common.dart';
+import 'package:RestaurantSaas/services/constant.dart';
 import 'package:RestaurantSaas/services/localizations.dart';
 import 'package:RestaurantSaas/styles/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map_picker/flutter_map_picker.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:geocoder/model.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CurrentLocation extends StatefulWidget {
   final Map localizedValues;
   final String locale;
 
-  const CurrentLocation({
-    Key key,
-    this.localizedValues,
-    this.locale,
-  }) : super(key: key);
+  const CurrentLocation({Key key, this.localizedValues, this.locale})
+      : super(key: key);
 
   @override
   _CurrentLocationState createState() => _CurrentLocationState();
@@ -24,18 +24,56 @@ class CurrentLocation extends StatefulWidget {
 
 class _CurrentLocationState extends State<CurrentLocation> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final Location _location = Location();
+  var position;
+  bool isPermissionAllowed = true, getDataLoading = false;
 
-  final Location location = Location();
-  var locationData;
-  var locationAddress, locationAddressMap;
+  @override
+  void initState() {
+    checkPermission();
+    super.initState();
+  }
 
-  PlacePickerResult pickedLocation;
-  LocationData currentLocation;
-  Location _location = new Location();
+  checkPermission() async {
+    PermissionStatus _permissionGranted;
+    _permissionGranted = await _location.hasPermission();
+    if (_permissionGranted == PermissionStatus.granted) {
+      setState(() {
+        _getCurrentLocation();
+        isPermissionAllowed = true;
+        getDataLoading = true;
+      });
+    } else {
+      setState(() {
+        isPermissionAllowed = false;
+      });
+    }
+  }
 
-  Map<String, dynamic> position;
-
-  var addressData;
+  selectChangeLocationMethod(latLng) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    PlacePickerResult pickerResult = await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => PlacePickerScreen(
+                  googlePlacesApiKey: GOOGLE_API_KEY,
+                  initialPosition: LatLng(latLng['lat'], latLng['long']),
+                  mainColor: PRIMARY,
+                  mapStrings: MapPickerStrings.english(),
+                  placeAutoCompleteLanguage:
+                      prefs.getString('selectedLanguage') ?? 'en',
+                )));
+    if (pickerResult != null) {
+      setState(() {
+        position = {
+          'lat': pickerResult.latLng.latitude,
+          'long': pickerResult.latLng.longitude,
+          'name': pickerResult.address
+        };
+      });
+      await Common.savePositionInfo(position);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,13 +95,16 @@ class _CurrentLocationState extends State<CurrentLocation> {
               padding: EdgeInsets.only(left: 10, right: 10),
               child: Image.asset("lib/assets/imgs/man.png")),
           SizedBox(height: 30),
-          buildLocation(),
-          SizedBox(height: 30),
-          buildSelectedlocation()
+          buildSelectedlocation(),
+          getDataLoading
+              ? Center(child: CircularProgressIndicator())
+              : Container(),
+          isPermissionAllowed ? Container() : buildSelectLocation()
         ],
       ),
-      bottomNavigationBar: locationData != null
-          ? Container(
+      bottomNavigationBar: position == null
+          ? Container(height: 1)
+          : Container(
               height: 55,
               margin: EdgeInsets.all(10),
               decoration: BoxDecoration(
@@ -77,20 +118,16 @@ class _CurrentLocationState extends State<CurrentLocation> {
                   borderRadius: new BorderRadius.circular(10.0),
                 ),
                 color: PRIMARY,
-                // blockButton: true,
-                onPressed: _saveCurrentLocation,
+                onPressed: _goToHomepage,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Text(
-                      MyLocalizations.of(context).saveandProceed,
-                      style: textbarlowSemiBoldWhite(),
-                    ),
+                    Text(MyLocalizations.of(context).saveandProceed,
+                        style: textbarlowSemiBoldWhite()),
                   ],
                 ),
               ),
-            )
-          : Container(height: 1),
+            ),
     );
   }
 
@@ -99,38 +136,36 @@ class _CurrentLocationState extends State<CurrentLocation> {
         width: MediaQuery.of(context).size.width,
         padding: EdgeInsets.all(20),
         child: Center(
-          child: Text(
-            locationAddress == null && locationAddressMap == null
-                ? MyLocalizations.of(context).selectlocation
-                : locationAddress == null
-                    ? locationAddressMap
-                    : locationAddress.addressLine,
-            style: textbarlowSemiBoldBlack(),
-          ),
+          child: Text(position == null ? '' : position['name'],
+              style: textbarlowSemiBoldBlack()),
         ));
   }
 
-  Widget buildLocation() {
+  Widget buildSelectLocation() {
     return Container(
       width: 305,
       height: 44,
       margin: EdgeInsets.only(left: 30, right: 30),
       child: RaisedButton(
-        onPressed: _getCurrentLocation,
+        onPressed: () {
+          if (position != null) {
+            selectChangeLocationMethod(
+                {'lat': position['lat'], 'long': position['long']});
+          } else {
+            selectChangeLocationMethod({'lat': 12.9167995, 'long': 77.5878204});
+          }
+        },
         color: PRIMARY,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Image.asset(
-              "lib/assets/icon/location1.png",
-              width: 20,
-              height: 20,
-            ),
+            Image.asset("lib/assets/icon/location1.png", width: 20, height: 20),
             SizedBox(width: 10),
             Text(
-              MyLocalizations.of(context).useCurrentLocation,
-              style: textbarlowSemiBoldWhite(),
-            ),
+                position != null
+                    ? MyLocalizations.of(context).changeLocation
+                    : MyLocalizations.of(context).selectlocation,
+                style: textbarlowSemiBoldWhite()),
           ],
         ),
       ),
@@ -138,46 +173,43 @@ class _CurrentLocationState extends State<CurrentLocation> {
   }
 
   void _getCurrentLocation() async {
-    if (mounted) {
-      setState(() {
-        locationAddressMap = null;
-      });
-    }
-    currentLocation = await _location.getLocation();
+    LocationData currentLocation = await _location.getLocation();
     final coordinates =
         new Coordinates(currentLocation.latitude, currentLocation.longitude);
     var addresses =
         await Geocoder.local.findAddressesFromCoordinates(coordinates);
-    var first = addresses.first;
-    addressData = first.addressLine;
     if (currentLocation != null && mounted) {
       setState(() {
-        locationData = currentLocation;
-        locationAddress = addresses.first;
+        getDataLoading = false;
         position = {
           'lat': currentLocation.latitude,
           'long': currentLocation.longitude,
-          'name': addressData
+          'name': addresses.first.addressLine
         };
       });
-      await Common.savePositionInfo(position).then((onValue) {});
+      await Common.savePositionInfo(position);
+    } else {
+      setState(() {
+        getDataLoading = false;
+      });
+      showError(
+          MyLocalizations.of(context).enableTogetlocation,
+          MyLocalizations.of(context)
+              .thereisproblemusingyourdevicelocationPleasecheckyourGPSsettings);
     }
   }
 
   showError(error, message) async {
     showDialog<Null>(
       context: context,
-      barrierDismissible: false, // user must tap button!
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           contentPadding: EdgeInsets.only(
             top: 10.0,
           ),
-          title: new Text(
-            "$error",
-            style: hintSfsemiboldb(),
-            textAlign: TextAlign.center,
-          ),
+          title: new Text("$error",
+              style: hintSfsemiboldb(), textAlign: TextAlign.center),
           content: Container(
             height: 100.0,
             child: Column(
@@ -228,36 +260,13 @@ class _CurrentLocationState extends State<CurrentLocation> {
     );
   }
 
-  void _saveCurrentLocation() async {
-    if (locationData != null) {
-      position = {
-        'lat': currentLocation.latitude,
-        'long': currentLocation.longitude,
-        'name': addressData
-      };
-      await Common.savePositionInfo(position).then((onValue) {});
-      Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: (BuildContext context) => HomePage(
-              locale: widget.locale,
-              localizedValues: widget.localizedValues,
-            ),
-          ),
-          (Route<dynamic> route) => false);
-    } else {
-      showError(
-          MyLocalizations.of(context).enableTogetlocation,
-          MyLocalizations.of(context)
-              .thereisproblemusingyourdevicelocationPleasecheckyourGPSsettings);
-    }
-  }
-
-  void showSnackbar(message) {
-    final snackBar = SnackBar(
-      content: Text(message),
-      duration: Duration(milliseconds: 3000),
-    );
-    _scaffoldKey.currentState.showSnackBar(snackBar);
+  void _goToHomepage() async {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (BuildContext context) => HomePage(
+              locale: widget.locale, localizedValues: widget.localizedValues),
+        ),
+        (Route<dynamic> route) => false);
   }
 }
