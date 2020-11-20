@@ -80,6 +80,7 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
           sentryError.reportError(error, stackTrace);
         }
       }).catchError((onError) {
+        print(onError);
         sentryError.reportError(onError, null);
       });
       return restaurants;

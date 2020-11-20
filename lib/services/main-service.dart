@@ -29,8 +29,10 @@ class MainService {
   static Future<dynamic> getNearByRestaurants(double lat, double long,
       {String count}) async {
     if (count == null) count = 'All';
+    print(API_ENDPOINT + 'locations/map/distance/$lat/$long/$count');
     final response = await client
         .get(API_ENDPOINT + 'locations/map/distance/$lat/$long/$count');
+    print(json.decode(response.body));
     return json.decode(response.body);
   }
 
