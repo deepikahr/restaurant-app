@@ -171,6 +171,7 @@ class HomePageState extends State<HomePage> {
         sentryError.reportError(error, stackTrace);
       }
     }).catchError((onError) {
+      print(onError);
       sentryError.reportError(onError, null);
     });
     return restaurants;
@@ -273,6 +274,12 @@ class HomePageState extends State<HomePage> {
           }
         });
       }
+    }).catchError((onError) {
+      setState(() {
+        renderArray = [];
+        getCuisionLoading = false;
+      });
+      print(onError);
     });
   }
 

@@ -7,10 +7,14 @@ const ONE_SIGNAL_APP_ID = '05ac6c51-8416-41ab-8779-b48503bbe125';
 // google api key
 const GOOGLE_API_KEY = "AIzaSyBzlzxdWPS9GdaKpxhui7o1d7QDIefQXTs";
 
-// api deploy production
-// const BASE_URL = 'https://api.stg.voydelivery.com/';
+// local
+// const BASE_URL = 'http://saas.ngrok.ionicfirebaseapp.com/';
 
-const BASE_URL = 'http://162.243.171.81:8000/';
+// testing
+// const BASE_URL = 'http://162.243.171.81:8000/';
+
+// production
+const BASE_URL = 'http://162.243.171.81:7000/';
 
 // stripe key
 const STRIPE_KEY = "pk_test_RBdAu6jIbEByY3KaBQFbH4N100nMkViv6g";
