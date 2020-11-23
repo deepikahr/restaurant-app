@@ -4,9 +4,7 @@ import 'package:RestaurantSaas/services/sentry-services.dart';
 import 'package:RestaurantSaas/services/utils.dart';
 import 'package:RestaurantSaas/styles/styles.dart';
 import 'package:flutter/material.dart';
-import 'package:getwidget/components/button/gf_button.dart';
 import 'package:toast/toast.dart';
-
 import 'flavours-list.dart';
 
 SentryError sentryError = new SentryError();
@@ -62,7 +60,6 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
 
   @override
   void initState() {
-    print(widget.shippingType);
     calculatePrice(widget.product);
     super.initState();
   }

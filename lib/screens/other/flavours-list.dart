@@ -43,7 +43,6 @@ class _FlavourPageState extends State<FlavourPage> {
   @override
   void initState() {
     cartProduct = widget.cartProduct;
-    print(cartProduct.toString());
     super.initState();
   }
 
@@ -203,9 +202,7 @@ class _FlavourPageState extends State<FlavourPage> {
               cartProduct.addAll({'flavour': selectedFlavoursList});
               cartProduct.addAll({'product': widget.product});
               addProduct();
-            } catch (error) {
-              print(error.toString());
-            }
+            } catch (error) {}
           },
           child: Container(
             alignment: AlignmentDirectional.center,
@@ -322,11 +319,11 @@ class FlavourTile extends StatefulWidget {
 
   const FlavourTile(
       {Key key,
-        this.flavourData,
-        this.changeQuantity,
-        this.index,
-        this.isSelectExtra,
-        this.maxSelect})
+      this.flavourData,
+      this.changeQuantity,
+      this.index,
+      this.isSelectExtra,
+      this.maxSelect})
       : super(key: key);
 
   @override

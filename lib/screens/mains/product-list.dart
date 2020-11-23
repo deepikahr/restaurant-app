@@ -733,8 +733,6 @@ class ProductListPageState extends State<ProductListPage> {
           });
         }
       }
-    }).catchError((error) {
-      print("working hours error : ${error.toString()} ");
-    });
+    }).catchError((error) {});
   }
 }
