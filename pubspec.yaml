@@ -1,7 +1,7 @@
 name: RestaurantSaas
 description: Restaurant Saas flutter app by Pietech Solution
 
-version: 1.0.14+15
+version: 1.0.15+16
 
 environment:
   sdk: ">=2.2.0 <3.0.0"
