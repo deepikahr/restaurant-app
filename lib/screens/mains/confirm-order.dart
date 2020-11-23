@@ -86,7 +86,6 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
       sentryError.reportError(onError, null);
     });
     await MainService.getAdminSettings().then((onValue) {
-      print("payment methods : ${onValue['paymentMethod']}");
       try {
         paymentMethods = onValue['paymentMethod'];
       } catch (error, stackTrace) {
@@ -101,7 +100,6 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
             DateFormat('HH:mm').format(DateTime.now()),
             DateFormat('EEEE').format(DateTime.now()))
         .then((verifyOpenAndCloseTime) {
-//      print('getRestaurantOpenAndCloseTime $verifyOpenAndCloseTime');
       try {
         setState(() {
           openAndCloseTime = verifyOpenAndCloseTime['res_code'] == 200

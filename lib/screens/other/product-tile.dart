@@ -127,55 +127,55 @@ class _BuildProductTileState extends State<BuildProductTile> {
     );
   }
 
-  void _updateProductQuantityFromCart(int productQuantity, bool increase,
-      String productId, Map<String, dynamic> newProduct) async {
-    await Common.getProducts().then((productsList) {
-      products = productsList;
-      if (productsList != null) {
-        productsList.forEach((element) {
-          if (element['productId'].toString() == productId.toString()) {
-            productsList.remove(element);
-            if (!isProductDelete) {
-              productsList.add(newProduct);
-            } else {
-              setState(() {
-                isProductDelete = false;
-              });
-            }
-            Common.addProduct(productsList).then((value) {});
-            if (productsList.length < 1) {
-              Common.setCart(null);
-              Common.addProduct(null);
-            } else {
-              _calculateCart();
-            }
-          }
-        });
-      }
-    }).catchError((onError) {});
-  }
+  // void _updateProductQuantityFromCart(int productQuantity, bool increase,
+  //     String productId, Map<String, dynamic> newProduct) async {
+  //   await Common.getProducts().then((productsList) {
+  //     products = productsList;
+  //     if (productsList != null) {
+  //       productsList.forEach((element) {
+  //         if (element['productId'].toString() == productId.toString()) {
+  //           productsList.remove(element);
+  //           if (!isProductDelete) {
+  //             productsList.add(newProduct);
+  //           } else {
+  //             setState(() {
+  //               isProductDelete = false;
+  //             });
+  //           }
+  //           Common.addProduct(productsList).then((value) {});
+  //           if (productsList.length < 1) {
+  //             Common.setCart(null);
+  //             Common.addProduct(null);
+  //           } else {
+  //             _calculateCart();
+  //           }
+  //         }
+  //       });
+  //     }
+  //   }).catchError((onError) {});
+  // }
 
-  void _changeProductQuantity(bool increase) {
-    if (increase) {
-      if (mounted) {
-        setState(() {
-          productQuantity++;
-        });
-      }
-    } else {
-      if (productQuantity == 1) {
-        setState(() {
-          isProductDelete = true;
-        });
-      } else if (productQuantity > 0) {
-        if (mounted) {
-          setState(() {
-            productQuantity--;
-          });
-        }
-      }
-    }
-  }
+  // void _changeProductQuantity(bool increase) {
+  //   if (increase) {
+  //     if (mounted) {
+  //       setState(() {
+  //         productQuantity++;
+  //       });
+  //     }
+  //   } else {
+  //     if (productQuantity == 1) {
+  //       setState(() {
+  //         isProductDelete = true;
+  //       });
+  //     } else if (productQuantity > 0) {
+  //       if (mounted) {
+  //         setState(() {
+  //           productQuantity--;
+  //         });
+  //       }
+  //     }
+  //   }
+  // }
 
   Widget _buildProductTileTitle(String imgUrl, String productName, double mrp,
       double off, double price, String info) {
@@ -222,52 +222,52 @@ class _BuildProductTileState extends State<BuildProductTile> {
     return quantity;
   }
 
-  void _calculatePrice(
-      final Map<String, dynamic> product, productList, flavoursList) async {
-    if (productList != null) {
-      productList.map((e) {
-        if (e['productId'] == product['_id']) {
-          flavoursList = e['flavour'] ?? [];
-        }
-      }).toList();
-    }
-    price = 0;
-    Map<String, dynamic> variant = product['variants'][0];
-    price = price + variant['price'];
+  // void _calculatePrice(
+  //     final Map<String, dynamic> product, productList, flavoursList) async {
+  //   if (productList != null) {
+  //     productList.map((e) {
+  //       if (e['productId'] == product['_id']) {
+  //         flavoursList = e['flavour'] ?? [];
+  //       }
+  //     }).toList();
+  //   }
+  //   price = 0;
+  //   Map<String, dynamic> variant = product['variants'][0];
+  //   price = price + variant['price'];
 
-    if (mounted) {
-      setState(() {
-        price = price * productQuantity;
-      });
-    }
-    List<dynamic> extraIngredientsList = List<dynamic>();
-    if (product['extraIngredients'].length > 0 &&
-        product['extraIngredients'][0] != null) {
-      product['extraIngredients'].forEach((item) {
-        if (item != null && item['isSelected'] != null && item['isSelected']) {
-          price = price + item['price'];
-          extraIngredientsList.add(item);
-        }
-      });
-    }
-    cartProduct = {
-      'Discount': variant['Discount'],
-      'MRP': variant['MRP'],
-      'note': null,
-      'Quantity': productQuantity,
-      'price': variant['price'],
-      'extraIngredients': extraIngredientsList,
-      'imageUrl': product['imageUrl'],
-      'productId': product['_id'],
-      'flavour': flavoursList ?? null,
-      'size': variant['size'],
-      'title': product['title'],
-      'restaurant': widget.restaurantName,
-      'restaurantID': widget.restaurantId,
-      'totalPrice': price,
-      'restaurantAddress': widget.address
-    };
-  }
+  //   if (mounted) {
+  //     setState(() {
+  //       price = price * productQuantity;
+  //     });
+  //   }
+  //   List<dynamic> extraIngredientsList = List<dynamic>();
+  //   if (product['extraIngredients'].length > 0 &&
+  //       product['extraIngredients'][0] != null) {
+  //     product['extraIngredients'].forEach((item) {
+  //       if (item != null && item['isSelected'] != null && item['isSelected']) {
+  //         price = price + item['price'];
+  //         extraIngredientsList.add(item);
+  //       }
+  //     });
+  //   }
+  //   cartProduct = {
+  //     'Discount': variant['Discount'],
+  //     'MRP': variant['MRP'],
+  //     'note': null,
+  //     'Quantity': productQuantity,
+  //     'price': variant['price'],
+  //     'extraIngredients': extraIngredientsList,
+  //     'imageUrl': product['imageUrl'],
+  //     'productId': product['_id'],
+  //     'flavour': flavoursList ?? null,
+  //     'size': variant['size'],
+  //     'title': product['title'],
+  //     'restaurant': widget.restaurantName,
+  //     'restaurantID': widget.restaurantId,
+  //     'totalPrice': price,
+  //     'restaurantAddress': widget.address
+  //   };
+  // }
 
   void _checkLoginAndNavigate() async {
     Common.getToken().then((onValue) async {
@@ -302,7 +302,7 @@ class _BuildProductTileState extends State<BuildProductTile> {
             _showClearCartAlert();
           }
         }
-      } catch (error, stackTrace) {}
+      } catch (error) {}
     }).catchError((onError) {});
   }
 
@@ -366,94 +366,94 @@ class _BuildProductTileState extends State<BuildProductTile> {
     );
   }
 
-  void _calculateCart() async {
-    double deliveryCharge = 0.0, subTotal = 0.0, grandTotal = 0.0;
-    Map<String, dynamic> selectedCoupon;
-    double couponDeduction = 0.0;
-    List<dynamic> products;
+//   void _calculateCart() async {
+//     double deliveryCharge = 0.0, subTotal = 0.0, grandTotal = 0.0;
+//     Map<String, dynamic> selectedCoupon;
+//     double couponDeduction = 0.0;
+//     List<dynamic> products;
 
-    // [0] other options when opening cart from menu
+//     // [0] other options when opening cart from menu
 
-    if (widget.taxInfo != null) {
-      Map<String, dynamic> cartInfo = {
-        'taxInfo': widget.taxInfo,
-        'locationInfo': widget.locationInfo
-      };
-      await Common.setCartInfo(cartInfo).then((onValue) {});
-    }
+//     if (widget.taxInfo != null) {
+//       Map<String, dynamic> cartInfo = {
+//         'taxInfo': widget.taxInfo,
+//         'locationInfo': widget.locationInfo
+//       };
+//       await Common.setCartInfo(cartInfo).then((onValue) {});
+//     }
 
-    // [1] retrive cart from storage if available
-    Map<String, dynamic> cart;
-    await Common.getCart().then((onValue) {
-      cart = onValue;
-    });
+//     // [1] retrive cart from storage if available
+//     Map<String, dynamic> cart;
+//     await Common.getCart().then((onValue) {
+//       cart = onValue;
+//     });
 
-    await Common.getProducts().then((value) {
-      products = value != null ? value : [];
-    });
+//     await Common.getProducts().then((value) {
+//       products = value != null ? value : [];
+//     });
 
-    subTotal = 0.0;
-    for (int i = 0; i < products.length; i++) {
-      subTotal = subTotal + products[i]['totalPrice'];
-    }
+//     subTotal = 0.0;
+//     for (int i = 0; i < products.length; i++) {
+//       subTotal = subTotal + products[i]['totalPrice'];
+//     }
 
-    // [3.1] calculate coupon deduction if applied
-    if (selectedCoupon != null) {
-      couponDeduction = (subTotal * selectedCoupon['offPrecentage'] / 100);
-      subTotal = subTotal - couponDeduction;
-    }
+//     // [3.1] calculate coupon deduction if applied
+//     if (selectedCoupon != null) {
+//       couponDeduction = (subTotal * selectedCoupon['offPrecentage'] / 100);
+//       subTotal = subTotal - couponDeduction;
+//     }
 
-    // [5] calculate delivery charge
-    if (widget.shippingType.compareTo('free') == 0) {
-      deliveryCharge = 0.0;
-    } else if (widget.shippingType.compareTo('flexible') == 0) {
-      if (subTotal > widget.minimumOrderAmount) {
-        deliveryCharge = 0.0;
-      } else {
-        deliveryCharge = widget.deliveryCharge.toDouble();
-      }
-    } else if (widget.shippingType.compareTo('fixed') == 0) {
-      deliveryCharge = widget.deliveryCharge.toDouble();
-    } else {
-      deliveryCharge = 0.0;
-    }
+//     // [5] calculate delivery charge
+//     if (widget.shippingType.compareTo('free') == 0) {
+//       deliveryCharge = 0.0;
+//     } else if (widget.shippingType.compareTo('flexible') == 0) {
+//       if (subTotal > widget.minimumOrderAmount) {
+//         deliveryCharge = 0.0;
+//       } else {
+//         deliveryCharge = widget.deliveryCharge.toDouble();
+//       }
+//     } else if (widget.shippingType.compareTo('fixed') == 0) {
+//       deliveryCharge = widget.deliveryCharge.toDouble();
+//     } else {
+//       deliveryCharge = 0.0;
+//     }
 
-    // [6] calculate grand total
-    grandTotal = subTotal + deliveryCharge;
+//     // [6] calculate grand total
+//     grandTotal = subTotal + deliveryCharge;
 
-    // [7] create complete order json as Map
-    cart = {
-      'locationId': widget.locationId,
-      'deliveryCharge': deliveryCharge,
-      'grandTotal': grandTotal,
-      'location':
-          widget.locationInfo != null ? widget.locationInfo['_id'] : null,
-      'locationName': widget.locationInfo != null
-          ? widget.locationInfo['locationName']
-          : null,
-      'orderType': 'Delivery',
-      'firstDeliveryFree': widget.isProductFirstDeliverFree,
-      'payableAmount': grandTotal,
-      'paymentOption': 'COD',
-      'position': null,
-      'shippingAddress': null,
-      'restaurant': products.length > 0 ? products[0]['restaurant'] : null,
-      'restaurantID': products.length > 0 ? products[0]['restaurantID'] : null,
-      'status': 'Pending',
-      'subTotal': subTotal,
-      'productDetails': products,
-      'note': null,
-      'isForDineIn': false,
-      'pickupDate': null,
-      'pickupTime': null,
-      'coupon': selectedCoupon == null
-          ? {'couponApplied': false}
-          : {'couponApplied': true, 'couponName': selectedCoupon['couponName']}
-    };
+//     // [7] create complete order json as Map
+//     cart = {
+//       'locationId': widget.locationId,
+//       'deliveryCharge': deliveryCharge,
+//       'grandTotal': grandTotal,
+//       'location':
+//           widget.locationInfo != null ? widget.locationInfo['_id'] : null,
+//       'locationName': widget.locationInfo != null
+//           ? widget.locationInfo['locationName']
+//           : null,
+//       'orderType': 'Delivery',
+//       'firstDeliveryFree': widget.isProductFirstDeliverFree,
+//       'payableAmount': grandTotal,
+//       'paymentOption': 'COD',
+//       'position': null,
+//       'shippingAddress': null,
+//       'restaurant': products.length > 0 ? products[0]['restaurant'] : null,
+//       'restaurantID': products.length > 0 ? products[0]['restaurantID'] : null,
+//       'status': 'Pending',
+//       'subTotal': subTotal,
+//       'productDetails': products,
+//       'note': null,
+//       'isForDineIn': false,
+//       'pickupDate': null,
+//       'pickupTime': null,
+//       'coupon': selectedCoupon == null
+//           ? {'couponApplied': false}
+//           : {'couponApplied': true, 'couponName': selectedCoupon['couponName']}
+//     };
 
-    // [8] set cart state and save to storage
-    if (widget.locationInfo != null) {
-      await Common.setCart(cart);
-    }
-  }
+//     // [8] set cart state and save to storage
+//     if (widget.locationInfo != null) {
+//       await Common.setCart(cart);
+//     }
+//   }
 }

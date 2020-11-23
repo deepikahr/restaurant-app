@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:RestaurantSaas/screens/mains/cusineBaseStore.dart';
 import 'package:RestaurantSaas/screens/other/search-restaurants.dart';
 import 'package:RestaurantSaas/screens/webView/web_view.dart';
@@ -8,11 +7,9 @@ import 'package:async_loader/async_loader.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
-import 'package:geocoder/geocoder.dart';
 import 'package:getwidget/components/list_tile/gf_list_tile.dart';
 import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../services/common.dart';
 import '../../services/counter-service.dart';
 import '../../services/localizations.dart';
@@ -128,8 +125,6 @@ class HomePageState extends State<HomePage> {
 
   StreamSubscription<LocationData> _locationStream;
   String address;
-  Location _location = Location();
-  Map<String, dynamic> position;
   String itemCount = '4';
   bool isFirstStart = true;
   Map<String, dynamic> tableInfo;
@@ -176,6 +171,7 @@ class HomePageState extends State<HomePage> {
         sentryError.reportError(error, stackTrace);
       }
     }).catchError((onError) {
+      print(onError);
       sentryError.reportError(onError, null);
     });
     return restaurants;
@@ -225,73 +221,66 @@ class HomePageState extends State<HomePage> {
     setState(() {
       getCuisionLoading = true;
     });
-    currentLocation = await _location.getLocation();
-    final coordinates =
-        new Coordinates(currentLocation.latitude, currentLocation.longitude);
-    var addresses =
-        await Geocoder.local.findAddressesFromCoordinates(coordinates);
-    var first = addresses.first;
-    addressData = first.addressLine;
-    if (currentLocation != null && mounted) {
-      setState(() {
-        position = {
-          'lat': currentLocation.latitude,
-          'long': currentLocation.longitude,
-          'name': addressData
-        };
-      });
-      await Common.savePositionInfo(position);
-    }
-    if (position != null) {
-      await MainService.getNearByRestaurants(position['lat'], position['long'],
-              count: null)
-          .then((value) {
-        if (value != null) {
-          List responseArray;
-          responseArray = value['dataArr'];
-          for (int i = 0; responseArray.length > i; i++) {
-            for (int j = 0;
-                responseArray[i]['restaurantID']['cuisine'].length > j;
-                j++) {
-              int matchedCuisineIndex;
-              for (int k = 0; renderArray.length > k; k++) {
-                if (renderArray != [] &&
-                    (renderArray[k]['cuisineName'] ==
-                        responseArray[i]['restaurantID']['cuisine'][j]
-                            ['cuisineName'])) {
-                  matchedCuisineIndex = k;
+
+    Common.getPositionInfo().then((position) async {
+      if (position != null) {
+        await MainService.getNearByRestaurants(
+                position['lat'], position['long'],
+                count: null)
+            .then((value) {
+          if (value != null) {
+            List responseArray;
+            responseArray = value['dataArr'];
+            for (int i = 0; responseArray.length > i; i++) {
+              for (int j = 0;
+                  responseArray[i]['restaurantID']['cuisine'].length > j;
+                  j++) {
+                int matchedCuisineIndex;
+                for (int k = 0; renderArray.length > k; k++) {
+                  if (renderArray != [] &&
+                      (renderArray[k]['cuisineName'] ==
+                          responseArray[i]['restaurantID']['cuisine'][j]
+                              ['cuisineName'])) {
+                    matchedCuisineIndex = k;
+                  }
+                }
+                if (matchedCuisineIndex == null) {
+                  List locations = [];
+                  locations.add(responseArray[i]);
+                  renderArray.add({
+                    'cuisineName': responseArray[i]['restaurantID']['cuisine']
+                        [j]['cuisineName'],
+                    'cuisineId': responseArray[i]['restaurantID']['cuisine'][j]
+                        ['_id'],
+                    'locations': locations,
+                    'cuisineImgUrl': responseArray[i]['restaurantID']['cuisine']
+                        [j]['cuisineImg']['imageUrl']
+                  });
+                } else {
+                  renderArray[matchedCuisineIndex]['locations']
+                      .add(responseArray[i]);
                 }
               }
-              if (matchedCuisineIndex == null) {
-                List locations = [];
-                locations.add(responseArray[i]);
-                renderArray.add({
-                  'cuisineName': responseArray[i]['restaurantID']['cuisine'][j]
-                      ['cuisineName'],
-                  'cuisineId': responseArray[i]['restaurantID']['cuisine'][j]
-                      ['_id'],
-                  'locations': locations,
-                  'cuisineImgUrl': responseArray[i]['restaurantID']['cuisine']
-                      [j]['cuisineImg']['imageUrl']
-                });
-              } else {
-                renderArray[matchedCuisineIndex]['locations']
-                    .add(responseArray[i]);
-              }
             }
-          }
 
-          setState(() {
-            getCuisionLoading = false;
-          });
-        } else {
-          setState(() {
-            renderArray = [];
-            getCuisionLoading = false;
-          });
-        }
+            setState(() {
+              getCuisionLoading = false;
+            });
+          } else {
+            setState(() {
+              renderArray = [];
+              getCuisionLoading = false;
+            });
+          }
+        });
+      }
+    }).catchError((onError) {
+      setState(() {
+        renderArray = [];
+        getCuisionLoading = false;
       });
-    }
+      print(onError);
+    });
   }
 
   getAdvertisementList() async {
@@ -332,66 +321,62 @@ class HomePageState extends State<HomePage> {
         ),
         centerTitle: true,
         actions: <Widget>[
-          isNearByRestaurants
-              ? IconButton(
-                  icon: Icon(
-                    Icons.search,
-                    color: Colors.white,
-                  ),
-                  onPressed: () {
-                    showSearch(
-                        context: context,
-                        delegate: RestaurantSearch(
-                            locale: widget.locale,
-                            localizedValues: widget.localizedValues,
-                            restaurantList: nearByRestaurentsList));
-                  })
-              : Container(),
-          GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => CartPage(
-                      localizedValues: widget.localizedValues,
-                      locale: widget.locale,
-                    ),
-                  ),
-                );
-              },
-              child: Stack(
-                children: <Widget>[
-                  Container(
-                      padding: EdgeInsets.only(top: 20.0, right: 10),
-                      child: Icon(
-                        Icons.shopping_cart,
-                        color: Colors.white,
-                      )),
-                  Positioned(
-                      right: 1,
-                      top: 6,
-                      child: (cartCount == null || cartCount == 0)
-                          ? Text(
-                              '',
-                              style: TextStyle(fontSize: 14.0),
-                            )
-                          : Container(
-                              height: 20,
-                              width: 20,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.black,
-                              ),
-                              child: Text('${cartCount.toString()}',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontFamily: "bold",
-                                      fontSize: 11)),
-                            )),
-                ],
-              )),
-          Padding(padding: EdgeInsets.only(left: 7.0)),
+          Padding(
+            padding: const EdgeInsets.only(left: 8, right: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                isNearByRestaurants
+                    ? IconButton(
+                        icon: Icon(Icons.search, color: Colors.white),
+                        onPressed: () {
+                          showSearch(
+                              context: context,
+                              delegate: RestaurantSearch(
+                                  locale: widget.locale,
+                                  localizedValues: widget.localizedValues,
+                                  restaurantList: nearByRestaurentsList));
+                        })
+                    : Container(),
+                GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (BuildContext context) => CartPage(
+                              localizedValues: widget.localizedValues,
+                              locale: widget.locale),
+                        ),
+                      );
+                    },
+                    child: Stack(
+                      children: <Widget>[
+                        Icon(Icons.shopping_cart, color: Colors.white),
+                        Positioned(
+                            right: 1,
+                            top: 6,
+                            child: (cartCount == null || cartCount == 0)
+                                ? Text('', style: TextStyle(fontSize: 14.0))
+                                : Container(
+                                    height: 20,
+                                    width: 20,
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.black,
+                                    ),
+                                    child: Text('${cartCount.toString()}',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontFamily: "bold",
+                                            fontSize: 11)),
+                                  )),
+                      ],
+                    )),
+              ],
+            ),
+          ),
         ],
       ),
       body: ListView(
@@ -909,7 +894,7 @@ class HomePageState extends State<HomePage> {
           restaurantName,
           style: textsemiboldblack(),
         ),
-        subTitle:
+        subtitle:
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(
             locationName ?? '',
