@@ -23,7 +23,6 @@ bool get isInDebugMode {
 SentryError sentryError = new SentryError();
 Timer oneSignalTimer;
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Map<String, Map<String, String>> localizedValues = await initializeI18n();
@@ -115,14 +114,9 @@ class _EntryPageState extends State<EntryPage> {
       debugShowCheckedModeBanner: false,
       title: APP_NAME,
       theme: ThemeData(
-        fontFamily: FONT_FAMILY,
-        primaryColor: PRIMARY,
-        accentColor: PRIMARY,
-      ),
+          fontFamily: FONT_FAMILY, primaryColor: PRIMARY, accentColor: PRIMARY),
       home: CurrentLocation(
-        locale: widget.locale,
-        localizedValues: widget.localizedValues,
-      ),
+          locale: widget.locale, localizedValues: widget.localizedValues),
     );
   }
 }
