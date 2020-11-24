@@ -275,5 +275,6 @@
   "doYouWantSameOrDifferent": "Do you want same or different flavor?",
   "same": "Same",
   "different": "Different",
-  "changeLocation": "Change Location"
+  "changeLocation": "Change Location",
+  "dragMapPin": "Drag the map to select a location or click search"
 }
