@@ -164,18 +164,20 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
     }
 
     // [5] calculate delivery charge
-    if (widget.shippingType.compareTo('free') == 0) {
-      deliveryCharge = 0.0;
-    } else if (widget.shippingType.compareTo('flexible') == 0) {
-      if (subTotal > widget.minimumOrderAmount) {
+    if (widget.shippingType != null) {
+      if (widget.shippingType.compareTo('free') == 0) {
         deliveryCharge = 0.0;
-      } else {
+      } else if (widget.shippingType.compareTo('flexible') == 0) {
+        if (subTotal > widget.minimumOrderAmount) {
+          deliveryCharge = 0.0;
+        } else {
+          deliveryCharge = widget.deliveryCharge.toDouble();
+        }
+      } else if (widget.shippingType.compareTo('fixed') == 0) {
         deliveryCharge = widget.deliveryCharge.toDouble();
+      } else {
+        deliveryCharge = 0.0;
       }
-    } else if (widget.shippingType.compareTo('fixed') == 0) {
-      deliveryCharge = widget.deliveryCharge.toDouble();
-    } else {
-      deliveryCharge = 0.0;
     }
 
     // [6] calculate grand total

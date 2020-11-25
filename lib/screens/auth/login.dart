@@ -297,14 +297,7 @@ class _LoginPageState extends State<LoginPage> {
         height: 56.0,
         width: screenWidth(context),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.topRight,
-            colors: [
-              const Color(0xFFFFFFFF).withOpacity(0.25),
-              const Color(0xFFFFFFFF).withOpacity(0.25)
-            ],
-          ),
+          color: Color(0xFFFFFFFF).withOpacity(0.25),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

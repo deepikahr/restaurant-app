@@ -275,5 +275,6 @@
   "doYouWantSameOrDifferent": "¿Quieres el mismo o diferente sabor?",
   "same": "Misma",
   "different": "Diferente",
-  "changeLocation": "Cambiar ubicación"
+  "changeLocation": "Cambiar ubicación",
+  "dragMapPin": "Arrastra el mapa para seleccionar una ubicación o haz clic en buscar"
 }
