@@ -894,7 +894,7 @@ class HomePageState extends State<HomePage> {
           restaurantName,
           style: textsemiboldblack(),
         ),
-        subTitle:
+        subtitle:
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(
             locationName ?? '',
