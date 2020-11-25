@@ -11,10 +11,10 @@ const GOOGLE_API_KEY = "AIzaSyBzlzxdWPS9GdaKpxhui7o1d7QDIefQXTs";
 // const BASE_URL = 'http://saas.ngrok.ionicfirebaseapp.com/';
 
 // testing
-// const BASE_URL = 'http://162.243.171.81:8000/';
+// const BASE_URL = 'https://restaurant-saas-api-stg.ionicfirebaseapp.com/';
 
 // production
-const BASE_URL = 'http://162.243.171.81:7000/';
+const BASE_URL = 'https://restaurant-saas-api.ionicfirebaseapp.com/';
 
 // stripe key
 const STRIPE_KEY = "pk_test_RBdAu6jIbEByY3KaBQFbH4N100nMkViv6g";
