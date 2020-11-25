@@ -15,8 +15,11 @@ class CurrentLocation extends StatefulWidget {
   final Map localizedValues;
   final String locale;
 
-  const CurrentLocation({Key key, this.localizedValues, this.locale})
-      : super(key: key);
+  const CurrentLocation({
+    Key key,
+    this.localizedValues,
+    this.locale,
+  }) : super(key: key);
 
   @override
   _CurrentLocationState createState() => _CurrentLocationState();
@@ -26,7 +29,7 @@ class _CurrentLocationState extends State<CurrentLocation> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final Location _location = Location();
   var position;
-  bool isPermissionAllowed = true, getDataLoading = false;
+  bool isPermissionAllowed = true, isPermissionCheckLoading = false;
 
   @override
   void initState() {
@@ -34,32 +37,47 @@ class _CurrentLocationState extends State<CurrentLocation> {
     super.initState();
   }
 
-  checkPermission() async {
+  void checkPermission() async {
     PermissionStatus _permissionGranted;
     _permissionGranted = await _location.hasPermission();
     if (_permissionGranted == PermissionStatus.granted) {
-      setState(() {
-        _getCurrentLocation();
-        isPermissionAllowed = true;
-        getDataLoading = true;
+      _getCurrentLocation();
+      isPermissionAllowed = true;
+    } else {
+      isPermissionAllowed = false;
+    }
+    setState(() {
+      isPermissionCheckLoading = false;
+    });
+  }
+
+  selectChangeLocationMethod() async {
+    LatLng initialPosition;
+    checkPermission();
+    if (isPermissionAllowed) {
+      await _location.onLocationChanged.first.then((location) {
+        initialPosition = LatLng(location.latitude, location.longitude);
+        showMapLocationPicker(initialPosition);
       });
     } else {
-      setState(() {
-        isPermissionAllowed = false;
-      });
+      initialPosition = LatLng(12.9167995, 77.5878204);
+      showMapLocationPicker(initialPosition);
     }
   }
 
-  selectChangeLocationMethod(latLng) async {
+  void showMapLocationPicker(initialPosition) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     PlacePickerResult pickerResult = await Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) => PlacePickerScreen(
                   googlePlacesApiKey: GOOGLE_API_KEY,
-                  initialPosition: LatLng(latLng['lat'], latLng['long']),
+                  initialPosition: initialPosition,
                   mainColor: PRIMARY,
-                  mapStrings: MapPickerStrings.english(),
+                  mapStrings: MapPickerStrings.english(
+                      selectAddress: MyLocalizations.of(context).selectAddress,
+                      cancel: MyLocalizations.of(context).cancel,
+                      address: MyLocalizations.of(context).address),
                   placeAutoCompleteLanguage:
                       prefs.getString('selectedLanguage') ?? 'en',
                 )));
@@ -95,11 +113,11 @@ class _CurrentLocationState extends State<CurrentLocation> {
               padding: EdgeInsets.only(left: 10, right: 10),
               child: Image.asset("lib/assets/imgs/man.png")),
           SizedBox(height: 30),
-          buildSelectedlocation(),
-          getDataLoading
+          isPermissionCheckLoading ? Container() : buildSelectedlocation(),
+          isPermissionCheckLoading
               ? Center(child: CircularProgressIndicator())
               : Container(),
-          isPermissionAllowed ? Container() : buildSelectLocation()
+          isPermissionCheckLoading ? Container() : buildSelectLocation()
         ],
       ),
       bottomNavigationBar: position == null
@@ -147,14 +165,7 @@ class _CurrentLocationState extends State<CurrentLocation> {
       height: 44,
       margin: EdgeInsets.only(left: 30, right: 30),
       child: RaisedButton(
-        onPressed: () {
-          if (position != null) {
-            selectChangeLocationMethod(
-                {'lat': position['lat'], 'long': position['long']});
-          } else {
-            selectChangeLocationMethod({'lat': 12.9167995, 'long': 77.5878204});
-          }
-        },
+        onPressed: selectChangeLocationMethod,
         color: PRIMARY,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -180,7 +191,7 @@ class _CurrentLocationState extends State<CurrentLocation> {
         await Geocoder.local.findAddressesFromCoordinates(coordinates);
     if (currentLocation != null && mounted) {
       setState(() {
-        getDataLoading = false;
+        isPermissionCheckLoading = false;
         position = {
           'lat': currentLocation.latitude,
           'long': currentLocation.longitude,
@@ -190,7 +201,7 @@ class _CurrentLocationState extends State<CurrentLocation> {
       await Common.savePositionInfo(position);
     } else {
       setState(() {
-        getDataLoading = false;
+        isPermissionCheckLoading = false;
       });
       showError(
           MyLocalizations.of(context).enableTogetlocation,
