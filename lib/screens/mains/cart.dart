@@ -903,6 +903,8 @@ class CartPageState extends State<CartPage> {
       });
     }
     cartProduct = {
+      'categoryId': product['category'],
+      'categoryName': product['title'],
       'Discount': product['Discount'],
       'MRP': product['MRP'],
       'note': null,

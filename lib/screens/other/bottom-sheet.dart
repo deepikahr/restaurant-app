@@ -86,6 +86,8 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
       });
     }
     cartProduct = {
+      'categoryId': product['category'],
+      'categoryName': product['title'],
       'Discount': variant['Discount'],
       'MRP': variant['MRP'],
       'note': null,
@@ -102,6 +104,7 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
       'totalPrice': price,
       'restaurantAddress': widget.restaurantAddress
     };
+    print(cartProduct.toString());
   }
 
   void addProduct() async {
