@@ -98,8 +98,13 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       });
     }
     cartProduct = {
+<<<<<<< HEAD
       'categoryId': variant['categoryId'],
       'categoryName': variant['categoryName'],
+=======
+      'categoryId': widget.product['category'],
+      'categoryName': widget.product['title'],
+>>>>>>> 7c55b9d178e1cf278f9c8b9e9661425cc3bc80ef
       'Discount': variant['Discount'],
       'MRP': variant['MRP'],
       'note': null,

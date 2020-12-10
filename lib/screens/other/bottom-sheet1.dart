@@ -269,7 +269,7 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
         context,
         MaterialPageRoute(
             builder: (BuildContext context) => FlavourPage(
-              shippingType: widget.shippingType,
+                  shippingType: widget.shippingType,
                   deliveryCharge: widget.deliveryCharge,
                   minimumOrderAmount: widget.minimumOrderAmount,
                   cartProduct: cartProduct,
@@ -303,6 +303,8 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
       });
     }
     cartProduct = {
+      'categoryId': product['category'],
+      'categoryName': product['title'],
       'Discount': variant['Discount'],
       'MRP': variant['MRP'],
       'note': null,
