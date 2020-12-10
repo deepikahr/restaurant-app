@@ -16,12 +16,18 @@ SentryError sentryError = new SentryError();
 
 class ProductDetailsPage extends StatefulWidget {
   final Map<String, dynamic> product, locationInfo, taxInfo, tableInfo;
-  final String restaurantName, restaurantId, restaurantAddress;
+  final String restaurantName,
+      restaurantId,
+      restaurantAddress,
+      categoryName,
+      categoryId;
   final Map<String, Map<String, String>> localizedValues;
   final String locale;
 
   ProductDetailsPage(
       {Key key,
+      this.categoryId,
+      this.categoryName,
       this.product,
       this.locationInfo,
       this.restaurantName,
@@ -74,6 +80,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     Map<String, dynamic> variant =
         widget.product['variants'][selectedSizeIndex];
     price = price + variant['price'];
+    print(variant);
 
     if (mounted) {
       setState(() {
@@ -91,6 +98,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       });
     }
     cartProduct = {
+      'categoryId': variant['categoryId'],
+      'categoryName': variant['categoryName'],
       'Discount': variant['Discount'],
       'MRP': variant['MRP'],
       'note': null,
@@ -105,7 +114,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       'restaurantID': widget.restaurantId,
       'totalPrice': price,
       'restaurantAddress': widget.restaurantAddress
-    };
+    };  
+
+    print("cat body");
+    print(cartProduct['categoryId'].toString);
   }
 
   @override
@@ -138,9 +150,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     currency = prefs.getString('currency');
   }
-
   void _checkFavourite() async {
     ProfileService.checkFavourite(widget.product['_id']).then((onValue) {
+     print(onValue);
       try {
         if (mounted) {
           if (mounted) {
@@ -723,11 +735,13 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
   void addProduct() async {
     await Common.getProducts().then((productsList) {
+      print(productsList);
       if (productsList != null) {
         tempProducts = productsList;
         tempProducts.add(cartProduct);
         for (int i = 0; i < tempProducts.length; i++) {}
         Common.addProduct(tempProducts).then((value) {
+          print(value);
           setState(() {
             isAdded = true;
           });

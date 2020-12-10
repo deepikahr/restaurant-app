@@ -20,12 +20,14 @@ SentryError sentryError = new SentryError();
 class CartPage extends StatefulWidget {
   Map<String, dynamic> product, taxInfo, locationInfo;
   final Map<String, Map<String, String>> localizedValues;
-  final String locale;
+  final String locale,categoryId,categoryName;
   final Map<String, dynamic> tableInfo;
   final Function listener;
 
   CartPage(
       {Key key,
+     this.categoryId,
+      this.categoryName,
       this.product,
       this.taxInfo,
       this.locationInfo,
@@ -148,6 +150,7 @@ class CartPageState extends State<CartPage> {
     // [0] other options when opening cart from menu
     if (widget.taxInfo == null) {
       await Common.getCartInfo().then((onValue) {
+        print(onValue.toString());
         if (onValue != null) {
           widget.taxInfo = onValue['taxInfo'];
           widget.locationInfo = onValue['locationInfo'];
@@ -164,6 +167,7 @@ class CartPageState extends State<CartPage> {
     // [1] retrive cart from storage if available
     Map<String, dynamic> cart = cartItems;
     await Common.getCart().then((onValue) {
+      // print(onValue);
       cart = onValue;
     }).catchError((onError) {
       if (mounted) {
@@ -174,6 +178,7 @@ class CartPageState extends State<CartPage> {
     });
 
     await Common.getProducts().then((value) {
+      print(value);
       products = value != null ? value : [];
     }).catchError((error) {
       if (mounted) {
@@ -261,6 +266,8 @@ class CartPageState extends State<CartPage> {
     // [7] create complete order json as Map
     if (products.length != 0) {
       cart = {
+        'categoryId': cart['categoryId'],
+        'categoryName': cart['categoryName'],
         'locationId': cart != null ? cart['locationId'] : null,
         'deliveryCharge': deliveryCharge.toInt(),
         'grandTotal': grandTotal,
@@ -290,6 +297,9 @@ class CartPageState extends State<CartPage> {
                 'couponName': selectedCoupon['couponName']
               }
       };
+
+      print("helloo...........");
+      print(cart['categoryId']);
     }
 
     // [8] set cart state and save to storage
@@ -903,6 +913,8 @@ class CartPageState extends State<CartPage> {
       });
     }
     cartProduct = {
+      'categoryId': product['categoryId'],
+      'categoryName': product['categoryName'],
       'Discount': product['Discount'],
       'MRP': product['MRP'],
       'note': null,

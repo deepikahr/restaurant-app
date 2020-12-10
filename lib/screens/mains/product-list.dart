@@ -26,6 +26,8 @@ class ProductListPage extends StatefulWidget {
       imgUrl,
       address,
       locationId,
+      categoryId,
+      categoryName,
       restaurantId;
   final Map<String, dynamic> workingHours, locationInfo, taxInfo;
   final List<dynamic> cuisine;
@@ -34,6 +36,8 @@ class ProductListPage extends StatefulWidget {
 
   ProductListPage({
     Key key,
+    this.categoryId,
+    this.categoryName,
     this.restaurantName,
     this.locationName,
     this.aboutUs,
@@ -150,6 +154,7 @@ class ProductListPageState extends State<ProductListPage> {
             icon: Icons.block);
       },
       renderSuccess: ({data}) {
+        // print(data);
         if (data['restaurant'] != null &&
             data['restaurant']['restaurantID'] != null) {
           Future.delayed(Duration(seconds: 0), () async {
@@ -182,6 +187,7 @@ class ProductListPageState extends State<ProductListPage> {
                     _buildCategoryTitle(
                         data['restaurant']['restaurantID']['firstDeliveryFree'],
                         data['categorydata'][index]['categoryTitle'],
+                        data['categorydata'][index]['categoryId'],
                         data['categorydata'][index]['categoryImageUrl'],
                         data['categorydata'][index]['product']),
                   ],
@@ -497,7 +503,7 @@ class ProductListPageState extends State<ProductListPage> {
   }
 
   Widget _buildCategoryTitle(bool isProductFirstDeliverFree,
-      String categoryName, String imgUrl, List<dynamic> products) {
+      String categoryName, categoryId, String imgUrl, List<dynamic> products) {
     return Column(
       children: [
         ExpansionTile(
@@ -543,6 +549,8 @@ class ProductListPageState extends State<ProductListPage> {
                     price: double.parse(
                         products[index]['variants'][0]['price'].toString()),
                     product: products[index],
+                    categoryId: products[index]['categoryId'],
+                    categoryName: products[index]['categoryName'],
                     currency: currency,
                     topPadding: index == 0 ? 42.0 : 0,
                     off: double.parse(
