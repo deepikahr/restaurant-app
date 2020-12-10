@@ -44,7 +44,6 @@ class _PaymentMethodState extends State<PaymentMethod> {
 
   void _placeOrder() async {
     await Common.getPositionInfo().then((onValue) {
-      // print("onValue");
       try {
         widget.cart['position'] = onValue;
       } catch (error, stackTrace) {

@@ -549,8 +549,6 @@ class ProductListPageState extends State<ProductListPage> {
                     price: double.parse(
                         products[index]['variants'][0]['price'].toString()),
                     product: products[index],
-                    categoryId: products[index]['categoryId'],
-                    categoryName: products[index]['categoryName'],
                     currency: currency,
                     topPadding: index == 0 ? 42.0 : 0,
                     off: double.parse(

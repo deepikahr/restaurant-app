@@ -21,14 +21,11 @@ class BuildProductTile extends StatefulWidget {
   final Map<String, dynamic> product;
   final double mrp, off, price, topPadding;
   final Map<String, Map<String, String>> localizedValues;
-  final String locale, locationId,  categoryId,
-      categoryName;
+  final String locale, locationId;
   final int deliveryCharge, minimumOrderAmount;
 
   const BuildProductTile({
     Key key,
-    this.categoryId,
-    this.categoryName,
     this.imgUrl,
     this.productName,
     this.info,
