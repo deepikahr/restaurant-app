@@ -16,8 +16,7 @@
 	<string>Restaurant Saas</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>This app requires access to your current location</string>
+	
 	<key>CFBundleShortVersionString</key>
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
@@ -29,9 +28,11 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Camera permission is required for barcode scanning.</string>
 	<key>NSLocationUsageDescription</key>
-	<string>This app requires access to your current location.</string>
+	<string>We are asking for location for delivery, to be able to know the exact location beside the written address to deliver the orders on the right place.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This app requires access to your current location</string>
+	<string>We are asking for location for delivery, to be able to know the exact location beside the written address to deliver the orders on the right place.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>We are asking for location for delivery, to be able to know the exact location beside the written address to deliver the orders on the right place.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This app requires access to the photo library to change profile picture.</string>
 	<key>UIBackgroundModes</key>
