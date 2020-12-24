@@ -3,6 +3,7 @@ import 'dart:core';
 
 import 'package:RestaurantSaas/screens/other/thank-you.dart';
 import 'package:RestaurantSaas/services/constant.dart';
+import 'package:RestaurantSaas/widgets/appbar.dart';
 import 'package:async_loader/async_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
@@ -51,6 +52,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
   Location _location = new Location();
   double grandTotal = 0.0, tempGrandTotal = 0.0;
   int deliveryCharge = 0;
+  int selectedRadio;
 
   bool isDeliveryAvailable = true,
       isFirstTime = true,
@@ -259,6 +261,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
   void initState() {
     dc = widget.cart['deliveryCharge'];
     gt = widget.cart['grandTotal'];
+    selectedRadio = widget.cart['orderType'] == 'Delivery' ? 1 : 0;
     getGlobalSettingsData();
     _getAddressList();
     super.initState();
@@ -287,30 +290,134 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
         });
 
     return Scaffold(
-      backgroundColor: whiteTextb,
+      backgroundColor: bg,
       key: _scaffoldKey,
-      appBar: AppBar(
-        leading: InkWell(
-          onTap: () {
-            widget.cart['deliveryCharge'] = dc;
-            widget.cart['grandTotal'] = gt;
-            Navigator.of(context).pop();
-          },
-          child: Icon(
-            Icons.arrow_back,
-            color: Colors.white,
-          ),
-        ),
-        backgroundColor: PRIMARY,
-        elevation: 0.0,
-        title: new Text(
-          MyLocalizations.of(context).reviewOrder,
-          style: textbarlowSemiBoldWhite(),
-        ),
-        centerTitle: true,
-      ),
+      appBar: appBarWithTitle(context, MyLocalizations.of(context).reviewOrder),
+      // AppBar(
+      //   leading: InkWell(
+      //     onTap: () {
+      //       widget.cart['deliveryCharge'] = dc;
+      //       widget.cart['grandTotal'] = gt;
+      //       Navigator.of(context).pop();
+      //     },
+      //     child: Icon(
+      //       Icons.arrow_back,
+      //       color: Colors.white,
+      //     ),
+      //   ),
+      //   backgroundColor: primary,
+      //   elevation: 0.0,
+      //   title: new Text(
+      //     MyLocalizations.of(context).reviewOrder,
+      //     style: textbarlowSemiBoldWhite(),
+      //   ),
+      //   centerTitle: true,
+      // ),
       body: _asyncLoader,
       bottomNavigationBar: _buildBottomBar(),
+    );
+  }
+
+  Widget infoBlock(title, value) {
+    return Container(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            title,
+            style: textMuliRegularsm(),
+          ),
+          Text(
+            value,
+            style: textMuliSemiboldmd(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget contactDetails(userInfo) {
+    return Container(
+      color: Colors.white,
+      margin: EdgeInsets.only(bottom: 10),
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 22),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(MyLocalizations.of(context).contactInformation,
+              style: textMuliSemiboldextra()),
+          SizedBox(height: 10),
+          infoBlock('Full Name', userInfo['name']),
+          Divider(
+            color: secondary.withOpacity(0.1),
+            height: 22,
+          ),
+          infoBlock('Mobile Number', userInfo['contactNumber'].toString()),
+        ],
+      ),
+    );
+  }
+
+  Widget orderType() {
+    return Container(
+      color: Colors.white,
+      padding: EdgeInsets.only(top: 16, left: 16, right: 16),
+      margin: EdgeInsets.only(bottom: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(MyLocalizations.of(context).selectOrderType,
+              style: textMuliSemiboldextra()),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Flexible(
+                flex: 6,
+                child: RadioListTile(
+                  value: 0,
+                  groupValue: selectedRadio,
+                  activeColor: Colors.green,
+                  onChanged: (val) {
+                    if (mounted) {
+                      setState(() {
+                        selectedRadio = val;
+                        widget.cart['orderType'] = 'Pickup';
+                      });
+                    }
+                  },
+                  title: Text(
+                    'PickUp',
+                    style: textMuliSemiboldm(),
+                  ),
+                ),
+              ),
+              Flexible(
+                flex: 6,
+                child: RadioListTile(
+                  value: 1,
+                  groupValue: selectedRadio,
+                  activeColor: Colors.green,
+                  onChanged: (val) {
+                    if (mounted) {
+                      setState(() {
+                        selectedRadio = val;
+                        widget.cart['orderType'] = 'Delivery';
+                        widget.cart['pickupDate'] = null;
+                        widget.cart['pickupTime'] = null;
+                      });
+                    }
+                  },
+                  title: Text(
+                    'Delivery',
+                    style: textMuliSemiboldm(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -323,114 +430,329 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
     if (widget.cart['orderType'] == 'Dine In') {
       isDineIn = true;
     }
-    return SingleChildScrollView(
-      scrollDirection: Axis.vertical,
-      child: Container(
-        alignment: AlignmentDirectional.topStart,
-        color: greyc,
-        child: ListView(
-          physics: ScrollPhysics(),
-          shrinkWrap: true,
-          children: <Widget>[
-            _buildHeader(),
-            new Column(
-              children: <Widget>[
-                _buildBulletTitle(
-                    1, MyLocalizations.of(context).contactInformation),
-                _buildContactBlock(userInfo['name'] ?? '',
-                    userInfo['contactNumber'].toString(), userInfo),
-                _buildBulletTitle(
-                    2, MyLocalizations.of(context).selectOrderType),
-                widget.tableInfo == null
-                    ? _buildOrderTypeBlock()
-                    : _buildDineInTypeBlock(),
-                isDineIn
-                    ? Container()
-                    : _buildBulletTitle(
-                        3,
-                        isPickup
-                            ? MyLocalizations.of(context).restaurantAddress
-                            : MyLocalizations.of(context).selectAddress),
-                isDineIn ? Container() : _buildAddressList(isPickup),
-                _buildBulletTitle(
-                    isDineIn ? 3 : 4, MyLocalizations.of(context).orderDetails),
-                _buildProductListBlock(userInfo),
-              ],
-            ),
-          ],
-        ),
-      ),
+    return ListView(
+      physics: ScrollPhysics(),
+      shrinkWrap: true,
+      children: <Widget>[
+        contactDetails(userInfo),
+        orderType(),
+        widget.tableInfo == null
+            ? _buildOrderTypeBlock()
+            : _buildDineInTypeBlock(),
+        // isDineIn
+        //     ? Container()
+        //     : _buildBulletTitle(
+        //         3,
+        //         isPickup
+        //             ? MyLocalizations.of(context).restaurantAddress
+        //             : MyLocalizations.of(context).selectAddress),
+        isDineIn ? Container() : deliveryType(isPickup),
+        // _buildBulletTitle(
+        //     isDineIn ? 3 : 4, MyLocalizations.of(context).orderDetails),
+        // _buildProductListBlock(userInfo),
+      ],
     );
   }
 
-  Widget _buildHeader() {
+  Widget pickUpType() {
     return Container(
-      color: Colors.black38,
-      padding: EdgeInsets.all(10.0),
-      child: new Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          new Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              new Text(
-                MyLocalizations.of(context).date,
-                style: hintStyleSmallWhiteLightOSL(),
-              ),
-              new Text(
-                DateTime.now().toString().substring(0, 10),
-                style: hintStyleSmallWhiteLightOSL(),
-              ),
-            ],
-          ),
-          new Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              new Text(
-                MyLocalizations.of(context).totalOrder,
-                style: hintStyleSmallWhiteLightOSL(),
-              ),
-              new Text(
-                '$currency' + widget.cart['grandTotal'].toStringAsFixed(2),
-                style: hintStyleSmallWhiteLightOSL(),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
+        child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: EdgeInsets.only(left: 15, right: 15, top: 15, bottom: 15),
+          child: Text('Select Order Type', style: textMuliBold()),
+        ),
+        // Container(
+        //   height: 59,
+        //   width: MediaQuery.of(context).size.width,
+        //   child: ListView.builder(
+        //     shrinkWrap: true,
+        //     scrollDirection: Axis.horizontal,
+        //     itemCount: 6,
+        //     itemBuilder: (BuildContext context, int index) {
+        //       return Container(
+        //         color: Color(0xFFF6F6F6),
+        //         width: 70,
+        //         child: Row(
+        //           children: <Widget>[
+        //             Padding(
+        //               padding: const EdgeInsets.only(top: 3, bottom: 3),
+        //               child: Container(
+        //                 width: 60,
+        //                 height: 49,
+        //                 margin: EdgeInsets.only(
+        //                   left: 10,
+        //                 ),
+        //                 decoration: BoxDecoration(
+        //                   color:
+        //                   _selectedIndex != null && _selectedIndex == index
+        //                       ? primary
+        //                       : Colors.transparent,
+        //                   borderRadius: BorderRadius.circular(5),
+        //                 ),
+        //                 child: InkWell(
+        //                   onTap: () => _onSelected(index),
+        //                   child: Column(
+        //                     mainAxisAlignment: MainAxisAlignment.center,
+        //                     children: <Widget>[
+        //                       Text('Mon',
+        //                           style: _selectedIndex != null &&
+        //                               _selectedIndex == index
+        //                               ? textMuliBoldwhite()
+        //                               : textMuliBoldsec()),
+        //                       Text('12 Feb',
+        //                           style: _selectedIndex != null &&
+        //                               _selectedIndex == index
+        //                               ? textMuliRegularwhite()
+        //                               : textMuliRegularsm()),
+        //                     ],
+        //                   ),
+        //                 ),
+        //               ),
+        //             ),
+        //           ],
+        //         ),
+        //       );
+        //     },
+        //   ),
+        // ),
+        ListView.builder(
+            physics: ScrollPhysics(),
+            shrinkWrap: true,
+            scrollDirection: Axis.vertical,
+            itemCount: 3,
+            itemBuilder: (BuildContext context, int index) {
+              return SingleChildScrollView(
+                  child: Container(
+                padding: EdgeInsets.only(left: 15, right: 15),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(
+                      '10pm-9am',
+                      style: textMuliRegular(),
+                    ),
+                    Radio(
+                      value: 0,
+                      groupValue: selectedRadio,
+                      activeColor: Colors.green,
+                      onChanged: (val) {
+                        print("Radio $val");
+                      },
+                    ),
+                  ],
+                ),
+              ));
+            }),
+      ],
+    ));
   }
 
-  Widget _buildBulletTitle(int number, String title) {
-    return Container(
-      color: greyc,
-      child: new Padding(
-        padding: EdgeInsets.only(top: 20.0, bottom: 5.0, left: 5.0, right: 5.0),
-        child: new Row(
-          children: <Widget>[
-            new Container(
-              width: 22.0,
-              height: 22.0,
-              alignment: AlignmentDirectional.center,
-              decoration: new BoxDecoration(
-                shape: BoxShape.circle,
-                color: primaryLight,
-              ),
-              child: new Text(
-                number.toString(),
-                textAlign: TextAlign.center,
-                style: hintStyleLightOSB(),
-              ),
-            ),
-            new Padding(padding: EdgeInsets.all(5.0)),
-            new Text(title, style: hintStyleSmallDarkOSB())
-          ],
+  Widget deliveryType(bool isPickup) {
+    if (isPickup) {
+      return Padding(
+        padding: EdgeInsets.only(
+          left: 10.0,
+          right: 10.0,
+          bottom: 10.0,
         ),
-      ),
-    );
+        child: Container(
+          color: Colors.white,
+          padding: EdgeInsets.all(10.0),
+          child: Container(
+            padding: EdgeInsets.all(10),
+            color: Colors.grey[200],
+            child: Text(widget.cart['productDetails'][0]['restaurantAddress']),
+          ),
+        ),
+      );
+    } else {
+      return isAddressget
+          ? CircularProgressIndicator()
+          : Container(
+              color: Colors.white,
+              child: Column(
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text(
+                          'Select Address',
+                          style: textMuliSemiboldextra(),
+                        ),
+                        InkWell(
+                          onTap: () async {
+                            currentLocation = await _location.getLocation();
+                            if (currentLocation != null) {
+                              PlacePickerResult pickerResult =
+                                  await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              PlacePickerScreen(
+                                                googlePlacesApiKey:
+                                                    GOOGLE_API_KEY,
+                                                initialPosition: LatLng(
+                                                    currentLocation.latitude,
+                                                    currentLocation.longitude),
+                                                mainColor: primary,
+                                                mapStrings:
+                                                    MapPickerStrings.english(),
+                                                placeAutoCompleteLanguage: 'en',
+                                              )));
+                              if (pickerResult != null) {
+                                setState(() {
+                                  var result = Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          AddAddressPage(
+                                              localizedValues:
+                                                  widget.localizedValues,
+                                              locale: widget.locale,
+                                              loactionAddress: {
+                                            'address':
+                                                pickerResult.address.toString(),
+                                            'lat': pickerResult.latLng.latitude,
+                                            'long':
+                                                pickerResult.latLng.longitude
+                                          }),
+                                    ),
+                                  );
+                                  result.then((res) {
+                                    _getAddressList();
+                                    _getUserInfo();
+                                  });
+                                });
+                              }
+                            } else {
+                              showError(
+                                  MyLocalizations.of(context)
+                                      .enableTogetlocation,
+                                  MyLocalizations.of(context).gPSsettings);
+                            }
+                          },
+                          child: Text(
+                            '+Add Address',
+                            style: textMuliSemiboldextraprimary(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  addressList.length > 0
+                      ? ListView.builder(
+                          physics: ScrollPhysics(),
+                          shrinkWrap: true,
+                          scrollDirection: Axis.vertical,
+                          itemCount: addressList.length,
+                          padding: EdgeInsets.zero,
+                          itemBuilder: (BuildContext context, int index) {
+                            if (addressList[index]['isSelected'] == null) {
+                              if (index == 0) {
+                                addressList[index]['isSelected'] = true;
+                              } else {
+                                addressList[index]['isSelected'] = false;
+                              }
+                            }
+                            return Column(
+                              children: <Widget>[
+                                RadioListTile(
+                                  groupValue: selectedAddressIndex,
+                                  value: index,
+                                  selected: addressList[index]['isSelected'],
+                                  onChanged: (int selected) {
+                                    if (mounted) {
+                                      setState(() {
+                                        selectedAddressIndex = selected;
+                                        addressList[index]['isSelected'] =
+                                            !addressList[index]['isSelected'];
+                                        widget.cart['shippingAddress'] =
+                                            addressList[index];
+                                      });
+                                    }
+                                  },
+                                  activeColor: primary,
+                                  title: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      new Text(
+                                        addressList[index]['addressType'],
+                                        style: textMuliRegular(),
+                                      ),
+                                      new Text(
+                                        addressList[index]['address'],
+                                        style: textMuliRegular(),
+                                      ),
+                                      new Text(
+                                        addressList[index]['contactNumber']
+                                            .toString(),
+                                        style: textMuliRegular(),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Container(
+                                      width: 112,
+                                      height: 32,
+                                      margin: EdgeInsets.all(8),
+                                      child: RaisedButton(
+                                          color: Colors.transparent,
+                                          elevation: 0,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  new BorderRadius.circular(
+                                                      5.0),
+                                              side:
+                                                  BorderSide(color: primary)),
+                                          onPressed: () {
+                                            _deleteAddressList(index);
+                                          },
+                                          child: Text(
+                                            'Delete',
+                                            style: textMuliSemiboldprimary(),
+                                          )),
+                                    ),
+                                    Container(
+                                      width: 112,
+                                      height: 32,
+                                      margin: EdgeInsets.all(8),
+                                      child: RaisedButton(
+                                          color: Colors.transparent,
+                                          elevation: 0,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  new BorderRadius.circular(
+                                                      5.0),
+                                              side:
+                                                  BorderSide(color: primary)),
+                                          onPressed: () {
+                                            // _deleteAddressList(index);
+                                          },
+                                          child: Text(
+                                            'Edit',
+                                            style: textMuliSemiboldprimary(),
+                                          )),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            );
+                          })
+                      : Container(),
+                ],
+              ),
+            );
+    }
   }
 
   Widget _buildDineInTypeBlock() {
@@ -450,7 +772,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                 padding:
                     EdgeInsets.only(top: 10, left: 10, bottom: 0, right: 10),
                 decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(9.0), color: PRIMARY),
+                    borderRadius: BorderRadius.circular(9.0), color: primary),
                 child: Column(
                   children: <Widget>[
                     Row(
@@ -460,7 +782,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                         Container(
                           width: screenWidth(context) * 0.7,
                           height: 34,
-                          color: PRIMARY,
+                          color: primary,
                           child: Column(
                             children: [
                               Row(
@@ -496,454 +818,296 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
   }
 
   Widget _buildOrderTypeBlock() {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 10.0,
-        right: 10.0,
-      ),
-      child: Container(
-        color: Colors.white,
-        padding: EdgeInsets.all(10.0),
-        child: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.only(left: 10.0, right: 10.0, bottom: 0.0),
-              child: Container(
-                padding:
-                    EdgeInsets.only(top: 10, left: 10, bottom: 0, right: 10),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(9.0), color: PRIMARY),
-                child: Column(
+    return Container(
+      color: Colors.white,
+      padding: EdgeInsets.all(16.0),
+      margin: EdgeInsets.only(bottom: 10),
+      child: Column(
+        children: [
+          widget.cart['orderType'] != 'Delivery'
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        InkWell(
-                          onTap: () {
-                            if (mounted) {
-                              setState(() {
-                                widget.cart['orderType'] = 'Pickup';
-                              });
-                            }
-                          },
-                          child: Container(
-                            width: screenWidth(context) * 0.3,
-                            height: 48,
-                            color: PRIMARY,
-                            child: Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      MyLocalizations.of(context).pickUp,
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.only(left: 10),
-                                    ),
-                                    widget.cart['orderType'] == 'Pickup'
-                                        ? Icon(
-                                            Icons.check,
-                                            color: Colors.white,
-                                            size: 15.0,
-                                          )
-                                        : Container(),
-                                  ],
-                                ),
-                                widget.cart['orderType'] == 'Pickup'
-                                    ? Divider(color: Colors.white)
-                                    : Divider(color: Colors.black),
-                              ],
-                            ),
+                      Text(
+                        MyLocalizations.of(context).clickToSlot +
+                            " " +
+                            MyLocalizations.of(context).pickUp +
+                            " " +
+                            MyLocalizations.of(context).dateandTime,
+                        style: textMuliSemiboldextra(),
+                      ),
+                      SizedBox(height: 10,),
+                      widget.cart['pickupDate'] != null
+                          ? Text(
+                        MyLocalizations.of(context).pickUp +
+                            " " +MyLocalizations.of(context).date +
+                                  " : " +
+                                  widget.cart['pickupDate'],
+                              style: titleBlackLightOSB(),
+                            )
+                          : Container(),
+                      widget.cart['pickupTime'] != null
+                          ? Text(
+                        MyLocalizations.of(context).pickUp +
+                            " " +
+                              MyLocalizations.of(context).time +
+                                  " : " +
+                                  widget.cart['pickupTime'],
+                              style: titleBlackLightOSB(),
+                            )
+                          : Container(),
+                      RaisedButton(
+                        onPressed: () async {
+                          if (mounted) {
+                            setState(() {
+                              showSlotTimimg = false;
+                              widget.cart['pickupDate'] = null;
+                              widget.cart['pickupTime'] = null;
+                            });
+                          }
+                          DatePicker.showDatePicker(
+                            context,
+                            showTitleActions: true,
+                            onChanged: (dt) {
+                              if (mounted) {
+                                setState(() {
+                                  pickupDate = dt;
+                                  widget.cart['pickupDate'] =
+                                      DateFormat('dd-MMM-yy')
+                                          .format(pickupDate);
+                                });
+                              }
+                            },
+                            onConfirm: (date) {
+                              if (widget.cart['pickupDate'] == null) {
+                                widget.cart['pickupDate'] =
+                                    DateFormat('dd-MMM-yy')
+                                        .format(DateTime.now());
+                                getSlotTime(
+                                    DateFormat('EEEE')
+                                        .format(DateTime.now()),
+                                    DateFormat('EEEE')
+                                        .format(DateTime.now()),
+                                    DateFormat('HH:mm')
+                                        .format(DateTime.now()));
+                              } else {
+                                getSlotTime(
+                                    DateFormat('EEEE').format(pickupDate),
+                                    DateFormat('EEEE')
+                                        .format(DateTime.now()),
+                                    DateFormat('HH:mm')
+                                        .format(DateTime.now()));
+                              }
+                            },
+                            minTime: new DateTime.now()
+                                .add(new Duration(days: 0)),
+                            maxTime: new DateTime.now()
+                                .add(new Duration(days: 6)),
+                          );
+                        },
+                        color: primary,
+                        child: new Text(
+                          MyLocalizations.of(context).selectDate,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 14.0,
+                            color: Colors.white,
+                            fontFamily: 'OpenSansRegular',
                           ),
                         ),
-                        isDeliveryAvailable
-                            ? Container(
-                                color: Colors.white,
-                                height: 25,
-                                width: 3,
-                              )
-                            : Container(),
-                        isDeliveryAvailable
-                            ? InkWell(
-                                onTap: () {
-                                  if (mounted) {
-                                    setState(() {
-                                      widget.cart['orderType'] = 'Delivery';
-                                      widget.cart['pickupDate'] = null;
-                                      widget.cart['pickupTime'] = null;
-                                    });
-                                  }
-                                },
-                                child: Container(
-                                  width: screenWidth(context) * 0.3,
-                                  height: 42,
-                                  color: PRIMARY,
-                                  child: Column(
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Text(
-                                            MyLocalizations.of(context)
-                                                .dELIVERY,
-                                            textAlign: TextAlign.center,
-                                            style:
-                                                TextStyle(color: Colors.white),
-                                          ),
-                                          Padding(
-                                            padding: EdgeInsets.only(left: 10),
-                                          ),
-                                          widget.cart['orderType'] == 'Delivery'
-                                              ? Icon(
-                                                  Icons.check,
-                                                  color: Colors.white,
-                                                  size: 15.0,
-                                                )
-                                              : Container(),
-                                        ],
+                      ),
+                      showSlotTimimg
+                          ? isAlwaysOpenOrClose == false
+                              ? todayWorkingHoursList.length > 0
+                                  ? ListView.builder(
+                                      physics: ScrollPhysics(),
+                                      shrinkWrap: true,
+                                      itemCount: todayWorkingHoursList.length,
+                                      itemBuilder:
+                                          (BuildContext context, int index) {
+                                        return Column(
+                                          children: [
+                                            ExpansionTile(
+                                              trailing:
+                                                  widget.cart['pickupTime'] !=
+                                                          null
+                                                      ? InkWell(
+                                                          onTap: () {
+                                                            if (mounted) {
+                                                              setState(() {
+                                                                widget.cart[
+                                                                        'pickupTime'] =
+                                                                    null;
+                                                              });
+                                                            }
+                                                          },
+                                                          child: Icon(
+                                                            Icons
+                                                                .arrow_drop_down,
+                                                            size: 24.0,
+                                                          ))
+                                                      : Icon(
+                                                          Icons.arrow_right,
+                                                          size: 24.0,
+                                                          color: primary,
+                                                        ),
+                                              children: [
+                                                widget.cart['pickupTime'] ==
+                                                        null
+                                                    ? GridView.builder(
+                                                        physics:
+                                                            ScrollPhysics(),
+                                                        shrinkWrap: true,
+                                                        scrollDirection:
+                                                            Axis.vertical,
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                right: 0.0),
+                                                    gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
+                                                        mainAxisSpacing: 4,
+                                                        crossAxisSpacing: 4,
+                                                        childAspectRatio: MediaQuery.of(context).size.width / 155,
+                                                        crossAxisCount: 4),
+                                                        itemCount: todayWorkingHoursList[
+                                                                        index]
+                                                                    [
+                                                                    'slotList'] ==
+                                                                null
+                                                            ? 0
+                                                            : todayWorkingHoursList[
+                                                                        index]
+                                                                    [
+                                                                    'slotList']
+                                                                .length,
+                                                        itemBuilder:
+                                                            (BuildContext
+                                                                    context,
+                                                                int indexx) {
+                                                          return todayWorkingHoursList[index]
+                                                                          [
+                                                                          'slotList']
+                                                                      .length >
+                                                                  0
+                                                              ? Container(
+                                                                  child: RaisedButton(
+                                                                onPressed:
+                                                                    () {
+                                                                  if (mounted) {
+                                                                    setState(
+                                                                        () {
+                                                                      if (mounted) {
+                                                                        setState(() {
+                                                                          showSlot = !showSlot;
+                                                                        });
+                                                                        if (todayWorkingHoursList[index]['slotList'][indexx] != "No slot available") {
+                                                                          selectedSlot = todayWorkingHoursList[index]['slotList'][indexx];
+                                                                          widget.cart['pickupTime'] = selectedSlot;
+                                                                        }
+                                                                      }
+                                                                    });
+                                                                  }
+                                                                },
+                                                                color:
+                                                                    primary,
+                                                                child:
+                                                                    new Text(
+                                                                  "${todayWorkingHoursList[index]['slotList'][indexx]}",
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontWeight:
+                                                                        FontWeight.w400,
+                                                                    fontSize:
+                                                                        12.0,
+                                                                    color:
+                                                                        Colors.white,
+                                                                    fontFamily:
+                                                                        'OpenSansRegular',
+                                                                  ),
+                                                                ),
+                                                              ))
+                                                              : Container();
+                                                        })
+                                                    : Container()
+                                              ],
+                                              title: new Text(
+                                                "${todayWorkingHoursList[index]['openTimeIn12Hr']} ${todayWorkingHoursList[index]['openTimeMeridian']}" +
+                                                    " - " +
+                                                    "${todayWorkingHoursList[index]['closeTimeIn12Hr']} ${todayWorkingHoursList[index]['closeTimeMeridian']}",
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.w400,
+                                                  fontSize: 14.0,
+                                                  color: Colors.black,
+                                                  fontFamily:
+                                                      'OpenSansRegular',
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      })
+                                  : Container(
+                                      child: Center(
+                                        child: Text(
+                                          MyLocalizations.of(context).closed,
+                                          style: titleBlackLightOSB(),
+                                        ),
                                       ),
-                                      widget.cart['orderType'] == 'Delivery'
-                                          ? Divider(color: Colors.white)
-                                          : Divider(color: Colors.black),
-                                    ],
-                                  ),
-                                ),
-                              )
-                            : Container(),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            widget.cart['orderType'] != 'Delivery'
-                ? Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                        Center(
-                            child: Column(
-                          children: <Widget>[
-                            Text(
-                              MyLocalizations.of(context).clickToSlot +
-                                  " " +
-                                  MyLocalizations.of(context).pickUp +
-                                  " " +
-                                  MyLocalizations.of(context).dateandTime,
-                              style: titleBlackLightOSB(),
-                            ),
-                            widget.cart['pickupDate'] != null
-                                ? Text(
-                                    MyLocalizations.of(context).date +
-                                        ": " +
-                                        widget.cart['pickupDate'],
-                                    style: titleBlackLightOSB(),
-                                  )
-                                : Container(),
-                            widget.cart['pickupTime'] != null
-                                ? Text(
-                                    MyLocalizations.of(context).time +
-                                        ": " +
-                                        widget.cart['pickupTime'],
-                                    style: titleBlackLightOSB(),
-                                  )
-                                : Container(),
-                            RaisedButton(
-                              onPressed: () async {
-                                if (mounted) {
-                                  setState(() {
-                                    showSlotTimimg = false;
-                                    widget.cart['pickupDate'] = null;
-                                    widget.cart['pickupTime'] = null;
-                                  });
-                                }
-                                DatePicker.showDatePicker(
-                                  context,
-                                  showTitleActions: true,
-                                  onChanged: (dt) {
-                                    if (mounted) {
-                                      setState(() {
-                                        pickupDate = dt;
-                                        widget.cart['pickupDate'] =
-                                            DateFormat('dd-MMM-yy')
-                                                .format(pickupDate);
-                                      });
-                                    }
-                                  },
-                                  onConfirm: (date) {
-                                    if (widget.cart['pickupDate'] == null) {
-                                      widget.cart['pickupDate'] =
-                                          DateFormat('dd-MMM-yy')
-                                              .format(DateTime.now());
-                                      getSlotTime(
-                                          DateFormat('EEEE')
-                                              .format(DateTime.now()),
-                                          DateFormat('EEEE')
-                                              .format(DateTime.now()),
-                                          DateFormat('HH:mm')
-                                              .format(DateTime.now()));
-                                    } else {
-                                      getSlotTime(
-                                          DateFormat('EEEE').format(pickupDate),
-                                          DateFormat('EEEE')
-                                              .format(DateTime.now()),
-                                          DateFormat('HH:mm')
-                                              .format(DateTime.now()));
-                                    }
-                                  },
-                                  minTime: new DateTime.now()
-                                      .add(new Duration(days: 0)),
-                                  maxTime: new DateTime.now()
-                                      .add(new Duration(days: 6)),
-                                );
-                              },
-                              color: PRIMARY,
+                                    )
+                              : Center(
+                                  child: Column(
+                                  children: <Widget>[
+                                    Text(
+                                      MyLocalizations.of(context)
+                                              .clickToSlot +
+                                          MyLocalizations.of(context).pickUp +
+                                          MyLocalizations.of(context).time,
+                                      style: titleBlackLightOSB(),
+                                    ),
+                                    RaisedButton(
+                                      onPressed: () {
+                                        DatePicker.showTimePicker(context,
+                                            showTitleActions: true,
+                                            onChanged: (dt) => setState(
+                                                  () {
+                                                    widget.cart[
+                                                            'pickupTime'] =
+                                                        DateFormat('hh:mm a')
+                                                            .format(dt);
+                                                  },
+                                                ),
+                                            onConfirm: (date) {},
+                                            currentTime: new DateTime.now()
+                                                .add(new Duration(days: 0)));
+                                      },
+                                      color: primary,
+                                      child: new Text(
+                                        "24/7 " +
+                                            MyLocalizations.of(context).open,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 12.0,
+                                          color: Colors.white,
+                                          fontFamily: 'OpenSansRegular',
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ))
+                          : Container(
                               child: new Text(
-                                MyLocalizations.of(context).selectDate,
+                                '',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w400,
                                   fontSize: 12.0,
-                                  color: Colors.white,
+                                  color: Colors.black,
                                   fontFamily: 'OpenSansRegular',
                                 ),
                               ),
-                            ),
-                          ],
-                        )),
-                        showSlotTimimg
-                            ? isAlwaysOpenOrClose == false
-                                ? todayWorkingHoursList.length > 0
-                                    ? ListView.builder(
-                                        physics: ScrollPhysics(),
-                                        shrinkWrap: true,
-                                        padding: EdgeInsets.only(right: 0.0),
-                                        itemCount: todayWorkingHoursList.length,
-                                        itemBuilder:
-                                            (BuildContext context, int index) {
-                                          return Column(
-                                            children: [
-                                              ExpansionTile(
-                                                trailing:
-                                                    widget.cart['pickupTime'] !=
-                                                            null
-                                                        ? InkWell(
-                                                            onTap: () {
-                                                              if (mounted) {
-                                                                setState(() {
-                                                                  widget.cart[
-                                                                          'pickupTime'] =
-                                                                      null;
-                                                                });
-                                                              }
-                                                            },
-                                                            child: Icon(
-                                                              Icons
-                                                                  .arrow_drop_down,
-                                                              size: 24.0,
-                                                            ))
-                                                        : Icon(
-                                                            Icons.arrow_right,
-                                                            size: 24.0,
-                                                            color: PRIMARY,
-                                                          ),
-                                                children: [
-                                                  widget.cart['pickupTime'] ==
-                                                          null
-                                                      ? ListView.builder(
-                                                          physics:
-                                                              ScrollPhysics(),
-                                                          shrinkWrap: true,
-                                                          scrollDirection:
-                                                              Axis.vertical,
-                                                          padding:
-                                                              EdgeInsets.only(
-                                                                  right: 0.0),
-                                                          itemCount: todayWorkingHoursList[
-                                                                          index]
-                                                                      [
-                                                                      'slotList'] ==
-                                                                  null
-                                                              ? 0
-                                                              : todayWorkingHoursList[
-                                                                          index]
-                                                                      [
-                                                                      'slotList']
-                                                                  .length,
-                                                          itemBuilder:
-                                                              (BuildContext
-                                                                      context,
-                                                                  int indexx) {
-                                                            return todayWorkingHoursList[index]
-                                                                            [
-                                                                            'slotList']
-                                                                        .length >
-                                                                    0
-                                                                ? Padding(
-                                                                    padding: const EdgeInsets
-                                                                            .only(
-                                                                        left:
-                                                                            20.0,
-                                                                        right:
-                                                                            20.0),
-                                                                    child: Container(
-                                                                        child: RaisedButton(
-                                                                      onPressed:
-                                                                          () {
-                                                                        if (mounted) {
-                                                                          setState(
-                                                                              () {
-                                                                            if (mounted) {
-                                                                              setState(() {
-                                                                                showSlot = !showSlot;
-                                                                              });
-                                                                              if (todayWorkingHoursList[index]['slotList'][indexx] != "No slot available") {
-                                                                                selectedSlot = todayWorkingHoursList[index]['slotList'][indexx];
-                                                                                widget.cart['pickupTime'] = selectedSlot;
-                                                                              }
-                                                                            }
-                                                                          });
-                                                                        }
-                                                                      },
-                                                                      color:
-                                                                          PRIMARY,
-                                                                      child:
-                                                                          new Text(
-                                                                        "${todayWorkingHoursList[index]['slotList'][indexx]}",
-                                                                        style:
-                                                                            TextStyle(
-                                                                          fontWeight:
-                                                                              FontWeight.w400,
-                                                                          fontSize:
-                                                                              12.0,
-                                                                          color:
-                                                                              Colors.white,
-                                                                          fontFamily:
-                                                                              'OpenSansRegular',
-                                                                        ),
-                                                                      ),
-                                                                    )),
-                                                                  )
-                                                                : Container();
-                                                          })
-                                                      : Container()
-                                                ],
-                                                title: new Text(
-                                                  "${todayWorkingHoursList[index]['openTimeIn12Hr']} ${todayWorkingHoursList[index]['openTimeMeridian']}" +
-                                                      " - " +
-                                                      "${todayWorkingHoursList[index]['closeTimeIn12Hr']} ${todayWorkingHoursList[index]['closeTimeMeridian']}",
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.w400,
-                                                    fontSize: 12.0,
-                                                    color: Colors.black,
-                                                    fontFamily:
-                                                        'OpenSansRegular',
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          );
-                                        })
-                                    : Container(
-                                        child: Center(
-                                          child: Text(
-                                            MyLocalizations.of(context).closed,
-                                            style: titleBlackLightOSB(),
-                                          ),
-                                        ),
-                                      )
-                                : Center(
-                                    child: Column(
-                                    children: <Widget>[
-                                      Text(
-                                        MyLocalizations.of(context)
-                                                .clickToSlot +
-                                            MyLocalizations.of(context).pickUp +
-                                            MyLocalizations.of(context).time,
-                                        style: titleBlackLightOSB(),
-                                      ),
-                                      RaisedButton(
-                                        onPressed: () {
-                                          DatePicker.showTimePicker(context,
-                                              showTitleActions: true,
-                                              onChanged: (dt) => setState(
-                                                    () {
-                                                      widget.cart[
-                                                              'pickupTime'] =
-                                                          DateFormat('hh:mm a')
-                                                              .format(dt);
-                                                    },
-                                                  ),
-                                              onConfirm: (date) {},
-                                              currentTime: new DateTime.now()
-                                                  .add(new Duration(days: 0)));
-                                        },
-                                        color: PRIMARY,
-                                        child: new Text(
-                                          "24/7 " +
-                                              MyLocalizations.of(context).open,
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w400,
-                                            fontSize: 12.0,
-                                            color: Colors.white,
-                                            fontFamily: 'OpenSansRegular',
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ))
-                            : Container(
-                                child: new Text(
-                                  '',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 12.0,
-                                    color: Colors.black,
-                                    fontFamily: 'OpenSansRegular',
-                                  ),
-                                ),
-                              )
-                      ])
-                : Container(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildContactBlock(
-      String title, String value, Map<String, dynamic> userInfo) {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 10.0,
-        right: 10.0,
-      ),
-      child: Container(
-        color: Colors.white,
-        padding: EdgeInsets.all(10.0),
-        child: new Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            new Text(
-              MyLocalizations.of(context).fullName,
-              style: hintStyleOSB(),
-            ),
-            new Text(
-              title,
-              style: hintLightOSR(),
-            ),
-            new Divider(),
-            new Text(
-              MyLocalizations.of(context).mobileNumber,
-              style: hintStyleOSB(),
-            ),
-            new Text(
-              value,
-              style: hintLightOSR(),
-            ),
-          ],
-        ),
+                            )
+                    ])
+              : Container(),
+        ],
       ),
     );
   }
@@ -1009,172 +1173,6 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
     );
   }
 
-  Widget _buildAddressList(bool isPickup) {
-    if (isPickup) {
-      return Padding(
-        padding: EdgeInsets.only(
-          left: 10.0,
-          right: 10.0,
-          bottom: 10.0,
-        ),
-        child: Container(
-          color: Colors.white,
-          padding: EdgeInsets.all(10.0),
-          child: Container(
-            padding: EdgeInsets.all(10),
-            color: Colors.grey[200],
-            child: Text(widget.cart['productDetails'][0]['restaurantAddress']),
-          ),
-        ),
-      );
-    } else {
-      return isAddressget
-          ? CircularProgressIndicator()
-          : Padding(
-              padding: EdgeInsets.only(
-                left: 10.0,
-                right: 10.0,
-                bottom: 10.0,
-              ),
-              child: Container(
-                color: Colors.white,
-                padding: EdgeInsets.all(10.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    addressList.length > 0
-                        ? ListView.builder(
-                            physics: ScrollPhysics(),
-                            shrinkWrap: true,
-                            padding: EdgeInsets.only(right: 0.0),
-                            itemCount: addressList.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              if (addressList[index]['isSelected'] == null) {
-                                if (index == 0) {
-                                  addressList[index]['isSelected'] = true;
-                                } else {
-                                  addressList[index]['isSelected'] = false;
-                                }
-                              }
-                              return RadioListTile(
-                                groupValue: selectedAddressIndex,
-                                value: index,
-                                selected: addressList[index]['isSelected'],
-                                onChanged: (int selected) {
-                                  if (mounted) {
-                                    setState(() {
-                                      selectedAddressIndex = selected;
-                                      addressList[index]['isSelected'] =
-                                          !addressList[index]['isSelected'];
-                                      widget.cart['shippingAddress'] =
-                                          addressList[index];
-                                    });
-                                  }
-                                },
-                                activeColor: PRIMARY,
-                                title: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    new Text(
-                                      addressList[index]['addressType'],
-                                      style: subTitleDarkLightOSS(),
-                                    ),
-                                    new Text(
-                                      addressList[index]['address'],
-                                      style: hintStyleSmallTextDarkOSR(),
-                                    ),
-                                    new Text(
-                                      addressList[index]['contactNumber']
-                                          .toString(),
-                                      style: hintStyleSmallTextDarkOSR(),
-                                    ),
-                                  ],
-                                ),
-                                secondary: InkWell(
-                                  onTap: () {
-                                    _deleteAddressList(index);
-                                  },
-                                  child: Icon(
-                                    Icons.delete,
-                                    color: PRIMARY,
-                                  ),
-                                ),
-                              );
-                            },
-                          )
-                        : Container(),
-                    Divider(),
-                    InkWell(
-                      onTap: () async {
-                        currentLocation = await _location.getLocation();
-                        if (currentLocation != null) {
-                          PlacePickerResult pickerResult = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => PlacePickerScreen(
-                                        googlePlacesApiKey: GOOGLE_API_KEY,
-                                        initialPosition: LatLng(
-                                            currentLocation.latitude,
-                                            currentLocation.longitude),
-                                        mainColor: PRIMARY,
-                                        mapStrings: MapPickerStrings.english(),
-                                        placeAutoCompleteLanguage: 'en',
-                                      )));
-                          if (pickerResult != null) {
-                            setState(() {
-                              var result = Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (BuildContext context) =>
-                                      AddAddressPage(
-                                          localizedValues:
-                                              widget.localizedValues,
-                                          locale: widget.locale,
-                                          loactionAddress: {
-                                        'address':
-                                            pickerResult.address.toString(),
-                                        'lat': pickerResult.latLng.latitude,
-                                        'long': pickerResult.latLng.longitude
-                                      }),
-                                ),
-                              );
-                              result.then((res) {
-                                _getAddressList();
-                                _getUserInfo();
-                              });
-                            });
-                          }
-                        } else {
-                          showError(
-                              MyLocalizations.of(context).enableTogetlocation,
-                              MyLocalizations.of(context).gPSsettings);
-                        }
-                      },
-                      child: Row(
-                        children: <Widget>[
-                          Icon(
-                            Icons.add_circle,
-                            color: PRIMARY,
-                            size: 18.0,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 8.0),
-                            child: Text(
-                              MyLocalizations.of(context).addAddress,
-                              style: textPrimaryOSR(),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-    }
-  }
-
   Widget _buildProductListBlock(Map<String, dynamic> userInfo) {
     List<dynamic> products = widget.cart['productDetails'];
     return Padding(
@@ -1218,7 +1216,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                           child: new Text(
                             'x' + products[index]['Quantity'].toString(),
                             textAlign: TextAlign.start,
-                            style: hintStylePrimaryOSR(),
+                            style: hintStyleprimaryOSR(),
                           ),
                         ),
                         Flexible(
@@ -1249,14 +1247,14 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
               children: <Widget>[
                 Icon(
                   Icons.info,
-                  color: PRIMARY,
+                  color: primary,
                   size: 18.0,
                 ),
                 Padding(
                   padding: const EdgeInsets.only(left: 8.0),
                   child: Text(
                     MyLocalizations.of(context).orderSummary,
-                    style: textPrimaryOSR(),
+                    style: textprimaryOSR(),
                   ),
                 )
               ],
@@ -1376,7 +1374,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                 Expanded(
                   child: new Container(
                     height: 78.0,
-                    color: PRIMARY,
+                    color: primary,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[

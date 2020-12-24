@@ -769,7 +769,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: PRIMARY,
+        backgroundColor: primary,
         title: Text(
           MyLocalizations.of(context).profile,
           style: textbarlowSemiBoldWhite(),
@@ -823,7 +823,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
           Expanded(
             child: new Container(
               height: 40.0,
-              color: PRIMARY,
+              color: primary,
               child: isLoading
                   ? Image.asset(
                       'lib/assets/icon/spinner.gif',

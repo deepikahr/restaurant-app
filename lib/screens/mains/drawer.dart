@@ -294,7 +294,7 @@ class _DrawerPageState extends State<DrawerPage> {
                     height: 26.0,
                     alignment: AlignmentDirectional.center,
                     decoration:
-                        BoxDecoration(shape: BoxShape.circle, color: PRIMARY),
+                        BoxDecoration(shape: BoxShape.circle, color: primary),
                     child: Text(
                       count.toString(),
                       textAlign: TextAlign.center,

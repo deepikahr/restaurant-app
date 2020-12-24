@@ -3,6 +3,8 @@ import 'package:RestaurantSaas/screens/mains/cusineBaseStore.dart';
 import 'package:RestaurantSaas/screens/other/search-restaurants.dart';
 import 'package:RestaurantSaas/screens/webView/web_view.dart';
 import 'package:RestaurantSaas/services/constant.dart';
+import 'package:RestaurantSaas/widgets/appbar.dart';
+import 'package:RestaurantSaas/widgets/card.dart';
 import 'package:async_loader/async_loader.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -39,7 +41,6 @@ class HomePage extends StatefulWidget {
 class HomePageState extends State<HomePage> {
   final GlobalKey<AsyncLoaderState> _asyncLoaderStateForAdvertisement =
       GlobalKey<AsyncLoaderState>();
-
   final GlobalKey<AsyncLoaderState> _asyncLoaderStateForNearByLocations =
       GlobalKey<AsyncLoaderState>();
   final GlobalKey<AsyncLoaderState> _asyncLoaderStateForTopRatedRestaurants =
@@ -63,6 +64,18 @@ class HomePageState extends State<HomePage> {
   int cartCounter;
   bool getCuisionLoading = false;
   List removeDuplicationList;
+  StreamSubscription<LocationData> _locationStream;
+  String address;
+  String itemCount = '4';
+  bool isFirstStart = true;
+  Map<String, dynamic> tableInfo;
+  String barcodeError;
+  LocationData currentLocation;
+  var addressData;
+  List renderArray = [];
+  String fullname;
+  bool isLoggedIn = false;
+  String review, branches;
 
   @override
   void initState() {
@@ -92,9 +105,6 @@ class HomePageState extends State<HomePage> {
     });
   }
 
-  String fullname;
-  bool isLoggedIn = false;
-
   Future _checkLoginStatus() async {
     Common.getToken().then((token) {
       if (token != null) {
@@ -122,16 +132,6 @@ class HomePageState extends State<HomePage> {
       }
     });
   }
-
-  StreamSubscription<LocationData> _locationStream;
-  String address;
-  String itemCount = '4';
-  bool isFirstStart = true;
-  Map<String, dynamic> tableInfo;
-  String barcodeError;
-  LocationData currentLocation;
-  var addressData;
-  List renderArray = [];
 
   @override
   void dispose() {
@@ -287,11 +287,10 @@ class HomePageState extends State<HomePage> {
     return getNearByRestaurants();
   }
 
-  String review, branches;
-
   Widget build(BuildContext context) {
     review = MyLocalizations.of(context).reviews;
     branches = MyLocalizations.of(context).branches;
+
     CounterService().getCounter().then((res) {
       try {
         if (mounted) {
@@ -305,80 +304,35 @@ class HomePageState extends State<HomePage> {
     }).catchError((onError) {
       sentryError.reportError(onError, null);
     });
+
+    Widget appBar() {
+      return homeAppbar(context, isNearByRestaurants, () {
+        showSearch(
+            context: context,
+            delegate: RestaurantSearch(
+                locale: widget.locale,
+                localizedValues: widget.localizedValues,
+                restaurantList: nearByRestaurentsList));
+      }, cartCount, () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (BuildContext context) => CartPage(
+                localizedValues: widget.localizedValues,
+                locale: widget.locale),
+          ),
+        );
+      });
+    }
+
     return Scaffold(
-      backgroundColor: whitec,
+      backgroundColor: bg,
       key: scaffoldKey,
       drawer: DrawerPage(
           scaffoldKey: scaffoldKey,
           locale: widget.locale,
           localizedValues: widget.localizedValues),
-      appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.white),
-        backgroundColor: PRIMARY,
-        title: Text(
-          APP_NAME,
-          style: textbarlowSemiBoldWhite(),
-        ),
-        centerTitle: true,
-        actions: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(left: 8, right: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                isNearByRestaurants
-                    ? IconButton(
-                        icon: Icon(Icons.search, color: Colors.white),
-                        onPressed: () {
-                          showSearch(
-                              context: context,
-                              delegate: RestaurantSearch(
-                                  locale: widget.locale,
-                                  localizedValues: widget.localizedValues,
-                                  restaurantList: nearByRestaurentsList));
-                        })
-                    : Container(),
-                GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (BuildContext context) => CartPage(
-                              localizedValues: widget.localizedValues,
-                              locale: widget.locale),
-                        ),
-                      );
-                    },
-                    child: Stack(
-                      children: <Widget>[
-                        Icon(Icons.shopping_cart, color: Colors.white),
-                        Positioned(
-                            right: 1,
-                            top: 6,
-                            child: (cartCount == null || cartCount == 0)
-                                ? Text('', style: TextStyle(fontSize: 14.0))
-                                : Container(
-                                    height: 20,
-                                    width: 20,
-                                    alignment: Alignment.center,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Colors.black,
-                                    ),
-                                    child: Text('${cartCount.toString()}',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontFamily: "bold",
-                                            fontSize: 11)),
-                                  )),
-                      ],
-                    )),
-              ],
-            ),
-          ),
-        ],
-      ),
+      appBar: appBar(),
       body: ListView(
         shrinkWrap: true,
         physics: ScrollPhysics(),
@@ -394,10 +348,12 @@ class HomePageState extends State<HomePage> {
                       height: 250,
                     ),
                     Center(
-                        child: Container(
-                            height: 50,
-                            width: 50,
-                            child: CircularProgressIndicator())),
+                      child: Container(
+                        height: 50,
+                        width: 50,
+                        child: CircularProgressIndicator(),
+                      ),
+                    ),
                   ],
                 ),
           _buildAdvertisementLoader(),
@@ -406,6 +362,7 @@ class HomePageState extends State<HomePage> {
               : Container(),
           Container(
             color: Colors.white70,
+            margin: EdgeInsets.only(bottom: 10),
             child: ListView(
               physics: ScrollPhysics(),
               shrinkWrap: true,
@@ -420,12 +377,12 @@ class HomePageState extends State<HomePage> {
           ),
           Container(
             color: Colors.white70,
-            child: ListView(
-              physics: ScrollPhysics(),
-              shrinkWrap: true,
+            margin: EdgeInsets.only(bottom: 10),
+            child: Column(
               children: <Widget>[
                 ((topRatedRestaurantsList?.length ?? 0) > 0)
-                    ? _buildGridHeader(MyLocalizations.of(context).topRated)
+                    ? _buildGridHeader(
+                        MyLocalizations.of(context).topRatedRestaurants)
                     : Container(),
                 _buildTopRatedRestaurantLoader(),
               ],
@@ -433,6 +390,7 @@ class HomePageState extends State<HomePage> {
           ),
           Container(
             color: Colors.white70,
+            margin: EdgeInsets.only(bottom: 10),
             child: ListView(
               physics: ScrollPhysics(),
               shrinkWrap: true,
@@ -465,208 +423,80 @@ class HomePageState extends State<HomePage> {
           if (data != null) {
             advertisementList = data['Banners'];
           }
-          return _buildOfferSlider(advertisementList);
-        });
-  }
-
-  Widget _buildGetNearByLocationLoader() {
-    return AsyncLoader(
-        key: _asyncLoaderStateForNearByLocations,
-        initState: () async => await getNearByRestaurants(),
-        renderLoad: () => Center(),
-        renderError: ([error]) {
-          sentryError.reportError(error, null);
-          return NoData(
-              message: MyLocalizations.of(context).connectionError,
-              icon: Icons.block);
-        },
-        renderSuccess: ({data}) {
-          isNearByRestaurants = true;
-          if (data != null) {
-            nearByRestaurentsList = data['dataArr'];
-          }
-          return Container(
-              child: ((nearByRestaurentsList?.length ?? 0) > 0)
-                  ? Container(
-                      color: Colors.white70,
-                      margin: EdgeInsets.only(bottom: 5),
-                      child: ListView.builder(
-                          physics: ScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: nearByRestaurentsList.length <
-                                  int.parse(itemCount)
-                              ? nearByRestaurentsList.length
-                              : int.parse(itemCount),
-                          itemBuilder: (BuildContext context, int index) {
-                            return InkWell(
-                                child: buildRestaurantCard(
-                                    nearByRestaurentsList[index],
-                                    review,
-                                    branches,
-                                    true),
-                                onTap: () {
-                                  nearByRestaurentsList[index]['taxInfo'] =
-                                      taxInfo;
-                                  goToProductListPage(
-                                      context,
-                                      nearByRestaurentsList[index],
-                                      true,
-                                      widget.localizedValues,
-                                      widget.locale);
-                                });
-                          }),
-                    )
-                  : Container(
-                      color: whitec,
-                      child: Column(
-                        children: [
-                          SizedBox(
-                            height: 200,
-                          ),
-                          NoData(
-                              message: MyLocalizations.of(context)
-                                  .noNearByLocationsFound,
-                              icon: Icons.data_usage),
-                        ],
-                      ),
-                    ));
-        });
-  }
-
-  Widget _buildTopRatedRestaurantLoader() {
-    return AsyncLoader(
-        key: _asyncLoaderStateForTopRatedRestaurants,
-        initState: () async => await getTopRatedRestaurants(),
-        renderLoad: () => Center(),
-        renderError: ([error]) {
-          sentryError.reportError(error, null);
-          return NoData(
-              message: MyLocalizations.of(context).connectionError,
-              icon: Icons.block);
-        },
-        renderSuccess: ({data}) {
-          isTopRatedRestaurants = true;
-          if (data != null) {
-            topRatedRestaurantsList = data;
-          }
-          return ((topRatedRestaurantsList?.length ?? 0) > 0)
-              ? ListView.builder(
-                  physics: ScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount:
-                      topRatedRestaurantsList.length < int.parse(itemCount)
-                          ? topRatedRestaurantsList.length
-                          : int.parse(itemCount),
-                  itemBuilder: (BuildContext context, int index) {
-                    return InkWell(
-                        child: buildRestaurantCard(
-                            topRatedRestaurantsList[index],
-                            review,
-                            branches,
-                            false),
+          return ((advertisementList?.length ?? 0) > 0)
+              ? Container(
+                  color: Colors.white70,
+                  height: 180,
+                  margin: EdgeInsets.only(bottom: 10),
+                  width: screenWidth(context),
+                  child: Swiper(
+                    autoplay: advertisementList.length > 1 ? true : false,
+                    itemCount: advertisementList.length > 10
+                        ? 10
+                        : advertisementList.length,
+                    // pagination: new SwiperPagination(),
+                    itemBuilder: (BuildContext context, int index) {
+                      return InkWell(
                         onTap: () {
-                          goToProductListPage(
-                              context,
-                              topRatedRestaurantsList[index],
-                              false,
-                              widget.localizedValues,
-                              widget.locale);
-                        });
-                  })
+                          if (advertisementList[index]['type'] ==
+                              'externalLink') {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => WebViewPage(
+                                          title: '',
+                                          url: advertisementList[index]
+                                              ['externalLink']['link'],
+                                        )));
+                          } else if (advertisementList[index]['type'] ==
+                              'restaurant') {
+                            matchLocationIdAndNavigate(
+                                advertisementList[index]['locationId']);
+                          } else if (advertisementList[index]['type'] ==
+                              'cuisine') {
+                            matchCuisineIdAndNavigate(
+                                advertisementList[index]['cuisine']);
+                          }
+                        },
+                        child: Stack(
+                          children: <Widget>[
+                            Column(
+                              children: <Widget>[
+                                Padding(
+                                  padding: const EdgeInsets.all(20),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(5),
+                                    child: new Image(
+                                      image: advertisementList[index]
+                                                  ['bannerImage']['imageUrl'] !=
+                                              null
+                                          ? NetworkImage(
+                                              advertisementList[index]
+                                                  ['bannerImage']['imageUrl'])
+                                          : AssetImage(
+                                              'lib/assets/imgs/chicken.png'),
+                                      fit: BoxFit.cover,
+                                      width: screenWidth(context),
+                                      height: 140,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                )
               : Container();
         });
-  }
-
-  Widget _buildNewlyArrivedRestaurantLoader() {
-    return AsyncLoader(
-        key: _asyncLoaderStateForNewlyArrivedRestaurants,
-        initState: () async => await getNewlyArrivedRestaurants(),
-        renderLoad: () => Center(),
-        renderError: ([error]) {
-          sentryError.reportError(error, null);
-          return NoData(
-              message: MyLocalizations.of(context).connectionError,
-              icon: Icons.block);
-        },
-        renderSuccess: ({data}) {
-          isNewlyArrivedRestaurants = true;
-          if (data != null) {
-            newlyArrivedRestaurantsList = data;
-          }
-          return Column(
-            children: <Widget>[
-              buildNewlyArrived(newlyArrivedRestaurantsList),
-            ],
-          );
-        });
-  }
-
-  Widget buildNewlyArrived(List<dynamic> data) {
-    return ((data?.length ?? 0) > 0)
-        ? ListView.builder(
-            physics: ScrollPhysics(),
-            shrinkWrap: true,
-            itemCount: data.length < int.parse(itemCount)
-                ? data.length
-                : int.parse(itemCount),
-            padding: const EdgeInsets.all(0.0),
-            itemBuilder: (BuildContext context, int index) {
-              return InkWell(
-                  child:
-                      buildRestaurantCard(data[index], review, branches, false),
-                  onTap: () {
-                    if (mounted) {
-                      setState(() {
-                        restaurantInfo = data[index];
-                      });
-                      goToProductListPage(context, data[index], false,
-                          widget.localizedValues, widget.locale);
-                    }
-                  });
-            })
-        : Container();
-  }
-
-  Widget _buildGridHeader(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          Text(
-            title,
-            style: textOSR(),
-          ),
-          _buildViewAllButton(title)
-        ],
-      ),
-    );
-  }
-
-  Widget _buildViewAllButton(String title) {
-    return InkWell(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (BuildContext context) => RestaurantListPage(
-              title: title,
-              localizedValues: widget.localizedValues,
-              locale: widget.locale,
-            ),
-          ),
-        );
-      },
-      child: Text(
-        MyLocalizations.of(context).viewAll,
-        style: textregulargreen(),
-      ),
-    );
   }
 
   Widget _buildCuisineOfferSlider(List<dynamic> list) {
     return list.length > 0
         ? Container(
+            margin: EdgeInsets.only(bottom: 10),
             color: Colors.white70,
             child: Column(
               children: <Widget>[
@@ -703,8 +533,9 @@ class HomePageState extends State<HomePage> {
                   ),
                 ),
                 SizedBox(height: 20),
-                SizedBox(
-                  height: 150,
+                Container(
+                  padding: EdgeInsets.only(right: 16, left: 16),
+                  height: 110,
                   child: ListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemCount: list == null ? 0 : list.length,
@@ -725,23 +556,28 @@ class HomePageState extends State<HomePage> {
                           },
                           child: Column(
                             children: [
-                              Image(
+                              ClipRRect(
+                                child: Image(
                                   image: list[index]['cuisineImgUrl'] != null
                                       ? NetworkImage(
                                           list[index]['cuisineImgUrl'])
                                       : AssetImage(
                                           'lib/assets/imgs/chicken.png'),
-                                  width: 100,
-                                  height: 100),
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    list[index]['cuisineName'],
-                                    style: textsemiboldblack(),
-                                  ),
+                                  width: 75,
+                                  height: 81,
+                                  fit: BoxFit.cover,
                                 ),
-                              )
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              SizedBox(
+                                height: 4,
+                              ),
+                              Text(
+                                list[index]['cuisineName'],
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: textMuliSemiboldsm(),
+                              ),
                             ],
                           ),
                         );
@@ -753,180 +589,402 @@ class HomePageState extends State<HomePage> {
         : Container();
   }
 
-  Widget _buildOfferSlider(List<dynamic> list) {
-    return ((list?.length ?? 0) > 0)
-        ? Container(
-            color: Color(0xFFF4F4F4),
-            height: 230,
-            width: screenWidth(context),
-            child: Swiper(
-              autoplay: list.length > 1 ? true : false,
-              itemCount: list.length > 10 ? 10 : list.length,
-              pagination: new SwiperPagination(),
-              itemBuilder: (BuildContext context, int index) {
-                return InkWell(
-                  onTap: () {
-                    if (list[index]['type'] == 'externalLink') {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => WebViewPage(
-                                    title: '',
-                                    url: list[index]['externalLink']['link'],
-                                  )));
-                    } else if (list[index]['type'] == 'restaurant') {
-                      matchLocationIdAndNavigate(list[index]['locationId']);
-                    } else if (list[index]['type'] == 'cuisine') {
-                      matchCuisineIdAndNavigate(list[index]['cuisine']);
-                    }
-                  },
-                  child: Stack(
-                    children: <Widget>[
-                      Column(
-                        children: <Widget>[
-                          Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(5),
-                              child: new Image(
-                                image: list[index]['bannerImage']['imageUrl'] !=
-                                        null
-                                    ? NetworkImage(
-                                        list[index]['bannerImage']['imageUrl'])
-                                    : AssetImage('lib/assets/imgs/chicken.png'),
-                                fit: BoxFit.cover,
-                                width: screenWidth(context),
-                                height: 180,
-                              ),
-                            ),
+  Widget _buildGetNearByLocationLoader() {
+    return AsyncLoader(
+        key: _asyncLoaderStateForNearByLocations,
+        initState: () async => await getNearByRestaurants(),
+        renderLoad: () => Center(),
+        renderError: ([error]) {
+          sentryError.reportError(error, null);
+          return NoData(
+              message: MyLocalizations.of(context).connectionError,
+              icon: Icons.block);
+        },
+        renderSuccess: ({data}) {
+          isNearByRestaurants = true;
+          if (data != null) {
+            nearByRestaurentsList = data['dataArr'];
+          }
+          return Container(
+              height: 156,
+              child: ((nearByRestaurentsList?.length ?? 0) > 0)
+                  ? Container(
+                      child: ListView.builder(
+                          padding: EdgeInsets.symmetric(horizontal: 16),
+                          physics: ScrollPhysics(),
+                          scrollDirection: Axis.horizontal,
+                          shrinkWrap: true,
+                          itemCount: nearByRestaurentsList.length <
+                                  int.parse(itemCount)
+                              ? nearByRestaurentsList.length
+                              : int.parse(itemCount),
+                          itemBuilder: (BuildContext context, int index) {
+                            return InkWell(
+                                // child: buildRestaurantCard(
+                                //     nearByRestaurentsList[index],
+                                //     review,
+                                //     branches,
+                                //     true),
+                                onTap: () {
+                                  nearByRestaurentsList[index]['taxInfo'] =
+                                      taxInfo;
+                                  goToProductListPage(
+                                      context,
+                                      nearByRestaurentsList[index],
+                                      true,
+                                      widget.localizedValues,
+                                      widget.locale);
+                                },
+                                child: Container(
+                                  width: 81,
+                                  margin: EdgeInsets.only(
+                                      left: 5, right: 10, top: 16),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      ClipRRect(
+                                        child: Image(
+                                          image: nearByRestaurentsList[index]
+                                                          ['restaurantID']
+                                                      ['logo'] !=
+                                                  null
+                                              ? NetworkImage(
+                                                  nearByRestaurentsList[index]
+                                                      ['restaurantID']['logo'])
+                                              : AssetImage(
+                                                  'lib/assets/imgs/chicken.png'),
+                                          width: 75,
+                                          height: 81,
+                                          fit: BoxFit.cover,
+                                        ),
+                                        borderRadius: BorderRadius.circular(5),
+                                      ),
+                                      SizedBox(
+                                        height: 4,
+                                      ),
+                                      Text(
+                                        nearByRestaurentsList[index]
+                                            ['restaurantID']['restaurantName'],
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: textMuliSemiboldsm(),
+                                      ),
+                                      Text(
+                                        nearByRestaurentsList[index]
+                                            ['locationName'],
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 2,
+                                        style: textMuliRegularxs(),
+                                      ),
+                                    ],
+                                  ),
+                                ));
+                          }),
+                    )
+                  : Container(
+                      color: whitec,
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: 200,
                           ),
+                          NoData(
+                              message: MyLocalizations.of(context)
+                                  .noNearByLocationsFound,
+                              icon: Icons.data_usage),
                         ],
                       ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          )
-        : Container();
+                    ));
+        });
   }
 
-  static Widget buildRestaurantCard(
-      info, review, branches, isNearByRestaurants) {
-    return Column(
-      children: <Widget>[
-        SizedBox(
-          height: 20,
-        ),
-        buildCardBottom(
-            isNearByRestaurants
-                ? info['locationName'] ?? null
-                : info['Locations']['locationName'],
-            isNearByRestaurants
-                ? info['restaurantID']['logo'] ?? null
-                : info['restaurantID']['logo'] ?? null,
-            isNearByRestaurants
-                ? info['restaurantID']['restaurantName']
-                : info['restaurantID']['restaurantName'],
-            isNearByRestaurants
-                ? double.parse(info['restaurantID']['rating'].toString())
-                : double.parse(info['Locations']['rating'].toString() ?? '0'),
-            info['locationCount'],
-            isNearByRestaurants
-                ? info['restaurantID']['reviewCount'] ?? 0
-                : info['reviewCount'] ?? 0,
-            review,
-            branches),
-      ],
-    );
+  Widget _buildTopRatedRestaurantLoader() {
+    return AsyncLoader(
+        key: _asyncLoaderStateForTopRatedRestaurants,
+        initState: () async => await getTopRatedRestaurants(),
+        renderLoad: () => Center(),
+        renderError: ([error]) {
+          sentryError.reportError(error, null);
+          return NoData(
+              message: MyLocalizations.of(context).connectionError,
+              icon: Icons.block);
+        },
+        renderSuccess: ({data}) {
+          isTopRatedRestaurants = true;
+          if (data != null) {
+            topRatedRestaurantsList = data;
+          }
+          return ((topRatedRestaurantsList?.length ?? 0) > 0)
+              ? Container(
+            height: 245,
+                width: MediaQuery.of(context).size.width,
+                child: GridView.builder(
+                    physics: ScrollPhysics(),
+                    shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
+                      mainAxisSpacing: 12,
+                        crossAxisSpacing: 12,
+                        childAspectRatio: MediaQuery.of(context).size.width / MediaQuery.of(context).size.height * 0.7,
+                        crossAxisCount: 2),
+                    itemCount:
+                        topRatedRestaurantsList.length < int.parse(itemCount)
+                            ? topRatedRestaurantsList.length
+                            : int.parse(itemCount),
+                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 16),
+                    itemBuilder: (BuildContext context, int index) {
+                      return InkWell(
+                          child: restaurantCard(context, topRatedRestaurantsList[index], MyLocalizations.of(context).topRatedRestaurants),
+                          // buildRestaurantCard(
+                          //     topRatedRestaurantsList[index],
+                          //     review,
+                          //     branches,
+                          //     false),
+                          onTap: () {
+                            goToProductListPage(
+                                context,
+                                topRatedRestaurantsList[index],
+                                false,
+                                widget.localizedValues,
+                                widget.locale);
+                          });
+                    }),
+              )
+              : Container();
+        });
   }
 
-  Widget buildFavIcon() {
-    return Container(
-      alignment: FractionalOffset.topRight,
-      padding: EdgeInsets.only(right: 5.0),
-      child: IconButton(
-          icon: const Icon(Icons.favorite, semanticLabel: 'Favorite'),
-          iconSize: 30.0,
-          onPressed: () {},
-          color: Colors.white),
-    );
+  Widget _buildNewlyArrivedRestaurantLoader() {
+    return AsyncLoader(
+        key: _asyncLoaderStateForNewlyArrivedRestaurants,
+        initState: () async => await getNewlyArrivedRestaurants(),
+        renderLoad: () => Center(),
+        renderError: ([error]) {
+          sentryError.reportError(error, null);
+          return NoData(
+              message: MyLocalizations.of(context).connectionError,
+              icon: Icons.block);
+        },
+        renderSuccess: ({data}) {
+          isNewlyArrivedRestaurants = true;
+          if (data != null) {
+            newlyArrivedRestaurantsList = data;
+          }
+          return ((newlyArrivedRestaurantsList?.length ?? 0) > 0)
+              ? Container(
+            height: 245,
+            width: MediaQuery.of(context).size.width,
+                child: GridView.builder(
+                physics: ScrollPhysics(),
+                shrinkWrap: true,
+                scrollDirection: Axis.horizontal,
+                gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    childAspectRatio: MediaQuery.of(context).size.width / MediaQuery.of(context).size.height * 0.7,
+                    crossAxisCount: 2),
+                itemCount: newlyArrivedRestaurantsList.length < int.parse(itemCount)
+                    ? newlyArrivedRestaurantsList.length
+                    : int.parse(itemCount),
+                padding: EdgeInsets.symmetric(horizontal: 6, vertical: 16),
+                itemBuilder: (BuildContext context, int index) {
+                  return InkWell(
+                      child:
+                      restaurantCard(context, newlyArrivedRestaurantsList[index], MyLocalizations.of(context).newlyArrived ),
+                      // buildRestaurantCard(newlyArrivedRestaurantsList[index], review, branches, false),
+                      onTap: () {
+                        if (mounted) {
+                          setState(() {
+                            restaurantInfo = newlyArrivedRestaurantsList[index];
+                          });
+                          goToProductListPage(context, newlyArrivedRestaurantsList[index], false,
+                              widget.localizedValues, widget.locale);
+                        }
+                      });
+                }),
+              )
+              : Container();
+        });
   }
 
-  static Widget buildCardBottom(
-      String locationName,
-      String imageUrl,
-      String restaurantName,
-      double rating,
-      int locationCounter,
-      int reviews,
-      String review,
-      branches) {
+  Widget _buildGridHeader(String title) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: GFListTile(
-        color: Color(0xFFF4F4F4),
-        margin: EdgeInsets.all(0),
-        padding: EdgeInsets.only(top: 0, right: 10, left: 0, bottom: 0),
-        avatar: imageUrl != null
-            ? ClipRRect(
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(5),
-                    bottomLeft: Radius.circular(5)),
-                child: Image(
-                    fit: BoxFit.cover,
-                    height: 65,
-                    width: 60,
-                    image: NetworkImage(imageUrl)),
-              )
-            : ClipRRect(
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(5),
-                    bottomLeft: Radius.circular(5)),
-                child: Image.asset(
-                  'lib/assets/imgs/na.jpg',
-                  height: 65,
-                  width: 60,
-                  fit: BoxFit.cover,
+      padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Text(
+            title,
+            style: textOSR(),
+          ),
+          InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (BuildContext context) => RestaurantListPage(
+                    title: title,
+                    localizedValues: widget.localizedValues,
+                    locale: widget.locale,
+                  ),
                 ),
-              ),
-        title: Text(
-          restaurantName,
-          style: textsemiboldblack(),
-        ),
-        subtitle:
-            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(
-            locationName ?? '',
-            style: textbarlowRegular(),
+              );
+            },
+            child: Text(
+              MyLocalizations.of(context).viewAll,
+              style: textregulargreen(),
+            ),
           ),
-          Text(
-            '',
-            style: textbarlowRegular(),
-          )
-        ]),
-        icon: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(
-            children: <Widget>[
-              Icon(
-                Icons.star,
-                size: 11,
-                color: Colors.black.withOpacity(0.50),
-              ),
-              Text(
-                rating.toString(),
-                style: textbarlowRegular(),
-              )
-            ],
-          ),
-          Text(
-            '${reviews ?? 0} $review',
-            style: textbarlowRegular(),
-          )
-        ]),
+        ],
       ),
     );
   }
+
+  // static Widget buildRestaurantCard(info, review, branches) {
+  //   // print('info $info');
+  //   return Container(
+  //     margin: EdgeInsets.all(5),
+  //     child: Column(
+  //       children: <Widget>[
+  //         buildCardImg(info),
+  //         buildCardBottom(
+  //             info['restaurantID']['restaurantName'],
+  //             info['rating'] ?? 0,
+  //             info['locationCount'],
+  //             info['reviewCount'] ?? 0,
+  //             review,
+  //             branches),
+  //       ],
+  //     ),
+  //   );
+  // }
+  //
+  // static Widget buildCardImg(info) {
+  //   return Container(
+  //     padding: EdgeInsets.all(0.0),
+  //     height: 120.0,
+  //     width: 180.0,
+  //     decoration: getBgDecoration(info['logo'] ?? null),
+  //     child: null, //buildFavIcon(),
+  //   );
+  // }
+  //
+  // static Decoration getBgDecoration(imgUrl) {
+  //   return BoxDecoration(
+  //     image: DecorationImage(
+  //         image: imgUrl != null
+  //             ? NetworkImage(imgUrl)
+  //             : AssetImage('lib/assets/imgs/na.jpg'),
+  //         repeat: ImageRepeat.noRepeat,
+  //         matchTextDirection: false,
+  //         alignment: Alignment.center,
+  //         fit: BoxFit.cover,
+  //         colorFilter: ColorFilter.mode(
+  //             Colors.black.withOpacity(0.2), BlendMode.darken)),
+  //   );
+  // }
+
+  // Widget buildFavIcon() {
+  //   return Container(
+  //     alignment: FractionalOffset.topRight,
+  //     padding: EdgeInsets.only(right: 5.0),
+  //     child: IconButton(
+  //         icon: const Icon(Icons.favorite, semanticLabel: 'Favorite'),
+  //         iconSize: 30.0,
+  //         onPressed: () {},
+  //         color: Colors.white),
+  //   );
+  // }
+
+  // static Widget buildCardBottom(String restaurantName, double rating,
+  //     int locationCounter, int reviews, String review, branches) {
+  //   return Container(
+  //     padding: EdgeInsets.only(left: 6.0, top: 6),
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: <Widget>[
+  //         Column(
+  //           crossAxisAlignment: CrossAxisAlignment.start,
+  //           children: <Widget>[
+  //             Text(
+  //               restaurantName,
+  //               maxLines: 2,
+  //               overflow: TextOverflow.ellipsis,
+  //               style: textMuliSemiboldsm(),
+  //             ),
+  //             locationCounter != null
+  //                 ? Text(
+  //                     locationCounter.toString() + ' $branches',
+  //                     overflow: TextOverflow.ellipsis,
+  //                     maxLines: 2,
+  //                     style: textMuliRegularxs(),
+  //                   )
+  //                 : Container(),
+  //           ],
+  //         ),
+  //         Flexible(
+  //           child: rating > 0
+  //               ? Column(
+  //                   children: <Widget>[
+  //                     Row(
+  //                       children: <Widget>[
+  //                         Text(
+  //                           " " + rating.toStringAsFixed(1) + " ",
+  //                           // style: priceDescription()
+  //                         ),
+  //                         Icon(Icons.star, color: primary, size: 16.0),
+  //                       ],
+  //                     ),
+  //                     Text(
+  //                       '(' + reviews.toString() + ') ' + review,
+  //                       // style: hintStyleSmallTextDarkOSR(),
+  //                       overflow: TextOverflow.ellipsis,
+  //                     )
+  //                   ],
+  //                 )
+  //               : Text(''),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
+  // void _showBottomSheet() {
+  //   if (mounted) {
+  //     setState(() {
+  //       showBottomSheetCallback = null;
+  //     });
+  //   }
+  //   scaffoldKey.currentState
+  //       .showBottomSheet<void>((BuildContext context) {
+  //     return Container(
+  //       decoration: BoxDecoration(
+  //         // border: Border(
+  //         //   top: BorderSide(color: primary, width: 6.0),
+  //         // ),
+  //           boxShadow: [
+  //             BoxShadow(color: Colors.black.withOpacity(0.4), blurRadius: 5)
+  //           ]),
+  //       child: LocationListSheet(
+  //         restaurantInfo: restaurantInfo,
+  //         localizedValues: widget.localizedValues,
+  //         locale: widget.locale,
+  //       ),
+  //     );
+  //   })
+  //       .closed
+  //       .whenComplete(() {
+  //     if (mounted) {
+  //       if (mounted) {
+  //         setState(() {
+  //           showBottomSheetCallback = _showBottomSheet;
+  //         });
+  //       }
+  //     }
+  //   });
+  // }
 
   void goToProductListPage(
       context, data, isNearByRestaurant, localizedValues, locale) {

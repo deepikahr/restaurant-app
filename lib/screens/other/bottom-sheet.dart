@@ -9,7 +9,7 @@ import 'flavours-list.dart';
 
 SentryError sentryError = new SentryError();
 
-class BottonSheetClassDryClean extends StatefulWidget {
+class BottomSheetClassDryClean extends StatefulWidget {
   final Map<String, dynamic> locationInfo;
   final List variantsList;
   final int deliveryCharge, minimumOrderAmount;
@@ -19,7 +19,7 @@ class BottonSheetClassDryClean extends StatefulWidget {
   final Map<String, dynamic> product;
   final bool isProductFirstDeliverFree;
 
-  BottonSheetClassDryClean({
+  BottomSheetClassDryClean({
     Key key,
     this.variantsList,
     this.product,
@@ -38,11 +38,11 @@ class BottonSheetClassDryClean extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _BottonSheetClassDryCleanState createState() =>
-      _BottonSheetClassDryCleanState();
+  _BottomSheetClassDryCleanState createState() =>
+      _BottomSheetClassDryCleanState();
 }
 
-class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
+class _BottomSheetClassDryCleanState extends State<BottomSheetClassDryClean> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int selectedSizeIndex = 0;
   Map<String, dynamic> cartProduct;
@@ -230,35 +230,43 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
     });
     return Scaffold(
       key: _scaffoldKey,
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            widget.product['variants'].length > 0
-                ? _buildSingleSelectionBlock(widget.currency)
-                : Container(
-                    height: 0.0,
-                    width: 0.0,
-                  ),
-            Padding(
-              padding: EdgeInsets.only(bottom: 5.0),
-              child: widget.product['extraIngredients'].length > 0
-                  ? _buildHeadingBlock(
-                      MyLocalizations.of(context).extra,
-                      MyLocalizations.of(context)
-                          .whichextraingredientswouldyouliketoadd,
-                    )
-                  : Container(
-                      height: 0.0,
-                      width: 0.0,
-                    ),
+      body: ListView(
+        shrinkWrap: true,
+        // mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            alignment: AlignmentDirectional.centerStart,
+            padding: EdgeInsets.all(16),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(widget.product['title'], style: subTitleDarkLightOSS(),),
+                Text(widget.product['description'], style: hintStyleSmallPNR(),)
+              ],
             ),
-            widget.product['extraIngredients'] != null
-                ? _buildMultiSelectionBlock(
-                    widget.product['extraIngredients'], widget.currency)
-                : Container(),
-          ],
-        ),
+          ),
+          widget.product['variants'].length > 0
+              ? _buildSingleSelectionBlock(widget.currency)
+              : Container(
+                  height: 0.0,
+                  width: 0.0,
+                ),
+          widget.product['extraIngredients'].length > 0
+              ? _buildHeadingBlock(
+                  MyLocalizations.of(context).extra,
+                  MyLocalizations.of(context)
+                      .whichextraingredientswouldyouliketoadd,
+                )
+              : Container(
+                  height: 0.0,
+                  width: 0.0,
+                ),
+          widget.product['extraIngredients'] != null
+              ? _buildMultiSelectionBlock(
+                  widget.product['extraIngredients'], widget.currency)
+              : Container(),
+        ],
       ),
       bottomNavigationBar: widget.product['isFlavoured']
           ? Container(
@@ -269,7 +277,7 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
                       start: 10.0, end: 10.0, bottom: 5.0),
                   child: RawMaterialButton(
                     padding: EdgeInsetsDirectional.only(start: .0, end: 15.0),
-                    fillColor: PRIMARY,
+                    fillColor: primary,
                     constraints: const BoxConstraints(minHeight: 44.0),
                     shape: RoundedRectangleBorder(
                       borderRadius: new BorderRadius.circular(5.0),
@@ -289,7 +297,7 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
                     start: 10.0, end: 10.0, bottom: 5.0),
                 child: RawMaterialButton(
                   padding: EdgeInsetsDirectional.only(start: .0, end: 15.0),
-                  fillColor: PRIMARY,
+                  fillColor: primary,
                   constraints: const BoxConstraints(minHeight: 44.0),
                   shape: RoundedRectangleBorder(
                     borderRadius: new BorderRadius.circular(5.0),
@@ -297,42 +305,39 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.only(right: 0.0),
-                        child: Container(
-                          color: Colors.black,
-                          margin: EdgeInsets.only(right: 0),
-                          width: 120,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: <Widget>[
-                              SizedBox(
-                                height: 2.0,
+                      Container(
+                        alignment: AlignmentDirectional.center,
+                        color: Colors.black,
+                        width: 120,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            SizedBox(
+                              height: 2.0,
+                            ),
+                            RichText(
+                              text: TextSpan(
+                                children: <TextSpan>[
+                                  TextSpan(
+                                    text: '(${quantity.toString()}) ',
+                                    style: textMuliRegularwhitesm(),
+                                  ),
+                                  TextSpan(
+                                      text: quantity == 1
+                                          ? MyLocalizations.of(context).item
+                                          : MyLocalizations.of(context).items,
+                                      style: textMuliRegularwhitesm()),
+                                ],
                               ),
-                              RichText(
-                                text: TextSpan(
-                                  children: <TextSpan>[
-                                    TextSpan(
-                                      text: '(${quantity.toString()}) ',
-                                      style: titleLightWhiteOSS(),
-                                    ),
-                                    TextSpan(
-                                        text: quantity == 1
-                                            ? MyLocalizations.of(context).item
-                                            : MyLocalizations.of(context).items,
-                                        style: titleLightWhiteOSS()),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(
-                                height: 1.0,
-                              ),
-                              new Text(
-                                '${widget.currency} ${price.toStringAsFixed(2)}',
-                                style: titleLightWhiteOSS(),
-                              ),
-                            ],
-                          ),
+                            ),
+                            SizedBox(
+                              height: 1.0,
+                            ),
+                            new Text(
+                              '${widget.currency} ${price.toStringAsFixed(2)}',
+                              style: titleLightWhiteOSS(),
+                            ),
+                          ],
                         ),
                       ),
                       addProductTocart ? CircularProgressIndicator() : Text(""),
@@ -367,15 +372,13 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
 
   Widget _buildHeadingBlock(String title, String subtitle) {
     return Padding(
-      padding: EdgeInsets.only(left: 10.0, right: 10.0),
+      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       child: Container(
         color: whiteTextb,
-        height: 58.0,
         child: new Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Padding(padding: EdgeInsets.only(top: 4.0)),
             Text(
               title,
               style: titleDarkBoldOSB(),
@@ -420,7 +423,7 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
                   calculatePrice(widget.product);
                 }
               },
-              activeColor: PRIMARY,
+              activeColor: primary,
               title: widget.product['variants'][index]['size'] != null
                   ? new Text(
                       widget.product['variants'][index]['size'],
@@ -471,7 +474,7 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
                               calculatePrice(widget.product);
                             }
                           },
-                          activeColor: PRIMARY,
+                          activeColor: primary,
                         ),
                         Text(
                           extras[index]['name'] != null

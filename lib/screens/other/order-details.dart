@@ -74,7 +74,7 @@ class _OrderDetailsState extends State<OrderDetails> {
               Icons.arrow_back,
               color: Colors.white,
             )),
-        backgroundColor: PRIMARY,
+        backgroundColor: primary,
         iconTheme: IconThemeData(color: Colors.white),
         title: new Text(
           MyLocalizations.of(context).orderDetails,
@@ -123,7 +123,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                                     height: 20.0,
                                     decoration: new BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: PRIMARY,
+                                      color: primary,
                                     ),
                                   ),
                                   new Container(
@@ -211,7 +211,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                               height: 20.0,
                               decoration: new BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: PRIMARY,
+                                color: primary,
                               ),
                             ),
                           ],

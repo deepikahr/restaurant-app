@@ -4,6 +4,7 @@ import 'package:RestaurantSaas/services/auth-service.dart';
 import 'package:RestaurantSaas/services/common.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -101,6 +102,12 @@ class EntryPage extends StatefulWidget {
 class _EntryPageState extends State<EntryPage> {
   @override
   Widget build(BuildContext context) {
+
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      systemNavigationBarColor: Colors.transparent,
+    ));
+
     return MaterialApp(
       locale: Locale(widget.locale),
       localizationsDelegates: [
@@ -114,7 +121,7 @@ class _EntryPageState extends State<EntryPage> {
       debugShowCheckedModeBanner: false,
       title: APP_NAME,
       theme: ThemeData(
-          fontFamily: FONT_FAMILY, primaryColor: PRIMARY, accentColor: PRIMARY),
+          fontFamily: FONT_FAMILY, primaryColor: primary, accentColor: primary),
       home: CurrentLocation(
           locale: widget.locale, localizedValues: widget.localizedValues),
     );

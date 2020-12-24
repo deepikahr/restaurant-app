@@ -81,7 +81,7 @@ class _RatingState extends State<Rating> {
           MyLocalizations.of(context).rateYourOrder,
           style: textbarlowSemiBoldWhite(),
         ),
-        backgroundColor: PRIMARY,
+        backgroundColor: primary,
         iconTheme: new IconThemeData(color: Colors.white),
       ),
       body: new Stack(
@@ -103,7 +103,7 @@ class _RatingState extends State<Rating> {
               child: new Theme(
                 data: new ThemeData(
                   brightness: Brightness.dark,
-                  accentColor: PRIMARY,
+                  accentColor: primary,
                   inputDecorationTheme: new InputDecorationTheme(
                     labelStyle: textOSL(),
                   ),
@@ -142,27 +142,27 @@ class _RatingState extends State<Rating> {
                         children: <Widget>[
                           new GestureDetector(
                             child: new Icon(Icons.star,
-                                color: _rating >= 1 ? PRIMARY : greyTextd),
+                                color: _rating >= 1 ? primary : greyTextd),
                             onTap: () => rate(1),
                           ),
                           new GestureDetector(
                             child: new Icon(Icons.star,
-                                color: _rating >= 2 ? PRIMARY : greyTextd),
+                                color: _rating >= 2 ? primary : greyTextd),
                             onTap: () => rate(2),
                           ),
                           new GestureDetector(
                             child: new Icon(Icons.star,
-                                color: _rating >= 3 ? PRIMARY : greyTextd),
+                                color: _rating >= 3 ? primary : greyTextd),
                             onTap: () => rate(3),
                           ),
                           new GestureDetector(
                             child: new Icon(Icons.star,
-                                color: _rating >= 4 ? PRIMARY : greyTextd),
+                                color: _rating >= 4 ? primary : greyTextd),
                             onTap: () => rate(4),
                           ),
                           new GestureDetector(
                             child: new Icon(Icons.star,
-                                color: _rating >= 5 ? PRIMARY : greyTextd),
+                                color: _rating >= 5 ? primary : greyTextd),
                             onTap: () => rate(5),
                           ),
                         ],
@@ -212,7 +212,7 @@ class _RatingState extends State<Rating> {
                       ),
                       child: isLoading
                           ? RawMaterialButton(
-                              fillColor: PRIMARY,
+                              fillColor: primary,
                               constraints:
                                   const BoxConstraints(minHeight: 45.0),
                               shape: new RoundedRectangleBorder(
@@ -232,7 +232,7 @@ class _RatingState extends State<Rating> {
                               splashColor: secondary,
                             )
                           : RawMaterialButton(
-                              fillColor: PRIMARY,
+                              fillColor: primary,
                               constraints:
                                   const BoxConstraints(minHeight: 45.0),
                               shape: new RoundedRectangleBorder(

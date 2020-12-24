@@ -25,7 +25,7 @@ class _ThankYouState extends State<ThankYou> {
     Common.removeCart();
     return Scaffold(
       body: Container(
-        color: PRIMARY,
+        color: primary,
         height: screenHeight(context),
         width: screenWidth(context),
         alignment: AlignmentDirectional.center,
@@ -74,11 +74,11 @@ class _ThankYouState extends State<ThankYou> {
                         children: <Widget>[
                           Text(
                             MyLocalizations.of(context).backTo,
-                            style: hintStylePrimaryLightOSR(),
+                            style: hintStyleprimaryLightOSR(),
                           ),
                           Icon(
                             Icons.home,
-                            color: PRIMARY,
+                            color: primary,
                             size: 18.0,
                           ),
                         ],

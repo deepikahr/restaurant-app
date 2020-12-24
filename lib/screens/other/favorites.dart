@@ -54,7 +54,7 @@ class _FavoritesState extends State<Favorites> {
           },
           child: Icon(Icons.arrow_back),
         ),
-        backgroundColor: PRIMARY,
+        backgroundColor: primary,
         title: new Text(
           MyLocalizations.of(context).favourites,
           style: textbarlowSemiBoldWhite(),
@@ -212,7 +212,7 @@ class _FavoritesState extends State<Favorites> {
                                   child: Icon(
                                     Icons.favorite,
                                     size: 35.0,
-                                    color: PRIMARY,
+                                    color: primary,
                                   ),
                                 ),
                         ],

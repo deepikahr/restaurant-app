@@ -144,7 +144,7 @@ class _LoginPageState extends State<LoginPage> {
                             localizedValues: widget.localizedValues,
                           ))),
             text: MyLocalizations.of(context).verifyNow,
-            style: textPrimaryBoldOSR())
+            style: textprimaryBoldOSR())
       ])),
     );
     _scaffoldKey.currentState.showSnackBar(snackBar);

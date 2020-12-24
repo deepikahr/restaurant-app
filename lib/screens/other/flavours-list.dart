@@ -209,7 +209,7 @@ class _FlavourPageState extends State<FlavourPage> {
             margin: EdgeInsets.only(left: 5.0, right: 5.0),
             height: 56.0,
             decoration: BoxDecoration(
-                color: PRIMARY, border: Border.all(color: PRIMARY)),
+                color: primary, border: Border.all(color: primary)),
             child: Text(
               MyLocalizations.of(context).addToCart,
               style: smallTitleWhiteOSR(),
@@ -368,9 +368,9 @@ class _FlavourTileState extends State<FlavourTile> {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: individualQuantity == 0 ? Colors.white : PRIMARY,
+                  color: individualQuantity == 0 ? Colors.white : primary,
                   border: Border.all(
-                      color: individualQuantity == 0 ? Colors.grey : PRIMARY),
+                      color: individualQuantity == 0 ? Colors.grey : primary),
                   borderRadius: BorderRadius.circular(50),
                 ),
                 child: Icon(
@@ -405,9 +405,9 @@ class _FlavourTileState extends State<FlavourTile> {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: individualQuantity == 0 ? Colors.white : PRIMARY,
+                  color: individualQuantity == 0 ? Colors.white : primary,
                   border: Border.all(
-                      color: individualQuantity == 0 ? Colors.grey : PRIMARY),
+                      color: individualQuantity == 0 ? Colors.grey : primary),
                   borderRadius: BorderRadius.circular(50),
                 ),
                 child: Icon(

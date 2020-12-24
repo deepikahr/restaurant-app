@@ -13,10 +13,11 @@ import '../../widgets/no-data.dart';
 import '../auth/login.dart';
 import '../other/coupons-list.dart';
 import 'confirm-order.dart';
+import 'package:RestaurantSaas/widgets/appbar.dart';
+import 'package:getwidget/getwidget.dart';
 
 SentryError sentryError = new SentryError();
 
-// ignore: must_be_immutable
 class CartPage extends StatefulWidget {
   Map<String, dynamic> product, taxInfo, locationInfo;
   final Map<String, Map<String, String>> localizedValues;
@@ -104,7 +105,7 @@ class CartPageState extends State<CartPage> {
                               decoration: BoxDecoration(),
                               child: Text(
                                 MyLocalizations.of(context).same.toUpperCase(),
-                                style: textPrimaryOSR(),
+                                style: textprimaryOSR(),
                               ),
                             ),
                           ),
@@ -124,7 +125,7 @@ class CartPageState extends State<CartPage> {
                                 MyLocalizations.of(context)
                                     .different
                                     .toUpperCase(),
-                                style: textPrimaryOSR(),
+                                style: textprimaryOSR(),
                               ),
                             ),
                           ),
@@ -347,73 +348,63 @@ class CartPageState extends State<CartPage> {
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: PRIMARY,
-        elevation: 0.0,
-        title: new Text(
-          MyLocalizations.of(context).cart,
-          style: textbarlowSemiBoldWhite(),
-        ),
-        leading: InkWell(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Icon(
-            Icons.arrow_back,
-            color: Colors.white,
-          ),
-        ),
-        centerTitle: true,
-        actions: <Widget>[],
-      ),
+      appBar: appBarWithTitle(context, MyLocalizations.of(context).cart),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : productsLength > 0
-              ? SingleChildScrollView(
-                  child: Stack(
-                    children: <Widget>[
-                      new Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                          SingleChildScrollView(
-                            child: Container(
-                                height: screenHeight(context) * 0.42,
-                                color: greyc,
-                                padding:
-                                    EdgeInsets.only(top: 10.0, bottom: 5.0),
-                                child: _buildCartItemTile(products)),
-                          ),
-                          Divider(),
-                          _buildApplyCouponLine(),
-                          selectedCoupon != null ? Divider() : Container(),
-                          selectedCoupon != null
-                              ? _buildPriceTagLine(
-                                  'Coupon (' +
-                                      selectedCoupon['couponName'] +
-                                      ' - ' +
-                                      selectedCoupon['offPrecentage']
-                                          .toString() +
-                                      '% off)',
-                                  couponDeduction)
-                              : Container(),
-                          Divider(),
-                          _buildPriceTagLine(
-                              MyLocalizations.of(context).subTotal, subTotal),
-                          Divider(),
-                          _buildPriceTagLine(
-                              MyLocalizations.of(context).deliveryCharges,
-                              deliveryCharge),
-                          Divider(),
-                          _buildPriceTagLine(
-                              MyLocalizations.of(context).grandTotal,
-                              grandTotal),
-                          Divider(),
-                        ],
-                      ),
-                    ],
-                  ),
+              ? ListView(
+                  children: <Widget>[
+                    SizedBox(height: 5),
+                    cartItemList(products),
+                    coupon(),
+                    billDetails(),
+                  ],
                 )
+              // SingleChildScrollView(
+              //     child: Stack(
+              //       children: <Widget>[
+              //         new Column(
+              //           crossAxisAlignment: CrossAxisAlignment.center,
+              //           mainAxisAlignment: MainAxisAlignment.start,
+              //           children: <Widget>[
+              //             SingleChildScrollView(
+              //               child: Container(
+              //                   height: screenHeight(context) * 0.42,
+              //                   color: greyc,
+              //                   padding:
+              //                       EdgeInsets.only(top: 10.0, bottom: 5.0),
+              //                   child: _buildCartItemTile(products)),
+              //             ),
+              //             Divider(),
+              //             _buildApplyCouponLine(),
+              //             selectedCoupon != null ? Divider() : Container(),
+              //             selectedCoupon != null
+              //                 ? _buildPriceTagLine(
+              //                     'Coupon (' +
+              //                         selectedCoupon['couponName'] +
+              //                         ' - ' +
+              //                         selectedCoupon['offPrecentage']
+              //                             .toString() +
+              //                         '% off)',
+              //                     couponDeduction)
+              //                 : Container(),
+              //             Divider(),
+              //             _buildPriceTagLine(
+              //                 MyLocalizations.of(context).subTotal, subTotal),
+              //             Divider(),
+              //             _buildPriceTagLine(
+              //                 MyLocalizations.of(context).deliveryCharges,
+              //                 deliveryCharge),
+              //             Divider(),
+              //             _buildPriceTagLine(
+              //                 MyLocalizations.of(context).grandTotal,
+              //                 grandTotal),
+              //             Divider(),
+              //           ],
+              //         ),
+              //       ],
+              //     ),
+              //   )
               : Padding(
                   padding: EdgeInsets.only(top: 50.0),
                   child: NoData(
@@ -422,7 +413,48 @@ class CartPageState extends State<CartPage> {
                   ),
                 ),
       bottomNavigationBar: productsLength > 0
-          ? _buildBottomBar()
+          ? Container(
+              padding: EdgeInsets.only(top: 10, bottom: 10),
+              child: Container(
+                width: 335,
+                height: 41,
+                margin: EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.black.withOpacity(0.29), blurRadius: 5)
+                    ]),
+                child: RaisedButton(
+                    color: primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(5.0),
+                    ),
+                    onPressed: _checkLoginAndNavigate,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        RichText(
+                          text: TextSpan(
+                            text: 'To Pay : ',
+                            style: textMuliSemiboldwhiteexs(),
+                            children: <TextSpan>[
+                              TextSpan(
+                                  text:
+                                      ' $currency ${grandTotal.toStringAsFixed(2)}',
+                                  style: textMuliSemiboldwhite()),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          'Checkout',
+                          style: textMuliSemiboldwhite(),
+                        ),
+                      ],
+                    )),
+              ),
+            )
+          // _buildBottomBar()
           : Container(
               height: 0,
               width: 0,
@@ -430,153 +462,373 @@ class CartPageState extends State<CartPage> {
     );
   }
 
-  Widget _buildCartItemTile(List<dynamic> products) {
+  Widget cartItemList(List<dynamic> products) {
     return ListView.builder(
         physics: ScrollPhysics(),
         shrinkWrap: true,
+        scrollDirection: Axis.vertical,
         itemCount: products.length,
         itemBuilder: (BuildContext context, int index) {
-          return Container(
-            padding: EdgeInsets.all(5),
-            // color: Colors.grey,
-            child: Container(
-              color: greyc,
-              child: Padding(
-                padding: EdgeInsets.only(left: 5, top: 5),
-                child: Column(
-                  children: [
-                    Text(
-                      products[index]['title'],
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                      style: subTitleDarkLightOSS(),
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        products[index]['size'].length > 30
-                            ? Text(
-                                products[index]['Quantity'].toString() +
-                                    'x ' +
-                                    products[index]['size'].substring(0, 28) +
-                                    "... ",
-                                textAlign: TextAlign.center,
-                                style: hintStylePrimaryOSR(),
-                              )
-                            : Text(
-                                products[index]['Quantity'].toString() +
-                                    'x ' +
-                                    products[index]['size'],
-                                textAlign: TextAlign.center,
-                                style: hintStylePrimaryOSR(),
-                              ),
-                        Text(
-                          '$currency' +
-                              products[index]['price'].toStringAsFixed(2),
-                          style: titleBlackBoldOSB(),
-                        ),
-                        Row(
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                  color: Colors.grey[300],
-                                  borderRadius: BorderRadius.circular(15.0)),
-                              height: 30,
-                              width: 100,
-                              child: Row(
-                                children: <Widget>[
-                                  Container(
-                                    width: 24,
-                                    height: 24,
-                                    decoration: BoxDecoration(
-                                      color: Colors.black,
-                                      borderRadius: BorderRadius.circular(20.0),
-                                    ),
-                                    child: InkWell(
-                                      onTap: () {
-                                        if (products[index]['Quantity'] <= 1) {
-                                          _updateProductQuantityFromCart(
-                                              products[index], products[index]);
-                                        } else {
-                                          products[index]['flavour'] == null
-                                              ? calculatePrice(
-                                                  products[index], false,
-                                                  decrement: true)
-                                              : calculatePrice(
-                                                  products[index], false,
-                                                  removeFlavours: true);
-                                        }
-                                      },
-                                      child: Icon(
-                                        Icons.remove,
-                                        color: PRIMARY,
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 20.0, right: 20),
-                                    child: Container(
-                                        child: Text(products[index]['Quantity']
-                                            .toString())),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 0.0),
-                                    child: Container(
-                                      width: 24,
-                                      height: 24,
-                                      decoration: BoxDecoration(
-                                        color: PRIMARY,
-                                        borderRadius:
-                                            BorderRadius.circular(15.0),
-                                      ),
-                                      child: InkWell(
-                                        onTap: () {
-                                          products[index]['flavour'] == null
-                                              ? calculatePrice(
-                                                  products[index], true)
-                                              : showFlavourOptionDialog(
-                                                  MyLocalizations.of(context)
-                                                      .doYouWantSameOrDifferent,
-                                                  products[index]);
-                                        },
-                                        child: Icon(Icons.add),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+          return SingleChildScrollView(
+              child: Container(
+            margin: EdgeInsets.only(left: 15, right: 15),
+            padding: EdgeInsets.only(bottom: 10, top: 10),
+            decoration: BoxDecoration(
+                border: Border(
+                    bottom: BorderSide(color: secondary.withOpacity(0.1)))),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Text(
+                        products[index]['title'],
+                        style: textMuliBold(),
+                      ),
+                      // Text(
+                      //   'Dominos',
+                      //   style: textMuliSemiboldmd(),
+                      // ),
+                      products[index]['size'].length > 30
+                          ? Text(
+                              products[index]['Quantity'].toString() +
+                                  'x ' +
+                                  products[index]['size'].substring(0, 28) +
+                                  "... ",
+                              style: textMuliRegular(),
+                            )
+                          : Text(
+                              products[index]['Quantity'].toString() +
+                                  'x ' +
+                                  products[index]['size'],
+                              style: textMuliRegular(),
                             ),
-                          ],
+                      products[index]['extraIngredients'].length == 0
+                          ? Container()
+                          : _buildCartExtraItemTile(
+                              products[index]['extraIngredients']),
+                      products[index]['flavour'] != null
+                          ? _buildFlavourList(products[index]['flavour'])
+                          : Container(),
+                    ],
+                  ),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: <Widget>[
+                    Row(
+                      //  crossAxisAlignment: CrossAxisAlignment.end,
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.only(top: 6.0, right: 2),
+                          child: Text(
+                            currency,
+                            style: textMuliRegularsm(),
+                          ),
+                        ),
+                        Text(
+                          products[index]['price'].toStringAsFixed(2),
+                          style: textMuliBold(),
                         ),
                       ],
                     ),
-                    products[index]['extraIngredients'].length == 0
-                        ? Container()
-                        : _buildCartExtraItemTile(
-                            products[index]['extraIngredients']),
-                    products[index]['flavour'] != null
-                        ? _buildFlavourList(products[index]['flavour'])
-                        : Container(),
-                    SizedBox(
-                      height: 10,
+                    Container(
+                      width: 112,
+                      // height: 32,
+                      margin: EdgeInsets.only(left: 8, bottom: 8, top: 8),
+                      decoration: BoxDecoration(
+                          border: Border.all(color: primary),
+                          borderRadius: BorderRadius.circular(5)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          InkWell(
+                            child: Icon(Icons.remove, color: primary),
+                            onTap: () {
+                              if (products[index]['Quantity'] <= 1) {
+                                _updateProductQuantityFromCart(
+                                    products[index], products[index]);
+                              } else {
+                                products[index]['flavour'] == null
+                                    ? calculatePrice(products[index], false,
+                                        decrement: true)
+                                    : calculatePrice(products[index], false,
+                                        removeFlavours: true);
+                              }
+                            },
+                          ),
+                          Text(
+                            products[index]['Quantity'].toString(),
+                            style: textMuliSemiboldsm(),
+                          ),
+                          InkWell(
+                            child: Icon(Icons.add, color: primary),
+                            onTap: () {
+                              products[index]['flavour'] == null
+                                  ? calculatePrice(products[index], true)
+                                  : showFlavourOptionDialog(
+                                      MyLocalizations.of(context)
+                                          .doYouWantSameOrDifferent,
+                                      products[index]);
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                     _buildAddNoteLine(index),
-                    Divider()
                   ],
                 ),
-              ),
+              ],
             ),
-          );
+          ));
         });
   }
+
+  Widget coupon() {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 10),
+      color: bg,
+      child: InkWell(
+        onTap: _goToCoupons,
+        child: Container(
+          color: Colors.white,
+          padding: EdgeInsets.all(16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: <Widget>[
+                  Image.asset(
+                    'lib/assets/icons/sale.png',
+                    width: 20,
+                    height: 20,
+                  ),
+                  SizedBox(
+                    width: 12,
+                  ),
+                  selectedCoupon != null
+                      ? Text(
+                          selectedCoupon['couponName'] +
+                              ' - ' +
+                              selectedCoupon['offPrecentage'].toString() +
+                              '% OFF',
+                          style: textMuliBold(),
+                        )
+                      : Text(
+                          MyLocalizations.of(context).applyCoupon,
+                          style: textMuliBold(),
+                        ),
+                  selectedCoupon != null
+                      ? Padding(
+                          padding: const EdgeInsets.only(left: 16.0),
+                          child: InkWell(
+                            onTap: () {
+                              if (mounted) {
+                                setState(() {
+                                  selectedCoupon = null;
+                                });
+                                calculateCart();
+                              }
+                            },
+                            child: Icon(
+                              Icons.cancel,
+                              size: 18,
+                              color: Colors.red,
+                            ),
+                          ),
+                        )
+                      : Container(),
+                ],
+              ),
+              selectedCoupon != null
+                  ? Text(
+                      '$currency' + couponDeduction.toStringAsFixed(2),
+                      style: textMuliBold(),
+                    )
+                  : Icon(
+                      Icons.arrow_forward_ios_outlined,
+                      size: 16,
+                    )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget billDetails() {
+    return Container(
+      padding: EdgeInsets.all(15),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            'Bill Details : ',
+            style: textMuliSemiboldextra(),
+          ),
+          SizedBox(height: 12),
+          priceTagLine(MyLocalizations.of(context).subTotal, subTotal),
+          SizedBox(height: 9),
+          priceTagLine(MyLocalizations.of(context).deliveryCharges, deliveryCharge),
+          selectedCoupon != null ?  SizedBox(height: 9) : Container(),
+          selectedCoupon != null ? priceTagLine(MyLocalizations.of(context).coupon, couponDeduction) : Container(),
+          Divider(color: secondary.withOpacity(0.1), thickness: 1, height: 22),
+          priceTagLine(MyLocalizations.of(context).grandTotal, grandTotal),
+        ],
+      ),
+    );
+  }
+
+  // Widget _buildCartItemTile(List<dynamic> products) {
+  //   return ListView.builder(
+  //       physics: ScrollPhysics(),
+  //       shrinkWrap: true,
+  //       itemCount: products.length,
+  //       itemBuilder: (BuildContext context, int index) {
+  //         return Container(
+  //           padding: EdgeInsets.all(5),
+  //           // color: Colors.grey,
+  //           child: Container(
+  //             color: greyc,
+  //             child: Padding(
+  //               padding: EdgeInsets.only(left: 5, top: 5),
+  //               child: Column(
+  //                 children: [
+  //                   Text(
+  //                     products[index]['title'],
+  //                     overflow: TextOverflow.ellipsis,
+  //                     maxLines: 2,
+  //                     style: subTitleDarkLightOSS(),
+  //                   ),
+  //                   Row(
+  //                     crossAxisAlignment: CrossAxisAlignment.center,
+  //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                     children: <Widget>[
+  //                       products[index]['size'].length > 30
+  //                           ? Text(
+  //                               products[index]['Quantity'].toString() +
+  //                                   'x ' +
+  //                                   products[index]['size'].substring(0, 28) +
+  //                                   "... ",
+  //                               textAlign: TextAlign.center,
+  //                               style: hintStyleprimaryOSR(),
+  //                             )
+  //                           : Text(
+  //                               products[index]['Quantity'].toString() +
+  //                                   'x ' +
+  //                                   products[index]['size'],
+  //                               textAlign: TextAlign.center,
+  //                               style: hintStyleprimaryOSR(),
+  //                             ),
+  //                       Text(
+  //                         '$currency' +
+  //                             products[index]['price'].toStringAsFixed(2),
+  //                         style: titleBlackBoldOSB(),
+  //                       ),
+  //                       Row(
+  //                         children: [
+  //                           Container(
+  //                             decoration: BoxDecoration(
+  //                                 color: Colors.grey[300],
+  //                                 borderRadius: BorderRadius.circular(15.0)),
+  //                             height: 30,
+  //                             width: 100,
+  //                             child: Row(
+  //                               children: <Widget>[
+  //                                 Container(
+  //                                   width: 24,
+  //                                   height: 24,
+  //                                   decoration: BoxDecoration(
+  //                                     color: Colors.black,
+  //                                     borderRadius: BorderRadius.circular(20.0),
+  //                                   ),
+  //                                   child: InkWell(
+  //                                     onTap: () {
+  //                                       if (products[index]['Quantity'] <= 1) {
+  //                                         _updateProductQuantityFromCart(
+  //                                             products[index], products[index]);
+  //                                       } else {
+  //                                         products[index]['flavour'] == null
+  //                                             ? calculatePrice(
+  //                                                 products[index], false,
+  //                                                 decrement: true)
+  //                                             : calculatePrice(
+  //                                                 products[index], false,
+  //                                                 removeFlavours: true);
+  //                                       }
+  //                                     },
+  //                                     child: Icon(
+  //                                       Icons.remove,
+  //                                       color: primary,
+  //                                     ),
+  //                                   ),
+  //                                 ),
+  //                                 Padding(
+  //                                   padding: const EdgeInsets.only(
+  //                                       left: 20.0, right: 20),
+  //                                   child: Container(
+  //                                       child: Text(products[index]['Quantity']
+  //                                           .toString())),
+  //                                 ),
+  //                                 Padding(
+  //                                   padding: const EdgeInsets.only(left: 0.0),
+  //                                   child: Container(
+  //                                     width: 24,
+  //                                     height: 24,
+  //                                     decoration: BoxDecoration(
+  //                                       color: primary,
+  //                                       borderRadius:
+  //                                           BorderRadius.circular(15.0),
+  //                                     ),
+  //                                     child: InkWell(
+  //                                       onTap: () {
+  //                                         products[index]['flavour'] == null
+  //                                             ? calculatePrice(
+  //                                                 products[index], true)
+  //                                             : showFlavourOptionDialog(
+  //                                                 MyLocalizations.of(context)
+  //                                                     .doYouWantSameOrDifferent,
+  //                                                 products[index]);
+  //                                       },
+  //                                       child: Icon(Icons.add),
+  //                                     ),
+  //                                   ),
+  //                                 ),
+  //                               ],
+  //                             ),
+  //                           ),
+  //                         ],
+  //                       ),
+  //                     ],
+  //                   ),
+  //                   products[index]['extraIngredients'].length == 0
+  //                       ? Container()
+  //                       : _buildCartExtraItemTile(
+  //                           products[index]['extraIngredients']),
+  //                   products[index]['flavour'] != null
+  //                       ? _buildFlavourList(products[index]['flavour'])
+  //                       : Container(),
+  //                   SizedBox(
+  //                     height: 10,
+  //                   ),
+  //                   _buildAddNoteLine(index),
+  //                   Divider()
+  //                 ],
+  //               ),
+  //             ),
+  //           ),
+  //         );
+  //       });
+  // }
 
   void _showBottomSheet(product) {
     showModalBottomSheet(
         context: context,
         builder: (BuildContext bc) {
-          return BottonSheetClassDryClean(
+          return BottomSheetClassDryClean(
             shippingType: shippingType,
             deliveryCharge: deliveryCharge,
             minimumOrderAmount: minimumOrderAmount,
@@ -598,10 +850,10 @@ class CartPageState extends State<CartPage> {
         itemCount: extraIngredients.length,
         itemBuilder: (BuildContext context, int index) {
           return Container(
+              alignment: AlignmentDirectional.topStart,
               width: screenWidth(context),
-              padding: EdgeInsets.only(left: 50.0),
               child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     new Text(
@@ -610,14 +862,14 @@ class CartPageState extends State<CartPage> {
                               '...'
                           : extraIngredients[index]['name'],
                       overflow: TextOverflow.ellipsis,
-                      style: hintStylePrimaryLightOSR(),
+                      style: hintStyleprimaryLightOSR(),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(right: 18.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: new Text(
                         'x' + '1',
                         textAlign: TextAlign.center,
-                        style: hintStylePrimaryOSR(),
+                        style: hintStyleprimaryOSR(),
                       ),
                     ),
                     new Text(
@@ -629,55 +881,71 @@ class CartPageState extends State<CartPage> {
         });
   }
 
-  Widget _buildPriceTagLine(String title, double value) {
-    return Padding(
-      padding: const EdgeInsets.only(
-        left: 12.0,
-        right: 12.0,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          new Text(
-            title,
-            overflow: TextOverflow.ellipsis,
-            style: titleBlackLightOSB(),
-          ),
-          new Text(
-            '$currency' + value.toStringAsFixed(2),
-            style: textPrimaryOSR(),
-          ),
-        ],
-      ),
+  Widget priceTagLine(String title, double value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        Text(
+          title,
+          style: textMuliRegulars(),
+        ),
+        Text(
+        '$currency' + value.toStringAsFixed(2),
+          style: textMuliRegulars(),
+        ),
+      ],
     );
   }
 
-  Widget _buildBottomBar() {
-    return GestureDetector(
-      onTap: _checkLoginAndNavigate,
-      child: new Container(
-        height: 70.0,
-        color: PRIMARY,
-        child: new Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            new Text(
-              MyLocalizations.of(context).completeOrder,
-              style: subTitleWhiteLightOSR(),
-            ),
-            new Padding(padding: EdgeInsets.only(top: 5.0)),
-            new Text(
-              MyLocalizations.of(context).total +
-                  ': $currency' +
-                  grandTotal.toStringAsFixed(2),
-              style: titleWhiteBoldOSB(),
-            )
-          ],
-        ),
-      ),
-    );
-  }
+  // Widget _buildPriceTagLine(String title, double value) {
+  //   return Padding(
+  //     padding: const EdgeInsets.only(
+  //       left: 12.0,
+  //       right: 12.0,
+  //     ),
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //       crossAxisAlignment: CrossAxisAlignment.center,
+  //       children: <Widget>[
+  //         new Text(
+  //           title,
+  //           overflow: TextOverflow.ellipsis,
+  //           style: titleBlackLightOSB(),
+  //         ),
+  //         new Text(
+  //           '$currency' + value.toStringAsFixed(2),
+  //           style: textprimaryOSR(),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
+  // Widget _buildBottomBar() {
+  //   return GestureDetector(
+  //     onTap: _checkLoginAndNavigate,
+  //     child: new Container(
+  //       height: 70.0,
+  //       color: primary,
+  //       child: new Column(
+  //         mainAxisAlignment: MainAxisAlignment.center,
+  //         children: <Widget>[
+  //           new Text(
+  //             MyLocalizations.of(context).completeOrder,
+  //             style: subTitleWhiteLightOSR(),
+  //           ),
+  //           new Padding(padding: EdgeInsets.only(top: 5.0)),
+  //           new Text(
+  //             MyLocalizations.of(context).total +
+  //                 ': $currency' +
+  //                 grandTotal.toStringAsFixed(2),
+  //             style: titleWhiteBoldOSB(),
+  //           )
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   void _checkLoginAndNavigate() async {
     ProfileService.getUserInfo().then((value) {
@@ -719,7 +987,7 @@ class CartPageState extends State<CartPage> {
   Widget _buildAddNoteLine(int index) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.end,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         InkWell(
           onTap: () {
@@ -753,39 +1021,39 @@ class CartPageState extends State<CartPage> {
     );
   }
 
-  Widget _buildApplyCouponLine() {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        InkWell(
-          onTap: _goToCoupons,
-          child: Text(
-            MyLocalizations.of(context).applyCoupon,
-            style: titleBlackLightOSBCoupon(),
-          ),
-        ),
-        Padding(padding: EdgeInsets.only(left: 10)),
-        selectedCoupon != null
-            ? InkWell(
-                onTap: () {
-                  if (mounted) {
-                    setState(() {
-                      selectedCoupon = null;
-                    });
-                    calculateCart();
-                  }
-                },
-                child: Icon(
-                  Icons.cancel,
-                  size: 18,
-                  color: Colors.red,
-                ),
-              )
-            : Container(),
-      ],
-    );
-  }
+  // Widget _buildApplyCouponLine() {
+  //   return Row(
+  //     crossAxisAlignment: CrossAxisAlignment.center,
+  //     mainAxisAlignment: MainAxisAlignment.center,
+  //     children: [
+  //       InkWell(
+  //         onTap: _goToCoupons,
+  //         child: Text(
+  //           MyLocalizations.of(context).applyCoupon,
+  //           style: titleBlackLightOSBCoupon(),
+  //         ),
+  //       ),
+  //       Padding(padding: EdgeInsets.only(left: 10)),
+  //       selectedCoupon != null
+  //           ? InkWell(
+  //               onTap: () {
+  //                 if (mounted) {
+  //                   setState(() {
+  //                     selectedCoupon = null;
+  //                   });
+  //                   calculateCart();
+  //                 }
+  //               },
+  //               child: Icon(
+  //                 Icons.cancel,
+  //                 size: 18,
+  //                 color: Colors.red,
+  //               ),
+  //             )
+  //           : Container(),
+  //     ],
+  //   );
+  // }
 
   Future<void> _showAddNoteAlert(int index) async {
     return showDialog<void>(

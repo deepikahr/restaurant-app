@@ -45,7 +45,7 @@ class _CouponsListState extends State<CouponsList> {
             color: Colors.white,
           ),
         ),
-        backgroundColor: PRIMARY,
+        backgroundColor: primary,
         title: new Text(
           MyLocalizations.of(context).coupon,
           style: textbarlowSemiBoldWhite(),

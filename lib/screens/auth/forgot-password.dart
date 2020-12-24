@@ -107,7 +107,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
           style: textbarlowSemiBoldWhite(),
         ),
         centerTitle: true,
-        backgroundColor: PRIMARY,
+        backgroundColor: primary,
         elevation: 0.0,
       ),
       body: Form(

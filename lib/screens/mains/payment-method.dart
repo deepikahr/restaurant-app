@@ -248,7 +248,7 @@ class _PaymentMethodState extends State<PaymentMethod> {
     return Scaffold(
       backgroundColor: whiteTextb,
       appBar: AppBar(
-        backgroundColor: PRIMARY,
+        backgroundColor: primary,
         elevation: 0.0,
         leading: InkWell(
             onTap: () {
@@ -267,7 +267,7 @@ class _PaymentMethodState extends State<PaymentMethod> {
       body: isPaymentMethodLoading
           ? Center(
               child: CircularProgressIndicator(
-                backgroundColor: PRIMARY,
+                backgroundColor: primary,
               ),
             )
           : _buildPaymentMethodSelector(),
@@ -277,7 +277,7 @@ class _PaymentMethodState extends State<PaymentMethod> {
                   onTap: _placeOrder,
                   child: Container(
                     height: 78.0,
-                    color: PRIMARY,
+                    color: primary,
                     child: isPlaceOrderLoading
                         ? Image.asset(
                             'lib/assets/icon/spinner.gif',
@@ -336,7 +336,7 @@ class _PaymentMethodState extends State<PaymentMethod> {
                                   });
                                 }
                               },
-                              activeColor: PRIMARY,
+                              activeColor: primary,
                               title: Text(
                                 paymentMethodList[index]['type'] == "COD"
                                     ? MyLocalizations.of(context).cod
@@ -344,18 +344,18 @@ class _PaymentMethodState extends State<PaymentMethod> {
                                             "STRIPE"
                                         ? MyLocalizations.of(context).addCard
                                         : paymentMethodList[index]['type'],
-                                style: TextStyle(color: PRIMARY),
+                                style: TextStyle(color: primary),
                               ),
                               secondary:
                                   paymentMethodList[index]['type'] == "COD"
                                       ? Text(
                                           currency,
                                           style: TextStyle(
-                                              fontSize: 16.0, color: PRIMARY),
+                                              fontSize: 16.0, color: primary),
                                         )
                                       : Icon(
                                           Icons.credit_card,
-                                          color: PRIMARY,
+                                          color: primary,
                                           size: 16.0,
                                         ),
                             ),

@@ -8,7 +8,7 @@ import 'flavour-list1.dart';
 
 SentryError sentryError = new SentryError();
 
-class BottonSheetClassDryClean extends StatefulWidget {
+class BottomSheetClassDryClean extends StatefulWidget {
   final int minimumOrderAmount;
   final double deliveryCharge;
   final String currency, locale, shippingType;
@@ -16,7 +16,7 @@ class BottonSheetClassDryClean extends StatefulWidget {
   final String restaurantName, restaurantId, restaurantAddress;
   final Map<String, dynamic> product;
 
-  BottonSheetClassDryClean({
+  BottomSheetClassDryClean({
     Key key,
     this.product,
     this.currency,
@@ -31,11 +31,11 @@ class BottonSheetClassDryClean extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _BottonSheetClassDryCleanState createState() =>
-      _BottonSheetClassDryCleanState();
+  _BottomSheetClassDryCleanState createState() =>
+      _BottomSheetClassDryCleanState();
 }
 
-class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
+class _BottomSheetClassDryCleanState extends State<BottomSheetClassDryClean> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int selectedSizeIndex = 0;
   Map<String, dynamic> cartProduct;
@@ -92,7 +92,7 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
                   start: 10.0, end: 10.0, bottom: 5.0),
               child: RawMaterialButton(
                 padding: EdgeInsetsDirectional.only(start: .0, end: 15.0),
-                fillColor: PRIMARY,
+                fillColor: primary,
                 constraints: const BoxConstraints(minHeight: 44.0),
                 shape: RoundedRectangleBorder(
                   borderRadius: new BorderRadius.circular(5.0),
@@ -175,7 +175,7 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
                   calculatePrice(widget.product);
                 }
               },
-              activeColor: PRIMARY,
+              activeColor: primary,
               title:
                   widget.product['product']['variants'][index]['size'] != null
                       ? new Text(
@@ -229,7 +229,7 @@ class _BottonSheetClassDryCleanState extends State<BottonSheetClassDryClean> {
                               calculatePrice(widget.product);
                             }
                           },
-                          activeColor: PRIMARY,
+                          activeColor: primary,
                         ),
                         Text(
                           extras[index]['name'] != null

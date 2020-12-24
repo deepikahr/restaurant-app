@@ -1,6 +1,7 @@
 import 'package:RestaurantSaas/screens/other/product-tile.dart';
 import 'package:RestaurantSaas/services/common.dart';
 import 'package:RestaurantSaas/services/profile-service.dart';
+import 'package:RestaurantSaas/widgets/appbar.dart';
 import 'package:async_loader/async_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -14,6 +15,7 @@ import '../../services/sentry-services.dart';
 import '../../styles/styles.dart';
 import '../../widgets/no-data.dart';
 import 'cart.dart';
+import 'package:getwidget/getwidget.dart';
 
 SentryError sentryError = new SentryError();
 
@@ -59,6 +61,8 @@ class ProductListPage extends StatefulWidget {
 class ProductListPageState extends State<ProductListPage> {
   bool isNewUser = true;
   final GlobalKey<AsyncLoaderState> _asyncLoaderState =
+      GlobalKey<AsyncLoaderState>();
+  final GlobalKey<AsyncLoaderState> _asyncLoaderState2 =
       GlobalKey<AsyncLoaderState>();
   bool isopenAndCloseTimeLoading = false;
   int productQuantity = 1;
@@ -133,9 +137,9 @@ class ProductListPageState extends State<ProductListPage> {
     }).catchError((onError) {});
   }
 
-  Widget getItemList() {
+  Widget getCategoryList() {
     return AsyncLoader(
-      key: _asyncLoaderState,
+      key: _asyncLoaderState2,
       initState: () async => await getProductList(),
       renderLoad: () => Center(
         child: Padding(
@@ -177,15 +181,12 @@ class ProductListPageState extends State<ProductListPage> {
                   ? data['categorydata'].length
                   : 0,
               itemBuilder: (BuildContext context, int index) {
-                return Column(
-                  children: <Widget>[
-                    _buildCategoryTitle(
-                        data['restaurant']['restaurantID']['firstDeliveryFree'],
-                        data['categorydata'][index]['categoryTitle'],
-                        data['categorydata'][index]['categoryImageUrl'],
-                        data['categorydata'][index]['product']),
-                  ],
-                );
+                // print('pro ${data['categorydata'][index]}');
+                return categoryBlock(
+                    data['restaurant']['restaurantID']['firstDeliveryFree'],
+                    data['categorydata'][index]['categoryTitle'],
+                    data['categorydata'][index]['categoryImageUrl'],
+                    data['categorydata'][index]['product']);
               },
             ),
           );
@@ -211,90 +212,235 @@ class ProductListPageState extends State<ProductListPage> {
     });
 
     return Scaffold(
-      appBar: AppBar(
-        leading: InkWell(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Icon(Icons.arrow_back, color: Colors.white),
-        ),
-        backgroundColor: PRIMARY,
-        elevation: 0.0,
-        title: Text(
-          widget.restaurantName,
-          style: textbarlowSemiBoldWhite(),
-        ),
-        centerTitle: true,
-        actions: <Widget>[
-          GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => CartPage(
-                      localizedValues: widget.localizedValues,
-                      locale: widget.locale,
-                      taxInfo: widget.taxInfo,
-                      locationInfo: widget.locationInfo,
-                    ),
-                  ),
-                );
-              },
-              child: Stack(
-                children: <Widget>[
-                  Container(
-                      padding: EdgeInsets.only(top: 20.0, right: 10),
-                      child: Icon(
-                        Icons.shopping_cart,
-                        color: Colors.white,
-                      )),
-                  Positioned(
-                      right: 3,
-                      top: 5,
-                      child: (cartCount == null || cartCount == 0)
-                          ? Text(
-                              '',
-                              style: TextStyle(fontSize: 14.0),
-                            )
-                          : Container(
-                              height: 20,
-                              width: 20,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.black,
-                              ),
-                              child: Text('${cartCount.toString()}',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontFamily: "bold",
-                                      fontSize: 11)),
-                            )),
-                ],
-              )),
-          Padding(padding: EdgeInsets.only(left: 7.0)),
-          // buildLocationIcon(),
-          // Padding(padding: EdgeInsets.only(left: 7.0)),
+      appBar: appBarWithCart(
+        context,
+        cartCount,
+        () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (BuildContext context) => CartPage(
+                localizedValues: widget.localizedValues,
+                locale: widget.locale,
+                taxInfo: widget.taxInfo,
+                locationInfo: widget.locationInfo,
+              ),
+            ),
+          );
+        },
+      ),
+      body: ListView(
+        children: <Widget>[
+          buildStore(),
+          getCategoryList(),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
+    );
+  }
+
+  Widget buildStore() {
+    return Container(
+      padding: EdgeInsets.only(left: 20, right: 20, top: 16, bottom: 16),
+      margin: EdgeInsets.only(bottom: 10),
+      width: MediaQuery.of(context).size.width,
+      color: Colors.white,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Stack(
-                fit: StackFit.passthrough,
+              widget.imgUrl != null
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: Image.network(
+                        widget.imgUrl,
+                        width: 60,
+                        height: 60,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  : Image.asset(
+                      'lib/assets/images/pizza.png',
+                      width: 60,
+                      height: 60,
+                    ),
+              SizedBox(width: 8),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  _buildBgImg(),
-                  _buildDescription(),
-                  _buildInfoBar(),
+                  Row(
+                    children: <Widget>[
+                      Text(
+                        widget.restaurantName,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: textMuliSemiboldsm(),
+                      ),
+                      Container(
+                        width: 30,
+                        height: 15,
+                        padding: EdgeInsets.only(left: 1, right: 1),
+                        margin: EdgeInsets.only(left: 5),
+                        color: Color(0xFF39B24A),
+                        child: Row(
+                          children: <Widget>[
+                            Icon(
+                              Icons.star,
+                              color: Colors.white,
+                              size: 10,
+                            ),
+                            Text(
+                              '4.5',
+                              style: textMuliSemiboldwhitexs(),
+                            )
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    widget.locationName,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
+                    style: textMuliRegularxs(),
+                  ),
+                  SizedBox(height: 3),
+                  Row(
+                    children: <Widget>[
+                      Container(
+                        padding: EdgeInsets.only(right: 4),
+                        decoration: BoxDecoration(
+                            border: Border(
+                                right: BorderSide(color: secondary, width: 1))),
+                        child: Text(
+                          isNewUser
+                              ? MyLocalizations.of(context)
+                                  .freeDeliveryAvailable
+                              : shippingType != null
+                                  ? (shippingType.compareTo('free') == 0)
+                                      ? MyLocalizations.of(context)
+                                          .freeDeliveryAvailable
+                                      : (shippingType.compareTo('flexible') ==
+                                              0)
+                                          ? "${MyLocalizations.of(context).freeDeliveryAbove}  \$${minimumOrderAmount.toString()}"
+                                          : (shippingType.compareTo('fixed') ==
+                                                  0)
+                                              ? "${MyLocalizations.of(context).fixedDelivery} \$ ${deliveryCharge.toString()}"
+                                              : ''
+                                  : '',
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                          style: textMuliRegularxs(),
+                        ),
+                      ),
+                      SizedBox(width: 4),
+                      !isopenAndCloseTimeLoading
+                          ? Text(
+                              'Now $openAndCloseTime ',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
+                              style: textMuliRegularxs(),
+                            )
+                          : Text(''),
+                      InkWell(
+                        onTap: () {
+                          _showTimingAlert();
+                        },
+                        child: Icon(Icons.info_outlined),
+                      )
+                    ],
+                  )
                 ],
-              ),
-              getItemList(),
+              )
             ],
           ),
-        ),
+          Image.asset(
+            'lib/assets/icons/free.png',
+            width: 44,
+            height: 31,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget categoryBlock(bool isProductFirstDeliverFree, String categoryName,
+      String imgUrl, List<dynamic> products) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      margin: EdgeInsets.only(bottom: 10),
+      color: Colors.white,
+      child: Column(
+        children: [
+          Row(
+            children: [
+              imgUrl != null ?
+        ClipRRect(child: Image.network(widget.imgUrl,
+        height: 65, fit: BoxFit.cover,
+        width: 65,
+      ), borderRadius: BorderRadius.circular(8), )
+        : Image.asset('lib/assets/images/dominos.png', height: 65, width: 65, fit: BoxFit.cover,),
+              SizedBox(
+                width: 12,
+              ),
+              Container(
+                alignment: AlignmentDirectional.topStart,
+                child: Text(
+                  categoryName,
+                  style: textMuliBold(),
+                  textAlign: TextAlign.left,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(
+            height: 16,
+          ),
+          Container(
+            child: GridView.builder(
+              scrollDirection: Axis.vertical,
+              shrinkWrap: true,
+              physics: const ScrollPhysics(),
+              itemCount: products.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 20,
+                mainAxisSpacing: 10,
+                childAspectRatio: MediaQuery.of(context).size.width / 498,
+              ),
+              itemBuilder: (BuildContext context, int index) => BuildProductTile(
+                locationId: widget.locationId,
+                isProductFirstDeliverFree: isProductFirstDeliverFree,
+                shippingType: shippingType,
+                deliveryCharge: deliveryCharge,
+                minimumOrderAmount: minimumOrderAmount,
+                locationInfo: widget.locationInfo,
+                taxInfo: widget.taxInfo,
+                restaurantId: widget.restaurantId,
+                restaurantName: widget.restaurantName,
+                address: widget.address,
+                localizedValues: widget.localizedValues,
+                locale: widget.locale,
+                imgUrl: products[index]['imageUrl'],
+                mrp: double.parse(
+                    products[index]['variants'][0]['MRP'].toString()),
+                price: double.parse(
+                    products[index]['variants'][0]['price'].toString()),
+                product: products[index],
+                currency: currency,
+                topPadding: index == 0 ? 42.0 : 0,
+                off: double.parse(
+                    products[index]['variants'][0]['Discount'].toString()),
+                productName: products[index]['title'],
+                info: products[index]['description'],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -324,246 +470,6 @@ class ProductListPageState extends State<ProductListPage> {
     }).catchError((onError) {
       sentryError.reportError(onError, null);
     });
-  }
-
-  Widget _buildBgImg() {
-    return Image(
-      image: widget.imgUrl != null
-          ? NetworkImage(widget.imgUrl)
-          : AssetImage("lib/assets/bgImgs/coverbg.png"),
-      height: 220.0,
-      width: screenWidth(context),
-      color: Colors.black45,
-      colorBlendMode: BlendMode.hardLight,
-      fit: BoxFit.fill,
-    );
-  }
-
-  Widget _buildDescription() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
-        _buildLocatioNameView(),
-        Padding(padding: EdgeInsets.only(top: 5.0)),
-        _buildAboutUsView(),
-        _buildAddressBox(),
-        _buildInfoBottom(),
-      ],
-    );
-  }
-
-  Widget _buildLocatioNameView() {
-    return Padding(
-      padding: EdgeInsets.only(top: 30.0),
-      child: Text(
-        widget?.locationName ?? '',
-        style: titleLightWhiteOSS(),
-      ),
-    );
-  }
-
-  Widget _buildAboutUsView() {
-    return Text(
-      widget.aboutUs.length > 100
-          ? widget.aboutUs.substring(0, 100)
-          : widget.aboutUs,
-      style: hintStyleSmallTextWhiteOSL(),
-    );
-  }
-
-  Widget _buildAddressBox() {
-    return Padding(
-      padding: EdgeInsets.only(top: 30.0, right: 2.0, left: 10.0),
-      child: Container(
-        height: 37.0,
-        width: 260.0,
-        decoration: BoxDecoration(
-            border: Border.all(
-              color: Colors.black.withOpacity(0.25),
-              width: 1.0,
-            ),
-            borderRadius: BorderRadius.circular(40.0),
-            color: Colors.black.withOpacity(0.25)),
-        child: Center(
-          child: Padding(
-            padding: EdgeInsets.only(left: 5.0, right: 5.0, bottom: 2.0),
-            child: Text(
-              widget.address,
-              style: hintStyleSmallWhiteOSR(),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfoBottom() {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 10.0,
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          Container(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              MyLocalizations.of(context).location,
-              style: hintStyleSmallWhiteLightOSR(),
-              textAlign: TextAlign.left,
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Flexible(
-                  flex: 12,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                        widget.locationName,
-                        style: hintStyleSmallWhiteOSR(),
-                      ),
-                    ],
-                  )),
-              Flexible(
-                flex: 12,
-                child: Padding(
-                  padding: EdgeInsets.only(right: 10.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      Padding(padding: EdgeInsets.only(left: 5.0)),
-                      !isopenAndCloseTimeLoading
-                          ? Text(
-                              openAndCloseTime,
-                              style: hintStyleSmallGreenLightOSS(),
-                            )
-                          : Text(
-                              "",
-                              style: hintStyleSmallGreenLightOSS(),
-                            ),
-                      Padding(padding: EdgeInsets.only(left: 10.0)),
-                      InkWell(
-                        onTap: () {
-                          _showTimingAlert();
-                        },
-                        child: Image.asset(
-                          'lib/assets/icon/about.png',
-                          width: 18.0,
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInfoBar() {
-    return Container(
-      margin: EdgeInsetsDirectional.only(top: 200.0),
-      color: PRIMARY,
-      child: ListTile(
-        leading: Image(
-          image: AssetImage('lib/assets/icon/qmark.png'),
-          height: 18.0,
-        ),
-        title: Text(
-          isNewUser
-              ? MyLocalizations.of(context).freeDeliveryAvailable
-              : shippingType != null
-                  ? (shippingType.compareTo('free') == 0)
-                      ? MyLocalizations.of(context).freeDeliveryAvailable
-                      : (shippingType.compareTo('flexible') == 0)
-                          ? "${MyLocalizations.of(context).freeDeliveryAbove}  \$${minimumOrderAmount.toString()}"
-                          : (shippingType.compareTo('fixed') == 0)
-                              ? "${MyLocalizations.of(context).fixedDelivery} \$ ${deliveryCharge.toString()}"
-                              : ''
-                  : '',
-          style: hintStyleSmallWhiteLightOSL(),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCategoryTitle(bool isProductFirstDeliverFree,
-      String categoryName, String imgUrl, List<dynamic> products) {
-    return Column(
-      children: [
-        ExpansionTile(
-          trailing: Padding(
-            padding: const EdgeInsets.all(5.0),
-            child: Container(
-                decoration:
-                    BoxDecoration(border: Border.all(color: primaryLight)),
-                height: 70.0,
-                width: 70.0,
-                child: imgUrl != null
-                    ? Image.network(
-                        imgUrl,
-                        fit: BoxFit.fill,
-                      )
-                    : Icon(
-                        Icons.collections_bookmark,
-                        color: Colors.black87,
-                      )),
-          ),
-          children: [
-            ListView.builder(
-                physics: ScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: products.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return BuildProductTile(
-                    locationId: widget.locationId,
-                    isProductFirstDeliverFree: isProductFirstDeliverFree,
-                    shippingType: shippingType,
-                    deliveryCharge: deliveryCharge,
-                    minimumOrderAmount: minimumOrderAmount,
-                    locationInfo: widget.locationInfo,
-                    taxInfo: widget.taxInfo,
-                    restaurantId: widget.restaurantId,
-                    restaurantName: widget.restaurantName,
-                    address: widget.address,
-                    localizedValues: widget.localizedValues,
-                    locale: widget.locale,
-                    imgUrl: products[index]['imgUrl'],
-                    mrp: double.parse(
-                        products[index]['variants'][0]['MRP'].toString()),
-                    price: double.parse(
-                        products[index]['variants'][0]['price'].toString()),
-                    product: products[index],
-                    currency: currency,
-                    topPadding: index == 0 ? 42.0 : 0,
-                    off: double.parse(
-                        products[index]['variants'][0]['Discount'].toString()),
-                    productName: products[index]['title'],
-                    info: products[index]['description'],
-                  );
-                }),
-          ],
-          title: categoryName.length > 25
-              ? Text(
-                  categoryName.substring(0, 25) + " ...",
-                  style: subTitleDarkBoldOSS(),
-                )
-              : Text(
-                  categoryName,
-                  style: subTitleDarkBoldOSS(),
-                ),
-        ),
-      ],
-    );
   }
 
   _showTimingAlert() {

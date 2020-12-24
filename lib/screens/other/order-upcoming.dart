@@ -231,7 +231,7 @@ class OrderUpcomingState extends State<OrderUpcoming>
                     padding: EdgeInsets.all(3),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadiusDirectional.circular((3.0)),
-                      color: PRIMARY,
+                      color: primary,
                     ),
                     child: Text(
                       MyLocalizations.of(context).pickUpTime +
@@ -247,7 +247,7 @@ class OrderUpcomingState extends State<OrderUpcoming>
                     padding: EdgeInsets.all(3),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadiusDirectional.circular((3.0)),
-                      color: PRIMARY,
+                      color: primary,
                     ),
                     child: Text(
                       MyLocalizations.of(context).tableNo +
@@ -287,7 +287,7 @@ class OrderUpcomingState extends State<OrderUpcoming>
               children: <Widget>[
                 Icon(
                   Icons.check_circle_outline,
-                  color: PRIMARY,
+                  color: primary,
                   size: 24.0,
                 ),
               ],
@@ -348,7 +348,7 @@ class OrderUpcomingState extends State<OrderUpcoming>
                       );
                     }
                   },
-                  fillColor: PRIMARY,
+                  fillColor: primary,
                   child: new Text(
                     isRatingAllowed
                         ? MyLocalizations.of(context).view

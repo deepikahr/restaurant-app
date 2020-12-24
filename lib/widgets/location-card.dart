@@ -79,7 +79,7 @@ class LocationCard extends StatelessWidget {
                   ),
                   padding: EdgeInsets.all(2.0),
                   decoration: BoxDecoration(
-                    color: PRIMARY,
+                    color: primary,
                     borderRadius: BorderRadius.circular(5.0),
                   ),
                 )

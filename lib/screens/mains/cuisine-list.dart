@@ -50,7 +50,7 @@ class _CuisineListState extends State<CuisineList> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: PRIMARY,
+        backgroundColor: primary,
         elevation: 0.0,
         leading: InkWell(
           onTap: () {

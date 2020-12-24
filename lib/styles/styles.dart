@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
 
-const PRIMARY = const Color(0xFFB6236C);
+const primary = const Color(0xFFFF9C5D);
 final primaryLight = const Color(0xFFD489AC);
-final secondary = const Color(0xFF2AA1BF);
+
+final secondary = const Color(0xFF53596B);
+
+final red = const Color(0xFFF44242);
+
+final green = const Color(0xFF20C978);
+
 final border = const Color(0xF707070);
 final bgcolor = const Color(0xFF8FD3F4);
 final blacktext = const Color(0xFF272A3F);
 
-final green = const Color(0xFF5ECB56);
-final red = const Color(0xFFff5757);
+// final green = const Color(0xFF5ECB56);
+// final red = const Color(0xFFff5757);
 
 final bgColor = const Color(0xFFefefef);
+final bg = const Color(0xFFF6F6F6);
+
 
 final darkTexta = const Color(0xFF333333);
 final darkTextb = const Color(0xFF343434);
@@ -842,83 +850,83 @@ TextStyle hintStyleSmallGreenLightOSS() {
 
 //.............................................. primary - text .............................................................
 
-TextStyle hintStylePrimaryLightOSR() {
+TextStyle hintStyleprimaryLightOSR() {
   return TextStyle(
     fontWeight: FontWeight.w400,
     fontSize: 14.0,
-    color: PRIMARY,
+    color: primary,
     fontFamily: 'OpenSansRegular',
   );
 }
 
-TextStyle hintStyleSmallPrimaryLightOSR() {
+TextStyle hintStyleSmallprimaryLightOSR() {
   return TextStyle(
     fontWeight: FontWeight.w400,
     fontSize: 13.0,
-    color: PRIMARY,
+    color: primary,
     fontFamily: 'OpenSansRegular',
   );
 }
 
-TextStyle hintStyleSmallTextPrimaryLightOSR() {
+TextStyle hintStyleSmallTextprimaryLightOSR() {
   return TextStyle(
     fontWeight: FontWeight.w400,
     fontSize: 12.0,
-    color: PRIMARY,
+    color: primary,
     fontFamily: 'OpenSansRegular',
   );
 }
 
-TextStyle hintStylePrimaryOSR() {
+TextStyle hintStyleprimaryOSR() {
   return TextStyle(
     fontWeight: FontWeight.w500,
     fontSize: 15.0,
-    color: PRIMARY,
+    color: primary,
     fontFamily: 'OpenSansRegular',
   );
 }
 
-TextStyle hintStyleSmallPrimaryOSR() {
+TextStyle hintStyleSmallprimaryOSR() {
   return TextStyle(
     fontWeight: FontWeight.w500,
     fontSize: 12.0,
-    color: PRIMARY,
+    color: primary,
     fontFamily: 'OpenSansRegular',
   );
 }
 
-TextStyle hintStylePrimaryOSS() {
+TextStyle hintStyleprimaryOSS() {
   return TextStyle(
     fontWeight: FontWeight.w600,
     fontSize: 12.0,
-    color: PRIMARY,
+    color: primary,
     fontFamily: 'OpenSansSemibold',
   );
 }
 
-TextStyle textPrimaryOSR() {
+TextStyle textprimaryOSR() {
   return TextStyle(
     fontWeight: FontWeight.w500,
     fontSize: 15.0,
-    color: PRIMARY,
+    color: primary,
     fontFamily: 'OpenSansBold',
   );
 }
 
-TextStyle textPrimaryBoldOSR() {
+TextStyle textprimaryBoldOSR() {
   return TextStyle(
     fontWeight: FontWeight.w500,
     fontSize: 16.0,
-    color: PRIMARY,
+    color: primary,
     fontFamily: 'OpenSansBold',
   );
 }
 
-TextStyle titlePrimaryPNR() {
+TextStyle titleprimaryPNR() {
   return TextStyle(
     fontWeight: FontWeight.w900,
     fontSize: 22.0,
-    color: PRIMARY,
+    color: primary,
     fontFamily: 'ProximaNovaRegular',
   );
 }
@@ -999,7 +1007,7 @@ TextStyle titleStyle() {
   return new TextStyle(
     fontWeight: FontWeight.w300,
     fontSize: 16.0,
-    color: PRIMARY,
+    color: primary,
   );
 }
 
@@ -1073,7 +1081,339 @@ TextStyle textregulargreen() {
   return TextStyle(
     fontWeight: FontWeight.w400,
     fontSize: 16.0,
-    color: PRIMARY,
+    color: primary,
     fontFamily: 'BarlowSemibold',
+  );
+}
+
+
+/////////////////////////////////////////////// new //////////////////////////////////////////////////
+
+//..................................Muli Bold ....................................
+
+TextStyle textMuliBoldwhite() {
+  return TextStyle(
+    fontSize: 16.0,
+    color: Colors.white,
+    fontFamily: 'MuliBold',
+  );
+}
+
+TextStyle textMuliBoldsec() {
+  return TextStyle(
+    fontSize: 16.0,
+    color: secondary,
+    fontFamily: 'MuliBold',
+  );
+}
+
+TextStyle textMuliBold() {
+  return TextStyle(
+    fontSize: 17.0,
+    color: secondary,
+    fontFamily: 'MuliBold',
+  );
+}
+
+TextStyle textMuliBoldprimary() {
+  return TextStyle(
+    fontSize: 17.0,
+    color: primary,
+    fontFamily: 'MuliBold',
+  );
+}
+
+TextStyle textMuliBoldlg() {
+  return TextStyle(
+    fontSize: 20.0,
+    color: secondary,
+    fontFamily: 'MuliBold',
+  );
+}
+
+TextStyle textMuliBoldlgprimary() {
+  return TextStyle(
+    fontSize: 35.0,
+    color: primary,
+    fontFamily: 'MuliBold',
+  );
+}
+
+///////////muli Regular/////////////
+///
+TextStyle textMuliRegularxs() {
+  return TextStyle(
+    fontSize: 10.0,
+    color: secondary,
+    fontFamily: 'MuliRegular',
+  );
+}
+
+TextStyle textMuliRegularxsgreen() {
+  return TextStyle(
+    fontSize: 10.0,
+    color: Color(0xFF20C978),
+    fontFamily: 'MuliRegular',
+  );
+}
+
+TextStyle textMuliRegularxswithop() {
+  return TextStyle(
+    fontSize: 10.0,
+    color: secondary.withOpacity(0.6),
+    fontFamily: 'MuliRegular',
+  );
+}
+
+TextStyle textMuliRegularsm() {
+  return TextStyle(
+    fontSize: 12.0,
+    color: secondary,
+    fontFamily: 'MuliRegular',
+  );
+}
+
+TextStyle textMuliRegularwhite() {
+  return TextStyle(
+    fontSize: 12.0,
+    color: Colors.white,
+    fontFamily: 'MuliRegular',
+  );
+}
+
+TextStyle textMuliRegularwhitesm() {
+  return TextStyle(
+    fontSize: 14.0,
+    color: Colors.white,
+    fontFamily: 'MuliRegular',
+  );
+}
+
+TextStyle textMuliRegularsmsec() {
+  return TextStyle(
+    fontSize: 14.0,
+    color: secondary.withOpacity(0.3),
+    fontFamily: 'MuliRegular',
+  );
+}
+
+TextStyle textMuliRegularsmstrike() {
+  return TextStyle(
+    fontSize: 12.0,
+    color: secondary.withOpacity(0.50),
+    decoration: TextDecoration.lineThrough,
+    fontFamily: 'MuliRegular',
+  );
+}
+
+TextStyle textMuliRegularprimary() {
+  return TextStyle(
+    fontSize: 12.0,
+    color: primary,
+    fontFamily: 'MuliRegular',
+  );
+}
+
+TextStyle textMuliRegulargreenn() {
+  return TextStyle(
+    fontSize: 12.0,
+    color: Color(0xFF20C978),
+    fontFamily: 'MuliRegular',
+  );
+}
+
+TextStyle textMuliRegular() {
+  return TextStyle(
+    fontSize: 16.0,
+    color: secondary,
+    fontFamily: 'MuliRegular',
+  );
+}
+
+TextStyle textMuliRegularwithop() {
+  return TextStyle(
+    fontSize: 16.0,
+    color: secondary.withOpacity(0.7),
+    fontFamily: 'MuliRegular',
+  );
+}
+
+TextStyle textMuliRegulars() {
+  return TextStyle(
+    fontSize: 17.0,
+    color: secondary,
+    fontFamily: 'MuliRegular',
+  );
+}
+
+TextStyle textMuliRegulargreen() {
+  return TextStyle(
+    fontSize: 17.0,
+    color: Color(0xFF20C978),
+    fontFamily: 'MuliRegular',
+  );
+}
+
+TextStyle textMuliRegularWithOp() {
+  return TextStyle(
+    fontSize: 14.0,
+    color: secondary.withOpacity(0.60),
+    fontFamily: 'MuliRegular',
+  );
+}
+
+// Muli semibold
+
+TextStyle textMuliSemiboldwhitexs() {
+  return TextStyle(
+    fontSize: 10.0,
+    color: Colors.white,
+    fontFamily: 'MuliSemiBold',
+  );
+}
+
+TextStyle textMuliSemiboldwhiteexs() {
+  return TextStyle(
+    fontSize: 12.0,
+    color: Colors.white,
+    fontFamily: 'MuliSemiBold',
+  );
+}
+
+TextStyle textMuliSemiboldxs() {
+  return TextStyle(
+    fontSize: 12.0,
+    color: secondary,
+    fontFamily: 'MuliSemiBold',
+  );
+}
+
+TextStyle textMuliSemiboldxsgreen() {
+  return TextStyle(
+    fontSize: 12.0,
+    color: Color(0xFF20C978),
+    fontFamily: 'MuliSemiBold',
+  );
+}
+
+TextStyle textMuliSemiboldprimarysm() {
+  return TextStyle(
+    fontSize: 11.0,
+    color: primary,
+    fontFamily: 'MuliSemiBold',
+  );
+}
+
+TextStyle textboldWhitesm() {
+  return TextStyle(
+    fontSize: 11.0,
+    color: Colors.white,
+    fontFamily: 'MuliSemiBold',
+  );
+}
+
+TextStyle textMuliSemiboldprimary() {
+  return TextStyle(
+    fontSize: 16.0,
+    color: primary,
+    fontFamily: 'MuliSemiBold',
+  );
+}
+
+TextStyle textMuliSemiboldsec() {
+  return TextStyle(
+    fontSize: 16.0,
+    color: secondary,
+    fontFamily: 'MuliSemiBold',
+  );
+}
+
+TextStyle textMuliSemiboldwhitee() {
+  return TextStyle(
+    fontSize: 16.0,
+    color: Colors.white,
+    fontFamily: 'MuliSemiBold',
+  );
+}
+
+TextStyle textMuliSemiboldsm() {
+  return TextStyle(
+    fontSize: 14.0,
+    color: secondary,
+    fontFamily: 'MuliSemiBold',
+  );
+}
+
+TextStyle textMuliSemiboldgreen() {
+  return TextStyle(
+    fontSize: 16.0,
+    color: Color(0xFF20C978),
+    fontFamily: 'MuliSemiBold',
+  );
+}
+
+TextStyle textMuliSemiboldmd() {
+  return TextStyle(
+    fontSize: 15.0,
+    color: secondary.withOpacity(0.80),
+    fontFamily: 'MuliSemiBold',
+  );
+}
+
+TextStyle textMuliSemiboldm() {
+  return TextStyle(
+    fontSize: 15.0,
+    color: secondary,
+    fontFamily: 'MuliSemiBold',
+  );
+}
+
+TextStyle textMuliSemibold() {
+  return TextStyle(
+    fontSize: 17.0,
+    color: secondary,
+    fontFamily: 'MuliSemiBold',
+  );
+}
+
+TextStyle textMuliSemiboldextraprimary() {
+  return TextStyle(
+    fontWeight: FontWeight.w800,
+    fontSize: 17.0,
+    color: primary,
+    fontFamily: 'MuliSemiBold',
+  );
+}
+
+TextStyle textMuliSemiboldextra() {
+  return TextStyle(
+    fontWeight: FontWeight.w800,
+    fontSize: 17.0,
+    color: secondary,
+    fontFamily: 'MuliSemiBold',
+  );
+}
+
+TextStyle textMuliSemiboldwhite() {
+  return TextStyle(
+    fontSize: 18.0,
+    color: Colors.white,
+    fontFamily: 'MuliSemiBold',
+  );
+}
+
+TextStyle textMuliSemiboldblue() {
+  return TextStyle(
+    fontSize: 20.0,
+    color: Color(0xFF5F829D),
+    fontFamily: 'MuliSemiBold',
+  );
+}
+
+TextStyle textMuliSemiboldd() {
+  return TextStyle(
+    fontSize: 25.0,
+    color: secondary,
+    fontFamily: 'MuliSemiBold',
   );
 }

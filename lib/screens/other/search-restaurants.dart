@@ -59,18 +59,20 @@ class RestaurantSearch extends SearchDelegate<String> {
                               localizedValues,
                               locale);
                         },
-                        child: HomePageState.buildCardBottom(
-                            searchedList[index]['locationName'],
-                            searchedList[index]['restaurantID']['logo'],
-                            searchedList[index]['restaurantID']
-                                ['restaurantName'],
-                            double.parse(searchedList[index]['restaurantID']
-                                    ['rating']
-                                .toString()),
-                            searchedList[index]['locationCount'],
-                            searchedList[index]['restaurantID']['reviewCount'],
-                            MyLocalizations.of(context).reviews,
-                            MyLocalizations.of(context).branches),
+                        child:  Text('hhhh'),
+                        // HomePageState.buildCardBottom(
+                        //     searchedList[index]['locationName'],
+                        //     searchedList[index]['restaurantID']['logo'],
+                        //     searchedList[index]['restaurantID']
+                        //         ['restaurantName'],
+                        //     double.parse(searchedList[index]['restaurantID']
+                        //             ['rating']
+                        //         .toString()),
+                        //     searchedList[index]['locationCount'],
+                        //     searchedList[index]['restaurantID']['reviewCount'],
+                        //     MyLocalizations.of(context).reviews,
+                        //     MyLocalizations.of(context).branches
+                        // ),
                       ),
                     ],
                   );

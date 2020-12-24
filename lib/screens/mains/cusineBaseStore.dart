@@ -25,7 +25,7 @@ class _CuisineBaseStoresState extends State<CuisineBaseStores> {
     branches = MyLocalizations.of(context).branches;
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: PRIMARY,
+        backgroundColor: primary,
         elevation: 0.0,
         title: new Text(
           widget.location['cuisineName'],

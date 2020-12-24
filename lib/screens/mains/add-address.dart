@@ -95,7 +95,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
             color: Colors.white,
           ),
         ),
-        backgroundColor: PRIMARY,
+        backgroundColor: primary,
         elevation: 0.0,
         title: new Text(
           MyLocalizations.of(context).deliveryAddress,
@@ -276,7 +276,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                                   groupValue: selectedRadioFirst == null
                                       ? selectedRadio
                                       : selectedRadioFirst,
-                                  activeColor: PRIMARY,
+                                  activeColor: primary,
                                   onChanged: (value) {
                                     setSelectedRadio(value);
                                   },
@@ -301,7 +301,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                               width: screenWidth(context),
                               height: 44.0,
                               decoration: BoxDecoration(
-                                color: PRIMARY,
+                                color: primary,
                                 borderRadius: BorderRadius.circular(50.0),
                               ),
                               child: Image.asset(
@@ -315,7 +315,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                               width: screenWidth(context),
                               height: 44.0,
                               decoration: BoxDecoration(
-                                color: PRIMARY,
+                                color: primary,
                                 borderRadius: BorderRadius.circular(50.0),
                               ),
                               child: new Text(

@@ -19,7 +19,7 @@ dependencies:
   location: ^3.0.2
   geocoder: ^0.2.1
   image_picker: ^0.6.5
-  onesignal_flutter: ^2.4.1
+  onesignal_flutter:
   intl: ^0.16.1
   toast: ^0.1.5
   sentry: ^3.0.1
@@ -75,3 +75,38 @@ flutter:
 
     - lib/assets/icon/spinner.gif
     - lib/assets/icon/location1.png
+
+    - lib/assets/icons/auth.png
+    - lib/assets/icons/arrowback.png
+    - lib/assets/icons/tickmark.png
+    - lib/assets/icons/location.png
+    - lib/assets/icons/locationon.png
+    - lib/assets/icons/cart.png
+    - lib/assets/icons/drawer.png
+    - lib/assets/images/banner.png
+    - lib/assets/images/pizza.png
+    - lib/assets/icons/shop.png
+    - lib/assets/icons/free.png
+    - lib/assets/images/dominos.png
+    - lib/assets/icons/veg.png
+    - lib/assets/icons/sale.png
+    - lib/assets/images/cod.png
+    - lib/assets/images/stripe.png
+    - lib/assets/images/thnku.png
+    - lib/assets/images/user.png
+    - lib/assets/icons/home.png
+    - lib/assets/icons/fav.png
+    - lib/assets/icons/orders.png
+    - lib/assets/icons/about.png
+    - lib/assets/icons/logo.png
+    - lib/assets/icons/call.png
+    - lib/assets/icons/mail.png
+    - lib/assets/icons/locate.png
+    - lib/assets/icons/tick.png
+    - lib/assets/icons/camera.png
+    - lib/assets/images/cod1.png
+    - lib/assets/images/c.png
+    - lib/assets/images/d.png
+    - lib/assets/images/m.png
+    - lib/assets/images/v.png
+    - lib/assets/images/a.png

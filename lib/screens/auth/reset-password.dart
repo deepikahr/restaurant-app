@@ -111,7 +111,7 @@ class _ResetPasswordState extends State<ResetPassword> {
           style: textbarlowSemiBoldWhite(),
         ),
         centerTitle: true,
-        backgroundColor: PRIMARY,
+        backgroundColor: primary,
         iconTheme: IconThemeData(color: Colors.black),
       ),
       body: Form(
@@ -173,7 +173,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: PRIMARY),
+                        borderSide: BorderSide(color: primary),
                       ),
                     ),
                     validator: (String value) {
@@ -246,7 +246,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: PRIMARY),
+                        borderSide: BorderSide(color: primary),
                       ),
                     ),
                     validator: (String value) {
@@ -281,7 +281,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                     right: 0.0,
                   ),
                   child: GFButton(
-                    color: PRIMARY,
+                    color: primary,
                     blockButton: true,
                     onPressed: resetPassword,
                     child: Row(

@@ -62,7 +62,7 @@ class OrderTrackState extends State<OrderTrack> {
             color: Colors.white,
           ),
         ),
-        backgroundColor: prefix0.PRIMARY,
+        backgroundColor: prefix0.primary,
         iconTheme: IconThemeData(color: Colors.white),
         title: new Text(
           MyLocalizations.of(context).trackOrder,
@@ -111,7 +111,7 @@ class OrderTrackState extends State<OrderTrack> {
                               height: 25.0,
                               decoration: new BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: PRIMARY,
+                                color: primary,
                               ),
                               child: Icon(
                                 Icons.check,
@@ -202,7 +202,7 @@ class OrderTrackState extends State<OrderTrack> {
                                   height: 15.0,
                                   decoration: new BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: PRIMARY,
+                                    color: primary,
                                   ),
                                 ),
                                 new Container(
@@ -211,8 +211,8 @@ class OrderTrackState extends State<OrderTrack> {
                                   margin: EdgeInsets.only(
                                       left: 9.0, top: 5.0, right: 9.0),
                                   decoration: new BoxDecoration(
-                                    border: Border.all(color: PRIMARY),
-                                    color: PRIMARY,
+                                    border: Border.all(color: primary),
+                                    color: primary,
                                   ),
                                 ),
                               ],

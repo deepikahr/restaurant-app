@@ -129,7 +129,7 @@ class _RegisterFormState extends State<RegisterForm> {
           style: textbarlowSemiBoldWhite(),
         ),
         centerTitle: true,
-        backgroundColor: PRIMARY,
+        backgroundColor: primary,
       ),
       body: SingleChildScrollView(
         child: Form(
@@ -345,7 +345,7 @@ class _RegisterFormState extends State<RegisterForm> {
                 });
               }
             },
-            activeColor: PRIMARY,
+            activeColor: primary,
           ),
           Container(
             child: Expanded(

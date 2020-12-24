@@ -19,7 +19,7 @@ class _AboutUsState extends State<AboutUs> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: PRIMARY,
+        backgroundColor: primary,
         elevation: 0.0,
         centerTitle: true,
         title: Text(

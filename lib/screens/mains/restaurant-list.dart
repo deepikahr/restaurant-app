@@ -1,4 +1,5 @@
 import 'package:RestaurantSaas/screens/mains/cart.dart';
+import 'package:RestaurantSaas/widgets/card.dart';
 import 'package:async_loader/async_loader.dart';
 import 'package:flutter/material.dart';
 
@@ -29,12 +30,12 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
   final GlobalKey<AsyncLoaderState> _asyncLoaderState =
       GlobalKey<AsyncLoaderState>();
   Map<String, dynamic> restaurantInfo;
-  VoidCallback showBottomSheetCallback;
+  // VoidCallback showBottomSheetCallback;
   int cartCount;
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   getRestaurantsList() async {
-    if (widget.title == MyLocalizations.of(context).topRated) {
+    if (widget.title == MyLocalizations.of(context).topRatedRestaurants) {
       List<dynamic> restaurants;
       await Common.getPositionInfo().then((position) async {
         try {
@@ -105,7 +106,7 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
     return Scaffold(
       key: scaffoldKey,
       appBar: AppBar(
-        backgroundColor: PRIMARY,
+        backgroundColor: primary,
         elevation: 0.0,
         leading: InkWell(
           onTap: () {
@@ -117,9 +118,7 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
           ),
         ),
         title: Text(
-          widget.title == MyLocalizations.of(context).restaurantsNearYou
-              ? widget.title
-              : widget.title + MyLocalizations.of(context).restaurants,
+          widget.title,
           style: textbarlowSemiBoldWhite(),
         ),
         centerTitle: true,
@@ -189,28 +188,33 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
               icon: Icons.block);
         },
         renderSuccess: ({data}) {
-          return Padding(
-            padding: const EdgeInsets.only(top: 20),
+          return Container(
+            alignment: AlignmentDirectional.topCenter,
+            padding: const EdgeInsets.only(top: 20, left: 16, right: 16),
             child: ((data?.length ?? 0) > 0)
                 ? ListView.builder(
                     physics: ScrollPhysics(),
                     shrinkWrap: true,
                     itemCount: data.length,
-                    padding: const EdgeInsets.all(0.0),
                     itemBuilder: (BuildContext context, int index) {
                       return InkWell(
-                          child: HomePageState.buildRestaurantCard(
-                              data[index],
-                              MyLocalizations.of(context).reviews,
-                              MyLocalizations.of(context).branches,
-                              widget.title ==
-                                      MyLocalizations.of(context).topRated
-                                  ? false
-                                  : widget.title ==
-                                          MyLocalizations.of(context)
-                                              .newlyArrived
-                                      ? false
-                                      : true),
+                          child:
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: restaurantCard(context, data[index], widget.title),
+                          ),
+                          // HomePageState.buildRestaurantCard(
+                          //     data[index],
+                          //     MyLocalizations.of(context).reviews,
+                          //     MyLocalizations.of(context).branches,
+                          //     widget.title ==
+                          //             MyLocalizations.of(context).topRatedRestaurants
+                          //         ? false
+                          //         : widget.title ==
+                          //                 MyLocalizations.of(context)
+                          //                     .newlyArrived
+                          //             ? false
+                          //             : true),
                           onTap: () {
                             if (mounted) {
                               setState(() {
@@ -220,7 +224,7 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
                                   context,
                                   data[index],
                                   widget.title ==
-                                          MyLocalizations.of(context).topRated
+                                          MyLocalizations.of(context).topRatedRestaurants
                                       ? false
                                       : widget.title ==
                                               MyLocalizations.of(context)

@@ -45,7 +45,7 @@ class _OrdersPageState extends State<OrdersPage>
           ),
         ),
         centerTitle: true,
-        backgroundColor: PRIMARY,
+        backgroundColor: primary,
         elevation: 0.0,
         title: Text(
           MyLocalizations.of(context).myOrders,
@@ -57,7 +57,7 @@ class _OrdersPageState extends State<OrdersPage>
         child: Column(
           children: <Widget>[
             Material(
-              color: PRIMARY,
+              color: primary,
               child: TabBar(
                 tabs: [
                   Tab(

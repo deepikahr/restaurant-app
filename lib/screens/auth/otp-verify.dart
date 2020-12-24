@@ -145,7 +145,7 @@ class _OtpVerifyState extends State<OtpVerify> {
           style: textbarlowSemiBoldWhite(),
         ),
         centerTitle: true,
-        backgroundColor: PRIMARY,
+        backgroundColor: primary,
       ),
       body: Form(
         key: _formKey,
