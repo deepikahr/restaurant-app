@@ -1,3 +1,4 @@
+import 'package:RestaurantSaas/widgets/card.dart';
 import 'package:async_loader/async_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -86,12 +87,12 @@ class OrderUpcomingState extends State<OrderUpcoming>
       Map<String, Map<String, String>> localizedValues,
       String currency) {
     return Container(
-      color: Colors.grey[300],
+      color: bg,
+      margin: EdgeInsets.only(top: 10),
       child: ListView.builder(
         physics: ScrollPhysics(),
         shrinkWrap: true,
         itemCount: orders.length,
-        padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 13.0),
         itemBuilder: (BuildContext context, int index) {
           if (orders[index]['status'] == "Accepted") {
             orders[index]['status'] = MyLocalizations.of(context).accepted;
@@ -115,58 +116,62 @@ class OrderUpcomingState extends State<OrderUpcoming>
           } else {
             orders[index]['orderType'] = orders[index]['orderType'];
           }
-          return Container(
-            width: screenWidth(context),
-            margin: EdgeInsetsDirectional.only(top: 8.0),
-            color: Colors.white,
-            padding: EdgeInsets.all(10),
-            child: Column(
-              children: <Widget>[
-                _buildImageHead(
-                    orders[index]['productDetails'][0]['imageUrl'],
-                    orders[index]['productDetails'].length,
-                    orders[index]['productDetails'][0]['restaurant'],
-                    orders[index]['status'],
-                    orders[index]['orderType'],
-                    orders[index]['tableNumber'],
-                    orders[index]['pickupDate'] == null
-                        ? ""
-                        : orders[index]['pickupDate'],
-                    orders[index]['pickupTime'] == null
-                        ? ""
-                        : orders[index]['pickupTime'],
-                    context),
-                _buildOrderInfo(
-                    orders[index]['orderType'],
-                    orders[index]['status'],
-                    'Date',
-                    orders[index]['orderID'],
-                    context,
-                    isRatingAllowed,
-                    orders[index]['_id'],
-                    locale,
-                    localizedValues),
-                _buildProductList(
-                    orders[index]['productDetails'],
-                    orders[index]['_id'],
-                    orders[index]['restaurantID'],
-                    orders[index]['location'],
-                    isRatingAllowed,
-                    currency),
-                _buildBottomPriceLine(
-                    double.parse(orders[index]['grandTotal'].toString()),
-                    orders[index]['paymentOption'],
-                    orders[index]['createdAtTime'] == null
-                        ? ""
-                        : DateFormat('dd-MMM-yy hh:mm a').format(
-                            new DateTime.fromMillisecondsSinceEpoch(
-                                orders[index]['createdAtTime']),
-                          ),
-                    context,
-                    currency)
-              ],
-            ),
+          return orderCard(
+            context, orders[index], isRatingAllowed,  locale,
+              localizedValues, currency
           );
+          // return Container(
+          //   width: screenWidth(context),
+          //   margin: EdgeInsetsDirectional.only(top: 8.0),
+          //   color: Colors.white,
+          //   padding: EdgeInsets.all(10),
+          //   child: Column(
+          //     children: <Widget>[
+          //       _buildImageHead(
+          //           orders[index]['productDetails'][0]['imageUrl'],
+          //           orders[index]['productDetails'].length,
+          //           orders[index]['productDetails'][0]['restaurant'],
+          //           orders[index]['status'],
+          //           orders[index]['orderType'],
+          //           orders[index]['tableNumber'],
+          //           orders[index]['pickupDate'] == null
+          //               ? ""
+          //               : orders[index]['pickupDate'],
+          //           orders[index]['pickupTime'] == null
+          //               ? ""
+          //               : orders[index]['pickupTime'],
+          //           context),
+          //       _buildOrderInfo(
+          //           orders[index]['orderType'],
+          //           orders[index]['status'],
+          //           'Date',
+          //           orders[index]['orderID'],
+          //           context,
+          //           isRatingAllowed,
+          //           orders[index]['_id'],
+          //           locale,
+          //           localizedValues),
+          //       _buildProductList(
+          //           orders[index]['productDetails'],
+          //           orders[index]['_id'],
+          //           orders[index]['restaurantID'],
+          //           orders[index]['location'],
+          //           isRatingAllowed,
+          //           currency),
+          //       _buildBottomPriceLine(
+          //           double.parse(orders[index]['grandTotal'].toString()),
+          //           orders[index]['paymentOption'],
+          //           orders[index]['createdAtTime'] == null
+          //               ? ""
+          //               : DateFormat('dd-MMM-yy hh:mm a').format(
+          //                   new DateTime.fromMillisecondsSinceEpoch(
+          //                       orders[index]['createdAtTime']),
+          //                 ),
+          //           context,
+          //           currency)
+          //     ],
+          //   ),
+          // );
         },
       ),
     );
@@ -485,3 +490,5 @@ class OrderUpcomingState extends State<OrderUpcoming>
     );
   }
 }
+
+

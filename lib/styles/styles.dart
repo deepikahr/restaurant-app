@@ -1322,11 +1322,22 @@ TextStyle textMuliSemiboldprimary() {
 
 TextStyle textMuliSemiboldsec() {
   return TextStyle(
+    fontWeight: FontWeight.w500,
     fontSize: 16.0,
     color: secondary,
     fontFamily: 'MuliSemiBold',
   );
 }
+
+
+TextStyle textMuliSemiboldgrey() {
+  return TextStyle(
+    fontSize: 16.0,
+    color: Color(0xFF8C909B),
+    fontFamily: 'MuliRegular',
+  );
+}
+
 
 TextStyle textMuliSemiboldwhitee() {
   return TextStyle(

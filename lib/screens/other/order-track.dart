@@ -1,15 +1,18 @@
 import 'dart:async';
 
 import 'package:RestaurantSaas/styles/styles.dart' as prefix0;
+import 'package:RestaurantSaas/widgets/appbar.dart';
 import 'package:async_loader/async_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/localizations.dart';
 import '../../services/profile-service.dart';
 import '../../services/sentry-services.dart';
 import '../../styles/styles.dart';
 import '../../widgets/no-data.dart';
+import 'package:getwidget/getwidget.dart';
 
 SentryError sentryError = new SentryError();
 
@@ -33,6 +36,21 @@ class OrderTrackState extends State<OrderTrack> {
     return await ProfileService.getOrderById(orderId);
   }
 
+  @override
+  void initState() {
+    super.initState();
+//    selectedLanguages();
+    getGlobalSettingsData();
+  }
+
+
+  String currency = "";
+
+  getGlobalSettingsData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    currency = prefs.getString('currency');
+  }
+
   Widget _retriveOrderTrack() {
     return AsyncLoader(
         key: _asyncLoader,
@@ -45,35 +63,19 @@ class OrderTrackState extends State<OrderTrack> {
               icon: Icons.block);
         },
         renderSuccess: ({data}) {
-          return _buildOrderTrackBody(data);
+          return trackOrderList(data);
         });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: InkWell(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Icon(
-            Icons.arrow_back,
-            color: Colors.white,
-          ),
-        ),
-        backgroundColor: prefix0.primary,
-        iconTheme: IconThemeData(color: Colors.white),
-        title: new Text(
-          MyLocalizations.of(context).trackOrder,
-          style: textbarlowSemiBoldWhite(),
-        ),
-      ),
+      appBar: appBarWithTitle(context, MyLocalizations.of(context).trackOrder,),
       body: _retriveOrderTrack(),
     );
   }
 
-  Widget _buildOrderTrackBody(Map<String, dynamic> order) {
+  Widget trackOrderList(order) {
     String status;
     if (order['status'] == "Accepted") {
       status = MyLocalizations.of(context).accepted;
@@ -89,169 +91,204 @@ class OrderTrackState extends State<OrderTrack> {
       status = order['status'];
     }
 
-    return SingleChildScrollView(
-      child: new Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Container(
-            padding: EdgeInsets.all(10.0),
-            color: Colors.black12,
-            child: new Column(
-              children: <Widget>[
-                new Row(
+    return ListView.builder(
+        physics: ScrollPhysics(),
+        shrinkWrap: true,
+        scrollDirection: Axis.vertical,
+        itemCount: 1,
+        padding: EdgeInsets.only(top: 16),
+        itemBuilder: (BuildContext context, int index) {
+          return SingleChildScrollView(
+              child: Container(
+                child: Column(
                   children: <Widget>[
-                    Flexible(
-                        flex: 2,
-                        fit: FlexFit.tight,
-                        child: new Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            new Container(
-                              width: 25.0,
-                              height: 25.0,
-                              decoration: new BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: primary,
-                              ),
-                              child: Icon(
-                                Icons.check,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        )),
-                    Flexible(
-                      flex: 12,
-                      fit: FlexFit.tight,
-                      child: new Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    Container(
+                      padding: EdgeInsets.only(left: 15, right: 15),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
-                          new Padding(
-                            padding: EdgeInsets.only(left: 6.0, right: 6.0),
-                            child: new Text(
-                              MyLocalizations.of(context).orderProgress + '...',
-                              style: textOSl(),
+                          order['productDetails'][0]['imageUrl'] != null
+                              ? ClipRRect(
+                            borderRadius: BorderRadius.circular(4),
+                            child: Image.network(
+                              order['productDetails'][0]['imageUrl'],
+                              width: 45,
+                              height: 45, fit: BoxFit.cover,
                             ),
-                          ),
+                          )
+                              : Image.asset("lib/assets/bgImgs/loginbg.png",   width: 45,
+                            height: 45, fit: BoxFit.cover,),
+                          SizedBox(width: 5),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                          order['productDetails'][0]['restaurant'],
+                                style: textMuliSemiboldm(),
+                              ),
+                              Text(
+                                  MyLocalizations.of(context).type +
+                                      ": " +
+                                      order['orderType'],
+                                style: textMuliRegularxswithop(),
+                              )
+                            ],
+                          )
                         ],
                       ),
                     ),
-                    new Padding(padding: EdgeInsets.all(5.0)),
-                    Column(
-                      children: <Widget>[
-                        new Text(MyLocalizations.of(context).orderID +
-                            ': ' +
-                            order['orderID'].toString()),
-                        new Text(
-                          MyLocalizations.of(context).status + ': ' + status,
-                          style: TextStyle(color: Colors.green),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              ],
-            ),
-          ),
-          ListView.builder(
-              physics: ScrollPhysics(),
-              shrinkWrap: true,
-              itemCount: order['userNotification'].length,
-              itemBuilder: (BuildContext context, int index) {
-                String status;
-                if (order['userNotification'][index]['status'] == "Pending") {
-                  status = MyLocalizations.of(context).pending;
-                } else if (order['userNotification'][index]['status'] ==
-                    "Order Accepted by vendor.") {
-                  status = MyLocalizations.of(context).orderAcceptedbyvendor;
-                } else if (order['userNotification'][index]['status'] ==
-                    "Your order is on the way.") {
-                  status = MyLocalizations.of(context).yourorderisontheway;
-                } else if (order['userNotification'][index]['status'] ==
-                    "Your order has been delivered,Share your experience with us.") {
-                  order['userNotification'][index]['status'] =
-                      MyLocalizations.of(context)
-                          .yourorderhasbeendeliveredshareyourexperiencewithus;
-                } else if (order['userNotification'][index]['status'] ==
-                    "Your order is cancelled,sorry for inconvenience.") {
-                  order['userNotification'][index]['status'] =
-                      MyLocalizations.of(context)
-                          .yourorderiscancelledsorryforinconvenience;
-                } else {
-                  status = order['userNotification'][index]['status'];
-                }
-
-                return new Padding(
-                  padding: EdgeInsets.all(10.0),
-                  child: new Column(
-                    children: <Widget>[
-                      new Row(
+                    SizedBox(height: 10),
+                    Container(
+                      padding: EdgeInsets.only(bottom: 5, left: 15, right: 15),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          Flexible(
-                            flex: 2,
-                            fit: FlexFit.tight,
-                            child: new Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                // Padding(
-                                //     padding:
-                                //         EdgeInsets.only(top: 0.0, bottom: 10)),
-                                new Container(
-                                  width: 20.0,
-                                  height: 15.0,
-                                  decoration: new BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: primary,
-                                  ),
-                                ),
-                                new Container(
-                                  width: 3.0,
-                                  height: 10.0,
-                                  margin: EdgeInsets.only(
-                                      left: 9.0, top: 5.0, right: 9.0),
-                                  decoration: new BoxDecoration(
-                                    border: Border.all(color: primary),
-                                    color: primary,
-                                  ),
-                                ),
-                              ],
-                            ),
+                          Row(
+                            children: <Widget>[
+                              Text(
+                                '${MyLocalizations.of(context).orderID} : ',
+                                style: textMuliRegularxswithop(),
+                              ),
+                              Text(
+                                order['orderID'].toString(),
+                                style: textMuliRegularxswithop(),
+                              ),
+                            ],
                           ),
-                          Flexible(
-                            flex: 12,
-                            fit: FlexFit.tight,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: <Widget>[
-                                new Text(
-                                  (index + 1).toString() + '. ' + status,
-                                  style: textOSl(),
+                          Row(
+                            children: <Widget>[
+                              Text(
+                                'Order On :',
+                                style: textMuliRegularxswithop(),
+                              ),
+                              Text(
+                                order['createdAtTime'] == null
+                                    ? ""
+                                    : DateFormat('dd-MMM-yy hh:mm a').format(
+                                  new DateTime.fromMillisecondsSinceEpoch(
+                                      order['createdAtTime']),
                                 ),
-                                // new Padding(padding: EdgeInsets.only(top: 5.0)),
-                                new Text(
-                                  DateFormat('dd-MMM-yy hh:mm a').format(
-                                      new DateTime.fromMillisecondsSinceEpoch(
-                                          order['userNotification'][index]
-                                                  ['time'] ??
-                                              0)),
-                                  style: textOS(),
-                                ),
-                              ],
-                            ),
+                                style: textMuliRegularxswithop(),
+                              ),
+                            ],
                           ),
+                          Row(
+                            children: <Widget>[
+                              Text(
+                                '${MyLocalizations.of(context).status} :',
+                                style: textMuliRegularxsgreen(),
+                              ),
+                              Text(
+                                status,
+                                style: textMuliRegularxsgreen(),
+                              ),
+                            ],
+                          )
                         ],
                       ),
-                    ],
-                  ),
-                );
-              }),
-          Divider(),
-        ],
-      ),
-    );
+                    ),
+                    Container(
+                        padding: EdgeInsets.only(
+                            bottom: 10, left: 15, right: 15, top: 10),
+                        child: MySeparator(color: secondary.withOpacity(0.2))),
+                    ListView.builder(
+                        itemCount: order['productDetails'].length,
+                        physics: ScrollPhysics(),
+                        shrinkWrap: true,
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        itemBuilder: (BuildContext context, int index) {
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Text(
+                                order['productDetails'][index]['title'],
+                                style: textMuliSemiboldxs(),
+                              ),
+                              Text(
+                                '$currency' +
+                                    order['productDetails'][index]['totalPrice']
+                                        .toStringAsFixed(2),
+                                style: textMuliSemiboldxs(),
+                              ),
+                            ],
+                          );
+                        }),
+                    SizedBox(height: 20),
+                    orderTrack(order),
+                  ],
+                ),
+              ));
+        });
   }
+
+  Widget orderTrack(order) {
+    return  ListView.builder(
+        itemCount: order['userNotification'].length,
+        physics: ScrollPhysics(),
+        shrinkWrap: true,
+        padding: EdgeInsets.symmetric(horizontal: 16),
+        itemBuilder: (BuildContext context, int index) {
+
+          String status;
+          if (order['userNotification'][index]['status'] == "Pending") {
+            status = MyLocalizations.of(context).pending;
+          } else if (order['userNotification'][index]['status'] ==
+              "Order Accepted by vendor.") {
+            status = MyLocalizations.of(context).orderAcceptedbyvendor;
+          } else if (order['userNotification'][index]['status'] ==
+              "Your order is on the way.") {
+            status = MyLocalizations.of(context).yourorderisontheway;
+          } else if (order['userNotification'][index]['status'] ==
+              "Your order has been delivered,Share your experience with us.") {
+            order['userNotification'][index]['status'] =
+                MyLocalizations.of(context)
+                    .yourorderhasbeendeliveredshareyourexperiencewithus;
+          } else if (order['userNotification'][index]['status'] ==
+              "Your order is cancelled,sorry for inconvenience.") {
+            order['userNotification'][index]['status'] =
+                MyLocalizations.of(context)
+                    .yourorderiscancelledsorryforinconvenience;
+          } else {
+            status = order['userNotification'][index]['status'];
+          }
+
+          return GFListTile(
+            avatar: Column(
+              children: <Widget>[
+                GFAvatar(
+                  backgroundColor: Colors.green,
+                  radius: 6,
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                CustomPaint(painter: LineDashedPainter()),
+              ],
+            ),
+            title: Text(
+              status,
+              style: textMuliSemiboldgreen(),
+            ),
+            subtitle: Text(
+                DateFormat('dd-MMM-yy hh:mm a').format(
+                    new DateTime.fromMillisecondsSinceEpoch(
+                        order['userNotification'][index]
+                        ['time'] ??
+                            0)),
+              style: textMuliRegularsm(),
+            ),
+            icon: Padding(
+              padding: const EdgeInsets.only(right: 68.0, bottom: 10),
+              child: Image.asset(
+                'lib/assets/icons/tick.png',
+                width: 24,
+                height: 14,
+              ),
+            ),
+          );
+        });
+  }
+
 
   static String readTimestamp(int timestamp, context) {
     var now = new DateTime.now();
@@ -284,3 +321,58 @@ class OrderTrackState extends State<OrderTrack> {
     return time;
   }
 }
+
+class LineDashedPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    var paint = Paint()..strokeWidth = 1;
+    var max = 55;
+    var dashWidth = 3;
+    var dashSpace = 4;
+    double startY = 0;
+    while (max >= 0) {
+      canvas.drawLine(Offset(0, startY), Offset(0, startY + dashWidth), paint);
+      final space = (dashSpace + dashWidth);
+      startY += space;
+      max -= space;
+    }
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
+}
+
+class MySeparator extends StatelessWidget {
+  final double height;
+  final Color color;
+
+  const MySeparator({this.height = 1, this.color = Colors.black});
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final boxWidth = constraints.constrainWidth();
+        final dashWidth = 5.0;
+        final dashHeight = height;
+        final dashCount = (boxWidth / (2 * dashWidth)).floor();
+        return Flex(
+          children: List.generate(dashCount, (_) {
+            return SizedBox(
+              width: dashWidth,
+              height: dashHeight,
+              child: DecoratedBox(
+                decoration: BoxDecoration(color: color),
+              ),
+            );
+          }),
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          direction: Axis.horizontal,
+        );
+      },
+    );
+  }
+}
+
+
+

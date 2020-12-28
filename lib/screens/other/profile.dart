@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:RestaurantSaas/main.dart';
 import 'package:RestaurantSaas/screens/mains/home.dart';
 import 'package:RestaurantSaas/services/initialize_i18n.dart';
+import 'package:RestaurantSaas/widgets/appbar.dart';
 import 'package:async/async.dart';
 import 'package:async_loader/async_loader.dart';
 import 'package:flutter/cupertino.dart';
@@ -227,282 +228,74 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
     });
   }
 
+  alertBox() {
+    return showDialog<Null>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return new AlertDialog(
+            title: new Text(MyLocalizations.of(context).alert),
+            content: new SingleChildScrollView(
+              child: new ListBody(
+                children: <Widget>[
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.pop(context);
+                            selectGallary();
+                          },
+                          child: new Text(
+                              MyLocalizations.of(context).choosefromphotos),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.pop(context);
+                            selectCamera();
+                          },
+                          child:
+                              new Text(MyLocalizations.of(context).takephoto),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: profileData['logo'] != null
+                            ? InkWell(
+                                onTap: () {
+                                  removeProfilePic();
+                                  Navigator.pop(context);
+                                },
+                                child: new Text(
+                                    MyLocalizations.of(context).removephoto),
+                              )
+                            : Container(),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              new FlatButton(
+                child: new Text(MyLocalizations.of(context).cancel),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
-    // if (isFirstTime) {
-    //   AsyncLoader _asyncLoader = AsyncLoader(
-    //       key: _asyncLoaderState,
-    //       initState: () async => await getProfileInfo(),
-    //       renderLoad: () => Center(child: CircularProgressIndicator()),
-    //       renderError: ([error]) {
-    //         sentryError.reportError(error, null);
-    //         return NoData(
-    //             message:
-    //                 MyLocalizations.of(context).pleaseCheckInternetConnection,
-    //             icon: Icons.block);
-    //       },
-    //       renderSuccess: ({data}) {
-    //         profileData = data;
-    //         return ListView(
-    //           shrinkWrap: true,
-    //           physics: ScrollPhysics(),
-    //           children: <Widget>[
-    //             new Padding(
-    //               padding: EdgeInsets.only(left: 20.0, right: 20.0),
-    //               child: Form(
-    //                 key: _formKey,
-    //                 child: Column(
-    //                   children: <Widget>[
-    //                     Stack(children: <Widget>[
-    //                       Padding(
-    //                         padding: const EdgeInsets.only(top: 8.0),
-    //                         child: Container(
-    //                           height: 120.0,
-    //                           width: 120.0,
-    //                           decoration: new BoxDecoration(
-    //                             border: new Border.all(
-    //                                 color: Colors.black, width: 2.0),
-    //                             borderRadius: BorderRadius.circular(80.0),
-    //                           ),
-    //                           child: _imageFile == null
-    //                               ? profileData['logo'] != null
-    //                                   ? new CircleAvatar(
-    //                                       backgroundImage: new NetworkImage(
-    //                                           "${profileData['logo']}"),
-    //                                     )
-    //                                   : new CircleAvatar(
-    //                                       backgroundImage: new AssetImage(
-    //                                           'lib/assets/imgs/na.jpg'))
-    //                               : isPicUploading
-    //                                   ? CircularProgressIndicator()
-    //                                   : new CircleAvatar(
-    //                                       backgroundImage:
-    //                                           new FileImage(_imageFile),
-    //                                       radius: 80.0,
-    //                                     ),
-    //                         ),
-    //                       ),
-    //                       Positioned(
-    //                         right: 2.0,
-    //                         bottom: 0.0,
-    //                         child: Container(
-    //                           height: 40.0,
-    //                           width: 40.0,
-    //                           child: new FloatingActionButton(
-    //                             foregroundColor: Colors.black,
-    //                             backgroundColor: Colors.white,
-    //                             onPressed: () {
-    //                               showDialog<Null>(
-    //                                   context: context,
-    //                                   barrierDismissible: false,
-    //                                   builder: (BuildContext context) {
-    //                                     return new AlertDialog(
-    //                                       title: new Text(
-    //                                           MyLocalizations.of(context)
-    //                                               .alert),
-    //                                       content: new SingleChildScrollView(
-    //                                         child: new ListBody(
-    //                                           children: <Widget>[
-    //                                             Column(
-    //                                               mainAxisAlignment:
-    //                                                   MainAxisAlignment.start,
-    //                                               crossAxisAlignment:
-    //                                                   CrossAxisAlignment.start,
-    //                                               children: <Widget>[
-    //                                                 Padding(
-    //                                                   padding:
-    //                                                       const EdgeInsets.all(
-    //                                                           8.0),
-    //                                                   child: InkWell(
-    //                                                     onTap: () {
-    //                                                       Navigator.pop(
-    //                                                           context);
-    //                                                       selectGallary();
-    //                                                     },
-    //                                                     child: new Text(
-    //                                                         MyLocalizations.of(
-    //                                                                 context)
-    //                                                             .choosefromphotos),
-    //                                                   ),
-    //                                                 ),
-    //                                                 Padding(
-    //                                                   padding:
-    //                                                       const EdgeInsets.all(
-    //                                                           8.0),
-    //                                                   child: InkWell(
-    //                                                     onTap: () {
-    //                                                       Navigator.pop(
-    //                                                           context);
-    //                                                       selectCamera();
-    //                                                     },
-    //                                                     child: new Text(
-    //                                                         MyLocalizations.of(
-    //                                                                 context)
-    //                                                             .takephoto),
-    //                                                   ),
-    //                                                 ),
-    //                                                 Padding(
-    //                                                   padding:
-    //                                                       const EdgeInsets.all(
-    //                                                           8.0),
-    //                                                   child:
-    //                                                       profileData['logo'] !=
-    //                                                               null
-    //                                                           ? InkWell(
-    //                                                               onTap: () {
-    //                                                                 removeProfilePic();
-    //                                                                 Navigator.pop(
-    //                                                                     context);
-    //                                                               },
-    //                                                               child: new Text(
-    //                                                                   MyLocalizations.of(
-    //                                                                           context)
-    //                                                                       .removephoto),
-    //                                                             )
-    //                                                           : Container(),
-    //                                                 ),
-    //                                               ],
-    //                                             )
-    //                                           ],
-    //                                         ),
-    //                                       ),
-    //                                       actions: <Widget>[
-    //                                         new FlatButton(
-    //                                           child: new Text(
-    //                                               MyLocalizations.of(context)
-    //                                                   .cancel),
-    //                                           onPressed: () {
-    //                                             Navigator.pop(context);
-    //                                           },
-    //                                         ),
-    //                                       ],
-    //                                     );
-    //                                   });
-    //                             },
-    //                             tooltip: 'Photo',
-    //                             child: new Icon(Icons.edit),
-    //                           ),
-    //                         ),
-    //                       ),
-    //                     ]),
-    //                     Container(
-    //                       margin: EdgeInsets.only(top: 10.0),
-    //                       decoration: BoxDecoration(
-    //                         border: Border.all(color: Colors.grey, width: 1.0),
-    //                       ),
-    //                       child: ListTile(
-    //                         title: Text(
-    //                             MyLocalizations.of(context).selectLanguages),
-    //                         trailing: DropdownButtonHideUnderline(
-    //                           child: DropdownButton(
-    //                             hint: Text(selectedLocale == null
-    //                                 ? 'Spanish'
-    //                                 : selectedLocale),
-    //                             value: selectedLanguages,
-    //                             onChanged: (newValue) async {
-    //                               await initializeI18n().then((value) async {
-    //                                 localizedValues = value;
-    //                                 SharedPreferences prefs =
-    //                                     await SharedPreferences.getInstance();
-    //                                 if (newValue == 'English') {
-    //                                   prefs.setString('selectedLanguage', 'en');
-    //                                 } else {
-    //                                   prefs.setString('selectedLanguage', 'es');
-    //                                 }
-    //                                 main();
-    //                                 Navigator.pop(context);
-    //                               });
-    //                             },
-    //                             items: languages.map((lang) {
-    //                               return DropdownMenuItem(
-    //                                 child: new Text(lang),
-    //                                 value: lang,
-    //                               );
-    //                             }).toList(),
-    //                           ),
-    //                         ),
-    //                       ),
-    //                     ),
-    //                     Container(
-    //                       margin: EdgeInsets.only(top: 20.0),
-    //                       decoration: BoxDecoration(
-    //                         border: Border.all(color: Colors.grey, width: 1.0),
-    //                       ),
-    //                       child: TextFormField(
-    //                         onSaved: (value) {
-    //                           data['name'] = value;
-    //                         },
-    //                         initialValue: data['name'],
-    //                         decoration: new InputDecoration(
-    //                           labelText: MyLocalizations.of(context).fullName,
-    //                           hintStyle: textOS(),
-    //                           contentPadding: EdgeInsets.all(10.0),
-    //                           border: InputBorder.none,
-    //                         ),
-    //                         keyboardType: TextInputType.text,
-    //                       ),
-    //                     ),
-    //                     Container(
-    //                       margin: EdgeInsets.only(top: 10.0),
-    //                       decoration: BoxDecoration(
-    //                         border: Border.all(color: Colors.grey, width: 1.0),
-    //                       ),
-    //                       child: TextFormField(
-    //                         maxLength: 10,
-    //                         onSaved: (value) {
-    //                           data['contactNumber'] = value;
-    //                         },
-    //                         validator: (String value) {
-    //                           if (value.isEmpty || value.length < 9) {
-    //                             return MyLocalizations.of(context)
-    //                                 .pleaseEnterValidMobileNumber;
-    //                           } else
-    //                             return null;
-    //                         },
-    //                         initialValue: data['contactNumber'].toString(),
-    //                         decoration: new InputDecoration(
-    //                           labelText:
-    //                               MyLocalizations.of(context).mobileNumber,
-    //                           hintStyle: textOS(),
-    //                           counterText: "",
-    //                           contentPadding: EdgeInsets.all(10.0),
-    //                           border: InputBorder.none,
-    //                         ),
-    //                         keyboardType: TextInputType.number,
-    //                       ),
-    //                     ),
-    //                     Container(
-    //                       margin: EdgeInsets.only(top: 10.0),
-    //                       decoration: BoxDecoration(
-    //                         border: Border.all(color: Colors.grey, width: 1.0),
-    //                       ),
-    //                       child: TextFormField(
-    //                         onSaved: (value) {
-    //                           data['country'] = value;
-    //                         },
-    //                         initialValue: data['country'],
-    //                         decoration: new InputDecoration(
-    //                           labelText: MyLocalizations.of(context).country,
-    //                           hintStyle: textOS(),
-    //                           contentPadding: EdgeInsets.all(10.0),
-    //                           border: InputBorder.none,
-    //                         ),
-    //                         keyboardType: TextInputType.text,
-    //                       ),
-    //                     ),
-    //                   ],
-    //                 ),
-    //               ),
-    //             ),
-    //           ],
-    //         );
-    //       });
-    //   if (mounted) {
-    //     setState(() {
-    //       isFirstTime = false;
-    //     });
-    //   }
-    // }
     AsyncLoader _asyncLoader = AsyncLoader(
         key: _asyncLoaderState,
         initState: () async => await getProfileInfo(),
@@ -515,210 +308,164 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
               icon: Icons.block);
         },
         renderSuccess: ({data}) {
+          print('profiel ${data['logo']}');
           profileData = data;
           return ListView(
             shrinkWrap: true,
             physics: ScrollPhysics(),
             children: <Widget>[
-              new Padding(
-                padding: EdgeInsets.only(left: 20.0, right: 20.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    children: <Widget>[
-                      Stack(children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: Container(
-                            height: 120.0,
-                            width: 120.0,
-                            decoration: new BoxDecoration(
-                              border: new Border.all(
-                                  color: Colors.black, width: 2.0),
-                              borderRadius: BorderRadius.circular(80.0),
-                            ),
-                            child: _imageFile == null
-                                ? profileData['logo'] != null
-                                    ? new CircleAvatar(
-                                        backgroundImage: new NetworkImage(
-                                            "${profileData['logo']}"),
-                                      )
-                                    : new CircleAvatar(
-                                        backgroundImage: new AssetImage(
-                                            'lib/assets/imgs/na.jpg'))
-                                : isPicUploading
-                                    ? CircularProgressIndicator()
-                                    : new CircleAvatar(
-                                        backgroundImage:
-                                            new FileImage(_imageFile),
-                                        radius: 80.0,
-                                      ),
+              Form(
+                key: _formKey,
+                child: Column(
+                  children: <Widget>[
+                    SizedBox(height: 35),
+                    Stack(children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Container(
+                          height: 120.0,
+                          width: 120.0,
+                          decoration: new BoxDecoration(
+                            border: new Border.all(
+                                color: secondary.withOpacity(0.5), width: 1.0),
+                            borderRadius: BorderRadius.circular(80.0),
                           ),
+                          child: _imageFile == null
+                              ? profileData['logo'] != null
+                                  ? new CircleAvatar(
+                                      backgroundImage: new NetworkImage(
+                                          "${profileData['logo']}"),
+                                    )
+                                  : new CircleAvatar(
+                                      backgroundImage: new AssetImage(
+                                          'lib/assets/imgs/na.jpg'))
+                              : isPicUploading
+                                  ? CircularProgressIndicator()
+                                  : new CircleAvatar(
+                                      backgroundImage:
+                                          new FileImage(_imageFile),
+                                      radius: 80.0,
+                                    ),
                         ),
-                        Positioned(
-                          right: 2.0,
-                          bottom: 0.0,
-                          child: Container(
-                            height: 40.0,
-                            width: 40.0,
-                            child: new FloatingActionButton(
-                              foregroundColor: Colors.black,
-                              backgroundColor: Colors.white,
-                              onPressed: () {
-                                showDialog<Null>(
-                                    context: context,
-                                    barrierDismissible: false,
-                                    builder: (BuildContext context) {
-                                      return new AlertDialog(
-                                        title: new Text(
-                                            MyLocalizations.of(context).alert),
-                                        content: new SingleChildScrollView(
-                                          child: new ListBody(
-                                            children: <Widget>[
-                                              Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: <Widget>[
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: InkWell(
-                                                      onTap: () {
-                                                        Navigator.pop(context);
-                                                        selectGallary();
-                                                      },
-                                                      child: new Text(
-                                                          MyLocalizations.of(
-                                                                  context)
-                                                              .choosefromphotos),
-                                                    ),
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: InkWell(
-                                                      onTap: () {
-                                                        Navigator.pop(context);
-                                                        selectCamera();
-                                                      },
-                                                      child: new Text(
-                                                          MyLocalizations.of(
-                                                                  context)
-                                                              .takephoto),
-                                                    ),
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child:
-                                                        profileData['logo'] !=
-                                                                null
-                                                            ? InkWell(
-                                                                onTap: () {
-                                                                  removeProfilePic();
-                                                                  Navigator.pop(
-                                                                      context);
-                                                                },
-                                                                child: new Text(
-                                                                    MyLocalizations.of(
-                                                                            context)
-                                                                        .removephoto),
-                                                              )
-                                                            : Container(),
-                                                  ),
-                                                ],
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                        actions: <Widget>[
-                                          new FlatButton(
-                                            child: new Text(
-                                                MyLocalizations.of(context)
-                                                    .cancel),
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                          ),
-                                        ],
-                                      );
-                                    });
-                              },
-                              tooltip: 'Photo',
-                              child: new Icon(Icons.edit),
-                            ),
-                          ),
-                        ),
-                      ]),
-                      Container(
-                        margin: EdgeInsets.only(top: 10.0),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey, width: 1.0),
-                        ),
-                        child: ListTile(
-                          title:
-                              Text(MyLocalizations.of(context).selectLanguages),
-                          trailing: DropdownButtonHideUnderline(
-                            child: DropdownButton(
-                              hint: Text(selectedLocale == null
-                                  ? 'English'
-                                  : selectedLocale),
-                              value: selectedLanguages,
-                              onChanged: (newValue) async {
-                                await initializeI18n().then((value) async {
-                                  localizedValues = value;
-                                  SharedPreferences prefs =
-                                      await SharedPreferences.getInstance();
-                                  if (newValue == 'English') {
-                                    prefs.setString('selectedLanguage', 'en');
-                                  } else {
-                                    prefs.setString('selectedLanguage', 'es');
-                                  }
-                                  main();
-                                  Navigator.pop(context);
-                                });
-                              },
-                              items: languages.map((lang) {
-                                return DropdownMenuItem(
-                                  child: new Text(lang),
-                                  value: lang,
-                                );
-                              }).toList(),
+                      ),
+                      Positioned(
+                        right: 2.0,
+                        bottom: 10.0,
+                        child: Container(
+                          height: 30.0,
+                          width: 30.0,
+                          child: new FloatingActionButton(
+                            foregroundColor: Colors.black,
+                            backgroundColor: Colors.white,
+                            onPressed: alertBox,
+                            child: new Icon(
+                              Icons.edit,
+                              size: 16,
                             ),
                           ),
                         ),
                       ),
-                      Container(
-                        margin: EdgeInsets.only(top: 20.0),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey, width: 1.0),
+                    ]),
+                    SizedBox(height: 20),
+                    Text(
+                      'John WIck',
+                      style: textMuliSemiboldsec(),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      'John WIck@gmail.com',
+                      style: textMuliRegular(),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      '8763663781',
+                      style: textMuliRegular(),
+                    ),
+                    SizedBox(height: 25),
+                    Container(
+                      color: bg,
+                      child: Container(
+                        color: Colors.white,
+                        margin: EdgeInsets.symmetric(vertical: 8),
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Text(MyLocalizations.of(context).selectLanguages,
+                                style: textMuliSemiboldsec()),
+                            DropdownButtonHideUnderline(
+                              child: DropdownButton(
+                                hint: Text(selectedLocale == null
+                                    ? 'English'
+                                    : selectedLocale),
+                                value: selectedLanguages,
+                                onChanged: (newValue) async {
+                                  await initializeI18n().then((value) async {
+                                    localizedValues = value;
+                                    SharedPreferences prefs =
+                                        await SharedPreferences.getInstance();
+                                    if (newValue == 'English') {
+                                      prefs.setString('selectedLanguage', 'en');
+                                    } else {
+                                      prefs.setString('selectedLanguage', 'es');
+                                    }
+                                    main();
+                                    Navigator.pop(context);
+                                  });
+                                },
+                                items: languages.map((lang) {
+                                  return DropdownMenuItem(
+                                    child: new Text(lang),
+                                    value: lang,
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          ],
                         ),
+                      ),
+                    ),
+                    Container(
+                      color: bg,
+                      child: Container(
+                        color: Colors.white,
+                        margin: EdgeInsets.only(bottom: 8),
+                        padding:
+                            EdgeInsets.only(left: 16, right: 16, bottom: 16),
                         child: TextFormField(
+                          cursorColor: primary,
+                          style: textMuliRegular(),
                           onSaved: (value) {
                             data['name'] = value;
                           },
                           initialValue: data['name'],
-                          decoration: new InputDecoration(
-                            labelText: MyLocalizations.of(context).fullName,
-                            hintStyle: textOS(),
-                            contentPadding: EdgeInsets.all(10.0),
-                            border: InputBorder.none,
-                          ),
                           keyboardType: TextInputType.text,
+                          decoration: InputDecoration(
+                            labelText: 'UserName',
+                            labelStyle: textMuliSemiboldgrey(),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: secondary.withOpacity(0.5)),
+                            ),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: secondary.withOpacity(0.5)),
+                            ),
+                            errorBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: secondary.withOpacity(0.3)),
+                            ),
+                          ),
                         ),
                       ),
-                      Container(
-                        margin: EdgeInsets.only(top: 10.0),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey, width: 1.0),
-                        ),
+                    ),
+                    Container(
+                      color: bg,
+                      child: Container(
+                        color: Colors.white,
+                        margin: EdgeInsets.only(bottom: 8),
+                        padding:
+                        EdgeInsets.only(left: 16, right: 16, bottom: 16),
                         child: TextFormField(
-                          maxLength: 10,
+                          cursorColor: primary,
+                          style: textMuliRegular(),
                           onSaved: (value) {
                             data['contactNumber'] = value;
                           },
@@ -730,37 +477,56 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                               return null;
                           },
                           initialValue: data['contactNumber'].toString(),
-                          decoration: new InputDecoration(
-                            labelText: MyLocalizations.of(context).mobileNumber,
-                            hintStyle: textOS(),
-                            counterText: "",
-                            contentPadding: EdgeInsets.all(10.0),
-                            border: InputBorder.none,
-                          ),
                           keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: 'Mobile Number',
+                            labelStyle: textMuliSemiboldgrey(),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: secondary.withOpacity(0.5)),
+                            ),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: secondary.withOpacity(0.5)),
+                            ),
+                            errorBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: secondary.withOpacity(0.3)),
+                            ),
+                          ),
                         ),
                       ),
-                      Container(
-                        margin: EdgeInsets.only(top: 10.0),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey, width: 1.0),
-                        ),
+                    ),
+                    Container(
+                      color: bg,
+                      child: Container(
+                        color: Colors.white,
+                        margin: EdgeInsets.only(bottom: 8),
+                        padding:
+                        EdgeInsets.only(left: 16, right: 16, bottom: 16),
                         child: TextFormField(
+                          cursorColor: primary,
+                          style: textMuliRegular(),
                           onSaved: (value) {
                             data['country'] = value;
                           },
                           initialValue: data['country'],
-                          decoration: new InputDecoration(
-                            labelText: MyLocalizations.of(context).country,
-                            hintStyle: textOS(),
-                            contentPadding: EdgeInsets.all(10.0),
-                            border: InputBorder.none,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: 'Country',
+                            labelStyle: textMuliSemiboldgrey(),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: secondary.withOpacity(0.5)),
+                            ),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: secondary.withOpacity(0.5)),
+                            ),
+                            errorBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: secondary.withOpacity(0.3)),
+                            ),
                           ),
-                          keyboardType: TextInputType.text,
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                    SizedBox(height: 25,)
+                  ],
                 ),
               ),
             ],
@@ -768,88 +534,41 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
         });
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: primary,
-        title: Text(
-          MyLocalizations.of(context).profile,
-          style: textbarlowSemiBoldWhite(),
-        ),
-        centerTitle: true,
-        leading: InkWell(
-          onTap: () {
-            Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(
-                  builder: (BuildContext context) => HomePage(
-                    locale: widget.locale,
-                    localizedValues: widget.localizedValues,
-                  ),
-                ),
-                (Route<dynamic> route) => false);
-          },
-          child: Icon(
-            Icons.arrow_back,
-            color: Colors.white,
-          ),
-        ),
-      ),
+      backgroundColor: Colors.white,
+      appBar: appBarWithTitle(context, MyLocalizations.of(context).profile),
       body: _asyncLoader,
-      bottomNavigationBar: _buildBottomBar(),
-    );
-  }
-
-  Widget _buildBottomBar() {
-    return Padding(
-      padding: EdgeInsets.all(20.0),
-      child: new Row(
-        children: <Widget>[
-          Expanded(
-            child: new Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black),
-              ),
-              height: 40.0,
-              child: FlatButton(
-                child: Text(
-                  MyLocalizations.of(context).cancel,
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ),
+      bottomNavigationBar: Container(
+        height: 41,
+        margin: EdgeInsets.all(15),
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: [
+              BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 5)
+            ]
+        ),
+        child: RaisedButton(
+          color: primary,
+          shape: RoundedRectangleBorder(
+            borderRadius: new BorderRadius.circular(5.0),
           ),
-          new Padding(padding: EdgeInsets.all(5.0)),
-          Expanded(
-            child: new Container(
-              height: 40.0,
-              color: primary,
-              child: isLoading
+          onPressed: _saveProfileInfo,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Save',
+                style: textMuliSemiboldwhite(),
+              ),
+              isLoading
                   ? Image.asset(
-                      'lib/assets/icon/spinner.gif',
-                      width: 19.0,
-                      height: 19.0,
-                    )
-                  : FlatButton(
-                      child: Text(
-                        MyLocalizations.of(context).save,
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      onPressed: () {
-                        _saveProfileInfo();
-                      },
-                    ),
-            ),
+                'lib/assets/icon/spinner.gif',
+                width: 19.0,
+                height: 19.0,
+              ) : Container()
+            ],
           )
-        ],
+        ),
       ),
-    );
-  }
-
-  void containerForSheet<T>({BuildContext context, Widget child}) {
-    showCupertinoModalPopup<T>(
-      context: context,
-      builder: (BuildContext context) => child,
     );
   }
 }

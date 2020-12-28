@@ -1,4 +1,5 @@
 import 'package:RestaurantSaas/services/constant.dart';
+import 'package:RestaurantSaas/widgets/appbar.dart';
 import 'package:flutter/material.dart';
 
 import '../../services/localizations.dart';
@@ -18,76 +19,118 @@ class _AboutUsState extends State<AboutUs> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: primary,
-        elevation: 0.0,
-        centerTitle: true,
-        title: Text(
-          MyLocalizations.of(context).aboutUs,
-          style: textbarlowSemiBoldWhite(),
-        ),
-        leading: InkWell(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Icon(Icons.arrow_back),
-        ),
-      ),
-      body: new SingleChildScrollView(
-        child: new Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Center(
-                child:
-                    new Image.asset('lib/assets/logos/logo.png', height: 200)),
-            new Padding(
-              padding: EdgeInsets.only(left: 20.0, right: 20.0, top: 20.0),
-              child: new Column(
+      backgroundColor: bg,
+      appBar: appBarWithTitle(context, MyLocalizations.of(context).aboutUs),
+      body: ListView(
+        children: <Widget>[
+          Container(
+            color: Colors.white,
+            margin: EdgeInsets.only(bottom: 8),
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            child: Column(
+              children: [
+                SizedBox(height: 35,),
+                Image.asset(
+                  'lib/assets/icons/logo.png',
+                  width: 80,
+                  height: 108,
+                ),
+                SizedBox(height: 15,),
+                Center(
+                  child: RichText(
+                    text: TextSpan(
+                      children: <TextSpan>[
+                        TextSpan(text: "RESTAURANT", style: textMuliBoldprimary()),
+                        TextSpan(
+                          text: ' SAAS',
+                          style: textMuliBold(),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 25,),
+              ],
+            ),
+          ),
+          Container(
+            color: Colors.white,
+            margin: EdgeInsets.only(bottom: 8),
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  'Description',
+                  style: textMuliSemiboldsec()
+                ),
+                SizedBox(height: 10),
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  child: Text(
+                    'Lorem ipsum dolor sit amet, consetetur sadipscing Stet clita  sadipscing',
+                    style: textMuliRegularwithop(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            color: Colors.white,
+            margin: EdgeInsets.only(bottom: 8),
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  MyLocalizations.of(context).address,
+                  style:  textMuliSemiboldsec()
+                ),
+                SizedBox(height: 6,),
+                Text(
+                  'Saudi Arabia Eastern province Saihat',
+                  style: textMuliRegularwithop(),
+                ),
+              ],
+            )
+          ),
+          Container(
+              color: Colors.white,
+              margin: EdgeInsets.only(bottom: 8),
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  new Text(
-                    APP_NAME,
-                    style: titleBoldOSL(),
+                children: [
+                  Text(
+                      MyLocalizations.of(context).contactInformation,
+                      style:  textMuliSemiboldsec()
                   ),
-                  new Padding(
-                    padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                    child: new Text(
-                      MyLocalizations.of(context).mobileNumber,
-                      style: textOSL(),
-                    ),
+                  SizedBox(height: 6,),
+                  Text(
+                    MyLocalizations.of(context).mobileNumber,
+                    style:  textMuliBold(),
                   ),
-                  new Text(
-                    '9098909800',
-                    style: textOS(),
+                  SizedBox(height: 6,),
+                  Text(
+                      '9098909800',
+                    style: textMuliRegularwithop(),
                   ),
-                  new Padding(
-                    padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                    child: new Text(
-                      MyLocalizations.of(context).emailId,
-                      style: textOSL(),
-                    ),
+                  SizedBox(height: 6,),
+                  Text(
+                    MyLocalizations.of(context).emailId,
+                    style:  textMuliBold(),
                   ),
-                  new Text(
+                  SizedBox(height: 6,),
+                  Text(
                     'ionicfirebaseapp@gmail.com',
-                    style: textOS(),
-                  ),
-                  new Padding(
-                    padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                    child: new Text(
-                      MyLocalizations.of(context).address,
-                      style: textOSL(),
-                    ),
-                  ),
-                  new Text(
-                    'Saudi Arabia Eastern province Saihat',
-                    style: textOS(),
+                    style: textMuliRegularwithop(),
                   ),
                 ],
-              ),
-            )
-          ],
-        ),
+              )
+          ),
+        ],
       ),
     );
   }

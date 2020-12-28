@@ -91,6 +91,7 @@ flutter:
     - lib/assets/icons/veg.png
     - lib/assets/icons/sale.png
     - lib/assets/images/cod.png
+    - lib/assets/images/cash.png
     - lib/assets/images/stripe.png
     - lib/assets/images/thnku.png
     - lib/assets/images/user.png
