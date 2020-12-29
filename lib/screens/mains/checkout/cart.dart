@@ -1,20 +1,19 @@
 import 'dart:async';
-import 'package:RestaurantSaas/screens/other/bottom-sheet1.dart';
+import 'package:RestaurantSaas/screens/products/bottom-sheet1.dart';
 import 'package:RestaurantSaas/services/main-service.dart';
 import 'package:RestaurantSaas/services/profile-service.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../services/common.dart';
-import '../../services/counter-service.dart';
-import '../../services/localizations.dart';
-import '../../services/sentry-services.dart';
-import '../../styles/styles.dart';
-import '../../widgets/no-data.dart';
-import '../auth/login.dart';
-import '../other/coupons-list.dart';
+import '../../../services/common.dart';
+import '../../../services/counter-service.dart';
+import '../../../services/localizations.dart';
+import '../../../services/sentry-services.dart';
+import '../../../styles/styles.dart';
+import '../../../widgets/no-data.dart';
+import '../../auth/login.dart';
+import 'coupons-list.dart';
 import 'confirm-order.dart';
 import 'package:RestaurantSaas/widgets/appbar.dart';
-import 'package:getwidget/getwidget.dart';
 
 SentryError sentryError = new SentryError();
 
@@ -436,7 +435,7 @@ class CartPageState extends State<CartPage> {
                       children: <Widget>[
                         RichText(
                           text: TextSpan(
-                            text: 'To Pay : ',
+                            text: '${MyLocalizations.of(context).total} : ',
                             style: textMuliSemiboldwhiteexs(),
                             children: <TextSpan>[
                               TextSpan(
@@ -447,7 +446,7 @@ class CartPageState extends State<CartPage> {
                           ),
                         ),
                         Text(
-                          'Checkout',
+                          '${MyLocalizations.of(context).proceed}',
                           style: textMuliSemiboldwhite(),
                         ),
                       ],
@@ -665,16 +664,11 @@ class CartPageState extends State<CartPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
-            'Bill Details : ',
-            style: textMuliSemiboldextra(),
-          ),
           SizedBox(height: 12),
           priceTagLine(MyLocalizations.of(context).subTotal, subTotal),
           SizedBox(height: 9),
-          priceTagLine(MyLocalizations.of(context).deliveryCharges, deliveryCharge),
-          selectedCoupon != null ?  SizedBox(height: 9) : Container(),
-          selectedCoupon != null ? priceTagLine(MyLocalizations.of(context).coupon, couponDeduction) : Container(),
+          priceTagLine(
+              MyLocalizations.of(context).deliveryCharges, deliveryCharge),
           Divider(color: secondary.withOpacity(0.1), thickness: 1, height: 22),
           priceTagLine(MyLocalizations.of(context).grandTotal, grandTotal),
         ],
@@ -890,7 +884,7 @@ class CartPageState extends State<CartPage> {
           style: textMuliRegulars(),
         ),
         Text(
-        '$currency' + value.toStringAsFixed(2),
+          '$currency' + value.toStringAsFixed(2),
           style: textMuliRegulars(),
         ),
       ],

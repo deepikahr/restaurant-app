@@ -1,6 +1,7 @@
-import 'package:RestaurantSaas/screens/mains/product-list.dart';
+import 'package:RestaurantSaas/screens/products/product-list.dart';
 import 'package:RestaurantSaas/services/localizations.dart';
 import 'package:RestaurantSaas/styles/styles.dart';
+import 'package:RestaurantSaas/widgets/appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 
@@ -24,24 +25,7 @@ class _CuisineBaseStoresState extends State<CuisineBaseStores> {
     review = MyLocalizations.of(context).reviews;
     branches = MyLocalizations.of(context).branches;
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: primary,
-        elevation: 0.0,
-        title: new Text(
-          widget.location['cuisineName'],
-          style: textbarlowSemiBoldWhite(),
-        ),
-        leading: InkWell(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Icon(
-            Icons.arrow_back,
-            color: Colors.white,
-          ),
-        ),
-        centerTitle: true,
-      ),
+      appBar: appBarWithTitle(context, widget.location['cuisineName']),
       body: ((widget.location?.length ?? 0) > 0)
           ? ListView.builder(
               physics: ScrollPhysics(),

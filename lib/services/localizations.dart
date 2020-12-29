@@ -1180,6 +1180,10 @@ class MyLocalizations {
     return localizedValues[locale.languageCode]['changeLocation'];
   }
 
+  String get resendOtp {
+    return localizedValues[locale.languageCode]['resendOtp'];
+  }
+
   greetTo(name) {
     return localizedValues[locale.languageCode]['greetTo']
         .replaceAll('{{name}}', name);

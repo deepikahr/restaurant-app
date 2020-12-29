@@ -1,6 +1,5 @@
 import 'dart:async';
-import 'package:RestaurantSaas/screens/mains/current-location.dart';
-import 'package:RestaurantSaas/screens/other/thank-you.dart';
+import 'package:RestaurantSaas/screens/mains/location/current-location.dart';
 import 'package:RestaurantSaas/services/auth-service.dart';
 import 'package:RestaurantSaas/services/common.dart';
 import 'package:flutter/cupertino.dart';
@@ -103,7 +102,6 @@ class EntryPage extends StatefulWidget {
 class _EntryPageState extends State<EntryPage> {
   @override
   Widget build(BuildContext context) {
-
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       systemNavigationBarColor: Colors.transparent,
@@ -123,7 +121,8 @@ class _EntryPageState extends State<EntryPage> {
       title: APP_NAME,
       theme: ThemeData(
           fontFamily: FONT_FAMILY, primaryColor: primary, accentColor: primary),
-      home: CurrentLocation(locale: widget.locale, localizedValues: widget.localizedValues),
+      home: CurrentLocation(
+          locale: widget.locale, localizedValues: widget.localizedValues),
     );
   }
 }

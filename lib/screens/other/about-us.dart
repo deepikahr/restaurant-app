@@ -29,18 +29,23 @@ class _AboutUsState extends State<AboutUs> {
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             child: Column(
               children: [
-                SizedBox(height: 35,),
+                SizedBox(
+                  height: 35,
+                ),
                 Image.asset(
                   'lib/assets/icons/logo.png',
                   width: 80,
                   height: 108,
                 ),
-                SizedBox(height: 15,),
+                SizedBox(
+                  height: 15,
+                ),
                 Center(
                   child: RichText(
                     text: TextSpan(
                       children: <TextSpan>[
-                        TextSpan(text: "RESTAURANT", style: textMuliBoldprimary()),
+                        TextSpan(
+                            text: "RESTAURANT", style: textMuliBoldprimary()),
                         TextSpan(
                           text: ' SAAS',
                           style: textMuliBold(),
@@ -49,7 +54,9 @@ class _AboutUsState extends State<AboutUs> {
                     ),
                   ),
                 ),
-                SizedBox(height: 25,),
+                SizedBox(
+                  height: 25,
+                ),
               ],
             ),
           ),
@@ -60,10 +67,7 @@ class _AboutUsState extends State<AboutUs> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text(
-                  'Description',
-                  style: textMuliSemiboldsec()
-                ),
+                Text('Description', style: textMuliSemiboldsec()),
                 SizedBox(height: 10),
                 Container(
                   width: MediaQuery.of(context).size.width * 0.9,
@@ -76,25 +80,24 @@ class _AboutUsState extends State<AboutUs> {
             ),
           ),
           Container(
-            color: Colors.white,
-            margin: EdgeInsets.only(bottom: 8),
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  MyLocalizations.of(context).address,
-                  style:  textMuliSemiboldsec()
-                ),
-                SizedBox(height: 6,),
-                Text(
-                  'Saudi Arabia Eastern province Saihat',
-                  style: textMuliRegularwithop(),
-                ),
-              ],
-            )
-          ),
+              color: Colors.white,
+              margin: EdgeInsets.only(bottom: 8),
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(MyLocalizations.of(context).address,
+                      style: textMuliSemiboldsec()),
+                  SizedBox(
+                    height: 6,
+                  ),
+                  Text(
+                    'Saudi Arabia Eastern province Saihat',
+                    style: textMuliRegularwithop(),
+                  ),
+                ],
+              )),
           Container(
               color: Colors.white,
               margin: EdgeInsets.only(bottom: 8),
@@ -103,33 +106,38 @@ class _AboutUsState extends State<AboutUs> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                      MyLocalizations.of(context).contactInformation,
-                      style:  textMuliSemiboldsec()
+                  Text(MyLocalizations.of(context).contactInformation,
+                      style: textMuliSemiboldsec()),
+                  SizedBox(
+                    height: 6,
                   ),
-                  SizedBox(height: 6,),
                   Text(
                     MyLocalizations.of(context).mobileNumber,
-                    style:  textMuliBold(),
+                    style: textMuliBold(),
                   ),
-                  SizedBox(height: 6,),
+                  SizedBox(
+                    height: 6,
+                  ),
                   Text(
-                      '9098909800',
+                    '9098909800',
                     style: textMuliRegularwithop(),
                   ),
-                  SizedBox(height: 6,),
+                  SizedBox(
+                    height: 6,
+                  ),
                   Text(
                     MyLocalizations.of(context).emailId,
-                    style:  textMuliBold(),
+                    style: textMuliBold(),
                   ),
-                  SizedBox(height: 6,),
+                  SizedBox(
+                    height: 6,
+                  ),
                   Text(
                     'ionicfirebaseapp@gmail.com',
                     style: textMuliRegularwithop(),
                   ),
                 ],
-              )
-          ),
+              )),
         ],
       ),
     );

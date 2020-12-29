@@ -13,14 +13,14 @@ import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../services/localizations.dart';
-import '../../services/main-service.dart';
-import '../../services/profile-service.dart';
-import '../../services/sentry-services.dart';
-import '../../styles/styles.dart';
-import '../../widgets/no-data.dart';
+import '../../../services/localizations.dart';
+import '../../../services/main-service.dart';
+import '../../../services/profile-service.dart';
+import '../../../services/sentry-services.dart';
+import '../../../styles/styles.dart';
+import '../../../widgets/no-data.dart';
 import 'add-address.dart';
-import 'payment-method.dart';
+import '../payment/payment-method.dart';
 
 SentryError sentryError = new SentryError();
 
@@ -430,29 +430,30 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
     if (widget.cart['orderType'] == 'Dine In') {
       isDineIn = true;
     }
-    return ListView(
+    return SingleChildScrollView(
       physics: ScrollPhysics(),
-      shrinkWrap: true,
-      children: <Widget>[
-        contactDetails(userInfo),
-        orderType(),
-        widget.tableInfo == null
-            ? _buildOrderTypeBlock()
-            : _buildDineInTypeBlock(),
-        isDineIn ? Container() : deliveryType(isPickup),
-        // _buildBulletTitle(isDineIn ? 3 : 4, MyLocalizations.of(context).orderDetails),
-        _buildProductListBlock(userInfo),
-        billDetails()
-      ],
+      child: Column(
+        children: <Widget>[
+          contactDetails(userInfo),
+          orderType(),
+          widget.tableInfo == null
+              ? _buildOrderTypeBlock()
+              : _buildDineInTypeBlock(),
+          isDineIn ? Container() : deliveryType(isPickup),
+          _buildProductListBlock(userInfo),
+          billDetails()
+        ],
+      ),
     );
   }
 
   Widget deliveryType(bool isPickup) {
     if (isPickup) {
       return Container(
+        width: MediaQuery.of(context).size.width,
         color: Colors.white,
         padding: EdgeInsets.all(16.0),
-        margin: EdgeInsets.only(bottom: 10),
+        // margin: EdgeInsets.only(bottom: 10),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -461,7 +462,9 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
               MyLocalizations.of(context).restaurantAddress,
               style: textMuliSemiboldextra(),
             ),
-            SizedBox(height: 6,),
+            SizedBox(
+              height: 6,
+            ),
             Text(widget.cart['productDetails'][0]['restaurantAddress']),
           ],
         ),
@@ -652,63 +655,25 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
   }
 
   Widget _buildDineInTypeBlock() {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 10.0,
-        right: 10.0,
-      ),
-      child: Container(
-        color: Colors.white,
-        padding: EdgeInsets.all(10.0),
-        child: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.only(left: 10.0, right: 10.0, bottom: 0.0),
-              child: Container(
-                padding:
-                    EdgeInsets.only(top: 10, left: 10, bottom: 0, right: 10),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(9.0), color: primary),
-                child: Column(
-                  children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Container(
-                          width: screenWidth(context) * 0.7,
-                          height: 34,
-                          color: primary,
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    MyLocalizations.of(context).dineIn,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.only(left: 10),
-                                  ),
-                                  Icon(
-                                    Icons.check,
-                                    color: Colors.white,
-                                    size: 15.0,
-                                  ),
-                                ],
-                              ),
-                              Divider(color: Colors.white),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+    return Container(
+      color: Colors.white,
+      padding: EdgeInsets.only(top: 16, left: 16, right: 16),
+      child: Row(
+        children: [
+          Text(
+            MyLocalizations.of(context).dineIn,
+            textAlign: TextAlign.center,
+            style: textMuliBoldprimary(),
+          ),
+          Padding(
+            padding: EdgeInsets.only(left: 10),
+          ),
+          Icon(
+            Icons.check_outlined,
+            color: primary,
+            size: 35.0,
+          ),
+        ],
       ),
     );
   }
@@ -1071,7 +1036,6 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
     );
   }
 
-
   Widget priceTagLine(String title, double value) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1102,14 +1066,18 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
             style: textMuliSemiboldextra(),
           ),
           SizedBox(height: 12),
-          priceTagLine(MyLocalizations.of(context).subTotal, widget.cart['subTotal']),
+          priceTagLine(
+              MyLocalizations.of(context).subTotal, widget.cart['subTotal']),
           SizedBox(height: 9),
-          priceTagLine(MyLocalizations.of(context).deliveryCharges, widget.cart['deliveryCharge'] == 'Free'
-              ? '0'
-              : double.parse(widget.cart['deliveryCharge'].toString())),
+          priceTagLine(
+              MyLocalizations.of(context).deliveryCharges,
+              widget.cart['deliveryCharge'] == 'Free'
+                  ? '0'
+                  : double.parse(widget.cart['deliveryCharge'].toString())),
           // selectedCoupon != null ? priceTagLine(MyLocalizations.of(context).coupon, couponDeduction) : Container(),
           Divider(color: secondary.withOpacity(0.1), thickness: 1, height: 22),
-          priceTagLine(MyLocalizations.of(context).grandTotal, widget.cart['grandTotal']),
+          priceTagLine(MyLocalizations.of(context).grandTotal,
+              widget.cart['grandTotal']),
         ],
       ),
     );
@@ -1165,8 +1133,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                         fit: FlexFit.tight,
                         child: new Text(
                           '$currency' +
-                              products[index]['totalPrice']
-                                  .toStringAsFixed(2),
+                              products[index]['totalPrice'].toStringAsFixed(2),
                           style: hintStyleOSB(),
                         ),
                       ),
@@ -1242,116 +1209,117 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
     return placeOrderLoading
         ? Center(child: CircularProgressIndicator())
         : Container(
-      color: Colors.white,
-      padding: EdgeInsets.only(top: 10, bottom: 10),
-      child: Container(
-        width: 335,
-        height: 41,
-        margin: EdgeInsets.all(15),
-        decoration: BoxDecoration(
-          color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: [
-              BoxShadow(
-                  color: Colors.black.withOpacity(0.29), blurRadius: 5)
-            ]),
-        child: RaisedButton(
-            color: primary,
-            shape: RoundedRectangleBorder(
-              borderRadius: new BorderRadius.circular(5.0),
-            ),
-            onPressed:  () {
-              if (widget.cart['orderType'] == 'Dine In') {
-                _buildBottomBarButton();
-              } else if (widget.cart['orderType'] == 'Pickup') {
-                if (widget.cart['pickupDate'] != null &&
-                    widget.cart['pickupTime'] != null) {
-                  _buildBottomBarButton();
-                } else if (widget.cart['pickupDate'] == null) {
-                  showSnackbar(MyLocalizations.of(context)
-                      .pleaseSelectDatefirstforpickup);
-                } else if (widget.cart['pickupTime'] == null) {
-                  showSnackbar(MyLocalizations.of(context)
-                      .pleaseSelectTimefirstforpickup);
-                } else {
-                  showSnackbar(MyLocalizations.of(context).selectDateTime);
-                }
-              } else if (widget.cart['orderType'] == 'Delivery') {
-                if (widget.cart['shippingAddress'] == null) {
-                  if (addressList.length == 0) {
-                    showSnackbar(MyLocalizations.of(context).addAddress);
-                  }
-                  widget.cart['shippingAddress'] = addressList[0];
-                }
-                if (widget.deliveryInfo == null ||
-                    widget.deliveryInfo['areaAthority']) {
-                  openAndCloseTime == "OPEN"
-                      ? _buildBottomBarButton()
-                      : showSnackbar(MyLocalizations.of(context)
-                      .storeisClosedPleaseTryAgainduringouropeninghours);
-                } else {
-                  if (widget.deliveryInfo['areaCode'] == null ||
-                      widget.deliveryInfo['areaCode'][0] == null) {
-                    openAndCloseTime == "OPEN"
-                        ? _buildBottomBarButton()
-                        : showSnackbar(MyLocalizations.of(context)
-                        .storeisClosedPleaseTryAgainduringouropeninghours);
-                  } else {
-                    bool isPinFound = false;
-                    for (int i = 0;
-                    i < widget.deliveryInfo['areaCode'].length;
-                    i++) {
-                      if (widget.deliveryInfo['areaCode'][i]['pinCode']
-                          .toString() ==
-                          widget.cart['shippingAddress']['postalCode']
-                              .toString()) {
-                        isPinFound = true;
-                      }
-                    }
-                    if (isPinFound) {
-                      openAndCloseTime == "OPEN"
-                          ? _buildBottomBarButton()
-                          : showSnackbar(MyLocalizations.of(context)
-                          .storeisClosedPleaseTryAgainduringouropeninghours);
-                    } else {
-                      _showAvailablePincodeAlert(
-                          widget.cart['restaurant'],
-                          widget.cart['shippingAddress']['postalCode']
-                              .toString(),
-                          widget.deliveryInfo['areaCode']);
-                    }
-                  }
-                }
-              } else {
-                showSnackbar(MyLocalizations.of(context)
-                    .somethingwentwrongpleaserestarttheapp +
-                    '.');
-              }
-            },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                RichText(
-                  text: TextSpan(
-                    text: 'To Pay : ',
-                    style: textMuliSemiboldwhiteexs(),
-                    children: <TextSpan>[
-                      TextSpan(
-                          text:
-                  '${widget.currency ?? currency} ${widget.cart['grandTotal'].toStringAsFixed(2)}',
-                          // ' $currency ${grandTotal.toStringAsFixed(2)}',
-                          style: textMuliSemiboldwhite()),
-                    ],
+            color: Colors.white,
+            padding: EdgeInsets.only(top: 10, bottom: 10),
+            child: Container(
+              width: 335,
+              height: 41,
+              margin: EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.black.withOpacity(0.29), blurRadius: 5)
+                  ]),
+              child: RaisedButton(
+                  color: primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(5.0),
                   ),
-                ),
-                Text(
-                    MyLocalizations.of(context).placeOrderNow,
-                  style: textMuliSemiboldwhite(),
-                ),
-              ],
-            )),
-      ),
-    );
+                  onPressed: () {
+                    if (widget.cart['orderType'] == 'Dine In') {
+                      _buildBottomBarButton();
+                    } else if (widget.cart['orderType'] == 'Pickup') {
+                      if (widget.cart['pickupDate'] != null &&
+                          widget.cart['pickupTime'] != null) {
+                        _buildBottomBarButton();
+                      } else if (widget.cart['pickupDate'] == null) {
+                        showSnackbar(MyLocalizations.of(context)
+                            .pleaseSelectDatefirstforpickup);
+                      } else if (widget.cart['pickupTime'] == null) {
+                        showSnackbar(MyLocalizations.of(context)
+                            .pleaseSelectTimefirstforpickup);
+                      } else {
+                        showSnackbar(
+                            MyLocalizations.of(context).selectDateTime);
+                      }
+                    } else if (widget.cart['orderType'] == 'Delivery') {
+                      if (widget.cart['shippingAddress'] == null) {
+                        if (addressList.length == 0) {
+                          showSnackbar(MyLocalizations.of(context).addAddress);
+                        }
+                        widget.cart['shippingAddress'] = addressList[0];
+                      }
+                      if (widget.deliveryInfo == null ||
+                          widget.deliveryInfo['areaAthority']) {
+                        openAndCloseTime == "OPEN"
+                            ? _buildBottomBarButton()
+                            : showSnackbar(MyLocalizations.of(context)
+                                .storeisClosedPleaseTryAgainduringouropeninghours);
+                      } else {
+                        if (widget.deliveryInfo['areaCode'] == null ||
+                            widget.deliveryInfo['areaCode'][0] == null) {
+                          openAndCloseTime == "OPEN"
+                              ? _buildBottomBarButton()
+                              : showSnackbar(MyLocalizations.of(context)
+                                  .storeisClosedPleaseTryAgainduringouropeninghours);
+                        } else {
+                          bool isPinFound = false;
+                          for (int i = 0;
+                              i < widget.deliveryInfo['areaCode'].length;
+                              i++) {
+                            if (widget.deliveryInfo['areaCode'][i]['pinCode']
+                                    .toString() ==
+                                widget.cart['shippingAddress']['postalCode']
+                                    .toString()) {
+                              isPinFound = true;
+                            }
+                          }
+                          if (isPinFound) {
+                            openAndCloseTime == "OPEN"
+                                ? _buildBottomBarButton()
+                                : showSnackbar(MyLocalizations.of(context)
+                                    .storeisClosedPleaseTryAgainduringouropeninghours);
+                          } else {
+                            _showAvailablePincodeAlert(
+                                widget.cart['restaurant'],
+                                widget.cart['shippingAddress']['postalCode']
+                                    .toString(),
+                                widget.deliveryInfo['areaCode']);
+                          }
+                        }
+                      }
+                    } else {
+                      showSnackbar(MyLocalizations.of(context)
+                              .somethingwentwrongpleaserestarttheapp +
+                          '.');
+                    }
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      RichText(
+                        text: TextSpan(
+                          text: 'To Pay : ',
+                          style: textMuliSemiboldwhiteexs(),
+                          children: <TextSpan>[
+                            TextSpan(
+                                text:
+                                    '${widget.currency ?? currency} ${widget.cart['grandTotal'].toStringAsFixed(2)}',
+                                // ' $currency ${grandTotal.toStringAsFixed(2)}',
+                                style: textMuliSemiboldwhite()),
+                          ],
+                        ),
+                      ),
+                      Text(
+                        MyLocalizations.of(context).placeOrderNow,
+                        style: textMuliSemiboldwhite(),
+                      ),
+                    ],
+                  )),
+            ),
+          );
     // RawMaterialButton(
     //         onPressed: () {
     //           if (widget.cart['orderType'] == 'Dine In') {

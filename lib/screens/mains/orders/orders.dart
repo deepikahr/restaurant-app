@@ -1,8 +1,8 @@
 import 'package:RestaurantSaas/widgets/appbar.dart';
 import 'package:flutter/material.dart';
 
-import '../../services/localizations.dart';
-import '../../styles/styles.dart';
+import '../../../services/localizations.dart';
+import '../../../styles/styles.dart';
 import 'order-history.dart';
 import 'order-upcoming.dart';
 import 'package:getwidget/getwidget.dart';
@@ -45,7 +45,8 @@ class _OrdersPageState extends State<OrdersPage>
             child: Container(
               height: 40,
               color: Colors.white,
-              margin: const EdgeInsets.only(top: 20, left: 45, right: 45, bottom: 20),
+              margin: const EdgeInsets.only(
+                  top: 20, left: 45, right: 45, bottom: 20),
               child: GFSegmentTabs(
                 tabController: tabController,
                 width: 280,

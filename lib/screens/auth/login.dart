@@ -1,10 +1,14 @@
 import 'dart:async';
 
-import 'package:RestaurantSaas/screens/mains/home.dart';
+import 'package:RestaurantSaas/screens/mains/home/home.dart';
 import 'package:RestaurantSaas/services/constant.dart';
+import 'package:RestaurantSaas/widgets/appbar.dart';
+import 'package:RestaurantSaas/widgets/button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:getwidget/components/button/gf_button.dart';
+import 'package:getwidget/types/gf_button_type.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/auth-service.dart';
@@ -153,209 +157,135 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
-      backgroundColor: Color(0XFF303030),
-      body: Container(
-        child: Stack(
-          fit: StackFit.expand,
-          children: <Widget>[
-            // buildLoginPageBg(),
-            SingleChildScrollView(
+        key: _scaffoldKey,
+        backgroundColor: Colors.white,
+        appBar: authAppBarWithTitle(context, MyLocalizations.of(context).login),
+        body: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Container(
+              padding: EdgeInsets.all(16),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  buildLoginPageLogo(),
-                  buildLoginPageForm(),
+                  SizedBox(height: 15),
+                  buildLoginLogo(),
+                  buildEmailTextField(),
+                  SizedBox(height: 15),
+                  buildPasswordTextField(),
+                  buildForgotPasswordButton(),
+                  SizedBox(height: 35),
+                  buildLoginButton(),
+                  SizedBox(height: 25),
+                  buildSignUpButton(),
                 ],
               ),
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget buildLoginPageBg() {
-    return Positioned(
-      top: 0.0,
-      child: Image(
-        image: AssetImage("lib/assets/bgImgs/background.png"),
-        fit: BoxFit.cover,
-        height: screenHeight(context),
-        width: screenWidth(context),
-      ),
-    );
-  }
-
-  Widget buildLoginPageLogo() {
-    return Padding(
-      padding: EdgeInsets.only(top: 70.0, bottom: 40.0),
-      child: Image(
-        image: AssetImage("lib/assets/logos/logo.png"),
-        fit: BoxFit.cover,
-        width: 95.0,
-      ),
-    );
-  }
-
-  Widget buildLoginPageForm() {
-    return Form(
-      key: _formKey,
-      child: Theme(
-        data: ThemeData(
-          brightness: Brightness.dark,
-        ),
-        child: Container(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            children: <Widget>[
-              buildEmailTextField(),
-              buildPasswordTextField(),
-              buildLoginButton(),
-              buildForgotPasswordButton(),
-              Padding(
-                padding: EdgeInsetsDirectional.only(top: 40.0, bottom: 20.0),
-                child: Text(
-                  MyLocalizations.of(context).dontHaveAccountYet,
-                  style: subTitleWhiteLightOSR(),
-                ),
-              ),
-              buildSignupButton()
-            ],
+            ),
           ),
+        ));
+  }
+
+  Widget buildLoginLogo() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        Image.asset(
+          'lib/assets/icons/auth.png',
+          width: 277.0,
+          height: 195,
         ),
-      ),
+        Container(
+            margin: EdgeInsets.only(top: 20, bottom: 20),
+            child: Text(
+              MyLocalizations.of(context).loginToYourAccount,
+              style: textMuliSemiboldd(),
+            )),
+      ],
     );
   }
 
   Widget buildEmailTextField() {
-    return Container(
-      color: Colors.white,
-      child: TextFormField(
-        initialValue: 'user@ionicfirebaseapp.com',
-        keyboardType: TextInputType.emailAddress,
-        validator: (String value) {
-          if (value.isEmpty) {
-            return MyLocalizations.of(context)
-                .pleaseEnterValidEmailOrPhoneNumber;
-          }
-          return null;
-        },
-        onChanged: (String value) {
-          mobileNumber = value;
-        },
-        decoration: InputDecoration(
-          labelText: MyLocalizations.of(context).yourEmailOrMobileNumber,
-          labelStyle: hintStyleGreyLightOSR(),
-          contentPadding: EdgeInsets.all(10),
-          border: InputBorder.none,
+    return TextFormField(
+      initialValue: 'user@ionicfirebaseapp.com',
+      keyboardType: TextInputType.emailAddress,
+      validator: (String value) {
+        if (value.isEmpty) {
+          return MyLocalizations.of(context).pleaseEnterValidEmailOrPhoneNumber;
+        }
+        return null;
+      },
+      onChanged: (String value) {
+        mobileNumber = value;
+      },
+      style: textMuliRegular(),
+      decoration: InputDecoration(
+        labelText: MyLocalizations.of(context).yourEmailOrMobileNumber,
+        labelStyle: textMuliSemiboldgrey(),
+        border: UnderlineInputBorder(
+          borderSide: BorderSide(color: secondary.withOpacity(0.5)),
         ),
-        style: textBlackOSR(),
       ),
     );
   }
 
   Widget buildPasswordTextField() {
-    return Container(
-      margin: EdgeInsets.only(top: 4.0),
-      color: Colors.white,
-      child: TextFormField(
-        initialValue: '123456',
-        keyboardType: TextInputType.text,
-        validator: (String value) {
-          if (value.isEmpty || value.length < 6) {
-            return MyLocalizations.of(context).pleaseEnterValidPassword;
-          } else
-            return null;
-        },
-        onSaved: (String value) {
-          password = value;
-        },
-        decoration: InputDecoration(
-          labelText: MyLocalizations.of(context).yourPassword,
-          labelStyle: hintStyleGreyLightOSR(),
-          contentPadding: EdgeInsets.only(
-            left: 15.0,
-            right: 15.0,
-            top: 10.0,
-            bottom: 10.0,
-          ),
-          border: InputBorder.none,
-        ),
-        style: textBlackOSR(),
-        obscureText: true,
-      ),
-    );
-  }
-
-  Widget buildLoginButton() {
-    return RawMaterialButton(
-      onPressed: isLoading ? null : login,
-      child: Container(
-        alignment: AlignmentDirectional.center,
-        margin: const EdgeInsetsDirectional.only(top: 10.0),
-        height: 56.0,
-        width: screenWidth(context),
-        decoration: BoxDecoration(
-          color: Color(0xFFFFFFFF).withOpacity(0.25),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              MyLocalizations.of(context).loginToYourAccount,
-              style: subTitleWhiteLightOSR(),
-            ),
-            Padding(padding: EdgeInsets.only(left: 5.0, right: 5.0)),
-            isLoading
-                ? Image.asset(
-                    'lib/assets/icon/spinner.gif',
-                    width: 19.0,
-                    height: 19.0,
-                  )
-                : Text(''),
-          ],
+    return TextFormField(
+      initialValue: '123456',
+      keyboardType: TextInputType.text,
+      validator: (String value) {
+        if (value.isEmpty || value.length < 6) {
+          return MyLocalizations.of(context).pleaseEnterValidPassword;
+        } else
+          return null;
+      },
+      onSaved: (String value) {
+        password = value;
+      },
+      obscureText: true,
+      style: textMuliRegular(),
+      decoration: InputDecoration(
+        labelText: MyLocalizations.of(context).yourPassword,
+        labelStyle: textMuliSemiboldgrey(),
+        border: UnderlineInputBorder(
+          borderSide: BorderSide(color: secondary.withOpacity(0.5)),
         ),
       ),
     );
   }
 
   Widget buildForgotPasswordButton() {
-    return Padding(
-      padding: const EdgeInsetsDirectional.only(top: 0.0, bottom: 20.0),
-      child: FlatButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (BuildContext context) => ForgotPassword(
-                  title: MyLocalizations.of(context).forgotPassword,
-                  locale: widget.locale,
-                  localizedValues: widget.localizedValues,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        GFButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (BuildContext context) => ForgotPassword(
+                    title: MyLocalizations.of(context).forgotPassword,
+                    locale: widget.locale,
+                    localizedValues: widget.localizedValues,
+                  ),
                 ),
-              ),
-            );
-          },
-          child: Text(
-            MyLocalizations.of(context).forgotPassword,
-            style: hintStyleLightOSB(),
-          )),
+              );
+            },
+            type: GFButtonType.transparent,
+            child: Text(
+              '${MyLocalizations.of(context).forgotPassword} ?',
+              style: textMuliRegular(),
+            )),
+      ],
     );
   }
 
-  Widget buildSignupButton() {
-    return RawMaterialButton(
-      child: Container(
-        alignment: AlignmentDirectional.center,
-        height: 56.0,
-        width: screenWidth(context),
-        decoration: BoxDecoration(border: Border.all(color: Colors.white70)),
-        child: Text(
-          MyLocalizations.of(context).signUpNow,
-          style: subTitleWhiteShadeLightOSR(),
-        ),
-      ),
-      onPressed: () {
+  Widget buildLoginButton() {
+    return buildPrimaryHalfWidthButton(
+        context, MyLocalizations.of(context).login, isLoading, login);
+  }
+
+  Widget buildSignUpButton() {
+    return InkWell(
+      onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -366,6 +296,19 @@ class _LoginPageState extends State<LoginPage> {
           ),
         );
       },
+      child: RichText(
+        text: TextSpan(
+          children: <TextSpan>[
+            TextSpan(
+                text: MyLocalizations.of(context).dontHaveAccountYet,
+                style: textMuliRegular()),
+            TextSpan(
+              text: ' ${MyLocalizations.of(context).signUpNow}',
+              style: textMuliSemiboldprimary(),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

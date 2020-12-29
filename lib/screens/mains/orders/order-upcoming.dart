@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../services/localizations.dart';
-import '../../services/profile-service.dart';
-import '../../services/sentry-services.dart';
-import '../../styles/styles.dart';
-import '../../widgets/no-data.dart';
+import '../../../services/localizations.dart';
+import '../../../services/profile-service.dart';
+import '../../../services/sentry-services.dart';
+import '../../../styles/styles.dart';
+import '../../../widgets/no-data.dart';
 import 'order-details.dart';
 import 'order-track.dart';
 
@@ -116,10 +116,8 @@ class OrderUpcomingState extends State<OrderUpcoming>
           } else {
             orders[index]['orderType'] = orders[index]['orderType'];
           }
-          return orderCard(
-            context, orders[index], isRatingAllowed,  locale,
-              localizedValues, currency
-          );
+          return orderCard(context, orders[index], isRatingAllowed, locale,
+              localizedValues, currency);
           // return Container(
           //   width: screenWidth(context),
           //   margin: EdgeInsetsDirectional.only(top: 8.0),
@@ -490,5 +488,3 @@ class OrderUpcomingState extends State<OrderUpcoming>
     );
   }
 }
-
-

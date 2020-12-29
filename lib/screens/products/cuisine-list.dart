@@ -2,11 +2,12 @@ import 'package:RestaurantSaas/services/counter-service.dart';
 import 'package:RestaurantSaas/services/localizations.dart';
 import 'package:RestaurantSaas/services/sentry-services.dart';
 import 'package:RestaurantSaas/styles/styles.dart';
+import 'package:RestaurantSaas/widgets/appbar.dart';
 import 'package:RestaurantSaas/widgets/no-data.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/components/list_tile/gf_list_tile.dart';
 
-import 'cart.dart';
+import '../mains/checkout/cart.dart';
 import 'cusineBaseStore.dart';
 
 SentryError sentryError = new SentryError();
@@ -49,69 +50,18 @@ class _CuisineListState extends State<CuisineList> {
     });
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: primary,
-        elevation: 0.0,
-        leading: InkWell(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Icon(
-            Icons.arrow_back,
-            color: Colors.white,
-          ),
-        ),
-        title: Text(
-          widget.title,
-          style: textbarlowSemiBoldWhite(),
-        ),
-        centerTitle: true,
-        actions: <Widget>[
-          GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => CartPage(
-                      locale: widget.locale,
-                      localizedValues: widget.localizedValues,
-                    ),
-                  ),
-                );
-              },
-              child: Stack(
-                children: <Widget>[
-                  Container(
-                      padding: EdgeInsets.only(top: 20.0, right: 10),
-                      child: Icon(Icons.shopping_cart)),
-                  Positioned(
-                      right: 3,
-                      top: 5,
-                      child: (cartCount == null || cartCount == 0)
-                          ? Text(
-                              '',
-                              style: TextStyle(fontSize: 14.0),
-                            )
-                          : Container(
-                              height: 20,
-                              width: 20,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.black,
-                              ),
-                              child: Text('${cartCount.toString()}',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontFamily: "bold",
-                                      fontSize: 11)),
-                            )),
-                ],
-              )),
-          Padding(padding: EdgeInsets.only(left: 7.0)),
-          // buildLocationIcon(),
-          // Padding(padding: EdgeInsets.only(left: 7.0)),
-        ],
+      appBar: appBarWithCartAndTitle(context, widget.title, cartCount,
+            () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (BuildContext context) => CartPage(
+                locale: widget.locale,
+                localizedValues: widget.localizedValues,
+              ),
+            ),
+          );
+        },
       ),
       body: ((widget.cuisineList?.length ?? 0) > 0)
           ? Padding(
@@ -174,6 +124,10 @@ class _CuisineListState extends State<CuisineList> {
                               title: Text(
                                 widget?.cuisineList[index]['cuisineName'] ?? '',
                                 style: textsemiboldblack(),
+                              ),
+                              subtitle: Text(
+                                widget?.cuisineList[index]['locations'][0]['restaurantID']['restaurantName'] ?? '',
+                                style:  hintStyleLightOSR()
                               ),
                             ),
                           ),

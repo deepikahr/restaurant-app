@@ -1,8 +1,10 @@
 import 'package:RestaurantSaas/screens/auth/reset-password.dart';
-import 'package:RestaurantSaas/screens/mains/home.dart';
+import 'package:RestaurantSaas/screens/mains/home/home.dart';
 import 'package:RestaurantSaas/services/common.dart';
 import 'package:RestaurantSaas/services/localizations.dart';
 import 'package:RestaurantSaas/styles/styles.dart';
+import 'package:RestaurantSaas/widgets/appbar.dart';
+import 'package:RestaurantSaas/widgets/button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -128,155 +130,103 @@ class _OtpVerifyState extends State<OtpVerify> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
-      backgroundColor: Color(0XFF303030),
-      appBar: AppBar(
-        leading: InkWell(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Icon(
-            Icons.arrow_back,
-            color: Colors.white,
-          ),
-        ),
-        title: Text(
-          MyLocalizations.of(context).verifyOtp,
-          style: textbarlowSemiBoldWhite(),
-        ),
-        centerTitle: true,
-        backgroundColor: primary,
-      ),
-      body: Form(
-        key: _formKey,
-        child: _buildOTPField(),
-      ),
-      bottomNavigationBar: _buildVerifyOTPButton(),
-    );
-  }
-
-  Widget _buildOTPField() {
-    return Container(
-      padding: EdgeInsetsDirectional.only(start: 14.0, end: 14.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          Padding(
-            padding: EdgeInsetsDirectional.only(bottom: 30.0),
-            child: Center(
-                child: Text(
-              MyLocalizations.of(context).verifyOtp + '!',
-              textAlign: TextAlign.center,
-              style: subTitleWhiteLightOSR(),
-            )),
-          ),
-          Container(
-            margin: EdgeInsets.only(top: 14.0),
-            color: Colors.white,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Flexible(
-                  fit: FlexFit.tight,
-                  flex: 9,
-                  child: TextFormField(
-                    decoration: new InputDecoration(
-                      labelText: MyLocalizations.of(context).otp,
-                      hintStyle: hintStyleGreyLightOSR(),
-                      contentPadding: EdgeInsets.all(12.0),
-                      border: InputBorder.none,
-                    ),
-                    keyboardType: TextInputType.number,
-                    validator: (String value) {
-                      if (value.isEmpty || value.length < 6) {
-                        return MyLocalizations.of(context).otpErrorMessage;
-                      } else
-                        return null;
-                    },
-                    inputFormatters: [
-                      LengthLimitingTextInputFormatter(6),
-                    ],
-                    onSaved: (value) {
-                      otp = value;
-                    },
-                  ),
-                ),
-                Flexible(
-                  fit: FlexFit.tight,
-                  flex: 1,
-                  child: Icon(Icons.email, size: 16.0, color: greyTextc),
-                ),
-              ],
-            ),
-          ),
-          new Padding(
-            padding: EdgeInsets.only(top: 20.0),
-            child: new Text(
-              MyLocalizations.of(context).otpMessage,
-              textAlign: TextAlign.center,
-              style: subTitleWhiteLightOSR(),
-            ),
-          ),
-          InkWell(
-            onTap: () {
-              AuthService.resendOtp({"contactNumber": widget.mobileNumber})
-                  .then((value) {
-                if (value['response_data']['message'] != null) {
-                  showSnackbar(value['response_data']['message']);
-                }
-              }).catchError((error) {
-                showSnackbar(error);
-              });
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    'Resend OTP',
-                    style: textbarlowSemiBoldwhite(),
-                  )
+        key: _scaffoldKey,
+        backgroundColor: bg,
+        appBar:
+            authAppBarWithTitle(context, MyLocalizations.of(context).verifyOtp),
+        body: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Container(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                children: <Widget>[
+                  SizedBox(height: 15),
+                  buildLoginLogo(),
+                  buildTextField(),
+                  SizedBox(height: 55),
+                  buildButton(),
+                  SizedBox(height: 15),
+                  buildResendOtpButton(),
                 ],
               ),
             ),
-          )
-        ],
+          ),
+        ));
+  }
+
+  Widget buildLoginLogo() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        Image.asset(
+          'lib/assets/icons/auth.png',
+          width: 277.0,
+          height: 195,
+        ),
+        Container(
+            margin: EdgeInsets.only(top: 20, bottom: 10),
+            child: Text(
+              '${MyLocalizations.of(context).verifyOtp}',
+              textAlign: TextAlign.center,
+              style: textMuliSemiboldd(),
+            )),
+        Container(
+            margin: EdgeInsets.all(25),
+            child: Text(
+              MyLocalizations.of(context).otpMessage,
+              style: textMuliRegular(),
+              textAlign: TextAlign.center,
+            )),
+      ],
+    );
+  }
+
+  Widget buildTextField() {
+    return TextFormField(
+      keyboardType: TextInputType.number,
+      validator: (String value) {
+        if (value.isEmpty || value.length < 6) {
+          return MyLocalizations.of(context).otpErrorMessage;
+        } else
+          return null;
+      },
+      inputFormatters: [
+        LengthLimitingTextInputFormatter(6),
+      ],
+      onSaved: (value) {
+        otp = value;
+      },
+      style: textMuliRegular(),
+      decoration: InputDecoration(
+        labelText: MyLocalizations.of(context).otp,
+        labelStyle: textMuliSemiboldgrey(),
+        border: UnderlineInputBorder(
+          borderSide: BorderSide(color: secondary.withOpacity(0.5)),
+        ),
       ),
     );
   }
 
-  Widget _buildVerifyOTPButton() {
-    return Container(
-      padding: const EdgeInsets.all(14.0),
-      child: RawMaterialButton(
-        child: !isLoading
-            ? Container(
-                alignment: AlignmentDirectional.center,
-                margin: EdgeInsets.only(left: 5.0, right: 5.0),
-                height: 56.0,
-                decoration:
-                    BoxDecoration(border: Border.all(color: Colors.white70)),
-                child: Text(
-                  MyLocalizations.of(context).verifyOtp,
-                  style: subTitleWhiteShadeLightOSR(),
-                ),
-              )
-            : Container(
-                alignment: AlignmentDirectional.center,
-                margin: EdgeInsets.only(left: 5.0, right: 5.0),
-                height: 56.0,
-                decoration:
-                    BoxDecoration(border: Border.all(color: Colors.white70)),
-                child: Image.asset(
-                  'lib/assets/icon/spinner.gif',
-                  width: 40.0,
-                  height: 40.0,
-                ),
-              ),
-        onPressed: verifyOTP,
-      ),
+  Widget buildButton() {
+    return buildPrimaryHalfWidthButton(
+        context, MyLocalizations.of(context).verifyOtp, isLoading, verifyOTP);
+  }
+
+  Widget buildResendOtpButton() {
+    return InkWell(
+      onTap: () {
+        AuthService.resendOtp({"contactNumber": widget.mobileNumber})
+            .then((value) {
+          if (value['response_data']['message'] != null) {
+            showSnackbar(value['response_data']['message']);
+          }
+        }).catchError((error) {
+          showSnackbar(error);
+        });
+      },
+      child:
+          Text(MyLocalizations.of(context).resendOtp, style: textMuliRegular()),
     );
   }
 }

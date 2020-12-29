@@ -1,4 +1,4 @@
-import 'package:RestaurantSaas/screens/mains/home.dart';
+import 'package:RestaurantSaas/screens/mains/home/home.dart';
 import 'package:RestaurantSaas/services/common.dart';
 import 'package:RestaurantSaas/services/constant.dart';
 import 'package:RestaurantSaas/services/localizations.dart';
@@ -127,105 +127,105 @@ class _CurrentLocationState extends State<CurrentLocation> {
       bottomNavigationBar: position == null
           ? Container(height: 1)
           : Container(
-        padding: EdgeInsets.symmetric(horizontal: 22, vertical: 34),
-        decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                  color: Colors.black.withOpacity(0.1), blurRadius: 1)
-            ]),
-        child: InkWell(
-          onTap: _goToHomepage,
-          child: Container(
-            height: 41,
-            alignment: AlignmentDirectional.center,
-          decoration: BoxDecoration(
-          color: primary,
-        borderRadius: BorderRadius.circular(5),
-          boxShadow: [
-            BoxShadow(
-                color: Colors.black.withOpacity(0.1), blurRadius: 1)
-          ]),
-              child: Text(
-                  MyLocalizations.of(context).saveandProceed,
-                style: textMuliSemiboldwhite(),
-              )),
-        ),
-      ),
+              padding: EdgeInsets.symmetric(horizontal: 22, vertical: 34),
+              decoration: BoxDecoration(color: Colors.white, boxShadow: [
+                BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 1)
+              ]),
+              child: InkWell(
+                onTap: _goToHomepage,
+                child: Container(
+                    height: 41,
+                    alignment: AlignmentDirectional.center,
+                    decoration: BoxDecoration(
+                        color: primary,
+                        borderRadius: BorderRadius.circular(5),
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 1)
+                        ]),
+                    child: Text(
+                      MyLocalizations.of(context).saveandProceed,
+                      style: textMuliSemiboldwhite(),
+                    )),
+              ),
+            ),
     );
   }
 
   Widget buildSelectedlocation() {
-    return position == null ? Container() : Container(
-        width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.only(left: 10, right: 10),
-        height: 72,
-        decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                  color: Colors.black.withOpacity(0.1), blurRadius: 1)
+    return position == null
+        ? Container()
+        : Container(
+            width: MediaQuery.of(context).size.width,
+            padding: EdgeInsets.all(10),
+            height: 72,
+            decoration: BoxDecoration(color: bg, boxShadow: [
+              BoxShadow(color: Colors.black.withOpacity(0.26), blurRadius: 1)
             ]),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Row(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Image.asset(
-                  'lib/assets/icons/locationon.png',
-                  width: 19,
-                  height: 25,
+                Row(
+                  children: <Widget>[
+                    Image.asset(
+                      'lib/assets/icons/locationon.png',
+                      width: 19,
+                      height: 25,
+                    ),
+                    SizedBox(
+                      width: 6,
+                    ),
+                    Container(
+                        padding: EdgeInsets.only(left: 4),
+                        width: MediaQuery.of(context).size.width * 0.6,
+                        child: Text(
+                          position['name'],
+                          style: textMuliSemiboldmd(),
+                        ))
+                  ],
                 ),
-                SizedBox(width: 6,),
                 Container(
-                    padding: EdgeInsets.only(left: 4),
-                    width: MediaQuery.of(context).size.width * 0.7,
-                    child: Text(
-                      position['name'],
-                      style: textMuliSemiboldmd(),
-                    ))
+                  height: 26,
+                  child: RaisedButton(
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(5.0),
+                      ),
+                      onPressed: () {},
+                      child: Text(
+                        MyLocalizations.of(context).changeLocation,
+                        style: textMuliSemiboldprimarysm(),
+                      )),
+                )
               ],
-            ),
-            Container(
-              width: 74,
-              height: 26,
-              child: RaisedButton(
-                  color: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(5.0),
-                  ),
-                  onPressed: () {},
-                  child: Text(
-                    'Change',
-                    style: textMuliSemiboldprimarysm(),
-                  )),
-            )
-          ],
-        ));
+            ));
   }
 
   Widget buildSelectLocation() {
     return position != null
-        ? Container() : Container(
-      width: 217,
-      height: 41,
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
-                color: Colors.black.withOpacity(0.1), blurRadius: 6)
-          ]),
-      child: GFButton(
-          color: primary,
-          borderShape: RoundedRectangleBorder(
-            borderRadius: new BorderRadius.circular(5.0),
-          ),
-          onPressed: selectChangeLocationMethod,
-          icon: Image.asset("lib/assets/icon/location1.png", width: 20, height: 20),
-          child: Text(MyLocalizations.of(context).selectlocation,
-            style: textMuliSemiboldwhite(),
-          )),
-    );
+        ? Container()
+        : Container(
+            width: 217,
+            height: 41,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 6)
+                ]),
+            child: GFButton(
+                color: primary,
+                borderShape: RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(5.0),
+                ),
+                onPressed: selectChangeLocationMethod,
+                icon: Image.asset("lib/assets/icon/location1.png",
+                    width: 20, height: 20),
+                child: Text(
+                  MyLocalizations.of(context).selectlocation,
+                  style: textMuliSemiboldwhite(),
+                )),
+          );
   }
 
   void _getCurrentLocation() async {

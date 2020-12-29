@@ -1,19 +1,19 @@
 import 'dart:async';
 
-import 'package:RestaurantSaas/screens/mains/home.dart';
+import 'package:RestaurantSaas/screens/mains/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../screens/auth/login.dart';
-import '../../screens/mains/cart.dart';
-import '../../services/common.dart';
-import '../../services/localizations.dart';
-import '../../services/profile-service.dart';
-import '../../styles/styles.dart';
-import '../other/about-us.dart';
-import '../other/orders.dart';
-import '../other/profile.dart';
+import '../../auth/login.dart';
+import '../checkout/cart.dart';
+import '../../../services/common.dart';
+import '../../../services/localizations.dart';
+import '../../../services/profile-service.dart';
+import '../../../styles/styles.dart';
+import '../../other/about-us.dart';
+import '../orders/orders.dart';
+import '../../other/profile.dart';
 
 class DrawerPage extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
@@ -111,8 +111,7 @@ class _DrawerPageState extends State<DrawerPage> {
           Navigator.pop(context);
           Navigator.push(
             context,
-            MaterialPageRoute(
-                builder: (context) => navigateTo),
+            MaterialPageRoute(builder: (context) => navigateTo),
           );
         },
         child: Row(
@@ -143,7 +142,7 @@ class _DrawerPageState extends State<DrawerPage> {
           ListView(
             children: <Widget>[
               InkWell(
-                onTap:  () {
+                onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -205,29 +204,42 @@ class _DrawerPageState extends State<DrawerPage> {
               SizedBox(
                 height: 30,
               ),
-              titleRow('Home', 'lib/assets/icons/home.png', HomePage(
-                  locale: widget.locale,
-                  localizedValues: widget.localizedValues)),
+              titleRow(
+                  'Home',
+                  'lib/assets/icons/home.png',
+                  HomePage(
+                      locale: widget.locale,
+                      localizedValues: widget.localizedValues)),
               isLoggedIn
-                  ? titleRow('My Cart', 'lib/assets/icons/cart.png', CartPage(
-                  locale: widget.locale,
-                  localizedValues: widget.localizedValues))
+                  ? titleRow(
+                      'My Cart',
+                      'lib/assets/icons/cart.png',
+                      CartPage(
+                          locale: widget.locale,
+                          localizedValues: widget.localizedValues))
                   : Container(),
               isLoggedIn
-                  ? titleRow('Order History', 'lib/assets/icons/orders.png',
+                  ? titleRow(
+                      'Order History',
+                      'lib/assets/icons/orders.png',
                       OrdersPage(
                           locale: widget.locale,
                           localizedValues: widget.localizedValues))
                   : Container(),
               isLoggedIn
-                  ? titleRow('Profile', 'lib/assets/icons/fav.png',
-                  Profile(
-                      locale: widget.locale,
-                      localizedValues: widget.localizedValues))
+                  ? titleRow(
+                      'Profile',
+                      'lib/assets/icons/fav.png',
+                      Profile(
+                          locale: widget.locale,
+                          localizedValues: widget.localizedValues))
                   : Container(),
-              titleRow('About Us', 'lib/assets/icons/about.png', AboutUs(
-                  locale: widget.locale,
-                  localizedValues: widget.localizedValues)),
+              titleRow(
+                  'About Us',
+                  'lib/assets/icons/about.png',
+                  AboutUs(
+                      locale: widget.locale,
+                      localizedValues: widget.localizedValues)),
             ],
           ),
           Positioned(
@@ -249,27 +261,29 @@ class _DrawerPageState extends State<DrawerPage> {
                 ),
                 onPressed: () {
                   if (!isLoggedIn) {
-                      Navigator.pop(context);
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (BuildContext context) => LoginPage(
-                              locale: widget.locale,
-                              localizedValues: widget.localizedValues)));
+                    Navigator.pop(context);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (BuildContext context) => LoginPage(
+                                locale: widget.locale,
+                                localizedValues: widget.localizedValues)));
                   } else {
+                    if (mounted) {
+                      setState(() {
+                        isLoggedIn = true;
+                      });
+                    }
+                    Common.removeToken().then((onValue) {
+                      showSnackbar(
+                          MyLocalizations.of(context).logoutSuccessfully + '!');
+                      Navigator.pop(context);
                       if (mounted) {
                         setState(() {
-                          isLoggedIn = true;
+                          isLoggedIn = false;
                         });
                       }
-                      Common.removeToken().then((onValue) {
-                        showSnackbar(
-                            MyLocalizations.of(context).logoutSuccessfully + '!');
-                        Navigator.pop(context);
-                        if (mounted) {
-                          setState(() {
-                            isLoggedIn = false;
-                          });
-                        }
-                      });
+                    });
                   }
                 },
                 child: Text(

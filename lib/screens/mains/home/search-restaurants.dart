@@ -1,4 +1,4 @@
-import 'package:RestaurantSaas/screens/mains/home.dart';
+import 'package:RestaurantSaas/screens/mains/home/home.dart';
 import 'package:RestaurantSaas/services/localizations.dart';
 import 'package:flutter/material.dart';
 
@@ -59,7 +59,7 @@ class RestaurantSearch extends SearchDelegate<String> {
                               localizedValues,
                               locale);
                         },
-                        child:  Text('hhhh'),
+                        child: Text('hhhh'),
                         // HomePageState.buildCardBottom(
                         //     searchedList[index]['locationName'],
                         //     searchedList[index]['restaurantID']['logo'],

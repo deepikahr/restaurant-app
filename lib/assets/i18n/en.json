@@ -276,5 +276,6 @@
   "same": "Same",
   "different": "Different",
   "changeLocation": "Change Location",
-  "dragMapPin": "Drag the map to select a location or click search"
+  "dragMapPin": "Drag the map to select a location or click search",
+  "resendOtp": "Resend OTP"
 }

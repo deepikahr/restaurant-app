@@ -7,11 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../services/localizations.dart';
-import '../../services/profile-service.dart';
-import '../../services/sentry-services.dart';
-import '../../styles/styles.dart';
-import '../../widgets/no-data.dart';
+import '../../../services/localizations.dart';
+import '../../../services/profile-service.dart';
+import '../../../services/sentry-services.dart';
+import '../../../styles/styles.dart';
+import '../../../widgets/no-data.dart';
 import 'package:getwidget/getwidget.dart';
 
 SentryError sentryError = new SentryError();
@@ -43,7 +43,6 @@ class OrderTrackState extends State<OrderTrack> {
     getGlobalSettingsData();
   }
 
-
   String currency = "";
 
   getGlobalSettingsData() async {
@@ -70,7 +69,10 @@ class OrderTrackState extends State<OrderTrack> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBarWithTitle(context, MyLocalizations.of(context).trackOrder,),
+      appBar: appBarWithTitle(
+        context,
+        MyLocalizations.of(context).trackOrder,
+      ),
       body: _retriveOrderTrack(),
     );
   }
@@ -100,135 +102,155 @@ class OrderTrackState extends State<OrderTrack> {
         itemBuilder: (BuildContext context, int index) {
           return SingleChildScrollView(
               child: Container(
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                      padding: EdgeInsets.only(left: 15, right: 15),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                          order['productDetails'][0]['imageUrl'] != null
-                              ? ClipRRect(
-                            borderRadius: BorderRadius.circular(4),
-                            child: Image.network(
-                              order['productDetails'][0]['imageUrl'],
-                              width: 45,
-                              height: 45, fit: BoxFit.cover,
-                            ),
-                          )
-                              : Image.asset("lib/assets/bgImgs/loginbg.png",   width: 45,
-                            height: 45, fit: BoxFit.cover,),
-                          SizedBox(width: 5),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Text(
-                          order['productDetails'][0]['restaurant'],
-                                style: textMuliSemiboldm(),
+            child: Column(
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.only(left: 15, right: 15),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      order['productDetails'][0]['imageUrl'] != null
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: Image.network(
+                                order['productDetails'][0]['imageUrl'],
+                                width: 45,
+                                height: 45,
+                                fit: BoxFit.cover,
                               ),
-                              Text(
-                                  MyLocalizations.of(context).type +
-                                      ": " +
-                                      order['orderType'],
-                                style: textMuliRegularxswithop(),
-                              )
-                            ],
+                            )
+                          : Image.asset(
+                              "lib/assets/bgImgs/loginbg.png",
+                              width: 45,
+                              height: 45,
+                              fit: BoxFit.cover,
+                            ),
+                      SizedBox(width: 5),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            order['productDetails'][0]['restaurant'],
+                            style: textMuliSemiboldm(),
+                          ),
+                          Text(
+                            MyLocalizations.of(context).type +
+                                ": " +
+                                order['orderType'],
+                            style: textMuliRegularxswithop(),
                           )
                         ],
+                      )
+                    ],
+                  ),
+                ),
+                SizedBox(height: 10),
+                Container(
+                  padding: EdgeInsets.only(bottom: 5, left: 15, right: 15),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          Text(
+                            '${MyLocalizations.of(context).orderID} : ',
+                            style: textMuliRegularxswithop(),
+                          ),
+                          Text(
+                            order['orderID'].toString(),
+                            style: textMuliRegularxswithop(),
+                          ),
+                        ],
                       ),
-                    ),
-                    SizedBox(height: 10),
-                    Container(
-                      padding: EdgeInsets.only(bottom: 5, left: 15, right: 15),
-                      child: Row(
+                      Row(
+                        children: <Widget>[
+                          Text(
+                            'Order On :',
+                            style: textMuliRegularxswithop(),
+                          ),
+                          Text(
+                            order['createdAtTime'] == null
+                                ? ""
+                                : DateFormat('dd-MMM-yy hh:mm a').format(
+                                    new DateTime.fromMillisecondsSinceEpoch(
+                                        order['createdAtTime']),
+                                  ),
+                            style: textMuliRegularxswithop(),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: <Widget>[
+                          Text(
+                            '${MyLocalizations.of(context).status} :',
+                            style: textMuliRegularxsgreen(),
+                          ),
+                          Text(
+                            status,
+                            style: textMuliRegularxsgreen(),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+                Container(
+                    padding: EdgeInsets.only(
+                        bottom: 10, left: 15, right: 15, top: 10),
+                    child: MySeparator(color: secondary.withOpacity(0.2))),
+                ListView.builder(
+                    itemCount: order['productDetails'].length,
+                    physics: ScrollPhysics(),
+                    shrinkWrap: true,
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    itemBuilder: (BuildContext context, int index) {
+                      return Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          Row(
-                            children: <Widget>[
-                              Text(
-                                '${MyLocalizations.of(context).orderID} : ',
-                                style: textMuliRegularxswithop(),
-                              ),
-                              Text(
-                                order['orderID'].toString(),
-                                style: textMuliRegularxswithop(),
-                              ),
-                            ],
+                          Text(
+                            order['productDetails'][index]['title'],
+                            style: textMuliSemiboldxs(),
                           ),
-                          Row(
-                            children: <Widget>[
-                              Text(
-                                'Order On :',
-                                style: textMuliRegularxswithop(),
-                              ),
-                              Text(
-                                order['createdAtTime'] == null
-                                    ? ""
-                                    : DateFormat('dd-MMM-yy hh:mm a').format(
-                                  new DateTime.fromMillisecondsSinceEpoch(
-                                      order['createdAtTime']),
-                                ),
-                                style: textMuliRegularxswithop(),
-                              ),
-                            ],
+                          Text(
+                            '$currency' +
+                                order['productDetails'][index]['totalPrice']
+                                    .toStringAsFixed(2),
+                            style: textMuliSemiboldxs(),
                           ),
-                          Row(
-                            children: <Widget>[
-                              Text(
-                                '${MyLocalizations.of(context).status} :',
-                                style: textMuliRegularxsgreen(),
-                              ),
-                              Text(
-                                status,
-                                style: textMuliRegularxsgreen(),
-                              ),
-                            ],
-                          )
                         ],
-                      ),
+                      );
+                    }),
+                order['orderType'] == 'Pickup'
+                    ? Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text(
+                      '${MyLocalizations.of(context).pickUpTime} : ',
+                      style: textMuliSemiboldxsgreen(),
                     ),
-                    Container(
-                        padding: EdgeInsets.only(
-                            bottom: 10, left: 15, right: 15, top: 10),
-                        child: MySeparator(color: secondary.withOpacity(0.2))),
-                    ListView.builder(
-                        itemCount: order['productDetails'].length,
-                        physics: ScrollPhysics(),
-                        shrinkWrap: true,
-                        padding: EdgeInsets.symmetric(horizontal: 16),
-                        itemBuilder: (BuildContext context, int index) {
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Text(
-                                order['productDetails'][index]['title'],
-                                style: textMuliSemiboldxs(),
-                              ),
-                              Text(
-                                '$currency' +
-                                    order['productDetails'][index]['totalPrice']
-                                        .toStringAsFixed(2),
-                                style: textMuliSemiboldxs(),
-                              ),
-                            ],
-                          );
-                        }),
-                    SizedBox(height: 20),
-                    orderTrack(order),
+                    Text(
+                      '${order['pickupDate'] == null ? "" : order['pickupDate']} '
+                          ' ${order['pickupTime'] == null ? "" : order['pickupTime']}',
+                      style: textMuliSemiboldxsgreen(),
+                    ),
                   ],
-                ),
-              ));
+                )
+                    : Container(),
+                SizedBox(height: 20),
+                orderTrack(order),
+              ],
+            ),
+          ));
         });
   }
 
   Widget orderTrack(order) {
-    return  ListView.builder(
+    return ListView.builder(
         itemCount: order['userNotification'].length,
         physics: ScrollPhysics(),
         shrinkWrap: true,
         padding: EdgeInsets.symmetric(horizontal: 16),
         itemBuilder: (BuildContext context, int index) {
-
           String status;
           if (order['userNotification'][index]['status'] == "Pending") {
             status = MyLocalizations.of(context).pending;
@@ -270,11 +292,9 @@ class OrderTrackState extends State<OrderTrack> {
               style: textMuliSemiboldgreen(),
             ),
             subtitle: Text(
-                DateFormat('dd-MMM-yy hh:mm a').format(
-                    new DateTime.fromMillisecondsSinceEpoch(
-                        order['userNotification'][index]
-                        ['time'] ??
-                            0)),
+              DateFormat('dd-MMM-yy hh:mm a').format(
+                  new DateTime.fromMillisecondsSinceEpoch(
+                      order['userNotification'][index]['time'] ?? 0)),
               style: textMuliRegularsm(),
             ),
             icon: Padding(
@@ -288,7 +308,6 @@ class OrderTrackState extends State<OrderTrack> {
           );
         });
   }
-
 
   static String readTimestamp(int timestamp, context) {
     var now = new DateTime.now();
@@ -373,6 +392,3 @@ class MySeparator extends StatelessWidget {
     );
   }
 }
-
-
-

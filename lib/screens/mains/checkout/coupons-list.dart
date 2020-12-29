@@ -1,13 +1,14 @@
 import 'dart:async';
 
+import 'package:RestaurantSaas/widgets/appbar.dart';
 import 'package:async_loader/async_loader.dart';
 import 'package:flutter/material.dart';
 
-import '../../services/localizations.dart';
-import '../../services/main-service.dart';
-import '../../services/sentry-services.dart';
-import '../../styles/styles.dart';
-import '../../widgets/no-data.dart';
+import '../../../services/localizations.dart';
+import '../../../services/main-service.dart';
+import '../../../services/sentry-services.dart';
+import '../../../styles/styles.dart';
+import '../../../widgets/no-data.dart';
 
 SentryError sentryError = new SentryError();
 
@@ -35,23 +36,7 @@ class _CouponsListState extends State<CouponsList> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: whiteTextb,
-      appBar: AppBar(
-        leading: InkWell(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Icon(
-            Icons.arrow_back,
-            color: Colors.white,
-          ),
-        ),
-        backgroundColor: primary,
-        title: new Text(
-          MyLocalizations.of(context).coupon,
-          style: textbarlowSemiBoldWhite(),
-        ),
-        centerTitle: true,
-      ),
+      appBar: appBarWithTitle(context, MyLocalizations.of(context).coupon),
       body: AsyncLoader(
         key: _asyncLoaderState,
         initState: () async => await getCouponsByLocationId(),
@@ -70,6 +55,7 @@ class _CouponsListState extends State<CouponsList> {
                 physics: ScrollPhysics(),
                 shrinkWrap: true,
                 itemCount: data.length,
+                padding: EdgeInsets.all(12),
                 itemBuilder: (BuildContext context, int index) {
                   return couponCard(
                     data[index],

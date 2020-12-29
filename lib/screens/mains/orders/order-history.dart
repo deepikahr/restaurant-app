@@ -2,11 +2,11 @@ import 'package:async_loader/async_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../screens/other/order-upcoming.dart';
-import '../../services/localizations.dart';
-import '../../services/profile-service.dart';
-import '../../services/sentry-services.dart';
-import '../../widgets/no-data.dart';
+import 'order-upcoming.dart';
+import '../../../services/localizations.dart';
+import '../../../services/profile-service.dart';
+import '../../../services/sentry-services.dart';
+import '../../../widgets/no-data.dart';
 
 SentryError sentryError = new SentryError();
 

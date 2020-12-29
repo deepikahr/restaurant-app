@@ -19,7 +19,6 @@ final blacktext = const Color(0xFF272A3F);
 final bgColor = const Color(0xFFefefef);
 final bg = const Color(0xFFF6F6F6);
 
-
 final darkTexta = const Color(0xFF333333);
 final darkTextb = const Color(0xFF343434);
 final darkTextc = const Color(0xFFbab6b8);
@@ -1086,7 +1085,6 @@ TextStyle textregulargreen() {
   );
 }
 
-
 /////////////////////////////////////////////// new //////////////////////////////////////////////////
 
 //..................................Muli Bold ....................................
@@ -1152,6 +1150,14 @@ TextStyle textMuliRegularxs() {
 TextStyle textMuliRegularxsgreen() {
   return TextStyle(
     fontSize: 10.0,
+    color: Color(0xFF20C978),
+    fontFamily: 'MuliRegular',
+  );
+}
+
+TextStyle textMuliRegularMgreen() {
+  return TextStyle(
+    fontSize: 16.0,
     color: Color(0xFF20C978),
     fontFamily: 'MuliRegular',
   );
@@ -1329,7 +1335,6 @@ TextStyle textMuliSemiboldsec() {
   );
 }
 
-
 TextStyle textMuliSemiboldgrey() {
   return TextStyle(
     fontSize: 16.0,
@@ -1337,7 +1342,6 @@ TextStyle textMuliSemiboldgrey() {
     fontFamily: 'MuliRegular',
   );
 }
-
 
 TextStyle textMuliSemiboldwhitee() {
   return TextStyle(

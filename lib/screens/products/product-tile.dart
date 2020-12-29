@@ -1,5 +1,5 @@
 import 'package:RestaurantSaas/screens/auth/login.dart';
-import 'package:RestaurantSaas/screens/mains/product-details.dart';
+import 'package:RestaurantSaas/screens/products/product-details.dart';
 import 'package:RestaurantSaas/services/common.dart';
 import 'package:RestaurantSaas/services/localizations.dart';
 import 'package:RestaurantSaas/styles/styles.dart';

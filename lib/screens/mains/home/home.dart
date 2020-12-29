@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'package:RestaurantSaas/screens/mains/cusineBaseStore.dart';
-import 'package:RestaurantSaas/screens/other/search-restaurants.dart';
+import 'package:RestaurantSaas/screens/products/cusineBaseStore.dart';
+import 'package:RestaurantSaas/screens/mains/home/search-restaurants.dart';
 import 'package:RestaurantSaas/screens/webView/web_view.dart';
 import 'package:RestaurantSaas/services/constant.dart';
 import 'package:RestaurantSaas/widgets/appbar.dart';
@@ -12,19 +12,19 @@ import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:getwidget/components/list_tile/gf_list_tile.dart';
 import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../services/common.dart';
-import '../../services/counter-service.dart';
-import '../../services/localizations.dart';
-import '../../services/main-service.dart';
-import '../../services/profile-service.dart';
-import '../../services/sentry-services.dart';
-import '../../styles/styles.dart';
-import '../../widgets/no-data.dart';
-import '../mains/product-list.dart';
-import 'cart.dart';
-import 'cuisine-list.dart';
+import '../../../services/common.dart';
+import '../../../services/counter-service.dart';
+import '../../../services/localizations.dart';
+import '../../../services/main-service.dart';
+import '../../../services/profile-service.dart';
+import '../../../services/sentry-services.dart';
+import '../../../styles/styles.dart';
+import '../../../widgets/no-data.dart';
+import '../../products/product-list.dart';
+import '../checkout/cart.dart';
+import '../../products/cuisine-list.dart';
 import 'drawer.dart';
-import 'restaurant-list.dart';
+import '../../products/restaurant-list.dart';
 
 SentryError sentryError = new SentryError();
 
@@ -306,23 +306,29 @@ class HomePageState extends State<HomePage> {
     });
 
     Widget appBar() {
-      return homeAppbar(context, isNearByRestaurants, () {
-        showSearch(
-            context: context,
-            delegate: RestaurantSearch(
-                locale: widget.locale,
-                localizedValues: widget.localizedValues,
-                restaurantList: nearByRestaurentsList));
-      }, cartCount, () {
-        Navigator.push(
+      return homeAppbar(
           context,
-          MaterialPageRoute(
-            builder: (BuildContext context) => CartPage(
-                localizedValues: widget.localizedValues,
-                locale: widget.locale),
-          ),
-        );
-      });
+          isNearByRestaurants,
+          () {
+            showSearch(
+                context: context,
+                delegate: RestaurantSearch(
+                    locale: widget.locale,
+                    localizedValues: widget.localizedValues,
+                    restaurantList: nearByRestaurentsList));
+          },
+          cartCount,
+          () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (BuildContext context) => CartPage(
+                    localizedValues: widget.localizedValues,
+                    locale: widget.locale),
+              ),
+            );
+          },
+          scaffoldKey);
     }
 
     return Scaffold(
@@ -717,40 +723,49 @@ class HomePageState extends State<HomePage> {
           }
           return ((topRatedRestaurantsList?.length ?? 0) > 0)
               ? Container(
-            height: 245,
-                width: MediaQuery.of(context).size.width,
-                child: GridView.builder(
-                    physics: ScrollPhysics(),
-                    shrinkWrap: true,
-                    scrollDirection: Axis.horizontal,
-                    gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
-                      mainAxisSpacing: 12,
-                        crossAxisSpacing: 12,
-                        childAspectRatio: MediaQuery.of(context).size.width / MediaQuery.of(context).size.height * 0.7,
-                        crossAxisCount: 2),
-                    itemCount:
-                        topRatedRestaurantsList.length < int.parse(itemCount)
-                            ? topRatedRestaurantsList.length
-                            : int.parse(itemCount),
-                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 16),
-                    itemBuilder: (BuildContext context, int index) {
-                      return InkWell(
-                          child: restaurantCard(context, topRatedRestaurantsList[index], MyLocalizations.of(context).topRatedRestaurants),
-                          // buildRestaurantCard(
-                          //     topRatedRestaurantsList[index],
-                          //     review,
-                          //     branches,
-                          //     false),
-                          onTap: () {
-                            goToProductListPage(
+                  height: 245,
+                  width: MediaQuery.of(context).size.width,
+                  child: GridView.builder(
+                      physics: ScrollPhysics(),
+                      shrinkWrap: true,
+                      scrollDirection: Axis.horizontal,
+                      gridDelegate:
+                          new SliverGridDelegateWithFixedCrossAxisCount(
+                              mainAxisSpacing: 12,
+                              crossAxisSpacing: 12,
+                              childAspectRatio:
+                                  MediaQuery.of(context).size.width /
+                                      MediaQuery.of(context).size.height *
+                                      0.7,
+                              crossAxisCount: 2),
+                      itemCount:
+                          topRatedRestaurantsList.length < int.parse(itemCount)
+                              ? topRatedRestaurantsList.length
+                              : int.parse(itemCount),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 6, vertical: 16),
+                      itemBuilder: (BuildContext context, int index) {
+                        return InkWell(
+                            child: restaurantCard(
                                 context,
                                 topRatedRestaurantsList[index],
-                                false,
-                                widget.localizedValues,
-                                widget.locale);
-                          });
-                    }),
-              )
+                                MyLocalizations.of(context)
+                                    .topRatedRestaurants),
+                            // buildRestaurantCard(
+                            //     topRatedRestaurantsList[index],
+                            //     review,
+                            //     branches,
+                            //     false),
+                            onTap: () {
+                              goToProductListPage(
+                                  context,
+                                  topRatedRestaurantsList[index],
+                                  false,
+                                  widget.localizedValues,
+                                  widget.locale);
+                            });
+                      }),
+                )
               : Container();
         });
   }
@@ -773,37 +788,50 @@ class HomePageState extends State<HomePage> {
           }
           return ((newlyArrivedRestaurantsList?.length ?? 0) > 0)
               ? Container(
-            height: 245,
-            width: MediaQuery.of(context).size.width,
-                child: GridView.builder(
-                physics: ScrollPhysics(),
-                shrinkWrap: true,
-                scrollDirection: Axis.horizontal,
-                gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
-                    mainAxisSpacing: 12,
-                    crossAxisSpacing: 12,
-                    childAspectRatio: MediaQuery.of(context).size.width / MediaQuery.of(context).size.height * 0.7,
-                    crossAxisCount: 2),
-                itemCount: newlyArrivedRestaurantsList.length < int.parse(itemCount)
-                    ? newlyArrivedRestaurantsList.length
-                    : int.parse(itemCount),
-                padding: EdgeInsets.symmetric(horizontal: 6, vertical: 16),
-                itemBuilder: (BuildContext context, int index) {
-                  return InkWell(
-                      child:
-                      restaurantCard(context, newlyArrivedRestaurantsList[index], MyLocalizations.of(context).newlyArrived ),
-                      // buildRestaurantCard(newlyArrivedRestaurantsList[index], review, branches, false),
-                      onTap: () {
-                        if (mounted) {
-                          setState(() {
-                            restaurantInfo = newlyArrivedRestaurantsList[index];
-                          });
-                          goToProductListPage(context, newlyArrivedRestaurantsList[index], false,
-                              widget.localizedValues, widget.locale);
-                        }
-                      });
-                }),
-              )
+                  height: 245,
+                  width: MediaQuery.of(context).size.width,
+                  child: GridView.builder(
+                      physics: ScrollPhysics(),
+                      shrinkWrap: true,
+                      scrollDirection: Axis.horizontal,
+                      gridDelegate:
+                          new SliverGridDelegateWithFixedCrossAxisCount(
+                              mainAxisSpacing: 12,
+                              crossAxisSpacing: 12,
+                              childAspectRatio:
+                                  MediaQuery.of(context).size.width /
+                                      MediaQuery.of(context).size.height *
+                                      0.7,
+                              crossAxisCount: 2),
+                      itemCount: newlyArrivedRestaurantsList.length <
+                              int.parse(itemCount)
+                          ? newlyArrivedRestaurantsList.length
+                          : int.parse(itemCount),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 6, vertical: 16),
+                      itemBuilder: (BuildContext context, int index) {
+                        return InkWell(
+                            child: restaurantCard(
+                                context,
+                                newlyArrivedRestaurantsList[index],
+                                MyLocalizations.of(context).newlyArrived),
+                            // buildRestaurantCard(newlyArrivedRestaurantsList[index], review, branches, false),
+                            onTap: () {
+                              if (mounted) {
+                                setState(() {
+                                  restaurantInfo =
+                                      newlyArrivedRestaurantsList[index];
+                                });
+                                goToProductListPage(
+                                    context,
+                                    newlyArrivedRestaurantsList[index],
+                                    false,
+                                    widget.localizedValues,
+                                    widget.locale);
+                              }
+                            });
+                      }),
+                )
               : Container();
         });
   }
@@ -840,151 +868,6 @@ class HomePageState extends State<HomePage> {
       ),
     );
   }
-
-  // static Widget buildRestaurantCard(info, review, branches) {
-  //   // print('info $info');
-  //   return Container(
-  //     margin: EdgeInsets.all(5),
-  //     child: Column(
-  //       children: <Widget>[
-  //         buildCardImg(info),
-  //         buildCardBottom(
-  //             info['restaurantID']['restaurantName'],
-  //             info['rating'] ?? 0,
-  //             info['locationCount'],
-  //             info['reviewCount'] ?? 0,
-  //             review,
-  //             branches),
-  //       ],
-  //     ),
-  //   );
-  // }
-  //
-  // static Widget buildCardImg(info) {
-  //   return Container(
-  //     padding: EdgeInsets.all(0.0),
-  //     height: 120.0,
-  //     width: 180.0,
-  //     decoration: getBgDecoration(info['logo'] ?? null),
-  //     child: null, //buildFavIcon(),
-  //   );
-  // }
-  //
-  // static Decoration getBgDecoration(imgUrl) {
-  //   return BoxDecoration(
-  //     image: DecorationImage(
-  //         image: imgUrl != null
-  //             ? NetworkImage(imgUrl)
-  //             : AssetImage('lib/assets/imgs/na.jpg'),
-  //         repeat: ImageRepeat.noRepeat,
-  //         matchTextDirection: false,
-  //         alignment: Alignment.center,
-  //         fit: BoxFit.cover,
-  //         colorFilter: ColorFilter.mode(
-  //             Colors.black.withOpacity(0.2), BlendMode.darken)),
-  //   );
-  // }
-
-  // Widget buildFavIcon() {
-  //   return Container(
-  //     alignment: FractionalOffset.topRight,
-  //     padding: EdgeInsets.only(right: 5.0),
-  //     child: IconButton(
-  //         icon: const Icon(Icons.favorite, semanticLabel: 'Favorite'),
-  //         iconSize: 30.0,
-  //         onPressed: () {},
-  //         color: Colors.white),
-  //   );
-  // }
-
-  // static Widget buildCardBottom(String restaurantName, double rating,
-  //     int locationCounter, int reviews, String review, branches) {
-  //   return Container(
-  //     padding: EdgeInsets.only(left: 6.0, top: 6),
-  //     child: Row(
-  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: <Widget>[
-  //         Column(
-  //           crossAxisAlignment: CrossAxisAlignment.start,
-  //           children: <Widget>[
-  //             Text(
-  //               restaurantName,
-  //               maxLines: 2,
-  //               overflow: TextOverflow.ellipsis,
-  //               style: textMuliSemiboldsm(),
-  //             ),
-  //             locationCounter != null
-  //                 ? Text(
-  //                     locationCounter.toString() + ' $branches',
-  //                     overflow: TextOverflow.ellipsis,
-  //                     maxLines: 2,
-  //                     style: textMuliRegularxs(),
-  //                   )
-  //                 : Container(),
-  //           ],
-  //         ),
-  //         Flexible(
-  //           child: rating > 0
-  //               ? Column(
-  //                   children: <Widget>[
-  //                     Row(
-  //                       children: <Widget>[
-  //                         Text(
-  //                           " " + rating.toStringAsFixed(1) + " ",
-  //                           // style: priceDescription()
-  //                         ),
-  //                         Icon(Icons.star, color: primary, size: 16.0),
-  //                       ],
-  //                     ),
-  //                     Text(
-  //                       '(' + reviews.toString() + ') ' + review,
-  //                       // style: hintStyleSmallTextDarkOSR(),
-  //                       overflow: TextOverflow.ellipsis,
-  //                     )
-  //                   ],
-  //                 )
-  //               : Text(''),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
-  // void _showBottomSheet() {
-  //   if (mounted) {
-  //     setState(() {
-  //       showBottomSheetCallback = null;
-  //     });
-  //   }
-  //   scaffoldKey.currentState
-  //       .showBottomSheet<void>((BuildContext context) {
-  //     return Container(
-  //       decoration: BoxDecoration(
-  //         // border: Border(
-  //         //   top: BorderSide(color: primary, width: 6.0),
-  //         // ),
-  //           boxShadow: [
-  //             BoxShadow(color: Colors.black.withOpacity(0.4), blurRadius: 5)
-  //           ]),
-  //       child: LocationListSheet(
-  //         restaurantInfo: restaurantInfo,
-  //         localizedValues: widget.localizedValues,
-  //         locale: widget.locale,
-  //       ),
-  //     );
-  //   })
-  //       .closed
-  //       .whenComplete(() {
-  //     if (mounted) {
-  //       if (mounted) {
-  //         setState(() {
-  //           showBottomSheetCallback = _showBottomSheet;
-  //         });
-  //       }
-  //     }
-  //   });
-  // }
 
   void goToProductListPage(
       context, data, isNearByRestaurant, localizedValues, locale) {

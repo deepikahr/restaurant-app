@@ -4,7 +4,7 @@ import 'package:RestaurantSaas/services/utils.dart';
 import 'package:RestaurantSaas/styles/styles.dart';
 import 'package:flutter/material.dart';
 
-import 'flavour-list1.dart';
+import '../other/flavour-list1.dart';
 
 SentryError sentryError = new SentryError();
 
@@ -269,7 +269,7 @@ class _BottomSheetClassDryCleanState extends State<BottomSheetClassDryClean> {
         context,
         MaterialPageRoute(
             builder: (BuildContext context) => FlavourPage(
-              shippingType: widget.shippingType,
+                  shippingType: widget.shippingType,
                   deliveryCharge: widget.deliveryCharge,
                   minimumOrderAmount: widget.minimumOrderAmount,
                   cartProduct: cartProduct,

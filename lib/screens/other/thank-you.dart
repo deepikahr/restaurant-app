@@ -1,4 +1,4 @@
-import 'package:RestaurantSaas/screens/mains/home.dart';
+import 'package:RestaurantSaas/screens/mains/home/home.dart';
 import 'package:flutter/material.dart';
 
 import '../../services/common.dart';
@@ -32,11 +32,10 @@ class _ThankYouState extends State<ThankYou> {
             SizedBox(height: MediaQuery.of(context).size.height * 0.27),
             Center(
                 child: Image.asset(
-                  'lib/assets/images/thnku.png',
-                  width: 226,
-                  height: 114,
-                )
-            ),
+              'lib/assets/images/thnku.png',
+              width: 226,
+              height: 114,
+            )),
             SizedBox(height: 6),
             Text(
               'Order Placed!',
@@ -70,10 +69,10 @@ class _ThankYouState extends State<ThankYou> {
                 context,
                 MaterialPageRoute(
                     builder: (BuildContext context) => HomePage(
-                      localizedValues: widget.localizedValues,
-                      locale: widget.locale,
-                    )),
-                    (Route<dynamic> route) => false);
+                          localizedValues: widget.localizedValues,
+                          locale: widget.locale,
+                        )),
+                (Route<dynamic> route) => false);
           },
           child: Text(
             'Home',

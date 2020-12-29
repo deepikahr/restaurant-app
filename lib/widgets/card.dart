@@ -1,5 +1,5 @@
-import 'package:RestaurantSaas/screens/other/order-details.dart';
-import 'package:RestaurantSaas/screens/other/order-track.dart';
+import 'package:RestaurantSaas/screens/mains/orders/order-details.dart';
+import 'package:RestaurantSaas/screens/mains/orders/order-track.dart';
 import 'package:RestaurantSaas/services/localizations.dart';
 import 'package:RestaurantSaas/styles/styles.dart';
 import 'package:flutter/material.dart';
@@ -41,18 +41,19 @@ Widget restaurantCard(BuildContext context, info, title) {
             ),
             SizedBox(height: 5),
             Text(
-              '${info['Locations']['locationName']}',
+              title == MyLocalizations.of(context).restaurantsNearYou ?
+              '${info['locationName']}' : '${info['Locations']['locationName']}' ,
               overflow: TextOverflow.ellipsis,
               maxLines: 2,
               style: textMuliRegularxs(),
             ),
             SizedBox(height: 3),
-            Text(
-              'Closes at 11:30 pm',
-              overflow: TextOverflow.ellipsis,
-              maxLines: 2,
-              style: textMuliRegularxs(),
-            ),
+            // Text(
+            //   'Closes at 11:30 pm',
+            //   overflow: TextOverflow.ellipsis,
+            //   maxLines: 2,
+            //   style: textMuliRegularxs(),
+            // ),
             SizedBox(height: 3),
             Container(
               width: 30,
@@ -101,15 +102,20 @@ Widget orderCard(
           children: <Widget>[
             orderData['productDetails'][0]['imageUrl'] != null
                 ? ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-                  child: Image.network(
+                    borderRadius: BorderRadius.circular(4),
+                    child: Image.network(
                       orderData['productDetails'][0]['imageUrl'],
                       width: 45,
-                      height: 45, fit: BoxFit.cover,
+                      height: 45,
+                      fit: BoxFit.cover,
                     ),
-                )
-                : Image.asset("lib/assets/bgImgs/loginbg.png",   width: 45,
-              height: 45, fit: BoxFit.cover,),
+                  )
+                : Image.asset(
+                    "lib/assets/bgImgs/loginbg.png",
+                    width: 45,
+                    height: 45,
+                    fit: BoxFit.cover,
+                  ),
             SizedBox(width: 5),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -129,52 +135,52 @@ Widget orderCard(
           ],
         ),
         SizedBox(height: 14),
-         Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Text(
-                    'Order ID:',
-                    style: textMuliRegularxswithop(),
-                  ),
-                  Text(
-                    orderData['orderID'].toString(),
-                    style: textMuliRegularxswithop(),
-                  ),
-                ],
-              ),
-              Row(
-                children: <Widget>[
-                  Text(
-                    'Order On:',
-                    style: textMuliRegularxswithop(),
-                  ),
-                  Text(
-                    orderData['createdAtTime'] == null
-                        ? ""
-                        : DateFormat('dd-MMM-yy hh:mm a').format(
-                            new DateTime.fromMillisecondsSinceEpoch(
-                                orderData['createdAtTime']),
-                          ),
-                    style: textMuliRegularxswithop(),
-                  ),
-                ],
-              ),
-              Row(
-                children: <Widget>[
-                  Text(
-                    'status:',
-                    style: textMuliRegularxsgreen(),
-                  ),
-                  Text(
-                    orderData['status'],
-                    style: textMuliRegularxsgreen(),
-                  ),
-                ],
-              )
-            ],
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                Text(
+                  'Order ID:',
+                  style: textMuliRegularxswithop(),
+                ),
+                Text(
+                  orderData['orderID'].toString(),
+                  style: textMuliRegularxswithop(),
+                ),
+              ],
+            ),
+            Row(
+              children: <Widget>[
+                Text(
+                  'Order On:',
+                  style: textMuliRegularxswithop(),
+                ),
+                Text(
+                  orderData['createdAtTime'] == null
+                      ? ""
+                      : DateFormat('dd-MMM-yy hh:mm a').format(
+                          new DateTime.fromMillisecondsSinceEpoch(
+                              orderData['createdAtTime']),
+                        ),
+                  style: textMuliRegularxswithop(),
+                ),
+              ],
+            ),
+            Row(
+              children: <Widget>[
+                Text(
+                  'status:',
+                  style: textMuliRegularxsgreen(),
+                ),
+                Text(
+                  orderData['status'],
+                  style: textMuliRegularxsgreen(),
+                ),
+              ],
+            )
+          ],
+        ),
         SizedBox(height: 14),
         MySeparator(color: secondary.withOpacity(0.2)),
         SizedBox(height: 14),
@@ -258,10 +264,14 @@ Widget orderCard(
               )
             : Container(),
         SizedBox(height: 10),
-        Text("${MyLocalizations.of(context).paymentMode}: " +
-            (orderData['paymentOption'] == 'Stripe' || orderData['paymentOption'] == "CREDIT CARD"
-                ? 'CC'
-                : orderData['paymentOption']), style: textMuliSemiboldsec(),),
+        Text(
+          "${MyLocalizations.of(context).paymentMode}: " +
+              (orderData['paymentOption'] == 'Stripe' ||
+                      orderData['paymentOption'] == "CREDIT CARD"
+                  ? 'CC'
+                  : orderData['paymentOption']),
+          style: textMuliSemiboldsec(),
+        ),
         SizedBox(height: 10),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -293,7 +303,7 @@ Widget orderCard(
                       borderRadius: new BorderRadius.circular(5.0),
                       side: BorderSide(color: primary)),
                   onPressed: () {
-                    if (!isRatingAllowed) {
+                    if (isRatingAllowed) {
                       Navigator.push(
                         context,
                         MaterialPageRoute(

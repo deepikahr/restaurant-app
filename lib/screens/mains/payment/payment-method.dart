@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stripe_payment/stripe_payment.dart';
 
-import '../../services/common.dart';
-import '../../services/localizations.dart';
-import '../../services/profile-service.dart';
-import '../../services/sentry-services.dart';
-import '../../styles/styles.dart';
-import '../other/thank-you.dart';
+import '../../../services/common.dart';
+import '../../../services/localizations.dart';
+import '../../../services/profile-service.dart';
+import '../../../services/sentry-services.dart';
+import '../../../styles/styles.dart';
+import '../../other/thank-you.dart';
 
 SentryError sentryError = new SentryError();
 
@@ -271,35 +271,36 @@ class _PaymentMethodState extends State<PaymentMethod> {
               ),
             )
           : _buildPaymentMethodSelector(),
-      bottomNavigationBar:
-          (!isPaymentMethodLoading && !paymentMethodAvaiilableCon)
-              ? Container(
-                width: 335,
-                height: 41,
-                margin: EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 3)
-                    ]
+      bottomNavigationBar: (!isPaymentMethodLoading &&
+              !paymentMethodAvaiilableCon)
+          ? Container(
+              width: 335,
+              height: 41,
+              margin: EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.black.withOpacity(0.1), blurRadius: 3)
+                  ]),
+              child: RaisedButton(
+                color: primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(5.0),
                 ),
-                child: RaisedButton(
-                  color: primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(5.0),
-                  ),
-                  onPressed: _placeOrder,
-                  child: isPlaceOrderLoading
-                      ? Image.asset(
-                    'lib/assets/icon/spinner.gif',
-                    width: 10.0,
-                    height: 10.0,
-                  ) : Text(
-                      MyLocalizations.of(context).placeOrderNow,
-                    style: textMuliSemiboldwhite(),
-                  ),
-                ),
-              )
+                onPressed: _placeOrder,
+                child: isPlaceOrderLoading
+                    ? Image.asset(
+                        'lib/assets/icon/spinner.gif',
+                        width: 10.0,
+                        height: 10.0,
+                      )
+                    : Text(
+                        MyLocalizations.of(context).placeOrderNow,
+                        style: textMuliSemiboldwhite(),
+                      ),
+              ),
+            )
           // InkWell(
           //         onTap: _placeOrder,
           //         child: Container(
@@ -329,115 +330,120 @@ class _PaymentMethodState extends State<PaymentMethod> {
           //                 ),
           //         ),
           //       )
-              : Container(
-                  child: Text(""),
-                ),
+          : Container(
+              child: Text(""),
+            ),
     );
   }
 
   Widget _buildPaymentMethodSelector() {
     return ((paymentMethodList?.length ?? 0) > 0)
         ? ListView(
-      shrinkWrap: true,
-          children: [
-            Container(
-              margin: EdgeInsets.only(bottom: 10, top: 6 ),
-              padding: EdgeInsets.all(16),
-              color: Colors.white,
-              child: Container(
-                width: 335,
-                height: 41,
-                margin: EdgeInsets.all(6),
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                    color: Color(0xFF20C978),
-                    borderRadius: BorderRadius.circular(5),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.black.withOpacity(0.29), blurRadius: 5)
-                    ]),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
+            shrinkWrap: true,
+            children: [
+              Container(
+                margin: EdgeInsets.only(bottom: 10, top: 6),
+                padding: EdgeInsets.all(16),
+                color: Colors.white,
+                child: Container(
+                    width: 335,
+                    height: 41,
+                    margin: EdgeInsets.all(6),
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                        color: Color(0xFF20C978),
+                        borderRadius: BorderRadius.circular(5),
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.black.withOpacity(0.29),
+                              blurRadius: 5)
+                        ]),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text(
+                          'To Pay :',
+                          style: textMuliSemiboldwhitee(),
+                        ),
+                        Text(
+                          '$currency ${widget.cart['grandTotal'].toStringAsFixed(2)}',
+                          style: textMuliSemiboldwhitee(),
+                        ),
+                      ],
+                    )),
+              ),
+              Container(
+                margin: EdgeInsets.only(
+                  bottom: 10,
+                ),
+                padding: EdgeInsets.all(16),
+                color: Colors.white,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Text(
-                      'To Pay :',
-                      style: textMuliSemiboldwhitee(),
+                      "Choose Payment Method",
+                      style: textMuliSemiboldextra(),
                     ),
-                    Text(
-                      '$currency ${widget.cart['grandTotal'].toStringAsFixed(2)}',
-                      style: textMuliSemiboldwhitee(),
+                    SizedBox(height: 10),
+                    ListView.builder(
+                      physics: ScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: paymentMethodList.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return paymentMethodList[index]['isSelected'] == true
+                            ? Container(
+                                margin: EdgeInsets.all(8.0),
+                                color: Colors.white,
+                                child: RadioListTile(
+                                  controlAffinity:
+                                      ListTileControlAffinity.trailing,
+                                  value: index,
+                                  groupValue: groupValue,
+                                  selected: paymentMethodList[index]
+                                      ['isSelected'],
+                                  onChanged: (int selected) {
+                                    if (mounted) {
+                                      setState(() {
+                                        groupValue = selected;
+                                        widget.cart['paymentOption'] =
+                                            paymentMethodList[index]['type'];
+                                      });
+                                    }
+                                  },
+                                  activeColor: primary,
+                                  title: Text(
+                                    paymentMethodList[index]['type'] == "COD"
+                                        ? MyLocalizations.of(context).cod
+                                        : paymentMethodList[index]['type'] ==
+                                                "STRIPE"
+                                            ? "STRIPE"
+                                            : paymentMethodList[index]['type'],
+                                    style: textMuliRegular(),
+                                  ),
+                                  secondary:
+                                      paymentMethodList[index]['type'] == "COD"
+                                          ? Image.asset(
+                                              'lib/assets/images/cash.png',
+                                              height: 60,
+                                              width: 60,
+                                            )
+                                          : Image.asset(
+                                              'lib/assets/images/stripe.png',
+                                              height: 60,
+                                              width: 60,
+                                            ),
+                                ),
+                              )
+                            : Container();
+                      },
                     ),
                   ],
-                )
+                ),
               ),
-            ),
-            Container(
-              margin: EdgeInsets.only(bottom: 10,),
-              padding: EdgeInsets.all(16),
-              color: Colors.white,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Choose Payment Method",
-                    style: textMuliSemiboldextra(),
-                  ),
-                  SizedBox(height: 10),
-                  ListView.builder(
-                    physics: ScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: paymentMethodList.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return paymentMethodList[index]['isSelected'] == true
-                          ? Container(
-                              margin: EdgeInsets.all(8.0),
-                              color: Colors.white,
-                              child: RadioListTile(
-                                controlAffinity: ListTileControlAffinity.trailing,
-                                value: index,
-                                groupValue: groupValue,
-                                selected: paymentMethodList[index]['isSelected'],
-                                onChanged: (int selected) {
-                                  if (mounted) {
-                                    setState(() {
-                                      groupValue = selected;
-                                      widget.cart['paymentOption'] =
-                                          paymentMethodList[index]['type'];
-                                    });
-                                  }
-                                },
-                                activeColor: primary,
-                                title: Text(
-                                  paymentMethodList[index]['type'] == "COD"
-                                      ? MyLocalizations.of(context).cod
-                                      : paymentMethodList[index]['type'] ==
-                                              "STRIPE"
-                                          ? "STRIPE"
-                                          : paymentMethodList[index]['type'],
-                                  style: textMuliRegular(),
-                                ),
-                                secondary:
-                                    paymentMethodList[index]['type'] == "COD"
-                                        ? Image.asset(
-                                      'lib/assets/images/cash.png',
-                                      height: 60,
-                                      width: 60,
-                                    ) : Image.asset(
-                                      'lib/assets/images/stripe.png',
-                                      height: 60,
-                                      width: 60,
-                                    ),
-                              ),
-                            )
-                          : Container();
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ],
-        )
+            ],
+          )
         : Container(
             padding: EdgeInsets.all(60),
             child: NoData(

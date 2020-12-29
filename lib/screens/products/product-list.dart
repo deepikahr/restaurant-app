@@ -1,4 +1,4 @@
-import 'package:RestaurantSaas/screens/other/product-tile.dart';
+import 'package:RestaurantSaas/screens/products/product-tile.dart';
 import 'package:RestaurantSaas/services/common.dart';
 import 'package:RestaurantSaas/services/profile-service.dart';
 import 'package:RestaurantSaas/widgets/appbar.dart';
@@ -14,7 +14,7 @@ import '../../services/main-service.dart';
 import '../../services/sentry-services.dart';
 import '../../styles/styles.dart';
 import '../../widgets/no-data.dart';
-import 'cart.dart';
+import '../mains/checkout/cart.dart';
 import 'package:getwidget/getwidget.dart';
 
 SentryError sentryError = new SentryError();
@@ -378,12 +378,22 @@ class ProductListPageState extends State<ProductListPage> {
         children: [
           Row(
             children: [
-              imgUrl != null ?
-        ClipRRect(child: Image.network(widget.imgUrl,
-        height: 65, fit: BoxFit.cover,
-        width: 65,
-      ), borderRadius: BorderRadius.circular(8), )
-        : Image.asset('lib/assets/images/dominos.png', height: 65, width: 65, fit: BoxFit.cover,),
+              imgUrl != null
+                  ? ClipRRect(
+                      child: Image.network(
+                        widget.imgUrl,
+                        height: 65,
+                        fit: BoxFit.cover,
+                        width: 65,
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    )
+                  : Image.asset(
+                      'lib/assets/images/dominos.png',
+                      height: 65,
+                      width: 65,
+                      fit: BoxFit.cover,
+                    ),
               SizedBox(
                 width: 12,
               ),
@@ -412,7 +422,8 @@ class ProductListPageState extends State<ProductListPage> {
                 mainAxisSpacing: 10,
                 childAspectRatio: MediaQuery.of(context).size.width / 498,
               ),
-              itemBuilder: (BuildContext context, int index) => BuildProductTile(
+              itemBuilder: (BuildContext context, int index) =>
+                  BuildProductTile(
                 locationId: widget.locationId,
                 isProductFirstDeliverFree: isProductFirstDeliverFree,
                 shippingType: shippingType,

@@ -1,7 +1,10 @@
 import 'dart:async';
 
+import 'package:RestaurantSaas/screens/auth/login.dart';
 import 'package:RestaurantSaas/screens/auth/otp-verify.dart';
 import 'package:RestaurantSaas/services/constant.dart';
+import 'package:RestaurantSaas/widgets/appbar.dart';
+import 'package:RestaurantSaas/widgets/button.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -115,280 +118,230 @@ class _RegisterFormState extends State<RegisterForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
-      backgroundColor: Color(0XFF303030),
-      appBar: AppBar(
-        leading: InkWell(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Icon(Icons.arrow_back, color: Colors.white),
-        ),
-        title: Text(
-          MyLocalizations.of(context).register,
-          style: textbarlowSemiBoldWhite(),
-        ),
-        centerTitle: true,
-        backgroundColor: primary,
-      ),
-      body: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: Column(
-              children: <Widget>[
-                _buildNameField(),
-                _buildCountryCode(),
-                _buildNumberField(),
-                _buildEmailField(),
-                _buildPasswordField(),
-                _buildTermsAndCondiField(),
-              ],
-            ),
-          ),
-        ),
-      ),
-      bottomNavigationBar: _buildRegisterButton(),
-    );
-  }
-
-  Widget _buildNameField() {
-    return Container(
-      margin: EdgeInsets.only(top: 14.0),
-      color: Colors.white,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Flexible(
-            fit: FlexFit.tight,
-            flex: 9,
-            child: TextFormField(
-              keyboardType: TextInputType.text,
-              validator: (String value) {
-                if (value.isEmpty) {
-                  return MyLocalizations.of(context).pleaseEnterValidName;
-                } else
-                  return null;
-              },
-              onChanged: (String value) {
-                register['name'] = value;
-              },
-              decoration: new InputDecoration(
-                labelText: MyLocalizations.of(context).fullName,
-                hintStyle: hintStyleGreyLightOSR(),
-                contentPadding: EdgeInsets.all(12.0),
-                border: InputBorder.none,
+        key: _scaffoldKey,
+        backgroundColor: Colors.white,
+        appBar:
+            authAppBarWithTitle(context, MyLocalizations.of(context).register),
+        body: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Container(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                children: <Widget>[
+                  SizedBox(height: 15),
+                  buildLoginLogo(),
+                  buildNameTextField(),
+                  SizedBox(height: 15),
+                  buildEmailTextField(),
+                  SizedBox(height: 15),
+                  Row(
+                    children: [
+                      _buildCountryCode(),
+                      SizedBox(
+                        width: 6,
+                      ),
+                      Expanded(child: buildMobileNumberTextField()),
+                    ],
+                  ),
+                  SizedBox(height: 15),
+                  buildPasswordTextField(),
+                  SizedBox(height: 15),
+                  _buildTermsAndConditionsField(),
+                  SizedBox(height: 35),
+                  buildRegisterButton(),
+                  SizedBox(height: 15),
+                  buildSignInButton(),
+                ],
               ),
             ),
           ),
-          Flexible(
-            fit: FlexFit.tight,
-            flex: 1,
-            child: Icon(Icons.person, size: 16.0, color: greyTextc),
-          ),
-        ],
+        ));
+  }
+
+  Widget buildLoginLogo() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        Image.asset(
+          'lib/assets/icons/auth.png',
+          width: 277.0,
+          height: 195,
+        ),
+        Container(
+            margin: EdgeInsets.only(top: 20, bottom: 20),
+            child: Text(
+              MyLocalizations.of(context).signUpNow,
+              style: textMuliSemiboldd(),
+            )),
+      ],
+    );
+  }
+
+  Widget buildNameTextField() {
+    return TextFormField(
+      keyboardType: TextInputType.text,
+      validator: (String value) {
+        if (value.isEmpty) {
+          return MyLocalizations.of(context).pleaseEnterValidName;
+        } else
+          return null;
+      },
+      onChanged: (String value) {
+        register['name'] = value;
+      },
+      style: textMuliRegular(),
+      decoration: InputDecoration(
+        labelText: MyLocalizations.of(context).fullName,
+        labelStyle: textMuliSemiboldgrey(),
+        border: UnderlineInputBorder(
+          borderSide: BorderSide(color: secondary.withOpacity(0.5)),
+        ),
+      ),
+    );
+  }
+
+  Widget buildEmailTextField() {
+    return TextFormField(
+      keyboardType: TextInputType.emailAddress,
+      validator: (String value) {
+        if ((value?.length ?? 0) > 0 &&
+            !RegExp(EMAIL_PATTERN).hasMatch(value)) {
+          return MyLocalizations.of(context).pleaseEnterValidEmail;
+        } else
+          return null;
+      },
+      onChanged: (String value) {
+        register['email'] = value;
+      },
+      style: textMuliRegular(),
+      decoration: InputDecoration(
+        labelText: MyLocalizations.of(context).emailId,
+        labelStyle: textMuliSemiboldgrey(),
+        border: UnderlineInputBorder(
+          borderSide: BorderSide(color: secondary.withOpacity(0.5)),
+        ),
+      ),
+    );
+  }
+
+  Widget buildMobileNumberTextField() {
+    return TextFormField(
+      keyboardType: TextInputType.number,
+      validator: (String value) {
+        if (value.isEmpty || value.length < 8) {
+          return MyLocalizations.of(context).pleaseEnterValidMobileNumber;
+        } else
+          return null;
+      },
+      onChanged: (String value) {
+        register['contactNumber'] = value;
+      },
+      style: textMuliRegular(),
+      decoration: InputDecoration(
+        labelText: MyLocalizations.of(context).mobileNumber,
+        labelStyle: textMuliSemiboldgrey(),
+        border: UnderlineInputBorder(
+          borderSide: BorderSide(color: secondary.withOpacity(0.5)),
+        ),
+      ),
+    );
+  }
+
+  Widget buildPasswordTextField() {
+    return TextFormField(
+      keyboardType: TextInputType.text,
+      obscureText: true,
+      validator: (String value) {
+        if (value.isEmpty || value.length < 6) {
+          return MyLocalizations.of(context).pleaseEnterValidPassword;
+        } else
+          return null;
+      },
+      onChanged: (String value) {
+        register['password'] = value;
+      },
+      style: textMuliRegular(),
+      decoration: InputDecoration(
+        labelText: MyLocalizations.of(context).yourPassword,
+        labelStyle: textMuliSemiboldgrey(),
+        border: UnderlineInputBorder(
+          borderSide: BorderSide(color: secondary.withOpacity(0.5)),
+        ),
       ),
     );
   }
 
   Widget _buildCountryCode() {
     return Container(
-      margin: EdgeInsets.only(top: 14.0),
-      color: Colors.white,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          CountryListPick(
-              initialSelection: '+91',
-              onChanged: (CountryCode code) {
-                register['countryCode'] = code.dialCode.substring(1).toString();
-              }),
-        ],
-      ),
+      margin: EdgeInsets.only(top: 11.0),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border(
+            bottom: BorderSide(color: secondary.withOpacity(0.5)),
+          )),
+      child: CountryListPick(
+          initialSelection: '+91',
+          onChanged: (CountryCode code) {
+            register['countryCode'] = code.dialCode.substring(1).toString();
+          }),
     );
   }
 
-  Widget _buildNumberField() {
-    return Container(
-      margin: EdgeInsets.only(top: 14.0),
-      color: Colors.white,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Flexible(
-            fit: FlexFit.tight,
-            flex: 9,
-            child: TextFormField(
-              maxLength: 10,
-              keyboardType: TextInputType.number,
-              validator: (String value) {
-                if (value.isEmpty || value.length < 8) {
-                  return MyLocalizations.of(context)
-                      .pleaseEnterValidMobileNumber;
-                } else
-                  return null;
-              },
-              onChanged: (String value) {
-                register['contactNumber'] = value;
-              },
-              decoration: new InputDecoration(
-                counterText: "",
-                labelText: MyLocalizations.of(context).mobileNumber,
-                hintStyle: hintStyleGreyLightOSR(),
-                contentPadding: EdgeInsets.all(12.0),
-                border: InputBorder.none,
-              ),
+  Widget _buildTermsAndConditionsField() {
+    return Row(
+      children: <Widget>[
+        new Checkbox(
+          value: isChecked,
+          onChanged: (bool value) {
+            if (mounted) {
+              setState(() {
+                isChecked = value;
+              });
+            }
+          },
+          activeColor: primary,
+        ),
+        Container(
+          child: Expanded(
+            child: new Text(MyLocalizations.of(context).acceptTerms,
+                style: textMuliRegular()),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget buildRegisterButton() {
+    return buildPrimaryHalfWidthButton(
+        context, MyLocalizations.of(context).register, isLoading, _onRegister);
+  }
+
+  Widget buildSignInButton() {
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (BuildContext context) => LoginPage(
+              locale: widget.locale,
+              localizedValues: widget.localizedValues,
             ),
           ),
-          Flexible(
-            fit: FlexFit.tight,
-            flex: 1,
-            child: Icon(Icons.phone, size: 16.0, color: greyTextc),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEmailField() {
-    return Container(
-      margin: EdgeInsets.only(top: 14.0),
-      color: Colors.white,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Flexible(
-            fit: FlexFit.tight,
-            flex: 9,
-            child: TextFormField(
-              decoration: new InputDecoration(
-                labelText: MyLocalizations.of(context).emailId,
-                hintStyle: hintStyleGreyLightOSR(),
-                contentPadding: EdgeInsets.all(12.0),
-                border: InputBorder.none,
-              ),
-              keyboardType: TextInputType.emailAddress,
-              validator: (String value) {
-                if ((value?.length ?? 0) > 0 &&
-                    !RegExp(EMAIL_PATTERN).hasMatch(value)) {
-                  return MyLocalizations.of(context).pleaseEnterValidEmail;
-                } else
-                  return null;
-              },
-              onChanged: (String value) {
-                register['email'] = value;
-              },
+        );
+      },
+      child: RichText(
+        text: TextSpan(
+          children: <TextSpan>[
+            TextSpan(
+                text: MyLocalizations.of(context).loginToYourAccount,
+                style: textMuliRegular()),
+            TextSpan(
+              text: ' ${MyLocalizations.of(context).signInNow}',
+              style: textMuliSemiboldprimary(),
             ),
-          ),
-          Flexible(
-            fit: FlexFit.tight,
-            flex: 1,
-            child: Icon(Icons.email, size: 16.0, color: greyTextc),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPasswordField() {
-    return Container(
-      margin: EdgeInsets.only(top: 14.0),
-      color: Colors.white,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Flexible(
-            fit: FlexFit.tight,
-            flex: 9,
-            child: TextFormField(
-              decoration: new InputDecoration(
-                labelText: MyLocalizations.of(context).password,
-                hintStyle: hintStyleGreyLightOSR(),
-                contentPadding: EdgeInsets.all(12.0),
-                border: InputBorder.none,
-              ),
-              keyboardType: TextInputType.text,
-              obscureText: true,
-              validator: (String value) {
-                if (value.isEmpty || value.length < 6) {
-                  return MyLocalizations.of(context).pleaseEnterValidPassword;
-                } else
-                  return null;
-              },
-              onChanged: (String value) {
-                register['password'] = value;
-              },
-            ),
-          ),
-          Flexible(
-            fit: FlexFit.tight,
-            flex: 1,
-            child: Icon(Icons.lock, size: 16.0, color: greyTextc),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTermsAndCondiField() {
-    return Padding(
-      padding: EdgeInsetsDirectional.only(top: 10.0, bottom: 30.0),
-      child: Row(
-        children: <Widget>[
-          new Checkbox(
-            value: isChecked,
-            onChanged: (bool value) {
-              if (mounted) {
-                setState(() {
-                  isChecked = value;
-                });
-              }
-            },
-            activeColor: primary,
-          ),
-          Container(
-            child: Expanded(
-              child: new Text(
-                MyLocalizations.of(context).acceptTerms,
-                style: subTitleWhiteShadeLightOSR(),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRegisterButton() {
-    return Container(
-      padding: const EdgeInsets.all(14.0),
-      child: RawMaterialButton(
-        child: !isLoading
-            ? Container(
-                alignment: AlignmentDirectional.center,
-                margin: EdgeInsets.only(left: 5.0, right: 5.0),
-                height: 56.0,
-                decoration:
-                    BoxDecoration(border: Border.all(color: Colors.white70)),
-                child: Text(
-                  MyLocalizations.of(context).registerNow,
-                  style: subTitleWhiteShadeLightOSR(),
-                ),
-              )
-            : Container(
-                alignment: AlignmentDirectional.center,
-                margin: EdgeInsets.only(left: 5.0, right: 5.0),
-                height: 56.0,
-                decoration:
-                    BoxDecoration(border: Border.all(color: Colors.white70)),
-                child: Image.asset(
-                  'lib/assets/icon/spinner.gif',
-                  width: 40.0,
-                  height: 40.0,
-                ),
-              ),
-        onPressed: _onRegister,
+          ],
+        ),
       ),
     );
   }

@@ -1,9 +1,10 @@
+import 'package:RestaurantSaas/widgets/appbar.dart';
 import 'package:flutter/material.dart';
 
-import '../../services/localizations.dart';
-import '../../services/profile-service.dart';
-import '../../services/sentry-services.dart';
-import '../../styles/styles.dart';
+import '../../../services/localizations.dart';
+import '../../../services/profile-service.dart';
+import '../../../services/sentry-services.dart';
+import '../../../styles/styles.dart';
 
 SentryError sentryError = new SentryError();
 
@@ -84,25 +85,8 @@ class _AddAddressPageState extends State<AddAddressPage> {
       MyLocalizations.of(context).others
     ];
     return Scaffold(
-      backgroundColor: bgColor,
-      appBar: AppBar(
-        leading: InkWell(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Icon(
-            Icons.arrow_back,
-            color: Colors.white,
-          ),
-        ),
-        backgroundColor: primary,
-        elevation: 0.0,
-        title: new Text(
-          MyLocalizations.of(context).deliveryAddress,
-          style: textbarlowSemiBoldWhite(),
-        ),
-        centerTitle: true,
-      ),
+      backgroundColor: bg,
+      appBar: appBarWithTitle(context,  MyLocalizations.of(context).deliveryAddress,),
       body: Form(
         key: _formKey,
         child: Stack(
@@ -302,8 +286,12 @@ class _AddAddressPageState extends State<AddAddressPage> {
                               height: 44.0,
                               decoration: BoxDecoration(
                                 color: primary,
-                                borderRadius: BorderRadius.circular(50.0),
-                              ),
+                                    borderRadius: BorderRadius.circular(10),
+                                    boxShadow: [
+                                      BoxShadow(
+                                          color: Colors.black.withOpacity(0.29), blurRadius: 5)
+                                    ]),
+
                               child: Image.asset(
                                 'lib/assets/icon/spinner.gif',
                                 width: 19.0,
@@ -314,10 +302,13 @@ class _AddAddressPageState extends State<AddAddressPage> {
                               alignment: AlignmentDirectional.center,
                               width: screenWidth(context),
                               height: 44.0,
-                              decoration: BoxDecoration(
-                                color: primary,
-                                borderRadius: BorderRadius.circular(50.0),
-                              ),
+                        decoration: BoxDecoration(
+                            color: primary,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Colors.black.withOpacity(0.29), blurRadius: 5)
+                            ]),
                               child: new Text(
                                 MyLocalizations.of(context).addAddress,
                                 style: subTitleWhiteBOldOSB(),

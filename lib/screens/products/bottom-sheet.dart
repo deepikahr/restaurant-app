@@ -5,7 +5,7 @@ import 'package:RestaurantSaas/services/utils.dart';
 import 'package:RestaurantSaas/styles/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:toast/toast.dart';
-import 'flavours-list.dart';
+import '../other/flavours-list.dart';
 
 SentryError sentryError = new SentryError();
 
@@ -241,8 +241,14 @@ class _BottomSheetClassDryCleanState extends State<BottomSheetClassDryClean> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(widget.product['title'], style: subTitleDarkLightOSS(),),
-                Text(widget.product['description'], style: hintStyleSmallPNR(),)
+                Text(
+                  widget.product['title'],
+                  style: subTitleDarkLightOSS(),
+                ),
+                Text(
+                  widget.product['description'],
+                  style: hintStyleSmallPNR(),
+                )
               ],
             ),
           ),

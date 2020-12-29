@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:RestaurantSaas/main.dart';
-import 'package:RestaurantSaas/screens/mains/home.dart';
+import 'package:RestaurantSaas/screens/mains/home/home.dart';
 import 'package:RestaurantSaas/services/initialize_i18n.dart';
 import 'package:RestaurantSaas/widgets/appbar.dart';
 import 'package:async/async.dart';
@@ -368,17 +368,17 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                     ]),
                     SizedBox(height: 20),
                     Text(
-                      'John WIck',
+                      data['name'].toString(),
                       style: textMuliSemiboldsec(),
                     ),
                     SizedBox(height: 5),
                     Text(
-                      'John WIck@gmail.com',
+                      data['email'].toString(),
                       style: textMuliRegular(),
                     ),
                     SizedBox(height: 5),
                     Text(
-                      '8763663781',
+                      data['contactNumber'].toString(),
                       style: textMuliRegular(),
                     ),
                     SizedBox(height: 25),
@@ -444,13 +444,16 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                             labelText: 'UserName',
                             labelStyle: textMuliSemiboldgrey(),
                             focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: secondary.withOpacity(0.5)),
+                              borderSide:
+                                  BorderSide(color: secondary.withOpacity(0.5)),
                             ),
                             enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: secondary.withOpacity(0.5)),
+                              borderSide:
+                                  BorderSide(color: secondary.withOpacity(0.5)),
                             ),
                             errorBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: secondary.withOpacity(0.3)),
+                              borderSide:
+                                  BorderSide(color: secondary.withOpacity(0.3)),
                             ),
                           ),
                         ),
@@ -462,7 +465,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                         color: Colors.white,
                         margin: EdgeInsets.only(bottom: 8),
                         padding:
-                        EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                            EdgeInsets.only(left: 16, right: 16, bottom: 16),
                         child: TextFormField(
                           cursorColor: primary,
                           style: textMuliRegular(),
@@ -482,13 +485,16 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                             labelText: 'Mobile Number',
                             labelStyle: textMuliSemiboldgrey(),
                             focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: secondary.withOpacity(0.5)),
+                              borderSide:
+                                  BorderSide(color: secondary.withOpacity(0.5)),
                             ),
                             enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: secondary.withOpacity(0.5)),
+                              borderSide:
+                                  BorderSide(color: secondary.withOpacity(0.5)),
                             ),
                             errorBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: secondary.withOpacity(0.3)),
+                              borderSide:
+                                  BorderSide(color: secondary.withOpacity(0.3)),
                             ),
                           ),
                         ),
@@ -500,7 +506,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                         color: Colors.white,
                         margin: EdgeInsets.only(bottom: 8),
                         padding:
-                        EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                            EdgeInsets.only(left: 16, right: 16, bottom: 16),
                         child: TextFormField(
                           cursorColor: primary,
                           style: textMuliRegular(),
@@ -513,19 +519,24 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                             labelText: 'Country',
                             labelStyle: textMuliSemiboldgrey(),
                             focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: secondary.withOpacity(0.5)),
+                              borderSide:
+                                  BorderSide(color: secondary.withOpacity(0.5)),
                             ),
                             enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: secondary.withOpacity(0.5)),
+                              borderSide:
+                                  BorderSide(color: secondary.withOpacity(0.5)),
                             ),
                             errorBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: secondary.withOpacity(0.3)),
+                              borderSide:
+                                  BorderSide(color: secondary.withOpacity(0.3)),
                             ),
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(height: 25,)
+                    SizedBox(
+                      height: 25,
+                    )
                   ],
                 ),
               ),
@@ -544,30 +555,29 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
             borderRadius: BorderRadius.circular(10),
             boxShadow: [
               BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 5)
-            ]
-        ),
+            ]),
         child: RaisedButton(
-          color: primary,
-          shape: RoundedRectangleBorder(
-            borderRadius: new BorderRadius.circular(5.0),
-          ),
-          onPressed: _saveProfileInfo,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Save',
-                style: textMuliSemiboldwhite(),
-              ),
-              isLoading
-                  ? Image.asset(
-                'lib/assets/icon/spinner.gif',
-                width: 19.0,
-                height: 19.0,
-              ) : Container()
-            ],
-          )
-        ),
+            color: primary,
+            shape: RoundedRectangleBorder(
+              borderRadius: new BorderRadius.circular(5.0),
+            ),
+            onPressed: _saveProfileInfo,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Save',
+                  style: textMuliSemiboldwhite(),
+                ),
+                isLoading
+                    ? Image.asset(
+                        'lib/assets/icon/spinner.gif',
+                        width: 19.0,
+                        height: 19.0,
+                      )
+                    : Container()
+              ],
+            )),
       ),
     );
   }

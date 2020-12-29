@@ -6,12 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../services/localizations.dart';
-import '../../services/profile-service.dart';
-import '../../services/sentry-services.dart';
-import '../../styles/styles.dart';
-import '../../widgets/no-data.dart';
-import '../other/ratings.dart';
+import '../../../services/localizations.dart';
+import '../../../services/profile-service.dart';
+import '../../../services/sentry-services.dart';
+import '../../../styles/styles.dart';
+import '../../../widgets/no-data.dart';
+import 'ratings.dart';
 
 SentryError sentryError = new SentryError();
 
@@ -77,7 +77,8 @@ class _OrderDetailsState extends State<OrderDetails> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: appBarWithTitle(context, MyLocalizations.of(context).orderDetails),
+      appBar:
+          appBarWithTitle(context, MyLocalizations.of(context).orderDetails),
       body: _retriveOrderDetails(),
     );
   }
@@ -85,7 +86,8 @@ class _OrderDetailsState extends State<OrderDetails> {
   Widget restaurantInfo(orderData) {
     String tableNumber = '';
     if (orderData['tableNumber'] != null) {
-      tableNumber = ' for Table number : ' + orderData['tableNumber'].toString();
+      tableNumber =
+          ' for Table number : ' + orderData['tableNumber'].toString();
     }
 
     return Container(
@@ -102,15 +104,20 @@ class _OrderDetailsState extends State<OrderDetails> {
                 children: <Widget>[
                   orderData['productDetails'][0]['imageUrl'] != null
                       ? ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: Image.network(
-                      orderData['productDetails'][0]['imageUrl'],
-                      width: 45,
-                      height: 45, fit: BoxFit.cover,
-                    ),
-                  )
-                      : Image.asset("lib/assets/bgImgs/loginbg.png",   width: 45,
-                    height: 45, fit: BoxFit.cover,),
+                          borderRadius: BorderRadius.circular(4),
+                          child: Image.network(
+                            orderData['productDetails'][0]['imageUrl'],
+                            width: 45,
+                            height: 45,
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                      : Image.asset(
+                          "lib/assets/bgImgs/loginbg.png",
+                          width: 45,
+                          height: 45,
+                          fit: BoxFit.cover,
+                        ),
                   SizedBox(width: 5),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -122,7 +129,8 @@ class _OrderDetailsState extends State<OrderDetails> {
                       Text(
                         MyLocalizations.of(context).type +
                             ": " +
-                            orderData['orderType']  + tableNumber,
+                            orderData['orderType'] +
+                            tableNumber,
                         style: textMuliRegularxswithop(),
                       )
                     ],
@@ -132,7 +140,7 @@ class _OrderDetailsState extends State<OrderDetails> {
             ),
             SizedBox(height: 14),
             Container(
-              padding: EdgeInsets.only( left: 15, right: 15),
+              padding: EdgeInsets.only(left: 15, right: 15),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
@@ -158,9 +166,9 @@ class _OrderDetailsState extends State<OrderDetails> {
                         orderData['createdAtTime'] == null
                             ? ""
                             : DateFormat('dd-MMM-yy hh:mm a').format(
-                          new DateTime.fromMillisecondsSinceEpoch(
-                              orderData['createdAtTime']),
-                        ),
+                                new DateTime.fromMillisecondsSinceEpoch(
+                                    orderData['createdAtTime']),
+                              ),
                         style: textMuliRegularxswithop(),
                       ),
                     ],
@@ -180,12 +188,11 @@ class _OrderDetailsState extends State<OrderDetails> {
                 ],
               ),
             ),
-
             SizedBox(height: 14),
             MySeparator(color: secondary.withOpacity(0.2)),
             SizedBox(height: 14),
             ListView.builder(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+                padding: EdgeInsets.symmetric(horizontal: 16),
                 itemCount: orderData['productDetails'].length,
                 physics: ScrollPhysics(),
                 shrinkWrap: true,
@@ -205,45 +212,43 @@ class _OrderDetailsState extends State<OrderDetails> {
                         orderData['productDetails'][index]['title'],
                         style: textMuliSemiboldxs(),
                       ),
-                      (orderData
-                      ['productDetails'][index]['RatingInfo'] == null)
+                      (orderData['productDetails'][index]['RatingInfo'] == null)
                           ? InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (BuildContext context) =>
-                                      Rating(
-                                        orderId: orderData['_id'],
-                                        productId: orderData['productDetails']
-                                        [index]['productId'],
-                                        locationId: orderData['location'],
-                                        restaurantId: orderData['restaurantID'],
-                                      ),
-                                ),
-                              );
-                            },
-                            child: new Text(
-                              MyLocalizations.of(context).rate,
-                              textAlign: TextAlign.start,
-                              style: textred(),
-                            ),
-                          )
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (BuildContext context) => Rating(
+                                      orderId: orderData['_id'],
+                                      productId: orderData['productDetails']
+                                          [index]['productId'],
+                                      locationId: orderData['location'],
+                                      restaurantId: orderData['restaurantID'],
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: new Text(
+                                MyLocalizations.of(context).rate,
+                                textAlign: TextAlign.start,
+                                style: textred(),
+                              ),
+                            )
                           : Row(
-                            children: <Widget>[
-                              Text(
-                                orderData['productDetails'][index]
-                                ['RatingInfo']['rating']
-                                    .toString(),
-                                style: TextStyle(color: Colors.green),
-                              ),
-                              Icon(
-                                Icons.star,
-                                size: 16,
-                                color: Colors.green,
-                              ),
-                            ],
-                          ),
+                              children: <Widget>[
+                                Text(
+                                  orderData['productDetails'][index]
+                                          ['RatingInfo']['rating']
+                                      .toString(),
+                                  style: TextStyle(color: Colors.green),
+                                ),
+                                Icon(
+                                  Icons.star,
+                                  size: 16,
+                                  color: Colors.green,
+                                ),
+                              ],
+                            ),
                       Text(
                         '$currency' +
                             orderData['productDetails'][index]['totalPrice']
@@ -270,13 +275,14 @@ class _OrderDetailsState extends State<OrderDetails> {
     } else {
       orderData['orderDataType'] = orderData['orderType'];
     }
+    print('sh ${orderData['shippingAddress']}');
     return Container(
       color: bg,
       child: Container(
         color: Colors.white,
         margin: EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(15.0),
-        child: Column(
+        child:  orderData['orderType'] == "Pickup" ? deliveredtime(orderData) : Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
@@ -284,11 +290,11 @@ class _OrderDetailsState extends State<OrderDetails> {
               style: textMuliBold(),
             ),
             SizedBox(height: 10),
-            Container(
+           Container(
               width: MediaQuery.of(context).size.width * 0.9,
               child: Text(
                 '${orderData['shippingAddress']['flatNo']}, ${orderData['shippingAddress']['address']}, '
-                    '${orderData['shippingAddress']['contactNumber']}, ${orderData['shippingAddress']['postalCode']}',
+                '${orderData['shippingAddress']['contactNumber']}, ${orderData['shippingAddress']['postalCode']}',
                 style: textMuliRegularwithop(),
               ),
             ),
@@ -335,7 +341,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                   style: textMuliRegulars(),
                 ),
                 Text(
-    '$currency' + orderData['deliveryCharge'].toStringAsFixed(2),
+                  '$currency' + orderData['deliveryCharge'].toStringAsFixed(2),
                   style: textMuliRegulars(),
                 ),
               ],
@@ -345,11 +351,11 @@ class _OrderDetailsState extends State<OrderDetails> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Text(
-    MyLocalizations.of(context).grandTotal,
+                  MyLocalizations.of(context).grandTotal,
                   style: textMuliRegulars(),
                 ),
                 Text(
-    '$currency' + orderData['grandTotal'].toStringAsFixed(2),
+                  '$currency' + orderData['grandTotal'].toStringAsFixed(2),
                   style: textMuliBoldlg(),
                 ),
               ],
@@ -361,21 +367,19 @@ class _OrderDetailsState extends State<OrderDetails> {
   }
 
   Widget deliveredtime(orderData) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Text(
-            'PickUp Time:',
-            style: textMuliSemiboldxsgreen(),
-          ),
-          Text(
-            '10.30pm',
-            style: textMuliSemiboldxsgreen(),
-          ),
-        ],
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Text(
+          '${MyLocalizations.of(context).pickUpTime} : ',
+          style: textMuliRegularMgreen(),
+        ),
+        Text(
+          '${orderData['pickupDate'] == null ? "" : orderData['pickupDate']} '
+              ' ${orderData['pickupTime'] == null ? "" : orderData['pickupTime']}',
+          style: textMuliRegularMgreen(),
+        ),
+      ],
     );
   }
 
@@ -688,7 +692,6 @@ class _OrderDetailsState extends State<OrderDetails> {
     );
   }
 }
-
 
 class MySeparator extends StatelessWidget {
   final double height;
