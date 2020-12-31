@@ -358,11 +358,11 @@ class ProductListPageState extends State<ProductListPage> {
               )
             ],
           ),
-          Image.asset(
-            'lib/assets/icons/free.png',
-            width: 44,
-            height: 31,
-          ),
+          // Image.asset(
+          //   'lib/assets/icons/free.png',
+          //   width: 44,
+          //   height: 31,
+          // ),
         ],
       ),
     );
@@ -382,16 +382,16 @@ class ProductListPageState extends State<ProductListPage> {
                   ? ClipRRect(
                       child: Image.network(
                         widget.imgUrl,
-                        height: 65,
+                        height: 45,
                         fit: BoxFit.cover,
-                        width: 65,
+                        width: 45,
                       ),
                       borderRadius: BorderRadius.circular(8),
                     )
                   : Image.asset(
                       'lib/assets/images/dominos.png',
-                      height: 65,
-                      width: 65,
+                      height: 45,
+                      width: 45,
                       fit: BoxFit.cover,
                     ),
               SizedBox(
@@ -420,7 +420,7 @@ class ProductListPageState extends State<ProductListPage> {
                 crossAxisCount: 2,
                 crossAxisSpacing: 20,
                 mainAxisSpacing: 10,
-                childAspectRatio: MediaQuery.of(context).size.width / 498,
+                childAspectRatio: MediaQuery.of(context).size.width / 535,
               ),
               itemBuilder: (BuildContext context, int index) =>
                   BuildProductTile(

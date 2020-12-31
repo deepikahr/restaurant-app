@@ -40,13 +40,13 @@ Widget restaurantCard(BuildContext context, info, title) {
               style: textMuliSemiboldsm(),
             ),
             SizedBox(height: 5),
-            Text(
-              title == MyLocalizations.of(context).restaurantsNearYou ?
-              '${info['locationName']}' : '${info['Locations']['locationName']}' ,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 2,
-              style: textMuliRegularxs(),
-            ),
+            // Text(
+            //   title == MyLocalizations.of(context).restaurantsNearYou ?
+            //   '${info['locationName']}' : '${info['Locations']['locationName']}' ,
+            //   overflow: TextOverflow.ellipsis,
+            //   maxLines: 2,
+            //   style: textMuliRegularxs(),
+            // ),
             SizedBox(height: 3),
             // Text(
             //   'Closes at 11:30 pm',
@@ -68,12 +68,12 @@ Widget restaurantCard(BuildContext context, info, title) {
                     color: Colors.white,
                     size: 10,
                   ),
-                  Text(
-                    title == MyLocalizations.of(context).restaurantsNearYou
-                        ? info['rating'].toString()
-                        : info['Locations']['rating'].toString(),
-                    style: textMuliSemiboldwhitexs(),
-                  )
+                  // Text(
+                  //   title == MyLocalizations.of(context).restaurantsNearYou
+                  //       ? info['rating'].toString()
+                  //       : info['Locations']['rating'].toString(),
+                  //   style: textMuliSemiboldwhitexs(),
+                  // )
                 ],
               ),
             )

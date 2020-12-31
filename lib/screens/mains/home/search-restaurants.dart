@@ -1,6 +1,9 @@
 import 'package:RestaurantSaas/screens/mains/home/home.dart';
 import 'package:RestaurantSaas/services/localizations.dart';
+import 'package:RestaurantSaas/styles/styles.dart';
+import 'package:RestaurantSaas/widgets/card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 class RestaurantSearch extends SearchDelegate<String> {
   final Map<String, Map<String, String>> localizedValues;
@@ -44,12 +47,10 @@ class RestaurantSearch extends SearchDelegate<String> {
         ? StatefulBuilder(builder: (context, setState) {
             return ListView.builder(
                 itemCount: searchedList?.length ?? 0,
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                 itemBuilder: (context, index) {
                   return Column(
                     children: <Widget>[
-                      SizedBox(
-                        height: 20,
-                      ),
                       InkWell(
                         onTap: () {
                           HomePageState().goToProductListPage(
@@ -59,7 +60,92 @@ class RestaurantSearch extends SearchDelegate<String> {
                               localizedValues,
                               locale);
                         },
-                        child: Text('hhhh'),
+                        child: Container(
+                          margin: EdgeInsets.only(bottom: 12),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              searchedList[index]['restaurantID']['logo'] != null
+                                  ? ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.network(
+                                  searchedList[index]['restaurantID']['logo'],
+                                  width: 138,
+                                  height: 108,
+                                  fit: BoxFit.cover,
+                                ),
+                              )
+                                  : Image.asset(
+                                'lib/assets/images/dominos.png',
+                                width: 138,
+                                height: 108,
+                              ),
+                              SizedBox(
+                                width: 12,
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: <Widget>[
+                                  SizedBox(height: 3),
+                                  Text(
+                                    searchedList[index]['restaurantID']
+                                    ['restaurantName'],
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: textMuliSemiboldsm(),
+                                  ),
+                                  SizedBox(height: 5),
+                                  Text(
+                  searchedList[index]['locationName'],
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
+                                    style: textMuliRegularxs(),
+                                  ),
+                                  // SizedBox(height: 3),
+                                  // Text(
+                                  //   '${searchedList[index]['locationCount']} ${MyLocalizations.of(context).branches}',
+                                  //   overflow: TextOverflow.ellipsis,
+                                  //   maxLines: 2,
+                                  //   style: textMuliRegularxs(),
+                                  // ),
+                                  SizedBox(height: 3),
+                                  Row(
+                                    children: [
+                                      Container(
+                                        height: 20,
+                                        padding: EdgeInsets.only(left: 12, right: 12),
+                                        color: Color(0xFF39B24A),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                          children: <Widget>[
+                                            Icon(
+                                              Icons.star,
+                                              color: Colors.white,
+                                              size: 16,
+                                            ),
+                                            Text(
+                                              ' ${searchedList[index]['restaurantID']['rating'].toString()}',
+                                              style: textMuliSemiboldwhitexs(),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 6,
+                                      ),
+                                      Text(
+                                        '(${searchedList[index]['restaurantID']['reviewCount']} ${MyLocalizations.of(context).reviews})',
+                                        style:hintStyleSmallTextOSL()
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
                         // HomePageState.buildCardBottom(
                         //     searchedList[index]['locationName'],
                         //     searchedList[index]['restaurantID']['logo'],

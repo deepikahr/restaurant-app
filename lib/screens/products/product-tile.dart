@@ -101,81 +101,66 @@ class _BuildProductTileState extends State<BuildProductTile> {
             SizedBox(
               height: 6,
             ),
-            Container(
-              width: MediaQuery.of(context).size.width,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Flexible(
-                    flex: 6,
-                    child: Text(
-                      "${widget.productName}",
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: textMuliSemiboldsm(),
-                    ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                  Text(
+                    "${widget.productName}",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: textMuliSemiboldsm(),
                   ),
-                  SizedBox(
-                    width: 6,
-                  ),
-                  Flexible(
-                    flex: 4,
-                    child: Text(
-                      '\$ ${widget.mrp}',
-                      style: textMuliRegularsmstrike(),
-                    ),
-                  ),
-                  SizedBox(width: 3),
-                  Flexible(
-                    flex: 4,
-                    child: Text(
-                      '\$ ${widget.price}',
-                      style: textMuliSemiboldsm(),
-                    ),
-                  ),
-                ],
-              ),
+                SizedBox(
+                  width: 6,
+                ),
+              ],
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    flex: 6,
-                    child: Text(
-                      widget.info,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: hintStyleGreyLightOSR(),
-                    ),
-                  ),
-                  widget.off > 0
-                      ? Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                                border: Border.all(color: Color(0xFFFF0000)),
-                                borderRadius: BorderRadius.circular(5.0)),
-                            child: Padding(
-                              padding: EdgeInsets.only(
-                                  left: 15.0,
-                                  top: 2.0,
-                                  bottom: 2.0,
-                                  right: 15.0),
-                              child: Text(
-                                widget.off.toStringAsFixed(1) + '% off',
-                                style: hintStyleRedOSS(),
-                              ),
-                            ),
-                          ),
-                        )
-                      : Text(''),
-                ],
-              ),
+            SizedBox(
+             height: 2,
             ),
-
-            SizedBox(height: 10),
+            Text(
+                widget.info,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: hintStyleGreyLightOSR(),
+              ),
+            SizedBox(
+              height: 8,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                widget.off > 0
+                    ? Container(
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Color(0xFFFF0000)),
+                          borderRadius: BorderRadius.circular(5.0)),
+                  padding: EdgeInsets.only(
+                      left: 12.0,
+                      top: 2.0,
+                      bottom: 2.0,
+                      right: 12.0),
+                      child: Text(
+                        widget.off.toStringAsFixed(1) + '% off',
+                        style: hintStyleRedOSS(),
+                      ),
+                    )
+                    : Text(''),
+                Text(
+                  '\$ ${widget.mrp}',
+                  style: textMuliRegularsmstrike(),
+                ),
+                SizedBox(width: 3),
+                Text(
+                  '\$ ${widget.price}',
+                  style: textMuliSemiboldsm(),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 6,
+            ),
             Container(
               height: 28,
               margin: EdgeInsets.all(8),

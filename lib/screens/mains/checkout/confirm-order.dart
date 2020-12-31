@@ -8,6 +8,9 @@ import 'package:async_loader/async_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_map_picker/flutter_map_picker.dart';
+import 'package:getwidget/components/button/gf_icon_button.dart';
+import 'package:getwidget/getwidget.dart';
+import 'package:getwidget/types/gf_button_type.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
@@ -585,7 +588,7 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                                     children: <Widget>[
                                       new Text(
                                         addressList[index]['addressType'],
-                                        style: textMuliRegular(),
+                                        style: textOSL()
                                       ),
                                       new Text(
                                         addressList[index]['address'],
@@ -598,52 +601,19 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
                                       ),
                                     ],
                                   ),
+                                  secondary: GFIconButton(
+                                      onPressed: () {
+                                        _deleteAddressList(index);
+                                      },
+                                      size: GFSize.SMALL,
+                                      type: GFButtonType.transparent,
+                                      color: Colors.black87,
+                                      icon: Icon(
+                                        Icons.close_outlined, size: 16,
+                                      )
+                                  ),
                                 ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    Container(
-                                      width: 112,
-                                      height: 32,
-                                      margin: EdgeInsets.all(8),
-                                      child: RaisedButton(
-                                          color: Colors.transparent,
-                                          elevation: 0,
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  new BorderRadius.circular(
-                                                      5.0),
-                                              side: BorderSide(color: primary)),
-                                          onPressed: () {
-                                            _deleteAddressList(index);
-                                          },
-                                          child: Text(
-                                            'Delete',
-                                            style: textMuliSemiboldprimary(),
-                                          )),
-                                    ),
-                                    Container(
-                                      width: 112,
-                                      height: 32,
-                                      margin: EdgeInsets.all(8),
-                                      child: RaisedButton(
-                                          color: Colors.transparent,
-                                          elevation: 0,
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  new BorderRadius.circular(
-                                                      5.0),
-                                              side: BorderSide(color: primary)),
-                                          onPressed: () {
-                                            // _deleteAddressList(index);
-                                          },
-                                          child: Text(
-                                            'Edit',
-                                            style: textMuliSemiboldprimary(),
-                                          )),
-                                    ),
-                                  ],
-                                ),
+                                Divider()
                               ],
                             );
                           })

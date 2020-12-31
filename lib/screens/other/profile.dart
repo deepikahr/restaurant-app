@@ -566,7 +566,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Save',
+                  MyLocalizations.of(context).save,
                   style: textMuliSemiboldwhite(),
                 ),
                 isLoading
