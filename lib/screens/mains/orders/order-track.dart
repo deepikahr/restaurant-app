@@ -1,12 +1,9 @@
 import 'dart:async';
-
-import 'package:RestaurantSaas/styles/styles.dart' as prefix0;
 import 'package:RestaurantSaas/widgets/appbar.dart';
 import 'package:async_loader/async_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../../services/localizations.dart';
 import '../../../services/profile-service.dart';
 import '../../../services/sentry-services.dart';
@@ -222,19 +219,19 @@ class OrderTrackState extends State<OrderTrack> {
                     }),
                 order['orderType'] == 'Pickup'
                     ? Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text(
-                      '${MyLocalizations.of(context).pickUpTime} : ',
-                      style: textMuliSemiboldxsgreen(),
-                    ),
-                    Text(
-                      '${order['pickupDate'] == null ? "" : order['pickupDate']} '
-                          ' ${order['pickupTime'] == null ? "" : order['pickupTime']}',
-                      style: textMuliSemiboldxsgreen(),
-                    ),
-                  ],
-                )
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Text(
+                            '${MyLocalizations.of(context).pickUpTime} : ',
+                            style: textMuliSemiboldxsgreen(),
+                          ),
+                          Text(
+                            '${order['pickupDate'] == null ? "" : order['pickupDate']} '
+                            ' ${order['pickupTime'] == null ? "" : order['pickupTime']}',
+                            style: textMuliSemiboldxsgreen(),
+                          ),
+                        ],
+                      )
                     : Container(),
                 SizedBox(height: 20),
                 orderTrack(order),

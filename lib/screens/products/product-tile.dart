@@ -1,5 +1,4 @@
 import 'package:RestaurantSaas/screens/auth/login.dart';
-import 'package:RestaurantSaas/screens/products/product-details.dart';
 import 'package:RestaurantSaas/services/common.dart';
 import 'package:RestaurantSaas/services/localizations.dart';
 import 'package:RestaurantSaas/styles/styles.dart';
@@ -105,26 +104,26 @@ class _BuildProductTileState extends State<BuildProductTile> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                  Text(
-                    "${widget.productName}",
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: textMuliSemiboldsm(),
-                  ),
+                Text(
+                  "${widget.productName}",
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: textMuliSemiboldsm(),
+                ),
                 SizedBox(
                   width: 6,
                 ),
               ],
             ),
             SizedBox(
-             height: 2,
+              height: 2,
             ),
             Text(
-                widget.info,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: hintStyleGreyLightOSR(),
-              ),
+              widget.info,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: hintStyleGreyLightOSR(),
+            ),
             SizedBox(
               height: 8,
             ),
@@ -133,19 +132,16 @@ class _BuildProductTileState extends State<BuildProductTile> {
               children: [
                 widget.off > 0
                     ? Container(
-                      decoration: BoxDecoration(
-                          border: Border.all(color: Color(0xFFFF0000)),
-                          borderRadius: BorderRadius.circular(5.0)),
-                  padding: EdgeInsets.only(
-                      left: 12.0,
-                      top: 2.0,
-                      bottom: 2.0,
-                      right: 12.0),
-                      child: Text(
-                        widget.off.toStringAsFixed(1) + '% off',
-                        style: hintStyleRedOSS(),
-                      ),
-                    )
+                        decoration: BoxDecoration(
+                            border: Border.all(color: Color(0xFFFF0000)),
+                            borderRadius: BorderRadius.circular(5.0)),
+                        padding: EdgeInsets.only(
+                            left: 12.0, top: 2.0, bottom: 2.0, right: 12.0),
+                        child: Text(
+                          widget.off.toStringAsFixed(1) + '% off',
+                          style: hintStyleRedOSS(),
+                        ),
+                      )
                     : Text(''),
                 Text(
                   '\$ ${widget.mrp}',

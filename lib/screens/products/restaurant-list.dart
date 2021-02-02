@@ -3,13 +3,11 @@ import 'package:RestaurantSaas/widgets/appbar.dart';
 import 'package:RestaurantSaas/widgets/card.dart';
 import 'package:async_loader/async_loader.dart';
 import 'package:flutter/material.dart';
-
 import '../../services/common.dart';
 import '../../services/counter-service.dart';
 import '../../services/localizations.dart';
 import '../../services/main-service.dart';
 import '../../services/sentry-services.dart';
-import '../../styles/styles.dart';
 import '../../widgets/no-data.dart';
 import '../mains/home/home.dart';
 
@@ -106,8 +104,11 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
     });
     return Scaffold(
       key: scaffoldKey,
-      appBar: appBarWithCartAndTitle(context, widget.title, cartCount,
-            () {
+      appBar: appBarWithCartAndTitle(
+        context,
+        widget.title,
+        cartCount,
+        () {
           Navigator.push(
             context,
             MaterialPageRoute(

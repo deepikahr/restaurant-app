@@ -1,4 +1,3 @@
-import 'package:RestaurantSaas/services/localizations.dart';
 import 'package:RestaurantSaas/styles/styles.dart';
 import 'package:flutter/material.dart';
 

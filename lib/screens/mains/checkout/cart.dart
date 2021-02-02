@@ -17,6 +17,7 @@ import 'package:RestaurantSaas/widgets/appbar.dart';
 
 SentryError sentryError = new SentryError();
 
+// ignore: must_be_immutable
 class CartPage extends StatefulWidget {
   Map<String, dynamic> product, taxInfo, locationInfo;
   final Map<String, Map<String, String>> localizedValues;

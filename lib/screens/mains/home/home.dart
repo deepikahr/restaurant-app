@@ -2,14 +2,12 @@ import 'dart:async';
 import 'package:RestaurantSaas/screens/products/cusineBaseStore.dart';
 import 'package:RestaurantSaas/screens/mains/home/search-restaurants.dart';
 import 'package:RestaurantSaas/screens/webView/web_view.dart';
-import 'package:RestaurantSaas/services/constant.dart';
 import 'package:RestaurantSaas/widgets/appbar.dart';
 import 'package:RestaurantSaas/widgets/card.dart';
 import 'package:async_loader/async_loader.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
-import 'package:getwidget/components/list_tile/gf_list_tile.dart';
 import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../services/common.dart';
@@ -560,31 +558,34 @@ class HomePageState extends State<HomePage> {
                               ),
                             );
                           },
-                          child: Column(
-                            children: [
-                              ClipRRect(
-                                child: Image(
-                                  image: list[index]['cuisineImgUrl'] != null
-                                      ? NetworkImage(
-                                          list[index]['cuisineImgUrl'])
-                                      : AssetImage(
-                                          'lib/assets/imgs/chicken.png'),
-                                  width: 75,
-                                  height: 81,
-                                  fit: BoxFit.cover,
+                          child: Container(
+                            padding: EdgeInsets.only(right: 5, left: 5),
+                            child: Column(
+                              children: [
+                                ClipRRect(
+                                  child: Image(
+                                    image: list[index]['cuisineImgUrl'] != null
+                                        ? NetworkImage(
+                                            list[index]['cuisineImgUrl'])
+                                        : AssetImage(
+                                            'lib/assets/imgs/chicken.png'),
+                                    width: 75,
+                                    height: 81,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius: BorderRadius.circular(5),
                                 ),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              SizedBox(
-                                height: 4,
-                              ),
-                              Text(
-                                list[index]['cuisineName'],
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: textMuliSemiboldsm(),
-                              ),
-                            ],
+                                SizedBox(
+                                  height: 4,
+                                ),
+                                Text(
+                                  list[index]['cuisineName'],
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: textMuliSemiboldsm(),
+                                ),
+                              ],
+                            ),
                           ),
                         );
                       }),

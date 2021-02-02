@@ -1,7 +1,5 @@
-import 'package:RestaurantSaas/services/constant.dart';
 import 'package:RestaurantSaas/widgets/appbar.dart';
 import 'package:flutter/material.dart';
-
 import '../../services/localizations.dart';
 import '../../styles/styles.dart';
 

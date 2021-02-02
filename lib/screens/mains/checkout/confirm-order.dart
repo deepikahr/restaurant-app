@@ -1153,27 +1153,6 @@ class _ConfrimOrderPageState extends State<ConfrimOrderPage> {
     );
   }
 
-  Widget _buildTotalPriceLine(String title, double value) {
-    return Container(
-      height: 40.0,
-      color: greyc,
-      padding: const EdgeInsets.only(left: 12.0, right: 12.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          new Text(
-            title,
-            style: titleBlackLightOSB(),
-          ),
-          new Text(
-            '$currency' + value.toStringAsFixed(2),
-            style: textLightOSR(),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildBottomBar() {
     return placeOrderLoading

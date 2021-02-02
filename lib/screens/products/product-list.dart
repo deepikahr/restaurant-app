@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
-
 import '../../services/counter-service.dart';
 import '../../services/localizations.dart';
 import '../../services/main-service.dart';
@@ -15,7 +14,6 @@ import '../../services/sentry-services.dart';
 import '../../styles/styles.dart';
 import '../../widgets/no-data.dart';
 import '../mains/checkout/cart.dart';
-import 'package:getwidget/getwidget.dart';
 
 SentryError sentryError = new SentryError();
 
@@ -60,8 +58,6 @@ class ProductListPage extends StatefulWidget {
 
 class ProductListPageState extends State<ProductListPage> {
   bool isNewUser = true;
-  final GlobalKey<AsyncLoaderState> _asyncLoaderState =
-      GlobalKey<AsyncLoaderState>();
   final GlobalKey<AsyncLoaderState> _asyncLoaderState2 =
       GlobalKey<AsyncLoaderState>();
   bool isopenAndCloseTimeLoading = false;

@@ -26,58 +26,47 @@ Widget restaurantCard(BuildContext context, info, title) {
                 width: 138,
                 height: 108,
               ),
-        SizedBox(
-          width: 12,
-        ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            SizedBox(height: 3),
-            Text(
-              info['restaurantID']['restaurantName'],
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: textMuliSemiboldsm(),
-            ),
-            SizedBox(height: 5),
-            // Text(
-            //   title == MyLocalizations.of(context).restaurantsNearYou ?
-            //   '${info['locationName']}' : '${info['Locations']['locationName']}' ,
-            //   overflow: TextOverflow.ellipsis,
-            //   maxLines: 2,
-            //   style: textMuliRegularxs(),
-            // ),
-            SizedBox(height: 3),
-            // Text(
-            //   'Closes at 11:30 pm',
-            //   overflow: TextOverflow.ellipsis,
-            //   maxLines: 2,
-            //   style: textMuliRegularxs(),
-            // ),
-            SizedBox(height: 3),
-            Container(
-              width: 30,
-              height: 15,
-              padding: EdgeInsets.only(left: 1, right: 1),
-              color: Color(0xFF39B24A),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Icon(
-                    Icons.star,
-                    color: Colors.white,
-                    size: 10,
-                  ),
-                  // Text(
-                  //   title == MyLocalizations.of(context).restaurantsNearYou
-                  //       ? info['rating'].toString()
-                  //       : info['Locations']['rating'].toString(),
-                  //   style: textMuliSemiboldwhitexs(),
-                  // )
-                ],
+        SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                info['restaurantID']['restaurantName'] ?? "",
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: textMuliSemiboldsm(),
               ),
-            )
-          ],
+              SizedBox(height: 3),
+              (info['rating'] != null && info['rating'] != 0) ||
+                      (info['Locations']['rating'] != null &&
+                          info['Locations']['rating'] != 0)
+                  ? Container(
+                      width: 30,
+                      height: 15,
+                      padding: EdgeInsets.only(left: 1, right: 1),
+                      color: Color(0xFF39B24A),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          Icon(
+                            Icons.star,
+                            color: Colors.white,
+                            size: 10,
+                          ),
+                          Text(
+                            info['rating'] != null
+                                ? info['rating'].toString()
+                                : info['Locations']['rating'].toString(),
+                            style: textMuliSemiboldwhitexs(),
+                          )
+                        ],
+                      ),
+                    )
+                  : Container()
+            ],
+          ),
         ),
       ],
     ),

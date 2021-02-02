@@ -108,48 +108,39 @@ class _CurrentLocationState extends State<CurrentLocation> {
         ),
         centerTitle: true,
       ),
-      body: Column(
+      body: ListView(
         children: <Widget>[
           SizedBox(height: 50),
-          Image.asset(
-            'lib/assets/icons/location.png',
-            width: 335.0,
-            height: 295,
-          ),
-          SizedBox(height: 125),
+          Image.asset('lib/assets/icons/location.png',
+              width: 335.0, height: 295),
+          SizedBox(height: 50),
           isPermissionCheckLoading ? Container() : buildSelectedlocation(),
           isPermissionCheckLoading
               ? Center(child: CircularProgressIndicator())
               : Container(),
           isPermissionCheckLoading ? Container() : buildSelectLocation(),
+          position == null
+              ? Container(height: 1)
+              : InkWell(
+                  onTap: _goToHomepage,
+                  child: Container(
+                      height: 41,
+                      alignment: AlignmentDirectional.center,
+                      decoration: BoxDecoration(
+                          color: primary,
+                          borderRadius: BorderRadius.circular(5),
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 1)
+                          ]),
+                      child: Text(
+                        MyLocalizations.of(context).saveandProceed,
+                        style: textMuliSemiboldwhite(),
+                      )),
+                ),
         ],
       ),
-      bottomNavigationBar: position == null
-          ? Container(height: 1)
-          : Container(
-              padding: EdgeInsets.symmetric(horizontal: 22, vertical: 34),
-              decoration: BoxDecoration(color: Colors.white, boxShadow: [
-                BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 1)
-              ]),
-              child: InkWell(
-                onTap: _goToHomepage,
-                child: Container(
-                    height: 41,
-                    alignment: AlignmentDirectional.center,
-                    decoration: BoxDecoration(
-                        color: primary,
-                        borderRadius: BorderRadius.circular(5),
-                        boxShadow: [
-                          BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 1)
-                        ]),
-                    child: Text(
-                      MyLocalizations.of(context).saveandProceed,
-                      style: textMuliSemiboldwhite(),
-                    )),
-              ),
-            ),
     );
   }
 
@@ -159,12 +150,10 @@ class _CurrentLocationState extends State<CurrentLocation> {
         : Container(
             width: MediaQuery.of(context).size.width,
             padding: EdgeInsets.all(10),
-            height: 72,
             decoration: BoxDecoration(color: bg, boxShadow: [
               BoxShadow(color: Colors.black.withOpacity(0.26), blurRadius: 1)
             ]),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: Column(
               children: <Widget>[
                 Row(
                   children: <Widget>[
@@ -192,7 +181,14 @@ class _CurrentLocationState extends State<CurrentLocation> {
                       shape: RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(5.0),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        LatLng initialPosition;
+                        setState(() {
+                          initialPosition =
+                              LatLng(position['lat'], position['long']);
+                          showMapLocationPicker(initialPosition);
+                        });
+                      },
                       child: Text(
                         MyLocalizations.of(context).changeLocation,
                         style: textMuliSemiboldprimarysm(),
@@ -206,7 +202,8 @@ class _CurrentLocationState extends State<CurrentLocation> {
     return position != null
         ? Container()
         : Container(
-            width: 217,
+            padding: EdgeInsets.only(left: 10, right: 10),
+            width: MediaQuery.of(context).size.width,
             height: 41,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),

@@ -1,7 +1,6 @@
 import 'package:RestaurantSaas/screens/mains/home/home.dart';
 import 'package:RestaurantSaas/services/localizations.dart';
 import 'package:RestaurantSaas/styles/styles.dart';
-import 'package:RestaurantSaas/widgets/card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -66,39 +65,42 @@ class RestaurantSearch extends SearchDelegate<String> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                              searchedList[index]['restaurantID']['logo'] != null
+                              searchedList[index]['restaurantID']['logo'] !=
+                                      null
                                   ? ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: Image.network(
-                                  searchedList[index]['restaurantID']['logo'],
-                                  width: 138,
-                                  height: 108,
-                                  fit: BoxFit.cover,
-                                ),
-                              )
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Image.network(
+                                        searchedList[index]['restaurantID']
+                                            ['logo'],
+                                        width: 138,
+                                        height: 108,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )
                                   : Image.asset(
-                                'lib/assets/images/dominos.png',
-                                width: 138,
-                                height: 108,
-                              ),
+                                      'lib/assets/images/dominos.png',
+                                      width: 138,
+                                      height: 108,
+                                    ),
                               SizedBox(
                                 width: 12,
                               ),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
                                 children: <Widget>[
                                   SizedBox(height: 3),
                                   Text(
                                     searchedList[index]['restaurantID']
-                                    ['restaurantName'],
+                                        ['restaurantName'],
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                     style: textMuliSemiboldsm(),
                                   ),
                                   SizedBox(height: 5),
                                   Text(
-                  searchedList[index]['locationName'],
+                                    searchedList[index]['locationName'],
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 2,
                                     style: textMuliRegularxs(),
@@ -115,10 +117,12 @@ class RestaurantSearch extends SearchDelegate<String> {
                                     children: [
                                       Container(
                                         height: 20,
-                                        padding: EdgeInsets.only(left: 12, right: 12),
+                                        padding: EdgeInsets.only(
+                                            left: 12, right: 12),
                                         color: Color(0xFF39B24A),
                                         child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
                                           children: <Widget>[
                                             Icon(
                                               Icons.star,
@@ -136,9 +140,8 @@ class RestaurantSearch extends SearchDelegate<String> {
                                         width: 6,
                                       ),
                                       Text(
-                                        '(${searchedList[index]['restaurantID']['reviewCount']} ${MyLocalizations.of(context).reviews})',
-                                        style:hintStyleSmallTextOSL()
-                                      ),
+                                          '(${searchedList[index]['restaurantID']['reviewCount']} ${MyLocalizations.of(context).reviews})',
+                                          style: hintStyleSmallTextOSL()),
                                     ],
                                   )
                                 ],

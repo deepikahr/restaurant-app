@@ -1,8 +1,6 @@
 import 'package:RestaurantSaas/screens/mains/home/home.dart';
 import 'package:flutter/material.dart';
-
 import '../../services/common.dart';
-import '../../services/localizations.dart';
 import '../../styles/styles.dart';
 
 class ThankYou extends StatefulWidget {
