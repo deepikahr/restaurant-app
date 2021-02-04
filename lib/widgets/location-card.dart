@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../styles/styles.dart';
+
 import '../services/localizations.dart';
+import '../styles/styles.dart';
 
 class LocationCard extends StatelessWidget {
   final String locationName;
@@ -30,7 +31,7 @@ class LocationCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             buildCardHeader(),
-            buildCuisineHolder(context),
+//            buildCuisineHolder(context),
             deliveryTime != null ? buildCardBottom() : Text(''),
           ],
         ),
@@ -158,6 +159,6 @@ class LocationCard extends StatelessWidget {
     if (cuisine.length > 2)
       return cuisine.substring(0, cuisine.length - 2).toUpperCase();
     else
-      return MyLocalizations.of(context).getLocalizations("NO_CUISINES");
+      return MyLocalizations.of(context).noCuisines;
   }
 }

@@ -1,21 +1,22 @@
 import 'package:RestaurantSaas/services/constant.dart';
 import 'package:RestaurantSaas/widgets/no-data.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stripe_payment/stripe_payment.dart';
+
+import '../../services/common.dart';
+import '../../services/localizations.dart';
+import '../../services/profile-service.dart';
+import '../../services/sentry-services.dart';
 import '../../styles/styles.dart';
 import '../other/thank-you.dart';
-import '../../services/profile-service.dart';
-import '../../services/common.dart';
-import '../../services/sentry-services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../services/localizations.dart';
 
 SentryError sentryError = new SentryError();
 
 class PaymentMethod extends StatefulWidget {
   final Map<String, dynamic> cart;
   final paymentMethods;
-  final Map localizedValues;
+  final Map<String, Map<String, String>> localizedValues;
   final String locale;
 
   PaymentMethod(
@@ -40,6 +41,7 @@ class _PaymentMethodState extends State<PaymentMethod> {
       isFirstTime = true;
   String currency = '';
   String _paymentMethodId;
+
   void _placeOrder() async {
     await Common.getPositionInfo().then((onValue) {
       try {
@@ -50,10 +52,8 @@ class _PaymentMethodState extends State<PaymentMethod> {
     }).catchError((onError) {
       sentryError.reportError(onError, null);
     });
-    if (widget.cart['paymentOption'] == 'RazorPay') {
-    } else {
-      _orderInfo();
-    }
+
+    _orderInfo();
   }
 
   getPaymentMethod() async {
@@ -105,15 +105,13 @@ class _PaymentMethodState extends State<PaymentMethod> {
             content: new SingleChildScrollView(
               child: new ListBody(
                 children: <Widget>[
-                  new Text(MyLocalizations.of(context)
-                      .getLocalizations("CHOOSE_PAYMENT_METHOD")),
+                  new Text(MyLocalizations.of(context).selectPaymentMethod),
                 ],
               ),
             ),
             actions: <Widget>[
               new FlatButton(
-                child: new Text(
-                    MyLocalizations.of(context).getLocalizations("OK")),
+                child: new Text(MyLocalizations.of(context).ok),
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -123,6 +121,7 @@ class _PaymentMethodState extends State<PaymentMethod> {
         },
       );
     } else {
+      widget.cart['paymentOption'] = paymentMethodList[groupValue]['type'];
       if (widget.cart['paymentOption'] == 'STRIPE') {
         StripePayment.paymentRequestWithCardForm(CardFormPaymentRequest())
             .then((pm) {
@@ -142,7 +141,6 @@ class _PaymentMethodState extends State<PaymentMethod> {
                 isPlaceOrderLoading = true;
               });
             }
-
             ProfileService.placeOrder(widget.cart).then((onValue) {
               if (mounted) {
                 setState(() {
@@ -173,27 +171,38 @@ class _PaymentMethodState extends State<PaymentMethod> {
         widget.cart['restaurantID'] =
             widget.cart['productDetails'][0]['restaurantID'];
         widget.cart['paymentMethodId'] = null;
-
         if (mounted) {
           setState(() {
             isPlaceOrderLoading = true;
           });
         }
+        Map<String, dynamic> cart = widget.cart;
+        cart['productDetails'].map((product) {
+          product.remove('product');
+          if (product['flavour'] != null) {
+            product['flavour'].map((flavour) {
+              flavour.remove('tempQuantity');
+            }).toList();
+          }
+        }).toList();
         ProfileService.placeOrder(widget.cart).then((onValue) {
           if (mounted) {
             setState(() {
               isPlaceOrderLoading = false;
             });
           }
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                builder: (BuildContext context) => ThankYou(
-                  locale: widget.locale,
-                  localizedValues: widget.localizedValues,
+          if (onValue['statusCode'] == 200) {
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (BuildContext context) => ThankYou(
+                      locale: widget.locale,
+                      localizedValues: widget.localizedValues),
                 ),
-              ),
-              (Route<dynamic> route) => route.isFirst);
+                (Route<dynamic> route) => route.isFirst);
+          } else {
+            showAlertMessageCardError(onValue['message']);
+          }
         });
       }
     }
@@ -214,8 +223,7 @@ class _PaymentMethodState extends State<PaymentMethod> {
             ),
             actions: <Widget>[
               new FlatButton(
-                child: new Text(
-                    MyLocalizations.of(context).getLocalizations("OK")),
+                child: new Text(MyLocalizations.of(context).ok.toUpperCase()),
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -228,7 +236,6 @@ class _PaymentMethodState extends State<PaymentMethod> {
   @override
   void initState() {
     getPaymentMethod();
-
     StripePayment.setOptions(StripeOptions(
         publishableKey: STRIPE_KEY,
         merchantId: "Test",
@@ -252,8 +259,8 @@ class _PaymentMethodState extends State<PaymentMethod> {
               color: Colors.white,
             )),
         title: new Text(
-          MyLocalizations.of(context).getLocalizations("PAYMENT_METHOD"),
-          style: titleBoldWhiteOSS(),
+          MyLocalizations.of(context).paymentMethod,
+          style: textbarlowSemiBoldWhite(),
         ),
         centerTitle: true,
       ),
@@ -280,17 +287,15 @@ class _PaymentMethodState extends State<PaymentMethod> {
                         : Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                              new Padding(padding: EdgeInsets.only(top: 10.0)),
-                              new Text(
-                                MyLocalizations.of(context)
-                                    .getLocalizations("PLACE_ORDER_NOW"),
+                              Padding(padding: EdgeInsets.only(top: 10.0)),
+                              Text(
+                                MyLocalizations.of(context).placeOrderNow,
                                 style: subTitleWhiteLightOSR(),
                               ),
-                              new Padding(padding: EdgeInsets.only(top: 5.0)),
-                              new Text(
-                                MyLocalizations.of(context)
-                                        .getLocalizations("TOTAL", true) +
-                                    ' $currency ${widget.cart['grandTotal'].toStringAsFixed(2)}',
+                              Padding(padding: EdgeInsets.only(top: 5.0)),
+                              Text(
+                                MyLocalizations.of(context).total +
+                                    ': $currency ${widget.cart['grandTotal'].toStringAsFixed(2)}',
                                 style: titleWhiteBoldOSB(),
                               ),
                             ],
@@ -304,7 +309,7 @@ class _PaymentMethodState extends State<PaymentMethod> {
   }
 
   Widget _buildPaymentMethodSelector() {
-    return paymentMethodList.length > 0
+    return ((paymentMethodList?.length ?? 0) > 0)
         ? SingleChildScrollView(
             child: Column(
               children: [
@@ -334,12 +339,10 @@ class _PaymentMethodState extends State<PaymentMethod> {
                               activeColor: PRIMARY,
                               title: Text(
                                 paymentMethodList[index]['type'] == "COD"
-                                    ? MyLocalizations.of(context)
-                                        .getLocalizations("CASH_ON_DELIVERY")
+                                    ? MyLocalizations.of(context).cod
                                     : paymentMethodList[index]['type'] ==
                                             "STRIPE"
-                                        ? MyLocalizations.of(context)
-                                            .getLocalizations("PAY_BY_CARD")
+                                        ? MyLocalizations.of(context).addCard
                                         : paymentMethodList[index]['type'],
                                 style: TextStyle(color: PRIMARY),
                               ),
@@ -366,8 +369,7 @@ class _PaymentMethodState extends State<PaymentMethod> {
         : Container(
             padding: EdgeInsets.all(60),
             child: NoData(
-              message: MyLocalizations.of(context)
-                  .getLocalizations("NO_PAYMENT_METHOD"),
+              message: MyLocalizations.of(context).noPaymentMethods,
               icon: Icons.hourglass_empty,
             ),
           );

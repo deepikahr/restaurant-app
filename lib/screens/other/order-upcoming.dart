@@ -1,21 +1,23 @@
+import 'package:async_loader/async_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../styles/styles.dart';
-import 'package:async_loader/async_loader.dart';
-import '../../widgets/no-data.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../services/localizations.dart';
 import '../../services/profile-service.dart';
+import '../../services/sentry-services.dart';
+import '../../styles/styles.dart';
+import '../../widgets/no-data.dart';
 import 'order-details.dart';
 import 'order-track.dart';
-import '../../services/sentry-services.dart';
-import '../../services/localizations.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 SentryError sentryError = new SentryError();
 
 class OrderUpcoming extends StatefulWidget {
   final bool isRatingAllowed;
-  final Map localizedValues;
+  final Map<String, Map<String, String>> localizedValues;
   final String locale;
+
   OrderUpcoming(
       {Key key, this.isRatingAllowed, this.locale, this.localizedValues})
       : super(key: key);
@@ -56,8 +58,7 @@ class OrderUpcomingState extends State<OrderUpcoming>
         renderError: ([error]) {
           sentryError.reportError(error, null);
           return NoData(
-              message:
-                  MyLocalizations.of(context).getLocalizations("ERROR_MSG"),
+              message: MyLocalizations.of(context).connectionError,
               icon: Icons.block);
         },
         renderSuccess: ({data}) {
@@ -73,14 +74,17 @@ class OrderUpcomingState extends State<OrderUpcoming>
   static Widget buildEmptyPage(context) {
     return Padding(
       padding: EdgeInsets.only(top: 40.0),
-      child: NoData(
-          message: MyLocalizations.of(context)
-              .getLocalizations("NO_COMPLETED_ORDERS")),
+      child: NoData(message: MyLocalizations.of(context).noCompletedOrders),
     );
   }
 
-  static Widget buildOrderList(List<dynamic> orders, bool isRatingAllowed,
-      context, final String locale, Map localizedValues, String currency) {
+  static Widget buildOrderList(
+      List<dynamic> orders,
+      bool isRatingAllowed,
+      context,
+      final String locale,
+      Map<String, Map<String, String>> localizedValues,
+      String currency) {
     return Container(
       color: Colors.grey[300],
       child: ListView.builder(
@@ -89,33 +93,28 @@ class OrderUpcomingState extends State<OrderUpcoming>
         itemCount: orders.length,
         padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 13.0),
         itemBuilder: (BuildContext context, int index) {
-          String status, orderTypeConvert;
           if (orders[index]['status'] == "Accepted") {
-            status = MyLocalizations.of(context).getLocalizations("ACCEPTED");
+            orders[index]['status'] = MyLocalizations.of(context).accepted;
           } else if (orders[index]['status'] == "On the way.") {
-            status = MyLocalizations.of(context).getLocalizations("ON_THE_WAY");
+            orders[index]['status'] = MyLocalizations.of(context).ontheWay;
           } else if (orders[index]['status'] == "Delivered") {
-            status = MyLocalizations.of(context).getLocalizations("DELIVERED");
+            orders[index]['status'] = MyLocalizations.of(context).delivered;
           } else if (orders[index]['status'] == "Cancelled") {
-            status = MyLocalizations.of(context).getLocalizations("CANCELLED");
+            orders[index]['status'] = MyLocalizations.of(context).cancelled;
           } else if (orders[index]['status'] == "Pending") {
-            status = MyLocalizations.of(context).getLocalizations("PENDING");
+            orders[index]['status'] = MyLocalizations.of(context).pending;
           } else {
-            status = orders[index]['status'];
+            orders[index]['status'] = orders[index]['status'];
           }
           if (orders[index]['orderType'] == "Pickup") {
-            orderTypeConvert =
-                MyLocalizations.of(context).getLocalizations("PICKUP");
+            orders[index]['orderType'] = MyLocalizations.of(context).pickUp;
           } else if (orders[index]['orderType'] == "Dine In") {
-            orderTypeConvert =
-                MyLocalizations.of(context).getLocalizations("DINE_IN");
+            orders[index]['orderType'] = MyLocalizations.of(context).dineIn;
           } else if (orders[index]['orderType'] == "Delivery") {
-            orderTypeConvert =
-                MyLocalizations.of(context).getLocalizations("DELIVERY");
+            orders[index]['orderType'] = MyLocalizations.of(context).dELIVERY;
           } else {
-            orderTypeConvert = orders[index]['orderType'];
+            orders[index]['orderType'] = orders[index]['orderType'];
           }
-
           return Container(
             width: screenWidth(context),
             margin: EdgeInsetsDirectional.only(top: 8.0),
@@ -127,8 +126,7 @@ class OrderUpcomingState extends State<OrderUpcoming>
                     orders[index]['productDetails'][0]['imageUrl'],
                     orders[index]['productDetails'].length,
                     orders[index]['productDetails'][0]['restaurant'],
-                    status,
-                    orderTypeConvert,
+                    orders[index]['status'],
                     orders[index]['orderType'],
                     orders[index]['tableNumber'],
                     orders[index]['pickupDate'] == null
@@ -139,9 +137,9 @@ class OrderUpcomingState extends State<OrderUpcoming>
                         : orders[index]['pickupTime'],
                     context),
                 _buildOrderInfo(
-                    orderTypeConvert,
                     orders[index]['orderType'],
-                    status,
+                    orders[index]['status'],
+                    'Date',
                     orders[index]['orderID'],
                     context,
                     isRatingAllowed,
@@ -179,7 +177,6 @@ class OrderUpcomingState extends State<OrderUpcoming>
       int itemCount,
       String restaurantName,
       String status,
-      String orderTypeConvert,
       String orderType,
       int tableNumber,
       String date,
@@ -213,24 +210,15 @@ class OrderUpcomingState extends State<OrderUpcoming>
                   style: titleLightWhiteOSR(),
                 ),
                 Text(
-                  itemCount == 1
-                      ? itemCount.toString() +
-                          ' ' +
-                          MyLocalizations.of(context).getLocalizations("ITEM")
-                      : itemCount.toString() +
-                          ' ' +
-                          MyLocalizations.of(context).getLocalizations("ITEMS"),
+                  itemCount.toString() + ' ' + MyLocalizations.of(context).item,
                   style: hintStyleSmallWhiteBoldOSL(),
                 ),
                 Text(
-                  MyLocalizations.of(context).getLocalizations("STATUS", true) +
-                      status,
+                  MyLocalizations.of(context).status + ": " + status,
                   style: hintStyleSmallWhiteBoldOSL(),
                 ),
                 Text(
-                  MyLocalizations.of(context)
-                          .getLocalizations("ORDER_TYPE", true) +
-                      orderTypeConvert,
+                  MyLocalizations.of(context).type + ": " + orderType,
                   style: hintStyleSmallWhiteBoldOSL(),
                 ),
               ]),
@@ -246,9 +234,11 @@ class OrderUpcomingState extends State<OrderUpcoming>
                       color: PRIMARY,
                     ),
                     child: Text(
-                      MyLocalizations.of(context)
-                              .getLocalizations("PICKUP_DATE_TIME", true) +
-                          (date + ", " + time),
+                      MyLocalizations.of(context).pickUpTime +
+                          ": " +
+                          date +
+                          "  " +
+                          time,
                       style: hintStyleSmallWhiteBoldOSL(),
                     ))
                 : Container(),
@@ -260,8 +250,8 @@ class OrderUpcomingState extends State<OrderUpcoming>
                       color: PRIMARY,
                     ),
                     child: Text(
-                      MyLocalizations.of(context)
-                              .getLocalizations("TABLE_NO", true) +
+                      MyLocalizations.of(context).tableNo +
+                          ".: " +
                           tableNumber.toString(),
                       style: hintStyleSmallWhiteBoldOSL(),
                     ))
@@ -273,15 +263,15 @@ class OrderUpcomingState extends State<OrderUpcoming>
   }
 
   static Widget _buildOrderInfo(
-      String orderTypeConvert,
-      String orderType,
+      String type,
       String status,
+      String time,
       int orderId,
       BuildContext context,
       bool isRatingAllowed,
       String orderIdUniq,
       final String locale,
-      Map localizedValues) {
+      Map<String, Map<String, String>> localizedValues) {
     return Container(
       padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
       child: Row(
@@ -311,12 +301,12 @@ class OrderUpcomingState extends State<OrderUpcoming>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  orderTypeConvert + ' : ' + status,
+                  type + ' : ' + status,
                   style: hintStyleSmallDarkBoldOSL(),
                 ),
                 Text(
-                  MyLocalizations.of(context)
-                          .getLocalizations("ORDER_ID", true) +
+                  MyLocalizations.of(context).orderID +
+                      ": " +
                       orderId.toString(),
                   style: titleBlackLightOSB(),
                 ),
@@ -361,8 +351,8 @@ class OrderUpcomingState extends State<OrderUpcoming>
                   fillColor: PRIMARY,
                   child: new Text(
                     isRatingAllowed
-                        ? MyLocalizations.of(context).getLocalizations("VIEW")
-                        : MyLocalizations.of(context).getLocalizations("TRACK"),
+                        ? MyLocalizations.of(context).view
+                        : MyLocalizations.of(context).track,
                     style: hintStylesmallWhiteLightOSL(),
                   ),
                 ),
@@ -466,30 +456,14 @@ class OrderUpcomingState extends State<OrderUpcoming>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Text(
-                "${MyLocalizations.of(context).getLocalizations("TOTAL", true)}",
+                "${MyLocalizations.of(context).grandTotal}: $currency" +
+                    total.toStringAsFixed(2),
                 style: hintStyleSmallDarkBoldOSL(),
               ),
               Text(
-                currency + total.toStringAsFixed(2),
-                overflow: TextOverflow.ellipsis,
-                style: hintStyleSmallDarkBoldOSL(),
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Text(
-                "${MyLocalizations.of(context).getLocalizations("PAYMENT_TYPE", true)}",
-                style: hintStyleSmallDarkBoldOSL(),
-              ),
-              Text(
-                (paymentMode == "COD"
-                    ? MyLocalizations.of(context)
-                        .getLocalizations("CASH_ON_DELIVERY")
-                    : paymentMode == "STRIPE" || paymentMode == "CREDIT CARD"
-                        ? MyLocalizations.of(context)
-                            .getLocalizations("PAY_BY_CARD")
+                "${MyLocalizations.of(context).paymentMode}: " +
+                    (paymentMode == 'Stripe' || paymentMode == "CREDIT CARD"
+                        ? 'CC'
                         : paymentMode),
                 overflow: TextOverflow.ellipsis,
                 style: hintStyleSmallDarkBoldOSL(),
@@ -499,13 +473,9 @@ class OrderUpcomingState extends State<OrderUpcoming>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
+              Text(MyLocalizations.of(context).chargesIncluding),
               Text(
-                "${MyLocalizations.of(context).getLocalizations("DATE", true)}",
-                style: hintStyleSmallDarkBoldOSL(),
-              ),
-              Text(
-                time.toString() ?? "",
-                overflow: TextOverflow.ellipsis,
+                time == null ? "" : time.toString(),
                 style: hintStyleSmallDarkBoldOSL(),
               ),
             ],

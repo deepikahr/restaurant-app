@@ -2,22 +2,25 @@ import 'dart:async';
 
 import 'package:RestaurantSaas/screens/mains/home.dart';
 import 'package:RestaurantSaas/services/constant.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../styles/styles.dart';
+
 import '../../services/auth-service.dart';
 import '../../services/common.dart';
-import 'registration.dart';
-import 'forgot-password.dart';
-import '../../services/sentry-services.dart';
 import '../../services/localizations.dart';
+import '../../services/sentry-services.dart';
+import '../../styles/styles.dart';
+import 'forgot-password.dart';
+import 'registration.dart';
 
 SentryError sentryError = new SentryError();
 
 class LoginPage extends StatefulWidget {
   final isDrawe;
   final String locale;
-  final Map localizedValues;
+  final Map<String, Map<String, String>> localizedValues;
 
   LoginPage({Key key, this.isDrawe, this.locale, this.localizedValues})
       : super(key: key);
@@ -27,13 +30,14 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  String email, password;
+  String mobileNumber, password;
   bool isLoading = false;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
+    mobileNumber = mobileNumber ?? 'user@ionicfirebaseapp.com';
     super.initState();
   }
 
@@ -47,22 +51,35 @@ class _LoginPageState extends State<LoginPage> {
         });
       }
       _formKey.currentState.save();
-      Map<String, dynamic> body = {
-        'email': email,
-        'password': password,
-        "playerId": prefs.getString("playerId")
-      };
-
+      var body;
+      if (RegExp(EMAIL_PATTERN).hasMatch(mobileNumber)) {
+        body = {
+          'email': mobileNumber,
+          'password': password,
+          "playerId": prefs.getString("playerId")
+        };
+      } else {
+        body = {
+          'email': mobileNumber,
+          'password': password,
+          "playerId": prefs.getString("playerId")
+        };
+      }
       AuthService.login(body).then((onValue) {
         try {
           if (onValue['message'] != null) {
-            showSnackbar(onValue['message']);
+            if (onValue['message'].toString().compareTo(
+                    'Your Mobile Number is not verified yet. Please verify it and then continue') ==
+                0) {
+              showVerifySnackbar(onValue['message']);
+            } else {
+              showSnackbar(onValue['message']);
+            }
           }
           if (onValue['token'] != null) {
             Common.setToken(onValue['token']).then((saved) {
               if (saved) {
-                showSnackbar(MyLocalizations.of(context)
-                    .getLocalizations("LOGIN_SUCCESSFUL"));
+                showSnackbar(MyLocalizations.of(context).loginSuccessful);
                 Future.delayed(Duration(milliseconds: 1500), () {
                   if (widget.isDrawe == true) {
                     Navigator.pushAndRemoveUntil(
@@ -75,7 +92,7 @@ class _LoginPageState extends State<LoginPage> {
                         (Route<dynamic> route) => route.isFirst);
                   } else {
                     Navigator.of(context).pop(
-                      MyLocalizations.of(context).getLocalizations("SUCCESS"),
+                      MyLocalizations.of(context).success,
                     );
                   }
                 });
@@ -110,6 +127,29 @@ class _LoginPageState extends State<LoginPage> {
     _scaffoldKey.currentState.showSnackBar(snackBar);
   }
 
+  void showVerifySnackbar(message) {
+    final snackBar = SnackBar(
+      duration: Duration(minutes: 1),
+      content: RichText(
+          text: TextSpan(text: message, children: [
+        TextSpan(text: '  '),
+        TextSpan(
+            recognizer: TapGestureRecognizer()
+              ..onTap = () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (BuildContext context) => ForgotPassword(
+                            title: MyLocalizations.of(context).verifyOtp,
+                            locale: widget.locale,
+                            localizedValues: widget.localizedValues,
+                          ))),
+            text: MyLocalizations.of(context).verifyNow,
+            style: textPrimaryBoldOSR())
+      ])),
+    );
+    _scaffoldKey.currentState.showSnackBar(snackBar);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -119,7 +159,7 @@ class _LoginPageState extends State<LoginPage> {
         child: Stack(
           fit: StackFit.expand,
           children: <Widget>[
-            buildLoginPageBg(),
+            // buildLoginPageBg(),
             SingleChildScrollView(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -151,9 +191,7 @@ class _LoginPageState extends State<LoginPage> {
     return Padding(
       padding: EdgeInsets.only(top: 70.0, bottom: 40.0),
       child: Image(
-        image: AssetImage(
-          "lib/assets/logos/playstore-icon.png",
-        ),
+        image: AssetImage("lib/assets/logos/logo.png"),
         fit: BoxFit.cover,
         width: 95.0,
       ),
@@ -178,8 +216,7 @@ class _LoginPageState extends State<LoginPage> {
               Padding(
                 padding: EdgeInsetsDirectional.only(top: 40.0, bottom: 20.0),
                 child: Text(
-                  MyLocalizations.of(context)
-                      .getLocalizations("DONT_HAVE_ACCOUNT"),
+                  MyLocalizations.of(context).dontHaveAccountYet,
                   style: subTitleWhiteLightOSR(),
                 ),
               ),
@@ -195,20 +232,20 @@ class _LoginPageState extends State<LoginPage> {
     return Container(
       color: Colors.white,
       child: TextFormField(
-        initialValue: "user@ionicfirebaseapp.com",
+        initialValue: 'user@ionicfirebaseapp.com',
         keyboardType: TextInputType.emailAddress,
         validator: (String value) {
-          if (value.isEmpty || !RegExp(EMAIL_PATTERN).hasMatch(value)) {
+          if (value.isEmpty) {
             return MyLocalizations.of(context)
-                .getLocalizations("ENTER_VALID_EMAIL_ID");
-          } else
-            return null;
+                .pleaseEnterValidEmailOrPhoneNumber;
+          }
+          return null;
         },
-        onSaved: (String value) {
-          email = value;
+        onChanged: (String value) {
+          mobileNumber = value;
         },
         decoration: InputDecoration(
-          labelText: MyLocalizations.of(context).getLocalizations("EMAIL_ID"),
+          labelText: MyLocalizations.of(context).yourEmailOrMobileNumber,
           labelStyle: hintStyleGreyLightOSR(),
           contentPadding: EdgeInsets.all(10),
           border: InputBorder.none,
@@ -223,12 +260,11 @@ class _LoginPageState extends State<LoginPage> {
       margin: EdgeInsets.only(top: 4.0),
       color: Colors.white,
       child: TextFormField(
-        initialValue: "123456",
+        initialValue: '123456',
         keyboardType: TextInputType.text,
         validator: (String value) {
           if (value.isEmpty || value.length < 6) {
-            return MyLocalizations.of(context)
-                .getLocalizations("PLEASE_ENTER_VALID_PASSWORD");
+            return MyLocalizations.of(context).pleaseEnterValidPassword;
           } else
             return null;
         },
@@ -236,7 +272,7 @@ class _LoginPageState extends State<LoginPage> {
           password = value;
         },
         decoration: InputDecoration(
-          labelText: MyLocalizations.of(context).getLocalizations("PASSWORD"),
+          labelText: MyLocalizations.of(context).yourPassword,
           labelStyle: hintStyleGreyLightOSR(),
           contentPadding: EdgeInsets.only(
             left: 15.0,
@@ -261,20 +297,13 @@ class _LoginPageState extends State<LoginPage> {
         height: 56.0,
         width: screenWidth(context),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.topRight,
-            colors: [
-              const Color(0xFFFFFFFF).withOpacity(0.25),
-              const Color(0xFFFFFFFF).withOpacity(0.25)
-            ],
-          ),
+          color: Color(0xFFFFFFFF).withOpacity(0.25),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              MyLocalizations.of(context).getLocalizations("LOGIN"),
+              MyLocalizations.of(context).loginToYourAccount,
               style: subTitleWhiteLightOSR(),
             ),
             Padding(padding: EdgeInsets.only(left: 5.0, right: 5.0)),
@@ -299,7 +328,8 @@ class _LoginPageState extends State<LoginPage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (BuildContext context) => ResetPassword(
+                builder: (BuildContext context) => ForgotPassword(
+                  title: MyLocalizations.of(context).forgotPassword,
                   locale: widget.locale,
                   localizedValues: widget.localizedValues,
                 ),
@@ -307,8 +337,7 @@ class _LoginPageState extends State<LoginPage> {
             );
           },
           child: Text(
-            MyLocalizations.of(context).getLocalizations("FORGET_PASSWORD") +
-                "?",
+            MyLocalizations.of(context).forgotPassword,
             style: hintStyleLightOSB(),
           )),
     );
@@ -322,7 +351,7 @@ class _LoginPageState extends State<LoginPage> {
         width: screenWidth(context),
         decoration: BoxDecoration(border: Border.all(color: Colors.white70)),
         child: Text(
-          MyLocalizations.of(context).getLocalizations("SIGN_IN_NOW"),
+          MyLocalizations.of(context).signUpNow,
           style: subTitleWhiteShadeLightOSR(),
         ),
       ),

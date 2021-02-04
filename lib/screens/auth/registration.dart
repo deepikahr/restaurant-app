@@ -1,17 +1,22 @@
+import 'dart:async';
+
+import 'package:RestaurantSaas/screens/auth/otp-verify.dart';
 import 'package:RestaurantSaas/services/constant.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../styles/styles.dart';
+import 'package:country_list_pick/country_list_pick.dart';
+
 import '../../services/auth-service.dart';
-import 'dart:async';
 import '../../services/localizations.dart';
-import 'package:flutter/foundation.dart';
+import '../../styles/styles.dart';
 
 class RegisterForm extends StatefulWidget {
   final String locale;
-  final Map localizedValues;
+  final Map<String, Map<String, String>> localizedValues;
 
   RegisterForm({Key key, this.locale, this.localizedValues}) : super(key: key);
+
   @override
   _RegisterFormState createState() => _RegisterFormState();
 }
@@ -24,10 +29,13 @@ class _RegisterFormState extends State<RegisterForm> {
   Map<String, dynamic> register = {
     'email': null,
     'password': null,
+    'countryCode': "91",
     'name': null,
     'role': 'User',
     'contactNumber': null
   };
+
+  get theme => null;
 
   @override
   void initState() {
@@ -52,13 +60,27 @@ class _RegisterFormState extends State<RegisterForm> {
             isLoading = true;
           });
         }
+        if (register['email'] == null) {
+          register.remove("email");
+        }
         _formKey.currentState.save();
         await AuthService.register(register).then((onValue) {
           if (onValue['message'] != null) {
             showSnackbar(onValue['message']);
             Future.delayed(const Duration(milliseconds: 3000), () {
               if (onValue['_id'] != null) {
-                Navigator.pop(context);
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => OtpVerify(
+                              isComingRegister: true,
+                              userToken: onValue['token'],
+                              countryCode: register['countryCode'],
+                              mobileNumber: register['contactNumber'],
+                              verificationId: onValue['verificationId'],
+                              localizedValues: widget.localizedValues,
+                              locale: widget.locale,
+                            )));
               }
               if (mounted) {
                 setState(() {
@@ -76,15 +98,15 @@ class _RegisterFormState extends State<RegisterForm> {
           }
         });
       } else {
-        showSnackbar(MyLocalizations.of(context)
-          ..getLocalizations("CONDITION_ACCEPT_MSG"));
+        showSnackbar(
+            MyLocalizations.of(context).pleaseAccepttermsandconditions);
       }
     }
   }
 
   showSnackbar(message) {
     final snackBar = SnackBar(
-      content: Text(message),
+      content: Text(message.toString()),
       duration: Duration(milliseconds: 3000),
     );
     _scaffoldKey.currentState.showSnackBar(snackBar);
@@ -94,51 +116,40 @@ class _RegisterFormState extends State<RegisterForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
+      backgroundColor: Color(0XFF303030),
       appBar: AppBar(
         leading: InkWell(
           onTap: () {
             Navigator.pop(context);
           },
-          child: Icon(
-            Icons.arrow_back,
-            color: Colors.white,
-          ),
+          child: Icon(Icons.arrow_back, color: Colors.white),
         ),
-        title: Text(MyLocalizations.of(context).getLocalizations("REGISTER")),
+        title: Text(
+          MyLocalizations.of(context).register,
+          style: textbarlowSemiBoldWhite(),
+        ),
         centerTitle: true,
         backgroundColor: PRIMARY,
       ),
-      body: Container(
-        child: Stack(
-          fit: StackFit.expand,
-          children: <Widget>[
-            Image(
-              image: AssetImage("lib/assets/bgImgs/background.png"),
-              fit: BoxFit.fill,
-              height: screenHeight(context),
-              width: screenWidth(context),
+      body: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: Column(
+              children: <Widget>[
+                _buildNameField(),
+                _buildCountryCode(),
+                _buildNumberField(),
+                _buildEmailField(),
+                _buildPasswordField(),
+                _buildTermsAndCondiField(),
+              ],
             ),
-            SingleChildScrollView(
-                child: Form(
-              key: _formKey,
-              child: Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    _buildNameField(),
-                    _buildNumberField(),
-                    _buildEmailField(),
-                    _buildPasswordField(),
-                    _buildTermsAndCondiField(),
-                    _buildRegisterButton(),
-                  ],
-                ),
-              ),
-            ))
-          ],
+          ),
         ),
       ),
+      bottomNavigationBar: _buildRegisterButton(),
     );
   }
 
@@ -156,17 +167,15 @@ class _RegisterFormState extends State<RegisterForm> {
               keyboardType: TextInputType.text,
               validator: (String value) {
                 if (value.isEmpty) {
-                  return MyLocalizations.of(context)
-                      .getLocalizations("ENTER_FULLNAME");
+                  return MyLocalizations.of(context).pleaseEnterValidName;
                 } else
                   return null;
               },
-              onSaved: (String value) {
+              onChanged: (String value) {
                 register['name'] = value;
               },
               decoration: new InputDecoration(
-                labelText:
-                    MyLocalizations.of(context).getLocalizations("FULLNAME"),
+                labelText: MyLocalizations.of(context).fullName,
                 hintStyle: hintStyleGreyLightOSR(),
                 contentPadding: EdgeInsets.all(12.0),
                 border: InputBorder.none,
@@ -178,6 +187,23 @@ class _RegisterFormState extends State<RegisterForm> {
             flex: 1,
             child: Icon(Icons.person, size: 16.0, color: greyTextc),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCountryCode() {
+    return Container(
+      margin: EdgeInsets.only(top: 14.0),
+      color: Colors.white,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          CountryListPick(
+              initialSelection: '+91',
+              onChanged: (CountryCode code) {
+                register['countryCode'] = code.dialCode.substring(1).toString();
+              }),
         ],
       ),
     );
@@ -197,19 +223,18 @@ class _RegisterFormState extends State<RegisterForm> {
               maxLength: 10,
               keyboardType: TextInputType.number,
               validator: (String value) {
-                if (value.isEmpty) {
+                if (value.isEmpty || value.length < 8) {
                   return MyLocalizations.of(context)
-                      .getLocalizations("ENTER_CONTACT_NUMBER");
+                      .pleaseEnterValidMobileNumber;
                 } else
                   return null;
               },
-              onSaved: (String value) {
+              onChanged: (String value) {
                 register['contactNumber'] = value;
               },
               decoration: new InputDecoration(
                 counterText: "",
-                labelText: MyLocalizations.of(context)
-                    .getLocalizations("CONTACT_NUMBER"),
+                labelText: MyLocalizations.of(context).mobileNumber,
                 hintStyle: hintStyleGreyLightOSR(),
                 contentPadding: EdgeInsets.all(12.0),
                 border: InputBorder.none,
@@ -219,7 +244,7 @@ class _RegisterFormState extends State<RegisterForm> {
           Flexible(
             fit: FlexFit.tight,
             flex: 1,
-            child: Icon(Icons.person, size: 16.0, color: greyTextc),
+            child: Icon(Icons.phone, size: 16.0, color: greyTextc),
           ),
         ],
       ),
@@ -238,21 +263,20 @@ class _RegisterFormState extends State<RegisterForm> {
             flex: 9,
             child: TextFormField(
               decoration: new InputDecoration(
-                labelText:
-                    MyLocalizations.of(context).getLocalizations("EMAIL_ID"),
+                labelText: MyLocalizations.of(context).emailId,
                 hintStyle: hintStyleGreyLightOSR(),
                 contentPadding: EdgeInsets.all(12.0),
                 border: InputBorder.none,
               ),
               keyboardType: TextInputType.emailAddress,
               validator: (String value) {
-                if (value.isEmpty || !RegExp(EMAIL_PATTERN).hasMatch(value)) {
-                  return MyLocalizations.of(context)
-                      .getLocalizations("ENTER_VALID_EMAIL_ID");
+                if ((value?.length ?? 0) > 0 &&
+                    !RegExp(EMAIL_PATTERN).hasMatch(value)) {
+                  return MyLocalizations.of(context).pleaseEnterValidEmail;
                 } else
                   return null;
               },
-              onSaved: (String value) {
+              onChanged: (String value) {
                 register['email'] = value;
               },
             ),
@@ -279,8 +303,7 @@ class _RegisterFormState extends State<RegisterForm> {
             flex: 9,
             child: TextFormField(
               decoration: new InputDecoration(
-                labelText:
-                    MyLocalizations.of(context).getLocalizations("PASSWORD"),
+                labelText: MyLocalizations.of(context).password,
                 hintStyle: hintStyleGreyLightOSR(),
                 contentPadding: EdgeInsets.all(12.0),
                 border: InputBorder.none,
@@ -289,12 +312,11 @@ class _RegisterFormState extends State<RegisterForm> {
               obscureText: true,
               validator: (String value) {
                 if (value.isEmpty || value.length < 6) {
-                  return MyLocalizations.of(context)
-                      .getLocalizations("PLEASE_ENTER_VALID_PASSWORD");
+                  return MyLocalizations.of(context).pleaseEnterValidPassword;
                 } else
                   return null;
               },
-              onSaved: (String value) {
+              onChanged: (String value) {
                 register['password'] = value;
               },
             ),
@@ -326,9 +348,11 @@ class _RegisterFormState extends State<RegisterForm> {
             activeColor: PRIMARY,
           ),
           Container(
-            child: new Text(
-              MyLocalizations.of(context).getLocalizations("ACCEPT_TERMS"),
-              style: subTitleWhiteShadeLightOSR(),
+            child: Expanded(
+              child: new Text(
+                MyLocalizations.of(context).acceptTerms,
+                style: subTitleWhiteShadeLightOSR(),
+              ),
             ),
           ),
         ],
@@ -338,25 +362,23 @@ class _RegisterFormState extends State<RegisterForm> {
 
   Widget _buildRegisterButton() {
     return Container(
-      // width: screenWidth(context),
-      // top: screenHeight(context) * 0.78,
+      padding: const EdgeInsets.all(14.0),
       child: RawMaterialButton(
         child: !isLoading
             ? Container(
                 alignment: AlignmentDirectional.center,
-                margin: EdgeInsets.only(left: 20.0, right: 20.0),
+                margin: EdgeInsets.only(left: 5.0, right: 5.0),
                 height: 56.0,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.white70),
-                ),
+                decoration:
+                    BoxDecoration(border: Border.all(color: Colors.white70)),
                 child: Text(
-                  MyLocalizations.of(context).getLocalizations("RIGISTER_NOW"),
+                  MyLocalizations.of(context).registerNow,
                   style: subTitleWhiteShadeLightOSR(),
                 ),
               )
             : Container(
                 alignment: AlignmentDirectional.center,
-                margin: EdgeInsets.only(left: 20.0, right: 20.0),
+                margin: EdgeInsets.only(left: 5.0, right: 5.0),
                 height: 56.0,
                 decoration:
                     BoxDecoration(border: Border.all(color: Colors.white70)),

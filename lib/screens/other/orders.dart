@@ -6,7 +6,7 @@ import 'order-history.dart';
 import 'order-upcoming.dart';
 
 class OrdersPage extends StatefulWidget {
-  final Map localizedValues;
+  final Map<String, Map<String, String>> localizedValues;
   final String locale;
 
   OrdersPage({Key key, this.locale, this.localizedValues}) : super(key: key);
@@ -39,12 +39,18 @@ class _OrdersPageState extends State<OrdersPage>
           onTap: () {
             Navigator.pop(context);
           },
-          child: Icon(Icons.arrow_back),
+          child: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
         ),
         centerTitle: true,
         backgroundColor: PRIMARY,
         elevation: 0.0,
-        title: Text(MyLocalizations.of(context).getLocalizations("MY_ORDERS")),
+        title: Text(
+          MyLocalizations.of(context).myOrders,
+          style: textbarlowSemiBoldWhite(),
+        ),
       ),
       body: DefaultTabController(
         length: 2,
@@ -56,13 +62,13 @@ class _OrdersPageState extends State<OrdersPage>
                 tabs: [
                   Tab(
                     child: Text(
-                      MyLocalizations.of(context).getLocalizations("UP_COMING"),
+                      MyLocalizations.of(context).upcoming,
                       style: subTitleWhiteLightOSR(),
                     ),
                   ),
                   Tab(
                     child: Text(
-                      MyLocalizations.of(context).getLocalizations("HISTORY"),
+                      MyLocalizations.of(context).history,
                       style: subTitleWhiteLightOSR(),
                     ),
                   ),

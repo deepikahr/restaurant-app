@@ -1,27 +1,24 @@
 import 'package:RestaurantSaas/screens/mains/cart.dart';
-import 'package:RestaurantSaas/screens/mains/product-list.dart';
-import '../../services/counter-service.dart';
-import 'package:flutter/material.dart';
-import '../../styles/styles.dart';
-import 'home.dart';
-import '../../services/main-service.dart';
 import 'package:async_loader/async_loader.dart';
-import '../../widgets/no-data.dart';
-import 'location-list-sheet.dart';
+import 'package:flutter/material.dart';
+
 import '../../services/common.dart';
-import '../../services/sentry-services.dart';
+import '../../services/counter-service.dart';
 import '../../services/localizations.dart';
+import '../../services/main-service.dart';
+import '../../services/sentry-services.dart';
+import '../../styles/styles.dart';
+import '../../widgets/no-data.dart';
+import 'home.dart';
 
 SentryError sentryError = new SentryError();
 
 class RestaurantListPage extends StatefulWidget {
   final String title;
-  final Map localizedValues;
+  final Map<String, Map<String, String>> localizedValues;
   final String locale;
-  final Map taxInfo;
 
-  RestaurantListPage(
-      {Key key, this.title, this.locale, this.localizedValues, this.taxInfo})
+  RestaurantListPage({Key key, this.title, this.locale, this.localizedValues})
       : super(key: key);
 
   @override
@@ -37,18 +34,28 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   getRestaurantsList() async {
-    if (widget.title ==
-        MyLocalizations.of(context).getLocalizations("TOP_RATED")) {
-      return await MainService.getTopRatedRestaurants();
-    } else if (widget.title ==
-        MyLocalizations.of(context).getLocalizations("NEWLY_ARRIVED")) {
-      return await MainService.getNewlyArrivedRestaurants();
-    } else {
+    if (widget.title == MyLocalizations.of(context).topRated) {
       List<dynamic> restaurants;
       await Common.getPositionInfo().then((position) async {
         try {
-          await MainService.getNearByRestaurants(
-                  position['lat'], position['long'])
+          await MainService.getTopRatedRestaurants(
+                  lat: position['lat'], long: position['long'])
+              .then((onValue) {
+            restaurants = onValue;
+          });
+        } catch (error, stackTrace) {
+          sentryError.reportError(error, stackTrace);
+        }
+      }).catchError((onError) {
+        sentryError.reportError(onError, null);
+      });
+      return restaurants;
+    } else if (widget.title == MyLocalizations.of(context).newlyArrived) {
+      List<dynamic> restaurants;
+      await Common.getPositionInfo().then((position) async {
+        try {
+          await MainService.getNewlyArrivedRestaurants(
+                  lat: position['lat'], long: position['long'])
               .then((onValue) {
             restaurants = onValue;
           });
@@ -60,12 +67,28 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
       });
       return restaurants;
     }
+    if (widget.title == MyLocalizations.of(context).restaurantsNearYou) {
+      List<dynamic> restaurants;
+      await Common.getPositionInfo().then((position) async {
+        try {
+          await MainService.getNearByRestaurants(
+                  position['lat'], position['long'])
+              .then((onValue) {
+            restaurants = onValue['dataArr'];
+          });
+        } catch (error, stackTrace) {
+          sentryError.reportError(error, stackTrace);
+        }
+      }).catchError((onError) {
+        print(onError);
+        sentryError.reportError(onError, null);
+      });
+      return restaurants;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-//    String review = MyLocalizations.of(context).reviews;
-
     CounterService().getCounter().then((res) {
       try {
         if (mounted) {
@@ -94,9 +117,10 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
           ),
         ),
         title: Text(
-          widget.title +
-              MyLocalizations.of(context).getLocalizations("RESTAURANTS"),
-          style: titleBoldWhiteOSS(),
+          widget.title == MyLocalizations.of(context).restaurantsNearYou
+              ? widget.title
+              : widget.title + MyLocalizations.of(context).restaurants,
+          style: textbarlowSemiBoldWhite(),
         ),
         centerTitle: true,
         actions: <Widget>[
@@ -116,7 +140,10 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
                 children: <Widget>[
                   Container(
                       padding: EdgeInsets.only(top: 20.0, right: 10),
-                      child: Icon(Icons.shopping_cart)),
+                      child: Icon(
+                        Icons.shopping_cart,
+                        color: Colors.white,
+                      )),
                   Positioned(
                       right: 3,
                       top: 5,
@@ -158,117 +185,57 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
         renderError: ([error]) {
           sentryError.reportError(error, null);
           return NoData(
-              message:
-                  MyLocalizations.of(context).getLocalizations("ERROR_MSG"),
+              message: MyLocalizations.of(context).connectionError,
               icon: Icons.block);
         },
         renderSuccess: ({data}) {
-          return GridView.builder(
-              physics: ScrollPhysics(),
-              shrinkWrap: true,
-              gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2),
-              itemCount: data.length,
-              padding: const EdgeInsets.all(0.0),
-              itemBuilder: (BuildContext context, int index) {
-                return widget.title ==
-                        MyLocalizations.of(context).getLocalizations("NEAR_BY")
-                    ? InkWell(
-                        child: HomePageState.buildRestaurantCardNear(
-                            data[index],
-                            MyLocalizations.of(context)
-                                .getLocalizations("REVIEW"),
-                            MyLocalizations.of(context)
-                                .getLocalizations("BRANCHES")),
-                        onTap: () async {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (BuildContext context) =>
-                                  ProductListPage(
-                                restaurantName: data[index]['list']
-                                    ['restaurantID']['restaurantName'],
-                                locationName: data[index]['list']
-                                    ['locationName'],
-                                aboutUs: data[index]['list']['aboutUs'],
-                                imgUrl:
-                                    data[index]['list']['restaurantID'] != null
-                                        ? data[index]['list']['restaurantID']
-                                            ['logo']
-                                        : null,
-                                address: data[index]['list']['address'],
-                                locationId: data[index]['list']['_id'],
-                                restaurantId: data[index]['list']
-                                    ['restaurantID']['_id'],
-                                cuisine: data[index]['list']['cuisine'],
-                                deliveryInfo:
-                                    data[index]['list']['deliveryInfo'] != null
-                                        ? data[index]['list']['deliveryInfo']
-                                            ['deliveryInfo']
-                                        : null,
-                                workingHours:
-                                    data[index]['list']['workingHours'] ?? null,
-                                locationInfo: data[index]['list'],
-                                taxInfo: widget.taxInfo,
-                                locale: widget.locale,
-                                localizedValues: widget.localizedValues,
-                              ),
-                            ),
-                          );
-                        })
-                    : InkWell(
-                        child: HomePageState.buildRestaurantCard(
-                            data[index],
-                            MyLocalizations.of(context)
-                                .getLocalizations("REVIEW"),
-                            MyLocalizations.of(context)
-                                .getLocalizations("BRANCHES")),
-                        onTap: () async {
-                          data[index]['list']['taxInfo'] = widget.taxInfo;
-                          if (mounted) {
-                            setState(() {
-                              restaurantInfo = data[index];
-                            });
-                            _showBottomSheet();
-                          }
-                        });
-              });
-        });
-  }
-
-  void _showBottomSheet() {
-    if (mounted) {
-      setState(() {
-        showBottomSheetCallback = null;
-      });
-    }
-    scaffoldKey.currentState
-        .showBottomSheet<void>((BuildContext context) {
-          return Container(
-            decoration: BoxDecoration(
-              border: Border(
-                top: BorderSide(color: PRIMARY, width: 6.0),
-              ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(6.0),
-              child: LocationListSheet(
-                restaurantInfo: restaurantInfo,
-                localizedValues: widget.localizedValues,
-                locale: widget.locale,
-              ),
-            ),
+          return Padding(
+            padding: const EdgeInsets.only(top: 20),
+            child: ((data?.length ?? 0) > 0)
+                ? ListView.builder(
+                    physics: ScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: data.length,
+                    padding: const EdgeInsets.all(0.0),
+                    itemBuilder: (BuildContext context, int index) {
+                      return InkWell(
+                          child: HomePageState.buildRestaurantCard(
+                              data[index],
+                              MyLocalizations.of(context).reviews,
+                              MyLocalizations.of(context).branches,
+                              widget.title ==
+                                      MyLocalizations.of(context).topRated
+                                  ? false
+                                  : widget.title ==
+                                          MyLocalizations.of(context)
+                                              .newlyArrived
+                                      ? false
+                                      : true),
+                          onTap: () {
+                            if (mounted) {
+                              setState(() {
+                                restaurantInfo = data[index];
+                              });
+                              HomePageState().goToProductListPage(
+                                  context,
+                                  data[index],
+                                  widget.title ==
+                                          MyLocalizations.of(context).topRated
+                                      ? false
+                                      : widget.title ==
+                                              MyLocalizations.of(context)
+                                                  .newlyArrived
+                                          ? false
+                                          : true,
+                                  widget.localizedValues,
+                                  widget.locale);
+                            }
+                          });
+                    })
+                : NoData(
+                    message: MyLocalizations.of(context).connectionError,
+                    icon: Icons.block),
           );
-        })
-        .closed
-        .whenComplete(() {
-          if (mounted) {
-            if (mounted) {
-              setState(() {
-                showBottomSheetCallback = _showBottomSheet;
-              });
-            }
-          }
         });
   }
 }

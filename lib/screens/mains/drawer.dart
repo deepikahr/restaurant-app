@@ -3,22 +3,25 @@ import 'dart:async';
 import 'package:RestaurantSaas/screens/mains/home.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../styles/styles.dart';
-import '../other/orders.dart';
-import '../../services/common.dart';
+
 import '../../screens/auth/login.dart';
 import '../../screens/mains/cart.dart';
-import '../other/about-us.dart';
-import '../other/profile.dart';
-import '../../services/profile-service.dart';
+import '../../services/common.dart';
 import '../../services/localizations.dart';
+import '../../services/profile-service.dart';
+import '../../styles/styles.dart';
+import '../other/about-us.dart';
+import '../other/orders.dart';
+import '../other/profile.dart';
 
 class DrawerPage extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
-  final Map localizedValues;
+  final Map<String, Map<String, String>> localizedValues;
   final String locale;
+
   DrawerPage({Key key, this.scaffoldKey, this.locale, this.localizedValues})
       : super(key: key);
+
   @override
   _DrawerPageState createState() => _DrawerPageState();
 }
@@ -116,8 +119,7 @@ class _DrawerPageState extends State<DrawerPage> {
                               : Container(height: 0, width: 0),
                           _buildMenuTileList(
                             'lib/assets/icon/spoon.png',
-                            MyLocalizations.of(context)
-                                .getLocalizations("HOME"),
+                            MyLocalizations.of(context).homePage,
                             0,
                             route: HomePage(
                               locale: widget.locale,
@@ -126,8 +128,7 @@ class _DrawerPageState extends State<DrawerPage> {
                           ),
                           _buildMenuTileList(
                             'lib/assets/icon/carte.png',
-                            MyLocalizations.of(context)
-                                .getLocalizations("CART"),
+                            MyLocalizations.of(context).cart,
                             cartCounter != null ? cartCounter : 0,
                             route: CartPage(
                               locale: widget.locale,
@@ -137,8 +138,7 @@ class _DrawerPageState extends State<DrawerPage> {
                           isLoggedIn
                               ? _buildMenuTileList(
                                   'lib/assets/icon/orderHistory.png',
-                                  MyLocalizations.of(context)
-                                      .getLocalizations("MY_ORDERS"),
+                                  MyLocalizations.of(context).myOrders,
                                   0,
                                   route: OrdersPage(
                                     locale: widget.locale,
@@ -160,8 +160,7 @@ class _DrawerPageState extends State<DrawerPage> {
                           isLoggedIn
                               ? _buildMenuTileList(
                                   'lib/assets/icon/settings.png',
-                                  MyLocalizations.of(context)
-                                      .getLocalizations("PROFILE"),
+                                  MyLocalizations.of(context).profile,
                                   0,
                                   route: ProfileApp(
                                       locale: widget.locale,
@@ -170,8 +169,7 @@ class _DrawerPageState extends State<DrawerPage> {
                               : Container(height: 0, width: 0),
                           _buildMenuTileList(
                             'lib/assets/icon/about.png',
-                            MyLocalizations.of(context)
-                                .getLocalizations("ABOUT_US"),
+                            MyLocalizations.of(context).aboutUs,
                             0,
                             route: AboutUs(
                               locale: widget.locale,
@@ -181,8 +179,7 @@ class _DrawerPageState extends State<DrawerPage> {
                           !isLoggedIn
                               ? _buildMenuTileList(
                                   'lib/assets/icon/loginIcon.png',
-                                  MyLocalizations.of(context)
-                                      .getLocalizations("LOGIN"),
+                                  MyLocalizations.of(context).login,
                                   0,
                                   route: LoginPage(
                                     locale: widget.locale,
@@ -193,8 +190,7 @@ class _DrawerPageState extends State<DrawerPage> {
                           isLoggedIn
                               ? _buildMenuTileList(
                                   'lib/assets/icon/loginIcon.png',
-                                  MyLocalizations.of(context)
-                                      .getLocalizations("LOGOUT"),
+                                  MyLocalizations.of(context).logout,
                                   0,
                                   check: false)
                               : Container(height: 0, width: 0),
@@ -212,10 +208,10 @@ class _DrawerPageState extends State<DrawerPage> {
   }
 
   Widget _buildMenuBg() {
-    return Image(
-        image: AssetImage("lib/assets/bgImgs/confirmedbg.png"),
-        fit: BoxFit.fill,
-        height: 800.0);
+    return Container(
+      height: MediaQuery.of(context).size.height,
+      color: Color(0XFF303030),
+    );
   }
 
   Widget _buildMenuProfileLogo(String imgUrl) {
@@ -263,17 +259,14 @@ class _DrawerPageState extends State<DrawerPage> {
               });
             }
             Common.removeToken().then((onValue) {
-              Common.removeCart().then((onValue) {
-                showSnackbar(MyLocalizations.of(context)
-                        .getLocalizations("LOGOUT_SUCCESSFULLY") +
-                    '!');
-                Navigator.pop(context);
-                if (mounted) {
-                  setState(() {
-                    isLoggedIn = false;
-                  });
-                }
-              });
+              showSnackbar(
+                  MyLocalizations.of(context).logoutSuccessfully + '!');
+              Navigator.pop(context);
+              if (mounted) {
+                setState(() {
+                  isLoggedIn = false;
+                });
+              }
             });
           }
         }
@@ -305,6 +298,7 @@ class _DrawerPageState extends State<DrawerPage> {
                     child: Text(
                       count.toString(),
                       textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white),
                     ),
                   ),
                 )
